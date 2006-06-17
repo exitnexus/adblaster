@@ -64,14 +64,6 @@ class AdCampaign{
 		 * */
 		return new AdCampaign(1,1,1);
 	}
-
-	public BannerView randomView(AdBlasterPolicy pol) {
-		// TODO Auto-generated method stub
-		User randomPick = u[(int) (Math.random()*u.length)];
-		int time = (int) (Math.random()*60*60*24);
-		Banner banner = b[(int) (Math.random()*b.length)];
-		return new BannerView(randomPick, banner, time);
-	}
 	
 
 }

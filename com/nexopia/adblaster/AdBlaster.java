@@ -10,8 +10,10 @@ public class AdBlaster {
 		
 		AdBlasterPolicy pol = new AdBlasterPolicy(ac);
 		
+		AdBlasterInstance instance = new AdBlasterInstance(1000, ac);
+		
 		for (int i = 0; i < 10; i++){
-			AdBlasterInstance instance = AdBlaster.generateInstance(pol, ac);
+			instance.fillInstance(pol);
 			pol = upgradePolicy(instance);
 		}
 	}
@@ -23,14 +25,6 @@ public class AdBlaster {
 
 	private static AdBlasterPolicy generatePolicy(AdCampaign ac) {
 		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private static AdBlasterInstance generateInstance(AdBlasterPolicy pol, AdCampaign ac) {
-		/*
-		 * Based on an existing policy, generate what we would have done with it.
-		 */
-		
 		return null;
 	}
 
