@@ -3,7 +3,13 @@
  */
 package com.nexopia.adblaster;
 
+import java.util.Vector;
+
 class AdCampaign{
+	int num_interests;
+	User u[];
+	Banner b[];
+
 	AdCampaign(int interests, int num_users, int num_banners){
 		u = new User[num_users];
 		for (int i = 0; i < num_users; i++){
@@ -16,10 +22,6 @@ class AdCampaign{
 		}
 		num_interests = interests;
 	}
-	
-	int num_interests;
-	User u[];
-	Banner b[];
 	
 	class Interests{
 		private Interests(){
@@ -42,4 +44,34 @@ class AdCampaign{
 			i = new Interests();
 		}
 	}
+
+	public static AdCampaign generateTestData(int num_banners, int num_users){
+		/*Generate a set of test banners and parameters
+		 * 
+		 * data: 
+		 * 	num_banners (int)
+		 *  banners (array)
+		 *   targetting data:
+		 *    max views daily (int)
+		 *    viewing ranges (time)
+		 *    profitability (float)
+		 *   
+		 *  num_users (int)
+		 *  users (array)
+		 *   targetting data
+		 *  
+		 * 
+		 * */
+		return new AdCampaign(1,1,1);
+	}
+
+	public BannerView randomView(AdBlasterPolicy pol) {
+		// TODO Auto-generated method stub
+		User randomPick = u[(int) (Math.random()*u.length)];
+		int time = (int) (Math.random()*60*60*24);
+		Banner banner = b[(int) (Math.random()*b.length)];
+		return new BannerView(randomPick, banner, time);
+	}
+	
+
 }
