@@ -42,11 +42,6 @@ public class AdBlasterInstance {
 			BannerView bv = (BannerView)views.get(i);
 			Banner b = getBestBanner(pol, bv);
 			bv.b = b;
-			try {
-				db.insert(bv);
-			} catch (DatabaseException dbe) {
-				System.err.println("DatabaseException: " + dbe);
-			}
 		}
 	}
 
@@ -91,7 +86,13 @@ public class AdBlasterInstance {
 	public static AdBlasterInstance randomInstance(int num, AdCampaign ac) {
 		AdBlasterInstance instance = new AdBlasterInstance(ac);
 		for (int i = 0; i < num; i++){
-			instance.views.add(instance.randomView(ac));
+			BannerView bv = instance.randomView(ac);
+			instance.views.add(bv);
+			try {
+				instance.db.insert(bv);
+			} catch (DatabaseException dbe) {
+				System.err.println("DatabaseException: " + dbe);
+			}
 		}
 		return instance;
 	}
