@@ -23,7 +23,7 @@ import com.sleepycat.je.SecondaryDatabase;
  */
 public class BannerViewDatabase {
 	Database db;
-	SecondaryDatabase timeDb;
+	SecondaryDatabase bannerTimeDb;
 	int lastid;
 	
 	public BannerViewDatabase(Environment dbEnv) throws DatabaseException {
@@ -47,16 +47,16 @@ public class BannerViewDatabase {
 		bannerTimeConf.setAllowCreate(true);
 		bannerTimeConf.setSortedDuplicates(true);
 		bannerTimeConf.setKeyCreator(bannerTimeKey);
-		SecondaryDatabase bannerTimeDb = dbEnv.openSecondaryDatabase(null, "BannerTimeViews", db, bannerTimeConf);
+		bannerTimeDb = dbEnv.openSecondaryDatabase(null, "BannerTimeViews", db, bannerTimeConf);
 		
+		/*
 		//Create a database keyed by BannerID
 		BannerKeyCreator bannerKey = new BannerKeyCreator();
 		SecondaryConfig bannerConf = new SecondaryConfig();
 		bannerConf.setAllowCreate(true);
 		bannerConf.setSortedDuplicates(true);
 		bannerConf.setKeyCreator(bannerTimeKey);
-		SecondaryDatabase bannerDb = dbEnv.openSecondaryDatabase(null, "BannerViews", db, bannerConf);
-		
+		SecondaryDatabase bannerDb = dbEnv.openSecondaryDatabase(null, "BannerViews", db, bannerConf);*/
 	}
 	
 	public void insert(BannerView bv) throws DatabaseException  {
@@ -73,6 +73,12 @@ public class BannerViewDatabase {
 		}
 	}
 	
+	public Cursor getCursor(int bannerID, int initialTime) throws DatabaseException {
+		Cursor c = bannerTimeDb.openCursor(null, null);
+		DatabaseEntry searchKey = BannerTimeKeyCreator.createDatabaseEntryKey(bannerID, initialTime);
+		c.getSearchKeyRange(searchKey, new DatabaseEntry(), null);
+		return c;
+	}
 	
 	
 	private static int byteArrayToInt(byte[] b) {
@@ -92,4 +98,5 @@ public class BannerViewDatabase {
         }
         return b;
     }
+	
 }

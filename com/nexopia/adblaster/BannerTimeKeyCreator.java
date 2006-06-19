@@ -28,6 +28,17 @@ public class BannerTimeKeyCreator implements SecondaryKeyCreator {
 		secondaryKey.setData(intToByteArray(bv.getTime()));
 		return true;
 	}
+	
+	public static DatabaseEntry createDatabaseEntryKey(int bannerid, int time) {
+		DatabaseEntry secondaryKey = new DatabaseEntry();
+		secondaryKey.setPartial(true);
+		secondaryKey.setPartialLength(4);
+		secondaryKey.setPartialOffset(0);
+		secondaryKey.setData(intToByteArray(bannerid));
+		secondaryKey.setPartialOffset(4);
+		secondaryKey.setData(intToByteArray(time));
+		return secondaryKey;
+	}
 
 	private static byte[] intToByteArray(int value) {
         byte[] b = new byte[4];
