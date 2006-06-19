@@ -1,6 +1,11 @@
 package com.nexopia.adblaster;
 
+import java.io.File;
 import java.util.Vector;
+
+import com.sleepycat.je.DatabaseException;
+import com.sleepycat.je.Environment;
+import com.sleepycat.je.EnvironmentConfig;
 
 
 /*
@@ -10,8 +15,20 @@ import java.util.Vector;
 public class AdBlasterInstance {
 	Vector views;
 	AdCampaign campaign;
+	Environment dbEnv;
+	BannerViewDatabase db;
+	
 	
 	AdBlasterInstance(AdCampaign ac){
+		try {
+			EnvironmentConfig envConf = new EnvironmentConfig();
+			envConf.setAllowCreate(true);
+			dbEnv = new Environment(new File("BerkDBTester.db"), envConf);
+			db = new BannerViewDatabase(dbEnv);
+		} catch (DatabaseException dbe) {
+			System.err.println("DatabaseException: " + dbe);
+		}
+		
 		campaign = ac;
 		views = new Vector();
 	}
@@ -25,6 +42,11 @@ public class AdBlasterInstance {
 			BannerView bv = (BannerView)views.get(i);
 			Banner b = getBestBanner(pol, bv);
 			bv.b = b;
+			try {
+				db.insert(bv);
+			} catch (DatabaseException dbe) {
+				System.err.println("DatabaseException: " + dbe);
+			}
 		}
 	}
 
