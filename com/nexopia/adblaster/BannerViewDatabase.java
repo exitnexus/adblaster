@@ -13,6 +13,7 @@ import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
 import com.sleepycat.je.SecondaryConfig;
+import com.sleepycat.je.SecondaryCursor;
 import com.sleepycat.je.SecondaryDatabase;
 
 /**
@@ -73,11 +74,11 @@ public class BannerViewDatabase {
 		}
 	}
 	
-	public Cursor getCursor(int bannerID, int initialTime) throws DatabaseException {
-		Cursor c = bannerTimeDb.openCursor(null, null);
+	public BannerViewCursor getCursor(int bannerID, int initialTime) throws DatabaseException {
+		SecondaryCursor c = bannerTimeDb.openSecondaryCursor(null, null);
 		DatabaseEntry searchKey = BannerTimeKeyCreator.createDatabaseEntryKey(bannerID, initialTime);
 		c.getSearchKeyRange(searchKey, new DatabaseEntry(), null);
-		return c;
+		return new BannerViewCursor(c);
 	}
 	
 	
