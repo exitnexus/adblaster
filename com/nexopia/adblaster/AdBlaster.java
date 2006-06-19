@@ -3,6 +3,8 @@ package com.nexopia.adblaster;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.Vector;
 
 import javax.swing.JFrame;
@@ -13,6 +15,8 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.*;
+
+import com.sleepycat.je.DatabaseException;
 
 public class AdBlaster {
 
@@ -34,11 +38,6 @@ public class AdBlaster {
 		AdCampaign ac = AdCampaign.generateTestData(num_banners, num_users);
 		AdBlasterPolicy pol = AdBlasterPolicy.randomPolicy(ac);
 		
-		JPanel statPanel = new JPanel();
-		statPanel.setLayout(new BoxLayout(statPanel, BoxLayout.PAGE_AXIS));
-		statPanel.add(new JScrollPane(getBannerTable(ac)));
-		
-		panel.add(statPanel, BorderLayout.SOUTH);
 		JPanel resultPanel = new JPanel(new BorderLayout());
 		
 		for (int day = 0; day < 10; day++){
@@ -61,9 +60,46 @@ public class AdBlaster {
 				resultPanel.add(new JTextField(""+instance.totalProfit()+"/"+maxProfit(instance)), BorderLayout.PAGE_END);
 				
 			}
+			for(int i = 0; i < instance.views.size(); i++){
+				try {
+					instance.db.insert((BannerView)instance.views.get(i));
+				} catch (DatabaseException dbe) {
+					System.err.println("DatabaseException: " + dbe);
+				}
+				
+			}
+
 		}
+		JPanel statPanel = new JPanel();
+		statPanel.setLayout(new BoxLayout(statPanel, BoxLayout.PAGE_AXIS));
+		statPanel.add(new JScrollPane(getBannerTable(ac, pol)));
+		panel.add(statPanel, BorderLayout.SOUTH);
+
 		panel.setPreferredSize(new Dimension(800,600));
 		frame.setSize(800,600);
+		frame.addWindowListener(new WindowListener(){
+
+			public void windowOpened(WindowEvent e) {
+			}
+
+			public void windowClosing(WindowEvent e) {
+			}
+
+			public void windowClosed(WindowEvent e) {
+				System.exit(0);
+			}
+
+			public void windowIconified(WindowEvent e) {
+			}
+
+			public void windowDeiconified(WindowEvent e) {
+			}
+
+			public void windowActivated(WindowEvent e) {
+			}
+
+			public void windowDeactivated(WindowEvent e) {
+			}});
 		frame.pack();
 		frame.setVisible(true);
 		
@@ -93,14 +129,15 @@ public class AdBlaster {
 		return instance.totalProfit();
 	}
 
-	private static JTable getBannerTable(AdCampaign ac) {
+	private static JTable getBannerTable(AdCampaign ac, AdBlasterPolicy pol) {
 		// TODO Auto-generated method stub
-		DefaultTableModel model = new DefaultTableModel(ac.b.length,3);
+		DefaultTableModel model = new DefaultTableModel(ac.b.length,4);
 		JTable table = new JTable(model);
 		for (int i = 0; i < ac.b.length; i++){
 			model.setValueAt(""+ac.b[i].getID(), i,0);
 			model.setValueAt(""+ac.b[i].profit, i,1);
 			model.setValueAt(""+ac.b[i].max_hits, i,2);
+			model.setValueAt((Float)pol.coefficients.get(ac.b[i]), i,3);
 		}
 		return table;
 	}

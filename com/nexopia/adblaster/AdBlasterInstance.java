@@ -88,11 +88,6 @@ public class AdBlasterInstance {
 		for (int i = 0; i < num; i++){
 			BannerView bv = instance.randomView(ac);
 			instance.views.add(bv);
-			try {
-				instance.db.insert(bv);
-			} catch (DatabaseException dbe) {
-				System.err.println("DatabaseException: " + dbe);
-			}
 		}
 		return instance;
 	}

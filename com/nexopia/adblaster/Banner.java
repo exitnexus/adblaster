@@ -22,7 +22,7 @@ class Banner{
 	Banner(){
 		interests = new Interests();
 		id = counter(); //TODO Banners need an ID we can track them by
-		max_hits = (int) (Math.pow((Math.random()-0.5) * 2,2) * 1000);
+		max_hits = (int) (Math.pow((Math.random()-0.5) * 2,2) * 100000);
 		this.profit = Math.random();
 	}
 	
