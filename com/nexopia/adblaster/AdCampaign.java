@@ -23,51 +23,6 @@ class AdCampaign{
 		num_interests = interests;
 	}
 	
-	class Interests{
-		private Interests(){
-		  checked = new boolean[num_interests];
-		}
-		public boolean checked[];
-	}
-	class User{
-		String name;
-		Interests i;
-		int id;
-		User(String s){
-			name = s;
-			i = new Interests();
-			id = 0; //TODO Thomas we shouldn't care about the user's name, just their ID 
-		}
-		
-		User(int id) {
-			this.id = id;
-			i = new Interests();
-			name = ""; //TODO username questions arrises here again
-		}
-		
-		int getID() {
-			return id;
-		}
-	}
-	
-	class Banner{
-		Interests i;
-		int id;
-		Banner(){
-			i = new Interests();
-			id = 0; //TODO Banners need an ID we can track them by
-		}
-		
-		Banner(int id) {
-			this.i = new Interests();
-			this.id = id;
-		}
-		
-		int getID() {
-			return id;
-		}
-	}
-
 	public static AdCampaign generateTestData(int num_banners, int num_users){
 		/*Generate a set of test banners and parameters
 		 * 

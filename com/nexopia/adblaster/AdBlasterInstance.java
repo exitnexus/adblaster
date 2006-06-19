@@ -2,8 +2,6 @@ package com.nexopia.adblaster;
 
 import java.util.Vector;
 
-import com.nexopia.adblaster.AdCampaign.Banner;
-import com.nexopia.adblaster.AdCampaign.User;
 
 /*
  * A representation of all data we store for one day, along with some functions to

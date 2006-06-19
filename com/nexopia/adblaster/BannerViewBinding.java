@@ -9,8 +9,6 @@ package com.nexopia.adblaster;
 import com.sleepycat.bind.tuple.TupleBinding;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
-import com.nexopia.adblaster.AdCampaign.Banner;
-import com.nexopia.adblaster.AdCampaign.User;
 
 /**
  * @author wolfe

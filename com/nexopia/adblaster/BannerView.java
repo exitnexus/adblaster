@@ -3,8 +3,6 @@
  */
 package com.nexopia.adblaster;
 
-import com.nexopia.adblaster.AdCampaign.Banner;
-import com.nexopia.adblaster.AdCampaign.User;
 
 class BannerView{
 	User u;
