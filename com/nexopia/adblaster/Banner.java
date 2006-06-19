@@ -9,16 +9,21 @@ package com.nexopia.adblaster;
 
 
 class Banner{
-	Interests i;
+	Interests interests;
 	int id;
+	public double profit;
+	int max_hits;
+	
 	Banner(){
-		i = new Interests();
+		interests = new Interests();
 		id = 0; //TODO Banners need an ID we can track them by
+		max_hits = (int) (Math.random() * 1000);
 	}
 	
 	Banner(int id) {
-		this.i = new Interests();
+		this.interests = new Interests();
 		this.id = id;
+		this.profit = 0;
 	}
 	
 	int getID() {

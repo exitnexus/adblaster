@@ -14,4 +14,7 @@ class Interests{
 	  checked = new Vector();
 	}
 	public Vector checked;
+	public boolean has(int k) {
+		return checked.contains(new Integer(k));
+	}
 }
