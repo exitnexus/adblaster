@@ -11,6 +11,8 @@ import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
+import com.sleepycat.je.SecondaryConfig;
+import com.sleepycat.je.SecondaryDatabase;
 
 /**
  * @author wolfe
@@ -30,17 +32,17 @@ public class BerkDBTester {
 			DatabaseConfig dbConf = new DatabaseConfig();
 			dbConf.setAllowCreate(true);
 			db = dbEnv.openDatabase(null, "BerkDBTester1", dbConf);
-			DatabaseEntry key = new DatabaseEntry(intToByteArray(1));
-			DatabaseEntry value = new DatabaseEntry(intToByteArray(10000));
-			db.put(null, key, value);
-			DatabaseEntry result = new DatabaseEntry();
-			db.get(null, key, result, null);
-			System.out.println("result:" + result);
+			TimeKeyCreator timeKey = new TimeKeyCreator();
+			SecondaryConfig secConf = new SecondaryConfig();
+			secConf.setAllowCreate(true);
+			secConf.setSortedDuplicates(true);
+			secConf.setKeyCreator(timeKey);
+			SecondaryDatabase timeDb = dbEnv.openSecondaryDatabase(null, "TimeBerkDBTester1", db, secConf);
+			
 		} catch (DatabaseException dbe) {
 			System.err.println("Exception: " + dbe);
 		} finally {
 		}
-		System.out.println("Hello World!");
 	}
 	
 	public static byte[] intToByteArray(int value) {
@@ -52,3 +54,4 @@ public class BerkDBTester {
         return b;
     }
 }
+
