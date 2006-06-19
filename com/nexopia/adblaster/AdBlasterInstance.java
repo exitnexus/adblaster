@@ -19,7 +19,12 @@ public class AdBlasterInstance {
 	public void fillInstance(AdBlasterPolicy pol){
 		for (int i = 0; i < views.size(); i++){
 			BannerView bv = (BannerView)views.get(i);
-			bv.b = getBestBanner(pol, bv);
+			bv.b = null;
+		}
+		for (int i = 0; i < views.size(); i++){
+			BannerView bv = (BannerView)views.get(i);
+			Banner b = getBestBanner(pol, bv);
+			bv.b = b;
 		}
 	}
 
@@ -32,11 +37,8 @@ public class AdBlasterInstance {
 		for (int j = 0; j < campaign.b.length; j++){
 			Banner b = campaign.b[j];
 			float score = ((Float)pol.coefficients.get(b)).floatValue();
-			for (int k = 0; k < b.interests.checked.size(); k++){
-				//score += (b.interests.has(k) && u.interests.has(k) ? 1:0) * pol.coefficients[k];
-				Integer interest = (Integer)b.interests.checked.get(k);
-				if (!u.interests.has(interest.intValue()))
-					score = -1;
+			if (!isValidBannerForUser(u, b) || (this.count(b) >= b.max_hits)){
+				score = -1;
 			}
 			if (score > bestScore){
 				bestScore = score;
@@ -46,6 +48,15 @@ public class AdBlasterInstance {
 		
 		Banner banner = campaign.b[bestMatch];
 		return banner;
+	}
+
+	public boolean isValidBannerForUser(User u, Banner b) {
+		for (int k = 0; k < b.interests.checked.size(); k++){
+			Integer interest = (Integer)b.interests.checked.get(k);
+			if (!u.interests.has(interest.intValue()))
+				return false;
+		}
+		return true;
 	}
 	
 	public BannerView randomView(AdCampaign campaign) {
@@ -85,6 +96,16 @@ public class AdBlasterInstance {
 		for (int i = 0; i < views.size(); i++){
 			if (((BannerView)views.get(i)).b == banner){
 				count ++;
+			}
+		}
+		return count;
+	}
+
+	public float totalProfit() {
+		float count = 0;
+		for (int i = 0; i < views.size(); i++){
+			if (((BannerView)views.get(i)).b != null){
+				count += ((BannerView)views.get(i)).b.profit;
 			}
 		}
 		return count;

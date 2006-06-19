@@ -10,7 +10,7 @@ class AdCampaign{
 	User u[];
 	Banner b[];
 
-	AdCampaign(int interests, int num_users, int num_banners){
+	AdCampaign(int interests, int num_banners, int num_users){
 		u = new User[num_users];
 		for (int i = 0; i < num_users; i++){
 			u[i] = new User("User" + i);
@@ -49,7 +49,16 @@ class AdCampaign{
 			}
 		}
 		
-		for(int i = 0; i < num_banners; i++){
+		/* Add a foolproof banner that never pays and never runs out.
+		 * 
+		 */
+		ac.b[0].profit = 0;
+		ac.b[0].max_hits = Integer.MAX_VALUE;
+		for (int j = 0; j < ac.num_interests; j++){
+			ac.b[0].interests.checked.add(new Integer(j));
+		}
+		
+		for(int i = 1; i < num_banners; i++){
 			ac.b[i].profit = Math.random();
 			for (int j = 0; j < ac.num_interests; j++){
 				if (Math.random() > 0.5){

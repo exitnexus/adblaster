@@ -14,19 +14,27 @@ class Banner{
 	public double profit;
 	int max_hits;
 	
+	static int count = 0;
+	public static int counter(){
+		return count++;
+	}
+	
 	Banner(){
 		interests = new Interests();
-		id = 0; //TODO Banners need an ID we can track them by
-		max_hits = (int) (Math.random() * 1000);
+		id = counter(); //TODO Banners need an ID we can track them by
+		max_hits = (int) (Math.pow((Math.random()-0.5) * 2,2) * 1000);
+		this.profit = Math.random();
 	}
 	
 	Banner(int id) {
-		this.interests = new Interests();
+		this();
 		this.id = id;
-		this.profit = 0;
 	}
 	
 	int getID() {
 		return id;
+	}
+	public String toString(){
+		return "" + this.id + "," + this.profit;
 	}
 }
