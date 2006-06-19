@@ -3,6 +3,8 @@ package com.nexopia.adblaster;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.Vector;
@@ -40,10 +42,10 @@ public class AdBlaster {
 		
 		JPanel resultPanel = new JPanel(new BorderLayout());
 		
-		for (int day = 0; day < 10; day++){
+		for (int day = 0; day < 1; day++){
 			System.out.println("Day "+ day);
 			AdBlasterInstance instance = AdBlasterInstance.randomInstance(num_serves, ac);
-			for (int i = 0; i < 2; i++){
+			for (int i = 0; i < 50; i++){
 				instance.fillInstance(pol);
 				upgradePolicy(instance, pol);
 
@@ -78,28 +80,24 @@ public class AdBlaster {
 		panel.setPreferredSize(new Dimension(800,600));
 		frame.setSize(800,600);
 		frame.addWindowListener(new WindowListener(){
+			public void windowOpened(WindowEvent e) {			}
 
-			public void windowOpened(WindowEvent e) {
-			}
-
-			public void windowClosing(WindowEvent e) {
-			}
-
-			public void windowClosed(WindowEvent e) {
+			public void windowClosing(WindowEvent e) {			
 				System.exit(0);
 			}
 
-			public void windowIconified(WindowEvent e) {
+			public void windowClosed(WindowEvent e) {		
+				System.exit(0);
 			}
 
-			public void windowDeiconified(WindowEvent e) {
-			}
+			public void windowIconified(WindowEvent e) {			}
 
-			public void windowActivated(WindowEvent e) {
-			}
+			public void windowDeiconified(WindowEvent e) {			}
 
-			public void windowDeactivated(WindowEvent e) {
-			}});
+			public void windowActivated(WindowEvent e) {			}
+
+			public void windowDeactivated(WindowEvent e) {			}}
+		);
 		frame.pack();
 		frame.setVisible(true);
 		
@@ -129,16 +127,42 @@ public class AdBlaster {
 		return instance.totalProfit();
 	}
 
-	private static JTable getBannerTable(AdCampaign ac, AdBlasterPolicy pol) {
+	private static JTable getBannerTable(final AdCampaign ac, AdBlasterPolicy pol) {
 		// TODO Auto-generated method stub
 		DefaultTableModel model = new DefaultTableModel(ac.b.length,4);
-		JTable table = new JTable(model);
+		final JTable table = new JTable(model);
 		for (int i = 0; i < ac.b.length; i++){
 			model.setValueAt(""+ac.b[i].getID(), i,0);
 			model.setValueAt(""+ac.b[i].profit, i,1);
 			model.setValueAt(""+ac.b[i].max_hits, i,2);
 			model.setValueAt((Float)pol.coefficients.get(ac.b[i]), i,3);
 		}
+		
+		table.addMouseListener(new MouseListener(){
+
+			public void mouseClicked(MouseEvent e) {
+				System.out.println(ac.b[table.getSelectedRow()].interests.checked);
+			}
+
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}});
 		return table;
 	}
 
