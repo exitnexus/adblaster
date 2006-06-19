@@ -8,8 +8,8 @@ import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.SecondaryDatabase;
 import com.sleepycat.je.SecondaryKeyCreator;
 
-public class TimeKeyCreator implements SecondaryKeyCreator {
-	public TimeKeyCreator() {
+public class BannerTimeKeyCreator implements SecondaryKeyCreator {
+	public BannerTimeKeyCreator() {
 	}
 	
 	/* (non-Javadoc)
@@ -20,6 +20,11 @@ public class TimeKeyCreator implements SecondaryKeyCreator {
 			throws DatabaseException {
 		BannerViewBinding bvb = new BannerViewBinding();
 		BannerView bv = (BannerView)bvb.entryToObject(data);
+		secondaryKey.setPartial(true);
+		secondaryKey.setPartialLength(4);
+		secondaryKey.setPartialOffset(0);
+		secondaryKey.setData(intToByteArray(bv.getBanner().getID()));
+		secondaryKey.setPartialOffset(4);
 		secondaryKey.setData(intToByteArray(bv.getTime()));
 		return true;
 	}

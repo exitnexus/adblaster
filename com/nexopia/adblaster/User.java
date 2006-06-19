@@ -8,12 +8,11 @@ package com.nexopia.adblaster;
 
 
 
-class User{
-	String name;
+class User {
 	Interests interests;
 	int id;
+	
 	User(String s){
-		name = s;
 		interests = new Interests();
 		id = 0; //TODO Thomas we shouldn't care about the user's name, just their ID 
 	}
@@ -21,7 +20,6 @@ class User{
 	User(int id) {
 		this.id = id;
 		interests = new Interests();
-		name = ""; //TODO username questions arrises here again
 	}
 	
 	int getID() {
@@ -29,6 +27,6 @@ class User{
 	}
 	
 	public String toString(){
-		return name;
+		return new Integer(id).toString();
 	}
 }
