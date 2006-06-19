@@ -38,12 +38,12 @@ public class BerkDBTester {
 			secConf.setSortedDuplicates(true);
 			secConf.setKeyCreator(timeKey);
 			SecondaryDatabase timeDb = dbEnv.openSecondaryDatabase(null, "TimeBerkDBTester1", db, secConf);
-			
 		} catch (DatabaseException dbe) {
 			System.err.println("Exception: " + dbe);
 		} finally {
 		}
 	}
+	
 	
 	public static byte[] intToByteArray(int value) {
         byte[] b = new byte[4];
