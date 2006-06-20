@@ -6,7 +6,6 @@
  */
 package com.nexopia.adblaster;
 
-import com.sleepycat.je.Cursor;
 import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.SecondaryCursor;
@@ -25,15 +24,18 @@ public class BannerViewCursor {
 	
 	public BannerView getNext() {
 		DatabaseEntry data = new DatabaseEntry();
+		DatabaseEntry key = new DatabaseEntry();
 		try {
-			c.getNext(new DatabaseEntry(), data, null);
+			c.getNext(key, data, null);
 		} catch (DatabaseException e) {
-			System.out.println("Database Exception: " + e);
+			System.out.println("DatabaseException: " + e);
+			e.printStackTrace();
 			return null;
 		}
 		if (data.getData() != null) {
 			BannerViewBinding bvb = new BannerViewBinding();
 			BannerView bv = (BannerView)bvb.entryToObject(data);
+			System.out.println(key.getData() + "-" + data.getData());
 			return bv;
 		} else {
 			return null;
@@ -46,10 +48,15 @@ public class BannerViewCursor {
 			c.getCurrent(new DatabaseEntry(), data, null);
 		} catch (DatabaseException e) {
 			System.out.println("Database Exception: " + e);
+			e.printStackTrace();
 			return null;
 		}
-		BannerViewBinding bvb = new BannerViewBinding();
-		BannerView bv = (BannerView)bvb.entryToObject(data);
-		return bv;
+		if (data.getData() != null) {
+			BannerViewBinding bvb = new BannerViewBinding();
+			BannerView bv = (BannerView)bvb.entryToObject(data);
+			return bv;
+		} else {
+			return null;
+		}
 	}
 }

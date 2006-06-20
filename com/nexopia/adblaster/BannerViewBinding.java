@@ -39,5 +39,4 @@ class BannerViewBinding extends TupleBinding {
 		to.writeInt(bv.getUser().getID());
 
 	}
-
 }

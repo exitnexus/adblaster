@@ -3,12 +3,15 @@
  */
 package com.nexopia.adblaster;
 
+import com.sleepycat.bind.tuple.TupleBinding;
+import com.sleepycat.bind.tuple.TupleInput;
+import com.sleepycat.bind.tuple.TupleOutput;
 import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.SecondaryDatabase;
 import com.sleepycat.je.SecondaryKeyCreator;
 
-public class BannerTimeKeyCreator implements SecondaryKeyCreator {
+public class BannerTimeKeyCreator extends TupleBinding implements SecondaryKeyCreator {
 	public BannerTimeKeyCreator() {
 	}
 	
@@ -20,32 +23,27 @@ public class BannerTimeKeyCreator implements SecondaryKeyCreator {
 			throws DatabaseException {
 		BannerViewBinding bvb = new BannerViewBinding();
 		BannerView bv = (BannerView)bvb.entryToObject(data);
-		secondaryKey.setPartial(true);
-		secondaryKey.setPartialLength(4);
-		secondaryKey.setPartialOffset(0);
-		secondaryKey.setData(intToByteArray(bv.getBanner().getID()));
-		secondaryKey.setPartialOffset(4);
-		secondaryKey.setData(intToByteArray(bv.getTime()));
+		int[] a = { bv.getBanner().getID(), bv.getTime() };
+		objectToEntry(a, secondaryKey);
 		return true;
 	}
 	
-	public static DatabaseEntry createDatabaseEntryKey(int bannerid, int time) {
-		DatabaseEntry secondaryKey = new DatabaseEntry();
-		secondaryKey.setPartial(true);
-		secondaryKey.setPartialLength(4);
-		secondaryKey.setPartialOffset(0);
-		secondaryKey.setData(intToByteArray(bannerid));
-		secondaryKey.setPartialOffset(4);
-		secondaryKey.setData(intToByteArray(time));
-		return secondaryKey;
+	/* (non-Javadoc)
+	 * @see com.sleepycat.bind.tuple.TupleBinding#entryToObject(com.sleepycat.bind.tuple.TupleInput)
+	 */
+	public Object entryToObject(TupleInput ti) {
+		int[] obj = new int[2];
+		obj[0] = ti.readInt(); //bannerID
+		obj[1] = ti.readInt(); //time
+		return obj;
 	}
 
-	private static byte[] intToByteArray(int value) {
-        byte[] b = new byte[4];
-        for (int i = 0; i < 4; i++) {
-            int offset = (b.length - 1 - i) * 8;
-            b[i] = (byte) ((value >>> offset) & 0xFF);
-        }
-        return b;
-    }
+	/* (non-Javadoc)
+	 * @see com.sleepycat.bind.tuple.TupleBinding#objectToEntry(java.lang.Object, com.sleepycat.bind.tuple.TupleOutput)
+	 */
+	public void objectToEntry(Object obj, TupleOutput to) {
+		int[] a = (int[])obj;
+		to.writeInt(a[0]); //bannerid
+		to.writeInt(a[1]); //time
+	}
 }

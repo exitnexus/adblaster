@@ -49,15 +49,6 @@ public class BannerViewDatabase {
 		bannerTimeConf.setSortedDuplicates(true);
 		bannerTimeConf.setKeyCreator(bannerTimeKey);
 		bannerTimeDb = dbEnv.openSecondaryDatabase(null, "BannerTimeViews", db, bannerTimeConf);
-		
-		/*
-		//Create a database keyed by BannerID
-		BannerKeyCreator bannerKey = new BannerKeyCreator();
-		SecondaryConfig bannerConf = new SecondaryConfig();
-		bannerConf.setAllowCreate(true);
-		bannerConf.setSortedDuplicates(true);
-		bannerConf.setKeyCreator(bannerTimeKey);
-		SecondaryDatabase bannerDb = dbEnv.openSecondaryDatabase(null, "BannerViews", db, bannerConf);*/
 	}
 	
 	public void insert(BannerView bv) throws DatabaseException  {
@@ -76,7 +67,10 @@ public class BannerViewDatabase {
 	
 	public BannerViewCursor getCursor(int bannerID, int initialTime) throws DatabaseException {
 		SecondaryCursor c = bannerTimeDb.openSecondaryCursor(null, null);
-		DatabaseEntry searchKey = BannerTimeKeyCreator.createDatabaseEntryKey(bannerID, initialTime);
+		BannerTimeKeyCreator bt = new BannerTimeKeyCreator();
+		DatabaseEntry searchKey = new DatabaseEntry();
+		int[] a = { bannerID, initialTime };
+		bt.objectToEntry(a, searchKey);
 		c.getSearchKeyRange(searchKey, new DatabaseEntry(), null);
 		return new BannerViewCursor(c);
 	}
