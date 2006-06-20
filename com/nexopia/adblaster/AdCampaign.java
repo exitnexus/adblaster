@@ -13,7 +13,7 @@ class AdCampaign{
 	AdCampaign(int interests, int num_banners, int num_users){
 		u = new User[num_users];
 		for (int i = 0; i < num_users; i++){
-			u[i] = new User("User" + i);
+			u[i] = new User(i, null); //TODO we're passing in a null database here which is bad in the long run
 		}
 		
 		b = new Banner[num_banners];
@@ -44,7 +44,7 @@ class AdCampaign{
 		for (int i = 0; i < num_users; i++){
 			for (int j = 0; j < ac.num_interests; j++){
 				if (Math.random() > 0.75){
-					ac.u[i].interests.checked.add(new Integer(j));
+					ac.u[i].interests.add(new Integer(j));
 				}
 			}
 		}
@@ -54,13 +54,14 @@ class AdCampaign{
 		 */
 		ac.b[0].profit = 0;
 		ac.b[0].max_hits = Integer.MAX_VALUE;
-		ac.b[0].interests.checked.clear();
+
+		ac.b[0].interests.getChecked().clear();
 
 		for(int i = 1; i < num_banners; i++){
 			ac.b[i].profit = Math.random();
 			for (int j = 0; j < ac.num_interests; j++){
 				if (Math.random() > 0.95){
-					ac.b[i].interests.checked.add(new Integer(j));
+					ac.b[i].interests.add(new Integer(j));
 				}
 			}
 		}

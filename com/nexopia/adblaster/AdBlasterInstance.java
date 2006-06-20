@@ -66,8 +66,8 @@ public class AdBlasterInstance {
 	}
 
 	public boolean isValidBannerForUser(User u, Banner b) {
-		for (int k = 0; k < b.interests.checked.size(); k++){
-			Integer interest = (Integer)b.interests.checked.get(k);
+		for (int k = 0; k < b.interests.getChecked().size(); k++){
+			Integer interest = (Integer)b.interests.getChecked().get(k);
 			if (!u.interests.has(interest.intValue()))
 				return false;
 		}

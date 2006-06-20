@@ -6,15 +6,34 @@
  */
 package com.nexopia.adblaster;
 
+import java.util.StringTokenizer;
 import java.util.Vector;
 
 
 class Interests{
-	public Interests(){
+	private Vector checked;
+	
+	Interests(){
 	  checked = new Vector();
 	}
-	public Vector checked;
-	public boolean has(int k) {
+	
+	Interests(String interests) {
+		StringTokenizer st = new StringTokenizer(interests, ",");
+		while (st.hasMoreTokens()) {
+			checked.add(new Integer(Integer.parseInt(st.nextToken())));
+		}
+	}
+	
+	boolean has(int k) {
 		return checked.contains(new Integer(k));
 	}
+	
+	void add(Integer i) {
+		checked.add(i);
+	}
+	
+	Vector getChecked() {
+		return checked;
+	}
+	
 }

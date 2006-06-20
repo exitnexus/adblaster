@@ -35,7 +35,6 @@ public class BannerViewCursor {
 		if (data.getData() != null) {
 			BannerViewBinding bvb = new BannerViewBinding();
 			BannerView bv = (BannerView)bvb.entryToObject(data);
-			System.out.println(key.getData() + "-" + data.getData());
 			return bv;
 		} else {
 			return null;

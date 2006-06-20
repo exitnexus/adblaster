@@ -144,7 +144,7 @@ public class AdBlaster {
 		table.addMouseListener(new MouseListener(){
 
 			public void mouseClicked(MouseEvent e) {
-				System.out.println(ac.b[table.getSelectedRow()].interests.checked);
+				System.out.println(ac.b[table.getSelectedRow()].interests.getChecked());
 			}
 
 			public void mousePressed(MouseEvent e) {			}

@@ -11,24 +11,61 @@ package com.nexopia.adblaster;
 class User {
 	Interests interests;
 	int id;
+	byte age;
+	byte sex;
+	short location;
 	
-	static int userid = 0;
-	
-	User(String s){
-		interests = new Interests();
-		id = userid++; 
+	User(int id, UserDatabase db) {
+		try {
+			User u = db.getUser(id);
+			id = u.id;
+			age = u.age;
+			sex = u.sex;
+			location = u.location;
+			interests = u.interests;
+		} catch (Exception e) {
+			this.id = id;
+			this.interests = new Interests();
+		}
 	}
 	
-	User(int id) {
+	User(int id, byte age, byte sex, short location, String interests) {
 		this.id = id;
-		interests = new Interests();
+		this.age = age;
+		this.sex = sex;
+		this.location = location;
+		this.interests = new Interests(interests);
 	}
-	
+
 	int getID() {
 		return id;
 	}
 	
 	public String toString(){
 		return new Integer(id).toString();
+	}
+	byte getAge() {
+		return age;
+	}
+	void setAge(byte age) {
+		this.age = age;
+	}
+	Interests getInterests() {
+		return interests;
+	}
+	void setInterests(Interests interests) {
+		this.interests = interests;
+	}
+	short getLocation() {
+		return location;
+	}
+	void setLocation(short location) {
+		this.location = location;
+	}
+	byte getSex() {
+		return sex;
+	}
+	void setSex(byte sex) {
+		this.sex = sex;
 	}
 }
