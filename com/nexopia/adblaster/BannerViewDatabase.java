@@ -37,7 +37,9 @@ public class BannerViewDatabase {
 		cur.getLast(lastKey, new DatabaseEntry(), null);
 		
 		if (lastKey != null && lastKey.getData() != null) {
-			lastid = byteArrayToInt(lastKey.getData());
+			IntegerBinding ib = new IntegerBinding();
+			Integer i = (Integer)ib.entryToObject(lastKey); 
+			lastid = i.intValue();
 		} else {
 			lastid = 0;
 		}
@@ -54,7 +56,9 @@ public class BannerViewDatabase {
 	public void insert(BannerView bv) throws DatabaseException  {
 		try {
 			lastid++;
-			DatabaseEntry key = new DatabaseEntry(intToByteArray(lastid));
+			IntegerBinding ib = new IntegerBinding();
+			DatabaseEntry key = new DatabaseEntry();
+			ib.objectToEntry(new Integer(lastid), key);
 			BannerViewBinding bvb = new BannerViewBinding();
 			DatabaseEntry data = new DatabaseEntry();
 			bvb.objectToEntry(bv, data);
@@ -74,24 +78,5 @@ public class BannerViewDatabase {
 		c.getSearchKeyRange(searchKey, new DatabaseEntry(), null);
 		return new BannerViewCursor(c);
 	}
-	
-	
-	private static int byteArrayToInt(byte[] b) {
-        int value = 0;
-        for (int i = 0; i < 4; i++) {
-            int shift = (4 - 1 - i) * 8;
-            value += (b[i] & 0x000000FF) << shift;
-        }
-        return value;
-    }
-	
-	private static byte[] intToByteArray(int value) {
-        byte[] b = new byte[4];
-        for (int i = 0; i < 4; i++) {
-            int offset = (b.length - 1 - i) * 8;
-            b[i] = (byte) ((value >>> offset) & 0xFF);
-        }
-        return b;
-    }
 	
 }

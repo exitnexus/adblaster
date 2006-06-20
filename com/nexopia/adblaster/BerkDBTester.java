@@ -6,7 +6,6 @@ package com.nexopia.adblaster;
 import java.io.File;
 import java.util.Random;
 
-import com.sleepycat.je.Cursor;
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
