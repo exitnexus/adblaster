@@ -1,7 +1,6 @@
 package com.nexopia.adblaster;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -15,7 +14,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 import javax.swing.*;
 
 import com.sleepycat.je.DatabaseException;
@@ -111,7 +109,7 @@ public class AdBlaster {
 			int c = ((Integer)t.data.get(1)).intValue(); 
 			for (int j = 0; j < instance.views.size() && c > 0; j++){
 				BannerView bv = (BannerView) instance.views.get(j);
-				if (bv.b.profit < b.profit && instance.isValidBannerForUser(bv.u,b)){
+				if (bv.b.getPayrate() < b.getPayrate() && instance.isValidBannerForUser(bv.u,b)){
 					c--;
 					bv.b = b;
 				}
@@ -134,8 +132,8 @@ public class AdBlaster {
 		final JTable table = new JTable(model);
 		for (int i = 0; i < ac.b.length; i++){
 			model.setValueAt(""+ac.b[i].getID(), i,0);
-			model.setValueAt(""+ac.b[i].profit, i,1);
-			model.setValueAt(""+ac.b[i].max_hits, i,2);
+			model.setValueAt(""+ac.b[i].getPayrate(), i,1);
+			model.setValueAt(""+ac.b[i].getMaxHits(), i,2);
 			model.setValueAt((Float)pol.coefficients.get(ac.b[i]), i,3);
 		}
 		// TODO Auto-generated method stub

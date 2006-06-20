@@ -53,7 +53,7 @@ public class AdBlasterInstance {
 		for (int j = 0; j < campaign.b.length; j++){
 			Banner b = campaign.b[j];
 			float score = ((Float)pol.coefficients.get(b)).floatValue();
-			if (isValidBannerForUser(u, b) && (this.count(b) < b.max_hits)){
+			if (isValidBannerForUser(u, b) && (this.count(b) < b.getMaxHits())){
 				if (score > bestScore){
 					bestScore = score;
 					bestMatch = j;
@@ -100,8 +100,8 @@ public class AdBlasterInstance {
 		for (int i = 0; i < this.campaign.b.length; i++){
 			Banner b = (Banner)this.campaign.b[i];
 			int count = count(b);
-			if (count < b.max_hits){
-				unserved.add(new Tuple(b, new Integer(b.max_hits - count)));
+			if (count < b.getMaxHits()){
+				unserved.add(new Tuple(b, new Integer(b.getMaxHits() - count)));
 			}
 		}
 		return unserved;
@@ -121,7 +121,7 @@ public class AdBlasterInstance {
 		float count = 0;
 		for (int i = 0; i < views.size(); i++){
 			if (((BannerView)views.get(i)).b != null){
-				count += ((BannerView)views.get(i)).b.profit;
+				count += ((BannerView)views.get(i)).b.getPayrate();
 			}
 		}
 		return count;

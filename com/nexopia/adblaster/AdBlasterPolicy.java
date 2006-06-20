@@ -31,10 +31,10 @@ public class AdBlasterPolicy {
 				Tuple t = (Tuple)unserved.get(i);
 				Banner b = (Banner)t.data.get(0); 
 				int c = ((Integer)t.data.get(1)).intValue();
-				if (b.profit > 0){
+				if (b.getPayrate() > 0){
 					for (int j = 0; j < instance.views.size() && c > 0; j++){
 						BannerView bv = (BannerView) instance.views.get(j);
-						if (bv.b.profit < b.profit && instance.isValidBannerForUser(bv.u,b)){
+						if (bv.b.getPayrate() < b.getPayrate() && instance.isValidBannerForUser(bv.u,b)){
 							changed = true;
 							c--;
 							this.increment(b, 0.1);

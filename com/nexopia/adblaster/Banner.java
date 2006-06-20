@@ -6,13 +6,19 @@
  */
 package com.nexopia.adblaster;
 
+import java.util.Random;
+import java.util.Vector;
+
 
 
 class Banner{
 	Interests interests;
 	int id;
-	public double profit;
-	int max_hits;
+	int payrate;
+	int maxHits;
+	Vector locations;
+	Vector ages;
+	Vector sexes;
 	
 	static int count = 0;
 	public static int counter(){
@@ -22,8 +28,9 @@ class Banner{
 	Banner(){
 		interests = new Interests();
 		id = counter(); //TODO Banners need an ID we can track them by
-		max_hits = (int) (Math.pow((Math.random()-0.5) * 2,2) * 1000);
-		this.profit = Math.random();
+		maxHits = (int) (Math.pow((Math.random()-0.5) * 2,2) * 1000);
+		Random r = new Random();
+		this.payrate = r.nextInt();;
 	}
 	
 	Banner(int id) {
@@ -35,6 +42,42 @@ class Banner{
 		return id;
 	}
 	public String toString(){
-		return "" + this.id + "," + this.profit;
+		return "" + this.id + "," + this.getPayrate();
+	}
+	public Vector getAges() {
+		return ages;
+	}
+	public void setAges(Vector ages) {
+		this.ages = ages;
+	}
+	public Interests getInterests() {
+		return interests;
+	}
+	public void setInterests(Interests interests) {
+		this.interests = interests;
+	}
+	public Vector getLocations() {
+		return locations;
+	}
+	public void setLocations(Vector locations) {
+		this.locations = locations;
+	}
+	public int getMaxHits() {
+		return maxHits;
+	}
+	public void setMaxHits(int maxHits) {
+		this.maxHits = maxHits;
+	}
+	public Vector getSexes() {
+		return sexes;
+	}
+	public void setSexes(Vector sexes) {
+		this.sexes = sexes;
+	}
+	public int getPayrate() {
+		return payrate;
+	}
+	public void setPayrate(int payrate) {
+		this.payrate = payrate;
 	}
 }

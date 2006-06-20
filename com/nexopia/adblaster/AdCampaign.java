@@ -3,7 +3,7 @@
  */
 package com.nexopia.adblaster;
 
-import java.util.Vector;
+import java.util.Random;
 
 class AdCampaign{
 	int num_interests;
@@ -52,13 +52,14 @@ class AdCampaign{
 		/* Add a foolproof banner that never pays and never runs out.
 		 * 
 		 */
-		ac.b[0].profit = 0;
-		ac.b[0].max_hits = Integer.MAX_VALUE;
+		ac.b[0].setPayrate(0);
+		ac.b[0].setMaxHits(Integer.MAX_VALUE);
 
 		ac.b[0].interests.getChecked().clear();
 
 		for(int i = 1; i < num_banners; i++){
-			ac.b[i].profit = Math.random();
+			Random r = new Random();
+			ac.b[i].setPayrate(r.nextInt());
 			for (int j = 0; j < ac.num_interests; j++){
 				if (Math.random() > 0.95){
 					ac.b[i].interests.add(new Integer(j));
