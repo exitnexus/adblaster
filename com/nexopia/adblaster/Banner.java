@@ -25,7 +25,7 @@ class Banner{
 		return count++;
 	}
 	
-	Banner(){
+	Banner() {
 		interests = new Interests();
 		id = counter(); //TODO Banners need an ID we can track them by
 		maxHits = (int) (Math.pow((Math.random()-0.5) * 2,2) * 1000);
@@ -36,6 +36,16 @@ class Banner{
 	Banner(int id) {
 		this();
 		this.id = id;
+	}
+	
+	Banner(int id, int payrate, int maxHits, Vector locations, Vector ages, Vector sexes, Interests interests) {
+		this.id = id;
+		this.payrate = payrate;
+		this.maxHits = maxHits;
+		this.locations = locations;
+		this.ages = ages;
+		this.sexes = sexes;
+		this.interests = interests;
 	}
 	
 	int getID() {
