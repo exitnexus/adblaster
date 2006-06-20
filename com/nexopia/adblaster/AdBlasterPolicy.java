@@ -22,4 +22,29 @@ public class AdBlasterPolicy {
 		coefficients.put(b, new Float(((Float)coefficients.get(b)).floatValue() + d));
 	}
 
+	public void upgradePolicy(AdBlasterInstance instance) {
+		boolean changed = true;
+		while (changed){
+			changed = false;
+			Vector unserved = instance.getUnserved();
+			for (int i = 0; i < unserved.size(); i++){
+				Tuple t = (Tuple)unserved.get(i);
+				Banner b = (Banner)t.data.get(0); 
+				int c = ((Integer)t.data.get(1)).intValue();
+				if (b.profit > 0){
+					for (int j = 0; j < instance.views.size() && c > 0; j++){
+						BannerView bv = (BannerView) instance.views.get(j);
+						if (bv.b.profit < b.profit && instance.isValidBannerForUser(bv.u,b)){
+							changed = true;
+							c--;
+							this.increment(b, 0.1);
+							this.increment(bv.b, -0.1);
+							bv.b = b;
+						}
+					}
+				}
+			}
+		}
+	}
+
 }

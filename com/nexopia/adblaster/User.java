@@ -12,9 +12,11 @@ class User {
 	Interests interests;
 	int id;
 	
+	static int userid = 0;
+	
 	User(String s){
 		interests = new Interests();
-		id = 0; //TODO Thomas we shouldn't care about the user's name, just their ID 
+		id = userid++; 
 	}
 	
 	User(int id) {

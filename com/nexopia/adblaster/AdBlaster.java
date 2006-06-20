@@ -23,7 +23,7 @@ import com.sleepycat.je.DatabaseException;
 public class AdBlaster {
 
 	static int num_serves = 2000;
-	static int num_users = 20;
+	static int num_users = 200;
 	static int num_banners = 35;
 	
 	public static void main(String args[]){
@@ -34,23 +34,22 @@ public class AdBlaster {
 		frame.setContentPane(panel);
 
 		JTabbedPane tab = new JTabbedPane();
-		JScrollPane scroll = new JScrollPane(tab);
-		panel.add(scroll, BorderLayout.CENTER);
+		panel.add(tab, BorderLayout.CENTER);
 		
 		AdCampaign ac = AdCampaign.generateTestData(num_banners, num_users);
 		AdBlasterPolicy pol = AdBlasterPolicy.randomPolicy(ac);
 		
 		JPanel resultPanel = new JPanel(new BorderLayout());
 		
-		for (int day = 0; day < 1; day++){
+		for (int day = 0; day < 5; day++){
 			System.out.println("Day "+ day);
 			AdBlasterInstance instance = AdBlasterInstance.randomInstance(num_serves, ac);
-			for (int i = 0; i < 50; i++){
+			for (int i = 0; i < 2; i++){
 				instance.fillInstance(pol);
-				upgradePolicy(instance, pol);
 
 				resultPanel = new JPanel(new BorderLayout());
-				tab.addTab("Iteration" + i, resultPanel);
+				JScrollPane scroll = new JScrollPane(resultPanel);
+				tab.addTab("" + day + " : " + i, scroll);
 				DefaultTableModel model = new DefaultTableModel(num_serves,3);
 				JTable table = new JTable(model);
 				for (int j = 0; j < num_serves; j++){
@@ -60,6 +59,8 @@ public class AdBlaster {
 				}
 				resultPanel.add(table, BorderLayout.CENTER);
 				resultPanel.add(new JTextField(""+instance.totalProfit()+"/"+maxProfit(instance)), BorderLayout.PAGE_END);
+				pol.upgradePolicy(instance);
+
 				
 			}
 			for(int i = 0; i < instance.views.size(); i++){
@@ -91,16 +92,15 @@ public class AdBlaster {
 			}
 
 			public void windowIconified(WindowEvent e) {			}
-
 			public void windowDeiconified(WindowEvent e) {			}
-
 			public void windowActivated(WindowEvent e) {			}
-
 			public void windowDeactivated(WindowEvent e) {			}}
 		);
 		frame.pack();
 		frame.setVisible(true);
+		// TODO Auto-generated method stub
 		
+
 	}
 	
 	private static void iterativeImprove(AdBlasterInstance instance) {
@@ -111,7 +111,7 @@ public class AdBlaster {
 			int c = ((Integer)t.data.get(1)).intValue(); 
 			for (int j = 0; j < instance.views.size() && c > 0; j++){
 				BannerView bv = (BannerView) instance.views.get(j);
-				if (bv.b.profit < b.profit){
+				if (bv.b.profit < b.profit && instance.isValidBannerForUser(bv.u,b)){
 					c--;
 					bv.b = b;
 				}
@@ -120,11 +120,12 @@ public class AdBlaster {
 	}
 	private static float maxProfit(AdBlasterInstance instance){
 		float count = -1;
-		while(instance.totalProfit() != count){
-			count = instance.totalProfit();
-			iterativeImprove(instance);
+		AdBlasterInstance i2 = instance.copy();
+		while(i2.totalProfit() != count){
+			count = i2.totalProfit();
+			iterativeImprove(i2);
 		}
-		return instance.totalProfit();
+		return i2.totalProfit();
 	}
 
 	private static JTable getBannerTable(final AdCampaign ac, AdBlasterPolicy pol) {
@@ -137,32 +138,23 @@ public class AdBlaster {
 			model.setValueAt(""+ac.b[i].max_hits, i,2);
 			model.setValueAt((Float)pol.coefficients.get(ac.b[i]), i,3);
 		}
+		// TODO Auto-generated method stub
 		
+
 		table.addMouseListener(new MouseListener(){
 
 			public void mouseClicked(MouseEvent e) {
 				System.out.println(ac.b[table.getSelectedRow()].interests.checked);
 			}
 
-			public void mousePressed(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
+			public void mousePressed(MouseEvent e) {			}
 
-			public void mouseReleased(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
+			public void mouseReleased(MouseEvent e) {			}
 
-			public void mouseEntered(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
+			public void mouseEntered(MouseEvent e) {			}
 
-			public void mouseExited(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}});
+			public void mouseExited(MouseEvent e) {			}
+			});
 		return table;
 	}
 
@@ -171,24 +163,6 @@ public class AdBlaster {
 		int min = (i / 60) % 60;
 		int sec = i % 60;
 		return "" + (hour%12) + ":" + min + ":" + sec + (hour > 12?"pm":"am");
-	}
-
-	private static void upgradePolicy(AdBlasterInstance instance, AdBlasterPolicy pol) {
-		Vector unserved = instance.getUnserved();
-		for (int i = 0; i < unserved.size(); i++){
-			Tuple t = (Tuple)unserved.get(i);
-			Banner b = (Banner)t.data.get(0); 
-			int c = ((Integer)t.data.get(1)).intValue(); 
-			for (int j = 0; j < instance.views.size() && c > 0; j++){
-				BannerView bv = (BannerView) instance.views.get(j);
-				if (bv.b.profit < b.profit && instance.isValidBannerForUser(bv.u,b)){
-					c--;
-					pol.increment(b, 0.1);
-					pol.increment(bv.b, -0.1);
-					bv.b = b;
-				}
-			}
-		}
 	}
 
 }

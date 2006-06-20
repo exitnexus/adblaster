@@ -40,10 +40,10 @@ class AdCampaign{
 		 *  
 		 * 
 		 * */
-		AdCampaign ac = new AdCampaign(10,num_banners,num_users);
+		AdCampaign ac = new AdCampaign(50,num_banners,num_users);
 		for (int i = 0; i < num_users; i++){
 			for (int j = 0; j < ac.num_interests; j++){
-				if (Math.random() > 0.5){
+				if (Math.random() > 0.75){
 					ac.u[i].interests.checked.add(new Integer(j));
 				}
 			}
@@ -54,14 +54,12 @@ class AdCampaign{
 		 */
 		ac.b[0].profit = 0;
 		ac.b[0].max_hits = Integer.MAX_VALUE;
-		for (int j = 0; j < ac.num_interests; j++){
-			ac.b[0].interests.checked.add(new Integer(j));
-		}
-		
+		ac.b[0].interests.checked.clear();
+
 		for(int i = 1; i < num_banners; i++){
 			ac.b[i].profit = Math.random();
 			for (int j = 0; j < ac.num_interests; j++){
-				if (Math.random() > 0.5){
+				if (Math.random() > 0.95){
 					ac.b[i].interests.checked.add(new Integer(j));
 				}
 			}

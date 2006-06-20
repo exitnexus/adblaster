@@ -23,4 +23,7 @@ class BannerView{
 	int getTime() {
 		return time;
 	}
+	BannerView copy(){
+		return new BannerView(u,b,time);
+	}
 }

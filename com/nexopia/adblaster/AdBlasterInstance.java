@@ -18,7 +18,6 @@ public class AdBlasterInstance {
 	Environment dbEnv;
 	BannerViewDatabase db;
 	
-	
 	AdBlasterInstance(AdCampaign ac){
 		try {
 			EnvironmentConfig envConf = new EnvironmentConfig();
@@ -54,12 +53,11 @@ public class AdBlasterInstance {
 		for (int j = 0; j < campaign.b.length; j++){
 			Banner b = campaign.b[j];
 			float score = ((Float)pol.coefficients.get(b)).floatValue();
-			if (!isValidBannerForUser(u, b) || (this.count(b) >= b.max_hits)){
-				score = -1;
-			}
-			if (score > bestScore){
-				bestScore = score;
-				bestMatch = j;
+			if (isValidBannerForUser(u, b) && (this.count(b) < b.max_hits)){
+				if (score > bestScore){
+					bestScore = score;
+					bestMatch = j;
+				}
 			}
 		}
 		
@@ -103,7 +101,7 @@ public class AdBlasterInstance {
 			Banner b = (Banner)this.campaign.b[i];
 			int count = count(b);
 			if (count < b.max_hits){
-				unserved.add(new Tuple(b, new Integer(count)));
+				unserved.add(new Tuple(b, new Integer(b.max_hits - count)));
 			}
 		}
 		return unserved;
@@ -127,6 +125,17 @@ public class AdBlasterInstance {
 			}
 		}
 		return count;
+	}
+
+	public AdBlasterInstance copy() {
+		AdBlasterInstance instance = new AdBlasterInstance(this.campaign);
+		instance.views = new Vector();
+		for (int i = 0; i < this.views.size(); i++){
+			instance.views.add(((BannerView)this.views.get(i)).copy());
+		}
+		instance.dbEnv = this.dbEnv;
+		instance.db = this.db;
+		return instance;
 	}
 
 }
