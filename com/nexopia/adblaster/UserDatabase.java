@@ -39,6 +39,7 @@ public class UserDatabase {
 		DatabaseEntry data = new DatabaseEntry();
 		ub.objectToEntry(u, data);
 		db.put(null, key, data);
+		this.userCount++;
 	}
 	
 	public User getUser(int userid) throws DatabaseException {
