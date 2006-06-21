@@ -9,11 +9,8 @@ import java.util.Random;
  * targetting info that can relate the banners and users.
  * 
  */
-class AdBlasterUniverse{
-	int num_interests;
-	User u[];
-	Banner b[];
-
+public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
+	
 	public AdBlasterUniverse(int interests, int num_banners, int num_users){
 		u = new User[num_users];
 		for (int i = 0; i < num_users; i++){

@@ -1,20 +1,29 @@
 package com.nexopia.adblaster;
 
+import java.io.File;
 import java.util.Vector;
 
 import com.sleepycat.je.DatabaseException;
+import com.sleepycat.je.Environment;
+import com.sleepycat.je.EnvironmentConfig;
 
 public class AdBlasterDbInstance extends AbstractAdBlasterInstance 
 		implements I_AdBlasterInstance {
 
-	UserDatabase user_db;
+	BannerViewDatabase bannerview_db;
+	Environment dbEnv;
 	
 	public AdBlasterDbInstance(){
 		try {
-			user_db = new UserDatabase(this.dbEnv);
-		} catch (DatabaseException e) {
-			e.printStackTrace();
+			EnvironmentConfig envConf = new EnvironmentConfig();
+			envConf.setAllowCreate(true);
+			dbEnv = new Environment(new File("BerkDBTester.db"), envConf);
+			db = new BannerViewDatabase(dbEnv);
+			bannerview_db = new BannerViewDatabase(this.dbEnv);
+		} catch (DatabaseException dbe) {
+			System.err.println("DatabaseException: " + dbe);
 		}
+		
 	}
 
 	public void fillInstance(AdBlasterPolicy pol) {

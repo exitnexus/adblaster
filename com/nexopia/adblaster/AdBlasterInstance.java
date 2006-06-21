@@ -15,18 +15,9 @@ import com.sleepycat.je.EnvironmentConfig;
  */
 public class AdBlasterInstance extends AbstractAdBlasterInstance 
 		implements I_AdBlasterInstance {
-	AdBlasterUniverse campaign;
+	AbstractAdBlasterUniverse campaign;
 	
-	AdBlasterInstance(AdBlasterUniverse ac){
-		try {
-			EnvironmentConfig envConf = new EnvironmentConfig();
-			envConf.setAllowCreate(true);
-			dbEnv = new Environment(new File("BerkDBTester.db"), envConf);
-			db = new BannerViewDatabase(dbEnv);
-		} catch (DatabaseException dbe) {
-			System.err.println("DatabaseException: " + dbe);
-		}
-		
+	AdBlasterInstance(AbstractAdBlasterUniverse ac){
 		campaign = ac;
 		views = new Vector();
 	}
@@ -54,8 +45,8 @@ public class AdBlasterInstance extends AbstractAdBlasterInstance
 		
 		int bestMatch = -1;
 		float bestScore = Float.NEGATIVE_INFINITY;
-		for (int j = 0; j < campaign.b.length; j++){
-			Banner b = campaign.b[j];
+		for (int j = 0; j < campaign.getBannerCount(); j++){
+			Banner b = campaign.getBanner(j);
 			float score = ((Float)pol.coefficients.get(b)).floatValue();
 			if (isValidBannerForUser(u, b) && (this.count(b) < b.getMaxHits())){
 				if (score > bestScore){
@@ -65,7 +56,7 @@ public class AdBlasterInstance extends AbstractAdBlasterInstance
 			}
 		}
 		
-		Banner banner = campaign.b[bestMatch];
+		Banner banner = campaign.getBanner(bestMatch);
 		return banner;
 	}
 
@@ -73,14 +64,14 @@ public class AdBlasterInstance extends AbstractAdBlasterInstance
 		return u.interests.hasAllIn(b.interests);
 	}
 	
-	public BannerView randomView(AdBlasterUniverse campaign) {
+	public BannerView randomView(AbstractAdBlasterUniverse ac) {
 		// TODO Auto-generated method stub
-		User randomPick = campaign.u[(int) (Math.random()*campaign.u.length)];
+		User randomPick = campaign.getUser((int) (Math.random()*campaign.getUserCount()));
 		int time = (int) (Math.random()*60*60*24);
 		return new BannerView(randomPick, null, time);
 	}
 
-	public static AdBlasterInstance randomInstance(int num, AdBlasterUniverse ac) {
+	public static AdBlasterInstance randomInstance(int num, AbstractAdBlasterUniverse ac) {
 		AdBlasterInstance instance = new AdBlasterInstance(ac);
 		for (int i = 0; i < num; i++){
 			BannerView bv = instance.randomView(ac);
@@ -96,8 +87,8 @@ public class AdBlasterInstance extends AbstractAdBlasterInstance
 	 */
 	public Vector getUnserved() {
 		Vector unserved = new Vector();
-		for (int i = 0; i < this.campaign.b.length; i++){
-			Banner b = (Banner)this.campaign.b[i];
+		for (int i = 0; i < this.campaign.getBannerCount(); i++){
+			Banner b = (Banner)this.campaign.getBanner(i);
 			int count = count(b);
 			if (count < b.getMaxHits()){
 				unserved.add(new Tuple(b, new Integer(b.getMaxHits() - count)));

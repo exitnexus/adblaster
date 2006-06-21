@@ -14,13 +14,14 @@ import java.util.Vector;
 
 
 class Interests{
-	private HashMap checked;
+	HashMap checked;
 	
 	Interests(){
 	  checked = new HashMap();
 	}
 	
 	Interests(String interests) {
+		this();
 		StringTokenizer st = new StringTokenizer(interests, ",");
 		while (st.hasMoreTokens()) {
 			checked.put(new Integer(Integer.parseInt(st.nextToken())), Boolean.TRUE);
@@ -47,6 +48,11 @@ class Interests{
 			}
 		}
 		return true;
+	}
+
+	public void putAll(Vector vector) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }

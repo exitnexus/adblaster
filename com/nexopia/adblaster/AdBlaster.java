@@ -22,9 +22,10 @@ import com.sleepycat.je.DatabaseException;
 
 public class AdBlaster {
 
-	static int num_serves = 10000;
-	static int num_users = 1000;
-	static int num_banners = 100;
+	static int num_serves = 1000;
+	static int num_users = 100;
+	static int num_banners = 10;
+	static AbstractAdBlasterUniverse ac;
 	
 	public static void main(String args[]){
 		
@@ -36,12 +37,13 @@ public class AdBlaster {
 		JTabbedPane tab = new JTabbedPane();
 		panel.add(tab, BorderLayout.CENTER);
 		
-		AdBlasterUniverse ac = AdBlasterUniverse.generateTestData(num_banners, num_users);
+		//ac = AdBlasterUniverse.generateTestData(num_banners, num_users);
+		ac = new AdBlasterDbUniverse();
 		AdBlasterPolicy pol = AdBlasterPolicy.randomPolicy(ac);
 		
 		JPanel resultPanel = new JPanel(new BorderLayout());
 		
-		for (int day = 0; day < 1; day++){
+		for (int day = 0; day < 5; day++){
 			System.out.println("Day "+ day);
 			//AdBlasterInstance instance = AdBlasterInstance.randomInstance(num_serves, ac);
 			AbstractAdBlasterInstance instance = new AdBlasterDbInstance();
@@ -67,14 +69,6 @@ public class AdBlaster {
 				statPanel.add(new JTextField(""+instance.totalProfit()));
 				resultPanel.add(statPanel, BorderLayout.PAGE_START);
 
-				
-			}
-			for(int i = 0; i < instance.views.size(); i++){
-				try {
-					instance.db.insert((BannerView)instance.views.get(i));
-				} catch (DatabaseException dbe) {
-					System.err.println("DatabaseException: " + dbe);
-				}
 				
 			}
 
@@ -208,15 +202,15 @@ public class AdBlaster {
 		return i2.totalProfit();
 	}
 
-	private static JTable getBannerTable(final AdBlasterUniverse ac, AdBlasterPolicy pol) {
+	private static JTable getBannerTable(AbstractAdBlasterUniverse ac2, AdBlasterPolicy pol) {
 		// TODO Auto-generated method stub
-		DefaultTableModel model = new DefaultTableModel(ac.b.length,4);
+		DefaultTableModel model = new DefaultTableModel(ac.getBannerCount(),4);
 		final JTable table = new JTable(model);
-		for (int i = 0; i < ac.b.length; i++){
-			model.setValueAt(""+ac.b[i].getID(), i,0);
-			model.setValueAt(""+ac.b[i].getPayrate(), i,1);
-			model.setValueAt(""+ac.b[i].getMaxHits(), i,2);
-			model.setValueAt((Float)pol.coefficients.get(ac.b[i]), i,3);
+		for (int i = 0; i < ac.getBannerCount(); i++){
+			model.setValueAt(""+ac.getBanner(i).getID(), i,0);
+			model.setValueAt(""+ac.getBanner(i).getPayrate(), i,1);
+			model.setValueAt(""+ac.getBanner(i).getMaxHits(), i,2);
+			model.setValueAt((Float)pol.coefficients.get(ac.getBanner(i)), i,3);
 		}
 		// TODO Auto-generated method stub
 		
@@ -224,7 +218,7 @@ public class AdBlaster {
 		table.addMouseListener(new MouseListener(){
 
 			public void mouseClicked(MouseEvent e) {
-				System.out.println(ac.b[table.getSelectedRow()].interests.getChecked());
+				System.out.println(ac.getBanner(table.getSelectedRow()).interests.getChecked());
 			}
 
 			public void mousePressed(MouseEvent e) {			}

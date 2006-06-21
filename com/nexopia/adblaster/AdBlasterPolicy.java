@@ -7,17 +7,17 @@ import java.util.Vector;
 
 public class AdBlasterPolicy {
 	HashMap coefficients;
-	AdBlasterUniverse campaign;
+	AbstractAdBlasterUniverse campaign;
 	
-	public AdBlasterPolicy(AdBlasterUniverse ac) {
+	public AdBlasterPolicy(AbstractAdBlasterUniverse ac) {
 		coefficients = new HashMap();
 		campaign = ac;
-		for (int i = 0; i < ac.b.length; i++){
-			coefficients.put(ac.b[i], new Float(Math.random()));
+		for (int i = 0; i < ac.getBannerCount(); i++){
+			coefficients.put(ac.getBanner(i), new Float(Math.random()));
 		}
 	}
 
-	public static AdBlasterPolicy randomPolicy(AdBlasterUniverse ac) {
+	public static AdBlasterPolicy randomPolicy(AbstractAdBlasterUniverse ac) {
 		return new AdBlasterPolicy(ac);
 	}
 
@@ -53,10 +53,10 @@ public class AdBlasterPolicy {
 			count = instance.totalProfit();
 			AdBlaster.iterativeImprove(instance);
 		}
-		for (int i = 0; i < campaign.b.length; i++){
+		for (int i = 0; i < campaign.getBannerCount(); i++){
 			int totalAvailable = 1;
 			int totalUsed = 0;
-			Banner b = campaign.b[i];
+			Banner b = campaign.getBanner(i);
 			for (Iterator it = instance.views.iterator(); it.hasNext();){
 				BannerView bv = (BannerView)it.next();
 				if (instance.isValidBannerForUser(bv.u,b)){
