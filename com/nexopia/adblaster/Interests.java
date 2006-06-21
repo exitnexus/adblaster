@@ -55,4 +55,18 @@ class Interests{
 		
 	}
 	
+	public String toString() {
+		String interests = "";
+		boolean first = true;
+		for (Iterator it = this.getChecked().iterator(); it.hasNext(); ){
+			if (first) {
+				first = false;
+				interests += (Integer)it.next();
+			} else {
+				interests += "," + (Integer)it.next();
+			}
+		}
+		return interests;
+	}
+	
 }

@@ -67,8 +67,8 @@ class Banner{
 		this.payrate = rs.getInt("PAYRATE");
 		this.maxHits = rs.getInt("MAXVIEWS");
 		this.campaignID = rs.getInt("CAMPAIGNID");
-		this.locations = Utilities.stringToVector(rs.getString("LOCATIONS"));
-		this.ages = Utilities.stringToVector(rs.getString("AGES"));
+		this.locations = Utilities.stringToVector(rs.getString("LOC"));
+		this.ages = Utilities.stringToVector(rs.getString("AGE"));
 		this.sexes = Utilities.stringToVector(rs.getString("SEX"));
 		this.interests = new Interests(rs.getString("INTERESTS"));
 	}

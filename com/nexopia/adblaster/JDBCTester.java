@@ -10,6 +10,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Vector;
 
 public class JDBCTester {
 
@@ -21,14 +24,16 @@ public class JDBCTester {
 			String sql = "SELECT * FROM banners";
 			Statement stmt = con.createStatement();
 			ResultSet rs = stmt.executeQuery(sql);
-			int i = 0;
-			while (rs.next()) {
-				i++;
-				String title = rs.getString("TITLE");
-				int id = rs.getInt("ID");
-				System.out.println(id + ": " + title);
+			System.out.println(rs.getFetchSize());
+			HashMap banners = new HashMap();
+			for (int i=0; rs.next(); i++) {
+				banners.put(new Integer(rs.getInt("ID")), new Banner(rs));
 			}
-			System.out.println("Total: " + i);
+
+			for (Iterator it = banners.values().iterator(); it.hasNext(); ){
+				Banner b = (Banner)it.next();
+				System.out.println(b.getID() + " " + b.getInterests());
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
