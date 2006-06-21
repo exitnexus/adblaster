@@ -6,34 +6,47 @@
  */
 package com.nexopia.adblaster;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
 
 class Interests{
-	private Vector checked;
+	private HashMap checked;
 	
 	Interests(){
-	  checked = new Vector();
+	  checked = new HashMap();
 	}
 	
 	Interests(String interests) {
 		StringTokenizer st = new StringTokenizer(interests, ",");
 		while (st.hasMoreTokens()) {
-			checked.add(new Integer(Integer.parseInt(st.nextToken())));
+			checked.put(new Integer(Integer.parseInt(st.nextToken())), Boolean.TRUE);
 		}
 	}
 	
-	boolean has(int k) {
-		return checked.contains(new Integer(k));
+	boolean has(Integer k) {
+		return checked.containsKey(k);
 	}
 	
 	void add(Integer i) {
-		checked.add(i);
+		checked.put(i, Boolean.TRUE);
 	}
 	
-	Vector getChecked() {
-		return checked;
+	Set getChecked() {
+		return checked.keySet();
+	}
+
+	public boolean hasAllIn(Interests interests) {
+		for (Iterator it = interests.getChecked().iterator(); it.hasNext(); ){
+			Integer interest = (Integer)it.next();
+			if (!has(interest)){
+				return false;
+			}
+		}
+		return true;
 	}
 	
 }

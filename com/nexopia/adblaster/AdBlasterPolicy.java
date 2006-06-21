@@ -1,20 +1,23 @@
 package com.nexopia.adblaster;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Vector;
 
 
 public class AdBlasterPolicy {
 	HashMap coefficients;
+	AdBlasterUniverse campaign;
 	
-	public AdBlasterPolicy(AdCampaign ac) {
+	public AdBlasterPolicy(AdBlasterUniverse ac) {
 		coefficients = new HashMap();
+		campaign = ac;
 		for (int i = 0; i < ac.b.length; i++){
-			coefficients.put(ac.b[i], new Float(1));
+			coefficients.put(ac.b[i], new Float(Math.random()));
 		}
 	}
 
-	public static AdBlasterPolicy randomPolicy(AdCampaign ac) {
+	public static AdBlasterPolicy randomPolicy(AdBlasterUniverse ac) {
 		return new AdBlasterPolicy(ac);
 	}
 
@@ -22,8 +25,8 @@ public class AdBlasterPolicy {
 		coefficients.put(b, new Float(((Float)coefficients.get(b)).floatValue() + d));
 	}
 
-	public void upgradePolicy(AdBlasterInstance instance) {
-		boolean changed = true;
+	public void upgradePolicy(AbstractAdBlasterInstance instance) {
+		/*boolean changed = true;
 		while (changed){
 			changed = false;
 			Vector unserved = instance.getUnserved();
@@ -44,7 +47,30 @@ public class AdBlasterPolicy {
 					}
 				}
 			}
+		}*/
+		float count = -1;
+		while(instance.totalProfit() != count){
+			count = instance.totalProfit();
+			AdBlaster.iterativeImprove(instance);
 		}
+		for (int i = 0; i < campaign.b.length; i++){
+			int totalAvailable = 1;
+			int totalUsed = 0;
+			Banner b = campaign.b[i];
+			for (Iterator it = instance.views.iterator(); it.hasNext();){
+				BannerView bv = (BannerView)it.next();
+				if (instance.isValidBannerForUser(bv.u,b)){
+					totalAvailable++;
+				}
+				if (bv.b == b){
+					totalUsed++;
+				}
+			}
+			float f = ((float)totalUsed)/(float)Math.min(b.maxHits,totalAvailable);
+			System.out.println(totalUsed +","+Math.min(totalAvailable,b.maxHits));
+			coefficients.put(b, new Float(f)); 
+		}
+
 	}
 
 }

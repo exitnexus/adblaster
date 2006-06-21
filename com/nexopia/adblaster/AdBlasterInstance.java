@@ -1,6 +1,7 @@
 package com.nexopia.adblaster;
 
 import java.io.File;
+import java.util.Random;
 import java.util.Vector;
 
 import com.sleepycat.je.DatabaseException;
@@ -12,13 +13,11 @@ import com.sleepycat.je.EnvironmentConfig;
  * A representation of all data we store for one day, along with some functions to
  * fill with learning data.
  */
-public class AdBlasterInstance {
-	Vector views;
-	AdCampaign campaign;
-	Environment dbEnv;
-	BannerViewDatabase db;
+public class AdBlasterInstance extends AbstractAdBlasterInstance 
+		implements I_AdBlasterInstance {
+	AdBlasterUniverse campaign;
 	
-	AdBlasterInstance(AdCampaign ac){
+	AdBlasterInstance(AdBlasterUniverse ac){
 		try {
 			EnvironmentConfig envConf = new EnvironmentConfig();
 			envConf.setAllowCreate(true);
@@ -37,7 +36,12 @@ public class AdBlasterInstance {
 			BannerView bv = (BannerView)views.get(i);
 			bv.b = null;
 		}
+		long time = System.currentTimeMillis();
 		for (int i = 0; i < views.size(); i++){
+			if ((System.currentTimeMillis() - time) > 5000){
+				System.out.println("..." + ((float)i/(float)views.size())*100 + "% complete.");
+				time = System.currentTimeMillis();
+			}
 			BannerView bv = (BannerView)views.get(i);
 			Banner b = getBestBanner(pol, bv);
 			bv.b = b;
@@ -66,22 +70,17 @@ public class AdBlasterInstance {
 	}
 
 	public boolean isValidBannerForUser(User u, Banner b) {
-		for (int k = 0; k < b.interests.getChecked().size(); k++){
-			Integer interest = (Integer)b.interests.getChecked().get(k);
-			if (!u.interests.has(interest.intValue()))
-				return false;
-		}
-		return true;
+		return u.interests.hasAllIn(b.interests);
 	}
 	
-	public BannerView randomView(AdCampaign campaign) {
+	public BannerView randomView(AdBlasterUniverse campaign) {
 		// TODO Auto-generated method stub
 		User randomPick = campaign.u[(int) (Math.random()*campaign.u.length)];
 		int time = (int) (Math.random()*60*60*24);
 		return new BannerView(randomPick, null, time);
 	}
 
-	public static AdBlasterInstance randomInstance(int num, AdCampaign ac) {
+	public static AdBlasterInstance randomInstance(int num, AdBlasterUniverse ac) {
 		AdBlasterInstance instance = new AdBlasterInstance(ac);
 		for (int i = 0; i < num; i++){
 			BannerView bv = instance.randomView(ac);
@@ -136,6 +135,23 @@ public class AdBlasterInstance {
 		instance.dbEnv = this.dbEnv;
 		instance.db = this.db;
 		return instance;
+	}
+	
+	public void makeMeADatabase(){
+		try {
+			EnvironmentConfig envConf = new EnvironmentConfig();
+			envConf.setAllowCreate(true);
+				dbEnv = new Environment(new File("BerkDBTester.db"), envConf);
+			db = new BannerViewDatabase(dbEnv);
+			UserDatabase userDb = new UserDatabase(dbEnv);
+			Random r = new Random(1);
+			for (int i=0; i<this.views.size(); i++) {
+				db.insert((BannerView)this.views.get(i));
+			}
+		} catch (DatabaseException e) {
+			System.err.println("DatabaseException: " + e);
+			e.printStackTrace();
+		}
 	}
 
 }

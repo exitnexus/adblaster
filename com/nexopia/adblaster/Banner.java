@@ -28,9 +28,8 @@ class Banner{
 	Banner() {
 		interests = new Interests();
 		id = counter(); //TODO Banners need an ID we can track them by
-		maxHits = (int) (Math.pow((Math.random()-0.5) * 2,2) * 1000);
-		Random r = new Random();
-		this.payrate = r.nextInt();;
+		maxHits = (int) (Math.pow((Math.random()-0.5) * 2,2) * 200) + 1;
+		this.payrate = (int)(Math.random()*10);
 	}
 	
 	Banner(int id) {
