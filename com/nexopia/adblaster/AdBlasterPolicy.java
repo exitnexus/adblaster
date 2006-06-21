@@ -73,4 +73,25 @@ public class AdBlasterPolicy {
 
 	}
 
+	Banner getBestBanner(AbstractAdBlasterInstance instance, BannerView bv) {
+		User u = bv.u;
+		int t = bv.getTime();
+		
+		int bestMatch = -1;
+		float bestScore = Float.NEGATIVE_INFINITY;
+		for (int j = 0; j < instance.campaign.getBannerCount(); j++){
+			Banner b = instance.campaign.getBanner(j);
+			float score = ((Float)coefficients.get(b)).floatValue();
+			if (instance.isValidBannerForUser(u, b) && (instance.count(b) < b.getMaxHits())){
+				if (score > bestScore){
+					bestScore = score;
+					bestMatch = j;
+				}
+			}
+		}
+		
+		Banner banner = instance.campaign.getBanner(bestMatch);
+		return banner;
+	}
+
 }

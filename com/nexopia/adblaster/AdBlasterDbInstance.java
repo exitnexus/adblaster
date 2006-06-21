@@ -13,7 +13,8 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance
 	BannerViewDatabase bannerview_db;
 	Environment dbEnv;
 	
-	public AdBlasterDbInstance(){
+	public AdBlasterDbInstance(AbstractAdBlasterUniverse c){
+		super(c);
 		try {
 			EnvironmentConfig envConf = new EnvironmentConfig();
 			envConf.setAllowCreate(true);
@@ -27,33 +28,40 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance
 	}
 
 	public void fillInstance(AdBlasterPolicy pol) {
-		// TODO Auto-generated method stub
-
-	}
-
-	public boolean isValidBannerForUser(User u, Banner b) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public BannerView randomView(AdBlasterUniverse campaign) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			BannerViewCursor cursor = bannerview_db.getCursor(0,0);
+			while(cursor.getCurrent() != null){
+				BannerView bv = cursor.getCurrent();
+				bv.b = pol.getBestBanner(this, bv);
+				this.views.add(bv);
+				cursor.getNext();
+			}
+		} catch (DatabaseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public Vector getUnserved() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public float totalProfit() {
-		// TODO Auto-generated method stub
-		return 0;
+	public AbstractAdBlasterInstance copy() {
+		AbstractAdBlasterInstance instance = new AdBlasterDbInstance(this.campaign);
+		instance.views = new Vector();
+		for (int i = 0; i < this.views.size(); i++){
+			instance.views.add(((BannerView)this.views.get(i)).copy());
+		}
+		instance.dbEnv = this.dbEnv;
+		instance.db = this.db;
+		return instance;
+
+	}
+	
+	public static void main(String args[]){
+		new AdBlasterDbInstance(null);
+		
 	}
 
-	public AdBlasterInstance copy() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 }

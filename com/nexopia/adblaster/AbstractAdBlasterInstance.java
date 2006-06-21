@@ -4,12 +4,18 @@ import java.util.Vector;
 
 import com.sleepycat.je.Environment;
 
-public class AbstractAdBlasterInstance implements I_AdBlasterInstance {
+public abstract class AbstractAdBlasterInstance {
 
 	Vector views;
 	Environment dbEnv;
 	BannerViewDatabase db;
-
+	AbstractAdBlasterUniverse campaign;
+	
+	public AbstractAdBlasterInstance(AbstractAdBlasterUniverse ac){
+		campaign = ac;
+		views = new Vector();
+	}
+	
 	public void fillInstance(AdBlasterPolicy pol) {
 	}
 
@@ -25,13 +31,26 @@ public class AbstractAdBlasterInstance implements I_AdBlasterInstance {
 		return null;
 	}
 
+	int count(Banner banner) {
+		int count = 0;
+		for (int i = 0; i < views.size(); i++){
+			if (((BannerView)views.get(i)).b == banner){
+				count ++;
+			}
+		}
+		return count;
+	}
+
 	public float totalProfit() {
-		return 0;
+		float count = 0;
+		for (int i = 0; i < views.size(); i++){
+			if (((BannerView)views.get(i)).b != null){
+				count += ((BannerView)views.get(i)).b.getPayrate();
+			}
+		}
+		return count;
 	}
 
-	public AdBlasterInstance copy() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	abstract public AbstractAdBlasterInstance copy();
+	
 }

@@ -15,13 +15,11 @@ import com.sleepycat.je.EnvironmentConfig;
  */
 public class AdBlasterInstance extends AbstractAdBlasterInstance 
 		implements I_AdBlasterInstance {
-	AbstractAdBlasterUniverse campaign;
 	
-	AdBlasterInstance(AbstractAdBlasterUniverse ac){
-		campaign = ac;
-		views = new Vector();
+	public AdBlasterInstance(AbstractAdBlasterUniverse ac) {
+		super(ac);
 	}
-	
+
 	public void fillInstance(AdBlasterPolicy pol){
 		for (int i = 0; i < views.size(); i++){
 			BannerView bv = (BannerView)views.get(i);
@@ -34,30 +32,9 @@ public class AdBlasterInstance extends AbstractAdBlasterInstance
 				time = System.currentTimeMillis();
 			}
 			BannerView bv = (BannerView)views.get(i);
-			Banner b = getBestBanner(pol, bv);
+			Banner b = pol.getBestBanner(this, bv);
 			bv.b = b;
 		}
-	}
-
-	private Banner getBestBanner(AdBlasterPolicy pol, BannerView bv) {
-		User u = bv.u;
-		int t = bv.getTime();
-		
-		int bestMatch = -1;
-		float bestScore = Float.NEGATIVE_INFINITY;
-		for (int j = 0; j < campaign.getBannerCount(); j++){
-			Banner b = campaign.getBanner(j);
-			float score = ((Float)pol.coefficients.get(b)).floatValue();
-			if (isValidBannerForUser(u, b) && (this.count(b) < b.getMaxHits())){
-				if (score > bestScore){
-					bestScore = score;
-					bestMatch = j;
-				}
-			}
-		}
-		
-		Banner banner = campaign.getBanner(bestMatch);
-		return banner;
 	}
 
 	public boolean isValidBannerForUser(User u, Banner b) {
@@ -97,27 +74,8 @@ public class AdBlasterInstance extends AbstractAdBlasterInstance
 		return unserved;
 	}
 
-	private int count(Banner banner) {
-		int count = 0;
-		for (int i = 0; i < views.size(); i++){
-			if (((BannerView)views.get(i)).b == banner){
-				count ++;
-			}
-		}
-		return count;
-	}
 
-	public float totalProfit() {
-		float count = 0;
-		for (int i = 0; i < views.size(); i++){
-			if (((BannerView)views.get(i)).b != null){
-				count += ((BannerView)views.get(i)).b.getPayrate();
-			}
-		}
-		return count;
-	}
-
-	public AdBlasterInstance copy() {
+	public AbstractAdBlasterInstance copy() {
 		AdBlasterInstance instance = new AdBlasterInstance(this.campaign);
 		instance.views = new Vector();
 		for (int i = 0; i < this.views.size(); i++){
@@ -126,6 +84,7 @@ public class AdBlasterInstance extends AbstractAdBlasterInstance
 		instance.dbEnv = this.dbEnv;
 		instance.db = this.db;
 		return instance;
+
 	}
 	
 	public void makeMeADatabase(){

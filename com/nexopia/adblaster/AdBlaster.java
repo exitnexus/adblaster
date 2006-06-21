@@ -46,7 +46,7 @@ public class AdBlaster {
 		for (int day = 0; day < 5; day++){
 			System.out.println("Day "+ day);
 			//AdBlasterInstance instance = AdBlasterInstance.randomInstance(num_serves, ac);
-			AbstractAdBlasterInstance instance = new AdBlasterDbInstance();
+			AbstractAdBlasterInstance instance = new AdBlasterDbInstance(ac);
 			System.out.println("Instances generated.");
 			for (int i = 0; i < 1; i++){
 				instance.fillInstance(pol);
