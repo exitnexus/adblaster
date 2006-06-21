@@ -7,8 +7,7 @@ import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
 
-public class AdBlasterDbInstance extends AbstractAdBlasterInstance 
-		implements I_AdBlasterInstance {
+public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 
 	BannerViewDatabase bannerview_db;
 	Environment dbEnv;

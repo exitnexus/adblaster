@@ -13,8 +13,7 @@ import com.sleepycat.je.EnvironmentConfig;
  * A representation of all data we store for one day, along with some functions to
  * fill with learning data.
  */
-public class AdBlasterInstance extends AbstractAdBlasterInstance 
-		implements I_AdBlasterInstance {
+public class AdBlasterInstance extends AbstractAdBlasterInstance{
 	
 	public AdBlasterInstance(AbstractAdBlasterUniverse ac) {
 		super(ac);

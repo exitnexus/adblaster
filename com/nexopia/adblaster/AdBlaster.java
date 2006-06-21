@@ -141,7 +141,7 @@ public class AdBlaster {
 					
 				
 			
-	private static void doSwap(Vector swaps, Banner endBanner, I_AdBlasterInstance instance) {
+	private static void doSwap(Vector swaps, Banner endBanner, AbstractAdBlasterInstance instance) {
 		//System.out.println("Swapping " + swaps);
 		Iterator it = swaps.iterator();
 		BannerView second = (BannerView)it.next();
@@ -192,9 +192,9 @@ public class AdBlaster {
 		return v;
 	}
 
-	private static float maxProfit(I_AdBlasterInstance instance){
+	private static float maxProfit(AbstractAdBlasterInstance instance){
 		float count = -1;
-		AdBlasterInstance i2 = instance.copy();
+		AbstractAdBlasterInstance i2 = instance.copy();
 		while(i2.totalProfit() != count){
 			count = i2.totalProfit();
 			iterativeImprove(i2);
