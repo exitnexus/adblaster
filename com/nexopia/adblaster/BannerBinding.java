@@ -19,11 +19,11 @@ import com.sleepycat.bind.tuple.TupleOutput;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
+
+/*
+We shouldn't be using this, we don't want to store a local copy of banners
 class BannerBinding extends TupleBinding {
 
-	/* (non-Javadoc)
-	 * @see com.sleepycat.bind.tuple.TupleBinding#entryToObject(com.sleepycat.bind.tuple.TupleInput)
-	 */
 	public Object entryToObject(TupleInput ti) {
 		//TODO need to get Banner and User out from inside AdCampaign so this works
 		int id = ti.readInt();
@@ -46,9 +46,6 @@ class BannerBinding extends TupleBinding {
 		return v;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.sleepycat.bind.tuple.TupleBinding#objectToEntry(java.lang.Object, com.sleepycat.bind.tuple.TupleOutput)
-	 */
 	public void objectToEntry(Object obj, TupleOutput to) {
 		Banner b = (Banner) obj;
 		to.writeInt(b.getID());
@@ -60,3 +57,4 @@ class BannerBinding extends TupleBinding {
 		to.writeString(b.getInterests().toString());
 	}
 }
+*/

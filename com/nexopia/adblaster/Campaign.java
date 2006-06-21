@@ -11,12 +11,11 @@ import java.util.Vector;
 
 
 
-class Banner{
+class Campaign{
 	Interests interests;
 	int id;
 	int payrate;
 	int maxHits;
-	int campaignID;
 	Vector locations;
 	Vector ages;
 	Vector sexes;
@@ -26,31 +25,19 @@ class Banner{
 		return count++;
 	}
 	
-	Banner() {
+	Campaign() {
 		interests = new Interests();
 		id = counter(); //TODO Banners need an ID we can track them by
 		maxHits = (int) (Math.pow((Math.random()-0.5) * 2,2) * 200) + 1;
 		this.payrate = (int)(Math.random()*10);
 	}
 	
-	/**
-	 * @return Returns the campaignID.
-	 */
-	public int getCampaignID() {
-		return campaignID;
-	}
-	/**
-	 * @param campaignID The campaignID to set.
-	 */
-	public void setCampaignID(int campaignID) {
-		this.campaignID = campaignID;
-	}
-	Banner(int id) {
+	Campaign(int id) {
 		this();
 		this.id = id;
 	}
 	
-	Banner(int id, int payrate, int maxHits, int campaignID, Vector locations, Vector ages, Vector sexes, Interests interests) {
+	Campaign(int id, int payrate, int maxHits, Vector locations, Vector ages, Vector sexes, Interests interests) {
 		this.id = id;
 		this.payrate = payrate;
 		this.maxHits = maxHits;

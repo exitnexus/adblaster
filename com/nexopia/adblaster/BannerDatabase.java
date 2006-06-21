@@ -18,6 +18,8 @@ import com.sleepycat.je.Environment;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
+//We shouldn't be using this we don't want to keep a local banner database
+/*
 public class BannerDatabase {
 	Database db;
 	
@@ -54,3 +56,4 @@ public class BannerDatabase {
 	}
 	
 }
+*/

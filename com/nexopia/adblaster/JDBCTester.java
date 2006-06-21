@@ -21,11 +21,14 @@ public class JDBCTester {
 			String sql = "SELECT * FROM banners";
 			Statement stmt = con.createStatement();
 			ResultSet rs = stmt.executeQuery(sql);
+			int i = 0;
 			while (rs.next()) {
+				i++;
 				String title = rs.getString("TITLE");
 				int id = rs.getInt("ID");
 				System.out.println(id + ": " + title);
 			}
+			System.out.println("Total: " + i);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
