@@ -22,7 +22,14 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 						
 			user_db = new UserDatabase(this.dbEnv);
 			
-			this.init(user_db.users.size(), banner_db.banners.size());
+			this.init(user_db.getUserCount(), banner_db.banners.size());
+			for (int i = 0; i < banner_db.banners.size(); i++){
+				this.setBanner(i, (Banner)banner_db.banners.get(i));
+			}
+			for (int i = 0; i < user_db.getUserCount(); i++){
+				this.setUser(i, user_db.getUser(i));
+			}
+			
 		} catch (DatabaseException dbe) {
 			System.err.println("DatabaseException: " + dbe);
 		}

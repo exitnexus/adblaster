@@ -55,7 +55,7 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	
 	public static void main(String args[]){
 		AdBlasterDbUniverse abu = new AdBlasterDbUniverse();
-		AdBlasterDbInstance abdbi = new AdBlasterDbInstance(null);
+		AdBlasterDbInstance abdbi = new AdBlasterDbInstance(abu);
 		AdBlasterPolicy pol = AdBlasterPolicy.randomPolicy(abu);
 		abdbi.fillInstance(pol);
 		

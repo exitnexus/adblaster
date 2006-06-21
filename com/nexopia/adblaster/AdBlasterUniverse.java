@@ -10,16 +10,17 @@ import java.util.Random;
  * 
  */
 public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
-	
+	protected int num_interests;
+
 	public AdBlasterUniverse(int interests, int num_banners, int num_users){
-		u = new User[num_users];
+		this.init(num_users, num_banners);
+		
 		for (int i = 0; i < num_users; i++){
-			u[i] = new User(i, null); //TODO we're passing in a null database here which is bad in the long run
+			setUser(i, new User(i, null)); //TODO we're passing in a null database here which is bad in the long run
 		}
 		
-		b = new Banner[num_banners];
 		for(int i = 0; i < num_banners; i++){
-			b[i] = new Banner();
+			setBanner(i, new Banner());
 		}
 		num_interests = interests;
 	}
@@ -45,7 +46,7 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 		for (int i = 0; i < num_users; i++){
 			for (int j = 0; j < ac.num_interests; j++){
 				if (Math.random() > 0.5){
-					ac.u[i].interests.add(new Integer(j));
+					ac.getUser(i).interests.add(new Integer(j));
 				}
 			}
 		}
@@ -53,16 +54,16 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 		/* Add a foolproof banner that never pays and never runs out.
 		 * 
 		 */
-		ac.b[0].setPayrate(0);
-		ac.b[0].setMaxHits(Integer.MAX_VALUE);
+		ac.getBanner(0).setPayrate(0);
+		ac.getBanner(0).setMaxHits(Integer.MAX_VALUE);
 
-		ac.b[0].interests.getChecked().clear();
+		ac.getBanner(0).interests.getChecked().clear();
 
 		for(int i = 1; i < num_banners; i++){
-			ac.b[i].setPayrate((int)(Math.random()*10));
+			ac.getBanner(i).setPayrate((int)(Math.random()*10));
 			for (int j = 0; j < ac.num_interests; j++){
 				if (Math.random() > 0.95){
-					ac.b[i].interests.add(new Integer(j));
+					ac.getBanner(i).interests.add(new Integer(j));
 				}
 			}
 		}

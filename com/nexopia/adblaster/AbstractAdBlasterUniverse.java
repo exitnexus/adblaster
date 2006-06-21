@@ -5,7 +5,6 @@ import java.awt.AWTEvent;
 public abstract class AbstractAdBlasterUniverse {
 	private User u[];
 	private Banner b[];
-	protected int num_interests;
 
 	protected void init(int u_num, int b_num){
 		u = new User[u_num];
@@ -18,14 +17,19 @@ public abstract class AbstractAdBlasterUniverse {
 	public int getBannerCount(){
 		return b.length;
 	}
+	protected void setBanner(int i, Banner banner) {
+		b[i] = banner;
+	}
+
 	public User getUser(int i) {
 		return u[i];
 	}
+
 	public int getUserCount(){
 		return u.length;
 	}
-	public int getNumInterests() {
-		return num_interests;
+	protected void setUser(int i, User user) {
+		u[i] = user;
 	}
 
 }

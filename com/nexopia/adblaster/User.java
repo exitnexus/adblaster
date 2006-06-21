@@ -40,9 +40,10 @@ class User {
 	int getID() {
 		return id;
 	}
+	static String sexes[] = {"m","f","u"};
 	
 	public String toString(){
-		return new Integer(id).toString();
+		return new Integer(id).toString() + ":" + age + ":" + sexes[sex];
 	}
 	byte getAge() {
 		return age;

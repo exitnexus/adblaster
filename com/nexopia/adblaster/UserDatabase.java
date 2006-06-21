@@ -6,12 +6,17 @@
  */
 package com.nexopia.adblaster;
 
+import java.io.File;
+import java.util.Random;
+import java.util.Vector;
+
 import com.sleepycat.je.Cursor;
 import com.sleepycat.je.Database;
 import com.sleepycat.je.DatabaseConfig;
 import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
+import com.sleepycat.je.EnvironmentConfig;
 
 /**
  * @author wolfe
@@ -53,12 +58,46 @@ public class UserDatabase {
 			User u = (User)ub.entryToObject(data);
 			return u;
 		} else {
+			System.out.println("Invalid user.");
 			return null;
 		}
 	}
 	
 	public int getUserCount(){
 		return userCount;
+	}
+	
+	public static void main(String args[]){
+		try {
+			EnvironmentConfig envConf = new EnvironmentConfig();
+			envConf.setAllowCreate(true);
+			Environment dbEnv = new Environment(new File("BerkDBTester.db"), envConf);
+			
+			UserDatabase user_db = new UserDatabase(dbEnv);
+
+			System.out.println(user_db.userCount);
+			
+			/*for (int i = 0; i < 100; i++){
+				User u = user_db.getUser(i);
+				System.out.println(u);
+			}*/
+			Random r = new Random ();
+			for (int i = 0; i < 5000; i++){
+				
+				int userid = i;
+				byte age = (byte)(14+r.nextInt(86));
+				byte sex = (byte)(r.nextBoolean()?1:0);
+				short loc = (short)r.nextInt();
+				String interests = "";
+				User u;
+				user_db.insert(u=new User(userid, age, sex, loc, interests));
+				System.out.println("Inserted " + u);
+			}
+			System.out.println(user_db.userCount);
+			
+		} catch (DatabaseException dbe) {
+			System.err.println("DatabaseException: " + dbe);
+		}
 	}
 	
 	public void refreshUserCount() {
