@@ -6,7 +6,8 @@
  */
 package com.nexopia.adblaster;
 
-import java.util.Random;
+import java.sql.SQLException;
+import java.sql.ResultSet;
 import java.util.Vector;
 
 
@@ -54,10 +55,22 @@ class Banner{
 		this.id = id;
 		this.payrate = payrate;
 		this.maxHits = maxHits;
+		this.campaignID = campaignID;
 		this.locations = locations;
 		this.ages = ages;
 		this.sexes = sexes;
 		this.interests = interests;
+	}
+	
+	Banner(ResultSet rs) throws SQLException {
+		this.id = rs.getInt("ID");
+		this.payrate = rs.getInt("PAYRATE");
+		this.maxHits = rs.getInt("MAXVIEWS");
+		this.campaignID = rs.getInt("CAMPAIGNID");
+		this.locations = Utilities.stringToVector(rs.getString("LOCATIONS"));
+		this.ages = Utilities.stringToVector(rs.getString("AGES"));
+		this.sexes = Utilities.stringToVector(rs.getString("SEX"));
+		this.interests = new Interests(rs.getString("INTERESTS"));
 	}
 	
 	int getID() {
