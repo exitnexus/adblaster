@@ -77,10 +77,6 @@ public class BannerDatabase {
 				int payrate = rs.getInt("PAYRATE");
 				int maxHits = rs.getInt("MAXVIEWS");
 				int campaignID = rs.getInt("CAMPAIGNID");
-				//System.out.println(parseCommaDelimitedInt(rs.getString("LOC")));
-				//System.out.println(rs.getString("AGE"));
-				//System.out.println(rs.getString("SEX"));
-				//System.out.println(rs.getString("INTERESTS"));
 				Vector location = parseCommaDelimitedInt(rs.getString("LOC"));
 				Vector ages = parseCommaDelimitedInt(rs.getString("AGE"));
 				Vector sexes = parseCommaDelimitedInt(rs.getString("SEX"));

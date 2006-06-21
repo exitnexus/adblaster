@@ -53,4 +53,8 @@ public class UserDatabase {
 		}
 	}
 	
+	public int getUserCount(){
+		return 1;
+	}
+	
 }

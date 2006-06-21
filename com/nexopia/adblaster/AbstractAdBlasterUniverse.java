@@ -3,9 +3,15 @@ package com.nexopia.adblaster;
 import java.awt.AWTEvent;
 
 public abstract class AbstractAdBlasterUniverse {
-	protected User u[];
-	protected Banner b[];
+	private User u[];
+	private Banner b[];
 	protected int num_interests;
+
+	protected void init(int u_num, int b_num){
+		u = new User[u_num];
+		b = new Banner[b_num];
+	}
+	
 	public Banner getBanner(int i) {
 		return b[i];
 	}

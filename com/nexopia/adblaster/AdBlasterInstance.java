@@ -36,44 +36,6 @@ public class AdBlasterInstance extends AbstractAdBlasterInstance{
 		}
 	}
 
-	public boolean isValidBannerForUser(User u, Banner b) {
-		return u.interests.hasAllIn(b.interests);
-	}
-	
-	public BannerView randomView(AbstractAdBlasterUniverse ac) {
-		// TODO Auto-generated method stub
-		User randomPick = campaign.getUser((int) (Math.random()*campaign.getUserCount()));
-		int time = (int) (Math.random()*60*60*24);
-		return new BannerView(randomPick, null, time);
-	}
-
-	public static AdBlasterInstance randomInstance(int num, AbstractAdBlasterUniverse ac) {
-		AdBlasterInstance instance = new AdBlasterInstance(ac);
-		for (int i = 0; i < num; i++){
-			BannerView bv = instance.randomView(ac);
-			instance.views.add(bv);
-		}
-		return instance;
-	}
-
-	/**
-	 * For a particular instance, get a list of all of the banners that were not served
-	 * that could have made a profit.
-	 * @return A vector of banners.
-	 */
-	public Vector getUnserved() {
-		Vector unserved = new Vector();
-		for (int i = 0; i < this.campaign.getBannerCount(); i++){
-			Banner b = (Banner)this.campaign.getBanner(i);
-			int count = count(b);
-			if (count < b.getMaxHits()){
-				unserved.add(new Tuple(b, new Integer(b.getMaxHits() - count)));
-			}
-		}
-		return unserved;
-	}
-
-
 	public AbstractAdBlasterInstance copy() {
 		AdBlasterInstance instance = new AdBlasterInstance(this.campaign);
 		instance.views = new Vector();

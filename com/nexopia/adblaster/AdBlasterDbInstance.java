@@ -41,10 +41,6 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 		}
 	}
 
-	public Vector getUnserved() {
-		return null;
-	}
-
 	public AbstractAdBlasterInstance copy() {
 		AbstractAdBlasterInstance instance = new AdBlasterDbInstance(this.campaign);
 		instance.views = new Vector();
@@ -58,7 +54,10 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	}
 	
 	public static void main(String args[]){
-		new AdBlasterDbInstance(null);
+		AdBlasterDbUniverse abu = new AdBlasterDbUniverse();
+		AdBlasterDbInstance abdbi = new AdBlasterDbInstance(null);
+		AdBlasterPolicy pol = AdBlasterPolicy.randomPolicy(abu);
+		abdbi.fillInstance(pol);
 		
 	}
 

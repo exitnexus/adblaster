@@ -19,8 +19,10 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 			dbEnv = new Environment(new File("BerkDBTester.db"), envConf);
 			
 			banner_db = new BannerDatabase();
-			
+						
 			user_db = new UserDatabase(this.dbEnv);
+			
+			this.init(user_db.users.size(), banner_db.banners.size());
 		} catch (DatabaseException dbe) {
 			System.err.println("DatabaseException: " + dbe);
 		}
