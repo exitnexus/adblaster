@@ -85,6 +85,7 @@ public class BannerViewDatabase {
 	}
 	
 	public void close() throws DatabaseException {
+		bannerTimeDb.close();
 		db.close();
 	}
 }
