@@ -30,7 +30,7 @@ public class BerkDBTester {
 			envConf.setAllowCreate(true);
 				dbEnv = new Environment(new File("BerkDBTester.db"), envConf);
 			db = new BannerViewDatabase(dbEnv);
-			userDb = new UserDatabase(dbEnv);
+			//userDb = new UserDatabase(dbEnv);
 			Random r = new Random(1);
 			for (int i=0; i<20000; i++) {
 				BannerView x = new BannerView(new User(0, userDb), new Banner(Math.abs(r.nextInt())%100), Math.abs(r.nextInt())%5);

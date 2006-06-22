@@ -33,6 +33,13 @@ class BannerViewBinding extends TupleBinding {
 	 * @see com.sleepycat.bind.tuple.TupleBinding#objectToEntry(java.lang.Object, com.sleepycat.bind.tuple.TupleOutput)
 	 */
 	public void objectToEntry(Object obj, TupleOutput to) {
+		/*User u = (User) obj;
+		to.writeInt(u.getID());
+		to.writeByte(u.getAge());
+		to.writeByte(u.getSex());
+		to.writeShort(u.getLocation());
+		to.writeString(u.getInterests().toString());
+		*/
 		BannerView bv = (BannerView)obj;
 		to.writeInt(bv.getBanner().getID());
 		to.writeInt(bv.getTime());

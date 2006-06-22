@@ -22,9 +22,20 @@ class Interests{
 	
 	Interests(String interests) {
 		this();
+		System.out.println("Interests:"+ interests);
 		StringTokenizer st = new StringTokenizer(interests, ",");
 		while (st.hasMoreTokens()) {
-			checked.put(new Integer(Integer.parseInt(st.nextToken())), Boolean.TRUE);
+			String token = st.nextToken();
+			if (token.length() == 0) {
+				continue;
+			}
+			try {
+				checked.put(new Integer(Integer.parseInt(token)), Boolean.TRUE);
+			} catch (NumberFormatException nfe) {
+				System.err.println("Number Format Exception creating Interests: "+ nfe);
+				nfe.printStackTrace();
+				//do nothing for any value that can't be parsed as an in
+			}
 		}
 	}
 	
