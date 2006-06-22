@@ -26,6 +26,7 @@ public class BannerViewDatabase {
 	Database db;
 	SecondaryDatabase bannerTimeDb;
 	int lastid;
+	int bannerviewcount;
 	
 	public BannerViewDatabase(Environment dbEnv) throws DatabaseException {
 		//Create our primary database keyed by a unique ID
@@ -79,4 +80,7 @@ public class BannerViewDatabase {
 		return new BannerViewCursor(c);
 	}
 	
+	public int getBannerViewCount() {
+		return lastid;
+	}
 }
