@@ -36,7 +36,7 @@ public class BannerViewDatabase {
 		Cursor cur = db.openCursor(null, null);
 		DatabaseEntry lastKey = new DatabaseEntry();
 		cur.getLast(lastKey, new DatabaseEntry(), null);
-		
+		cur.close();
 		if (lastKey != null && lastKey.getData() != null) {
 			IntegerBinding ib = new IntegerBinding();
 			Integer i = (Integer)ib.entryToObject(lastKey); 
