@@ -50,6 +50,8 @@ public class AdBlaster {
 		panel.add(tab, BorderLayout.CENTER);
 		
 		//ac = AdBlasterUniverse.generateTestData(num_banners, num_users);
+		//((AdBlasterUniverse)ac).makeMeADatabase(dbEnv);
+		
 		ac = new AdBlasterDbUniverse(dbEnv);
 		AdBlasterPolicy pol = AdBlasterPolicy.randomPolicy(ac);
 		

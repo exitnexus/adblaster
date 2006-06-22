@@ -101,6 +101,14 @@ public class UserDatabase {
 			DatabaseEntry value = new DatabaseEntry();
 			c = db.openCursor(null, null);
 			if (c.getFirst(key, value, null) == OperationStatus.SUCCESS) {
+				if (value.getData() != null) {
+					UserBinding ub = new UserBinding();
+					User u = (User)ub.entryToObject(value);
+					users.add(u);
+				} else {
+					System.out.println("Invalid user.");
+					return null;
+				}
 				while (c.getNext(key, value, null) == OperationStatus.SUCCESS) {
 					if (value.getData() != null) {
 						UserBinding ub = new UserBinding();
@@ -124,9 +132,9 @@ public class UserDatabase {
 				System.err.println("Failed to close cursor after getAllUsers: "+e);
 				e.printStackTrace();
 			}
-			return users;
 		}
-	}
+		return users;
+ 	}
 
 	public int getUserCount() {
 		return this.userCount;
@@ -149,17 +157,17 @@ public class UserDatabase {
 			System.out.println(user_db.userCount);
 			
 			Random r = new Random ();
-			for (int i = 0; i < 100; i++){
+			/*for (int i = 0; i < 100; i++){
 				
 				int userid = i;
 				byte age = (byte)(14+r.nextInt(86));
 				byte sex = (byte)(r.nextBoolean()?1:0);
 				short loc = (short)r.nextInt();
-				String interests = "1,4";
+				String interests = "1,4,6,7,8,9";
 				User u;
 				user_db.insert(u=new User(userid, age, sex, loc, interests));
 				System.out.println("Inserted " + u);
-			}
+			}*/
 			user_db.refreshUserCount();
 			System.out.println(user_db.getUserCount());
 			for (int i = 0; i < 100; i++){

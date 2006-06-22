@@ -5,6 +5,10 @@ package com.nexopia.adblaster;
 
 import java.util.Random;
 
+import com.sleepycat.je.DatabaseException;
+import com.sleepycat.je.Environment;
+import com.sleepycat.je.EnvironmentConfig;
+
 /* Represents a whole system (typically a website) of users with a set of banners, and \
  * targetting info that can relate the banners and users.
  * 
@@ -33,6 +37,27 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 		num_interests = interests;
 	}
 	
+	public void makeMeADatabase(Environment dbEnv){
+		try {			
+
+			EnvironmentConfig envConf = new EnvironmentConfig();
+			envConf.setAllowCreate(true);
+			
+			UserDatabase db = new UserDatabase(dbEnv);
+
+			Random r = new Random(1);
+			System.out.println("Should be inserting " + this.getUserCount() + " users.");
+			for (int i=0; i<this.getUserCount(); i++) {
+				db.insert((User)this.getUser(i));
+			}
+			
+			db.close();
+		} catch (DatabaseException e) {
+			System.err.println("DatabaseException: " + e);
+			e.printStackTrace();
+		}
+	}
+
 	public static AdBlasterUniverse generateTestData(int num_banners, int num_users){
 		/*Generate a set of test banners and parameters
 		 * 
@@ -46,7 +71,7 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 		 *   
 		 *  num_users (int)
 		 *  users (array)
-		 *   targetting data
+		 *   targetting dataxmms divx
 		 *  
 		 * 
 		 * */
@@ -58,6 +83,7 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 				}
 			}
 		}
+		
 		
 		/* Add a foolproof banner that never pays and never runs out.
 		 * 
