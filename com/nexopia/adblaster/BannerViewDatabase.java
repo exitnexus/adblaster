@@ -83,4 +83,8 @@ public class BannerViewDatabase {
 	public int getBannerViewCount() {
 		return lastid;
 	}
+	
+	public void close() throws DatabaseException {
+		db.close();
+	}
 }
