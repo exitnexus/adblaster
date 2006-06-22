@@ -58,4 +58,8 @@ public class BannerViewCursor {
 			return null;
 		}
 	}
+	
+	public void close() throws DatabaseException {
+		c.close();
+	}
 }
