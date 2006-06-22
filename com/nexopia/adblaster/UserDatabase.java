@@ -64,10 +64,11 @@ public class UserDatabase {
 	}
 	
 	public void refreshUserCount() {
+		Cursor c = null;
 		try {
 			DatabaseEntry key = new DatabaseEntry();
 			DatabaseEntry value = new DatabaseEntry();
-			Cursor c = db.openCursor(null, null);
+			c = db.openCursor(null, null);
 			if (c.getFirst(key, value, null) == OperationStatus.SUCCESS) {
 				int i = 1;
 				while (c.getNext(key, value, null) == OperationStatus.SUCCESS) {
@@ -81,6 +82,13 @@ public class UserDatabase {
 			this.userCount = 0;
 			System.err.println("Database Exception in refreshUserCount(): " + dbe);
 			dbe.printStackTrace();
+		} finally {
+			try {
+				c.close();
+			} catch (DatabaseException e) {
+				System.err.println("Failed to close cursor after refreshUserCount: "+e);
+				e.printStackTrace();
+			}
 		}
 	}
 	
