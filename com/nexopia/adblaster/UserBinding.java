@@ -39,7 +39,7 @@ class UserBinding extends TupleBinding {
 			} catch (IllegalArgumentException e){
 				System.err.println("Warning... did not load interests.");
 				e.printStackTrace();
-				s = "";
+				s = "";   
 			}
 		}
 		

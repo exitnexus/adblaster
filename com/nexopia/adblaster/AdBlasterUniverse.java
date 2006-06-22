@@ -16,7 +16,15 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 		this.init(num_users, num_banners);
 		
 		for (int i = 0; i < num_users; i++){
-			setUser(i, new User(i, null)); //TODO we're passing in a null database here which is bad in the long run
+			Random r = new Random(System.currentTimeMillis());
+			int userid = i;
+			byte age = (byte)(14+r.nextInt(86));
+			byte sex = (byte)(r.nextBoolean()?1:0);
+			short loc = (short)r.nextInt(1000);
+			String inter = "1,4";
+			System.out.println(userid + ":" + age + ":" + sex + ":" + loc + ":" + inter);
+			
+			setUser(i, new User(userid, age, sex, loc, inter)); //TODO we're passing in a null database here which is bad in the long run
 		}
 		
 		for(int i = 0; i < num_banners; i++){
