@@ -8,6 +8,7 @@ package com.nexopia.adblaster;
 
 import java.io.File;
 import java.util.Random;
+import java.util.Vector;
 
 import com.sleepycat.je.Cursor;
 import com.sleepycat.je.Database;
@@ -91,7 +92,42 @@ public class UserDatabase {
 			}
 		}
 	}
-	
+
+	public Vector getAllUsers() {
+		Vector users = new Vector();
+		Cursor c = null;
+		try {
+			DatabaseEntry key = new DatabaseEntry();
+			DatabaseEntry value = new DatabaseEntry();
+			c = db.openCursor(null, null);
+			if (c.getFirst(key, value, null) == OperationStatus.SUCCESS) {
+				while (c.getNext(key, value, null) == OperationStatus.SUCCESS) {
+					if (value.getData() != null) {
+						UserBinding ub = new UserBinding();
+						User u = (User)ub.entryToObject(value);
+						users.add(u);
+					} else {
+						System.out.println("Invalid user.");
+						return null;
+					}
+				}
+			}
+		} catch (DatabaseException dbe) {
+			System.err.println("Database Exception in getAllUsers(): " + dbe);
+			dbe.printStackTrace();
+		} catch (Exception e){
+			e.printStackTrace();
+		} finally {
+			try {
+				c.close();
+			} catch (DatabaseException e) {
+				System.err.println("Failed to close cursor after getAllUsers: "+e);
+				e.printStackTrace();
+			}
+			return users;
+		}
+	}
+
 	public int getUserCount() {
 		return this.userCount;
 	}

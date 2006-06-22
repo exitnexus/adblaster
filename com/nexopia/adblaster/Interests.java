@@ -22,7 +22,6 @@ class Interests{
 	
 	Interests(String interests) {
 		this();
-		System.out.println("Interests:"+ interests);
 		StringTokenizer st = new StringTokenizer(interests, ",");
 		while (st.hasMoreTokens()) {
 			String token = st.nextToken();

@@ -7,8 +7,6 @@ import com.sleepycat.je.Environment;
 public abstract class AbstractAdBlasterInstance {
 
 	Vector views;
-	Environment dbEnv;
-	BannerViewDatabase db;
 	AbstractAdBlasterUniverse campaign;
 	
 	public AbstractAdBlasterInstance(AbstractAdBlasterUniverse ac){
@@ -39,7 +37,7 @@ public abstract class AbstractAdBlasterInstance {
 	}
 
 	public Vector getUnserved() {
-		/**
+		/**Loaded bannervie
 		 * For a particular instance, get a list of all of the banners that were not served
 		 * that could have made a profit.
 		 * @return A vector of banners.

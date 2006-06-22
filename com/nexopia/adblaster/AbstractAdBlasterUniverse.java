@@ -32,4 +32,18 @@ public abstract class AbstractAdBlasterUniverse {
 		u[i] = user;
 	}
 
+	public Banner getRandomBannerMatching(BannerView bv, AdBlasterInstance instance) {
+		User u = bv.u;
+		
+		Banner match = null;
+		while (match == null){
+			Banner b = getBanner((int)(Math.random()*getBannerCount()));
+			if (instance.isValidBannerForUser(u, b) && (instance.count(b) < b.getMaxHits())){
+				match = b;
+			}
+		}
+		
+		return match;	
+	}
+
 }

@@ -27,7 +27,23 @@ class UserBinding extends TupleBinding {
 	 */
 	public Object entryToObject(TupleInput ti) {
 		//TODO need to get Banner and User out from inside AdCampaign so this works
-		User u = new User(ti.readInt(), ti.readByte(), ti.readByte(), ti.readShort(), ti.readString(ti.getStringByteLength()-1));
+		int id = ti.readInt();
+		byte age = ti.readByte();
+		byte sex = ti.readByte();
+		short loc = ti.readShort();
+		int len = ti.getStringByteLength()-1;
+		String s = "";
+		if (len > 0){
+			try {
+				s = ti.readString(len);
+			} catch (IllegalArgumentException e){
+				System.err.println("Warning... did not load interests.");
+				e.printStackTrace();
+				s = "";
+			}
+		}
+		
+		User u = new User(id, age, sex, loc, s);
 		return u;
 	}
 

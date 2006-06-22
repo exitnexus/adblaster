@@ -35,6 +35,8 @@ class User {
 		this.sex = sex;
 		this.location = location;
 		this.interests = new Interests(interests);
+		System.out.println("Creating user with interests:"+ interests);
+
 	}
 
 	int getID() {

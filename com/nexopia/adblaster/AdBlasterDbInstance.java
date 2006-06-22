@@ -9,32 +9,31 @@ import com.sleepycat.je.EnvironmentConfig;
 
 public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 
-	BannerViewDatabase bannerview_db;
 	Environment dbEnv;
-	
-	public AdBlasterDbInstance(AbstractAdBlasterUniverse c){
+
+	public AdBlasterDbInstance(AbstractAdBlasterUniverse c, Environment dbEnv){
 		super(c);
-		try {
-			EnvironmentConfig envConf = new EnvironmentConfig();
-			envConf.setAllowCreate(true);
-			dbEnv = new Environment(new File("BerkDBTester.db"), envConf);
-			db = new BannerViewDatabase(dbEnv);
-			bannerview_db = new BannerViewDatabase(this.dbEnv);
-		} catch (DatabaseException dbe) {
-			System.err.println("DatabaseException: " + dbe);
-		}
+		this.dbEnv = dbEnv;
 		
 	}
 
 	public void fillInstance(AdBlasterPolicy pol) {
 		try {
-			BannerViewCursor cursor = bannerview_db.getCursor(0,0);
-			while(cursor.getCurrent() != null){
-				BannerView bv = cursor.getCurrent();
-				bv.b = pol.getBestBanner(this, bv);
+			BannerViewDatabase db;
+			db = new BannerViewDatabase(dbEnv);
+			BannerViewCursor cursor = db.getCursor(0,0);
+			int i = 0;
+			BannerView bv = null;
+			while((bv = cursor.getNext()) != null){
+				i++;
+				if (i%100 == 0){
+					System.out.println("Loaded bannerview " + i + ": " + bv);
+				}
+				//bv.b = pol.getBestBanner(this, bv);
 				this.views.add(bv);
-				cursor.getNext();
 			}
+			cursor.close();
+			db.close();
 		} catch (DatabaseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -42,20 +41,28 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	}
 
 	public AbstractAdBlasterInstance copy() {
-		AbstractAdBlasterInstance instance = new AdBlasterDbInstance(this.campaign);
+		AdBlasterDbInstance instance = new AdBlasterDbInstance(this.campaign, this.dbEnv);
 		instance.views = new Vector();
 		for (int i = 0; i < this.views.size(); i++){
 			instance.views.add(((BannerView)this.views.get(i)).copy());
 		}
-		instance.dbEnv = this.dbEnv;
-		instance.db = this.db;
 		return instance;
 
 	}
 	
 	public static void main(String args[]){
-		AdBlasterDbUniverse abu = new AdBlasterDbUniverse();
-		AdBlasterDbInstance abdbi = new AdBlasterDbInstance(abu);
+		EnvironmentConfig envConf = new EnvironmentConfig();
+		envConf.setAllowCreate(true);
+
+		Environment dbEnv = null;
+		try {
+			dbEnv = new Environment(new File("BerkDBTester.db"), envConf);
+		} catch (DatabaseException e1) {
+			e1.printStackTrace();
+		}
+
+		AdBlasterDbUniverse abu = new AdBlasterDbUniverse(dbEnv);
+		AdBlasterDbInstance abdbi = new AdBlasterDbInstance(abu, dbEnv);
 		AdBlasterPolicy pol = AdBlasterPolicy.randomPolicy(abu);
 		abdbi.fillInstance(pol);
 		

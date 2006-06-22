@@ -26,4 +26,7 @@ class BannerView{
 	BannerView copy(){
 		return new BannerView(u,b,time);
 	}
+	public String toString(){
+		return u.toString() + " : " + b.toString() + ":" + time;
+	}
 }

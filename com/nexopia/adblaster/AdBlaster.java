@@ -7,6 +7,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -19,15 +20,26 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.*;
 
 import com.sleepycat.je.DatabaseException;
+import com.sleepycat.je.Environment;
+import com.sleepycat.je.EnvironmentConfig;
 
 public class AdBlaster {
 
-	static int num_serves = 1000;
+	static int num_serves = 10000;
 	static int num_users = 100;
 	static int num_banners = 10;
 	static AbstractAdBlasterUniverse ac;
 	
 	public static void main(String args[]){
+		EnvironmentConfig envConf = new EnvironmentConfig();
+		envConf.setAllowCreate(true);
+
+		Environment dbEnv = null;
+		try {
+			dbEnv = new Environment(new File("BerkDBTester.db"), envConf);
+		} catch (DatabaseException e1) {
+			e1.printStackTrace();
+		}
 		
 		JFrame frame = new JFrame("AdBlaster Test");
 		JPanel panel = new JPanel(new BorderLayout());
@@ -38,18 +50,34 @@ public class AdBlaster {
 		panel.add(tab, BorderLayout.CENTER);
 		
 		//ac = AdBlasterUniverse.generateTestData(num_banners, num_users);
-		ac = new AdBlasterDbUniverse();
+		ac = new AdBlasterDbUniverse(dbEnv);
 		AdBlasterPolicy pol = AdBlasterPolicy.randomPolicy(ac);
 		
 		JPanel resultPanel = new JPanel(new BorderLayout());
 		
-		for (int day = 0; day < 5; day++){
+		//AdBlasterInstance instance1 = AdBlasterInstance.randomInstance(num_serves, ac);
+		//instance1.fillInstance(pol);
+		//instance1.makeMeADatabase(dbEnv);
+
+		AbstractAdBlasterInstance instance2 = new AdBlasterDbInstance(ac, dbEnv);
+		instance2.fillInstance(pol);
+
+		try {
+			dbEnv.close();
+		} catch (DatabaseException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		System.exit(0);
+
+		for (int day = 0; day < 1; day++){
 			System.out.println("Day "+ day);
 			//AdBlasterInstance instance = AdBlasterInstance.randomInstance(num_serves, ac);
-			AbstractAdBlasterInstance instance = new AdBlasterDbInstance(ac);
+			AbstractAdBlasterInstance instance = new AdBlasterDbInstance(ac, dbEnv);
 			System.out.println("Instances generated.");
 			for (int i = 0; i < 1; i++){
 				instance.fillInstance(pol);
+				//instance.makeMeADatabase();
 
 				resultPanel = new JPanel(new BorderLayout());
 				JScrollPane scroll = new JScrollPane(resultPanel);

@@ -31,7 +31,8 @@ public class AdBlasterInstance extends AbstractAdBlasterInstance{
 				time = System.currentTimeMillis();
 			}
 			BannerView bv = (BannerView)views.get(i);
-			Banner b = pol.getBestBanner(this, bv);
+			//Banner b = pol.getBestBanner(this, bv);
+			Banner b = campaign.getRandomBannerMatching(bv, this);
 			bv.b = b;
 		}
 	}
@@ -42,23 +43,25 @@ public class AdBlasterInstance extends AbstractAdBlasterInstance{
 		for (int i = 0; i < this.views.size(); i++){
 			instance.views.add(((BannerView)this.views.get(i)).copy());
 		}
-		instance.dbEnv = this.dbEnv;
-		instance.db = this.db;
 		return instance;
 
 	}
 	
-	public void makeMeADatabase(){
-		try {
+	public void makeMeADatabase(Environment dbEnv){
+		try {			
+
 			EnvironmentConfig envConf = new EnvironmentConfig();
 			envConf.setAllowCreate(true);
-				dbEnv = new Environment(new File("BerkDBTester.db"), envConf);
-			db = new BannerViewDatabase(dbEnv);
-			UserDatabase userDb = new UserDatabase(dbEnv);
+			
+			BannerViewDatabase db = new BannerViewDatabase(dbEnv);
+
 			Random r = new Random(1);
+			System.out.println("Should be inserting " + this.views.size() + " BannerViews.");
 			for (int i=0; i<this.views.size(); i++) {
 				db.insert((BannerView)this.views.get(i));
 			}
+			
+			db.close();
 		} catch (DatabaseException e) {
 			System.err.println("DatabaseException: " + e);
 			e.printStackTrace();
