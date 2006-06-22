@@ -23,7 +23,7 @@ class UserBinding extends TupleBinding {
 	 */
 	public Object entryToObject(TupleInput ti) {
 		//TODO need to get Banner and User out from inside AdCampaign so this works
-		User u = new User(ti.readInt(), ti.readByte(), ti.readByte(), ti.readShort(), ti.readString(ti.getStringByteLength()));
+		User u = new User(ti.readInt(), ti.readByte(), ti.readByte(), ti.readShort(), ti.readString(ti.getStringByteLength()-1));
 		return u;
 	}
 

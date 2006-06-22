@@ -40,7 +40,7 @@ class User {
 	int getID() {
 		return id;
 	}
-	static String sexes[] = {"m","f","u"};
+	static String sexes[] = {"u","m","f"};
 	
 	public String toString(){
 		return new Integer(id).toString() + ":" + age + ":" + sexes[sex];
