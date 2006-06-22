@@ -20,7 +20,7 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	public void fillInstance(AdBlasterPolicy pol) {
 		try {
 			BannerViewDatabase db;
-			db = new BannerViewDatabase(dbEnv);
+			db = new BannerViewDatabase();
 			BannerViewCursor cursor = db.getCursor(0,0);
 			int i = 0;
 			BannerView bv = null;

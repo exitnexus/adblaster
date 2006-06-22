@@ -53,7 +53,7 @@ public class AdBlasterInstance extends AbstractAdBlasterInstance{
 			EnvironmentConfig envConf = new EnvironmentConfig();
 			envConf.setAllowCreate(true);
 			
-			BannerViewDatabase db = new BannerViewDatabase(dbEnv);
+			BannerViewDatabase db = new BannerViewDatabase();
 
 			Random r = new Random(1);
 			System.out.println("Should be inserting " + this.views.size() + " BannerViews.");

@@ -23,7 +23,7 @@ class BannerViewBinding extends TupleBinding {
 	 */
 	public Object entryToObject(TupleInput ti) {
 		//TODO need to get Banner and User out from inside AdCampaign so this works
-		Banner b = new Banner(ti.readInt());
+		Banner b = new Banner(ti.readInt());//, BerkDBTester.bannerMap);
 		int time = ti.readInt();
 		User u = new User(ti.readInt(), BerkDBTester.userDb);
 		return new BannerView(u,b,time);

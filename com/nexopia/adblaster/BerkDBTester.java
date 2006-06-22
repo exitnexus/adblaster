@@ -4,6 +4,12 @@
 package com.nexopia.adblaster;
 
 import java.io.File;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Random;
 
 import com.sleepycat.je.Cursor;
@@ -24,23 +30,41 @@ import com.sleepycat.je.StatsConfig;
 
 public class BerkDBTester {
 	static UserDatabase userDb;
+	static HashMap bannerMap;
 	
 	public static void main(String[] args) {
+		//load all banners into memory
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			String url = "jdbc:mysql://192.168.0.50:3307/banner";
+			Connection con = DriverManager.getConnection(url, "nathan", "nathan");
+			String sql = "SELECT * FROM banners";
+			Statement stmt = con.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+			System.out.println(rs.getFetchSize());
+			HashMap banners = new HashMap();
+			for (int i=0; rs.next(); i++) {
+				banners.put(new Integer(rs.getInt("ID")), new Banner(rs));
+			}
+			/*//Display the Banners
+			for (Iterator it = banners.values().iterator(); it.hasNext(); ){
+				Banner b = (Banner)it.next();
+				System.out.println(b.getID() + " " + b.getInterests());
+			}*/
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		//Create our UserDB and BannerViewDB
 		Environment dbEnv = null;
 		BannerViewDatabase db = null;
-		userDb = null;
+		//userDb = null;
 		//try {
 		try {
-			EnvironmentConfig envConf = new EnvironmentConfig();
-			envConf.setAllowCreate(true);
-			System.out.println("No Write Sync: " + envConf.getTxnWriteNoSync() );
-			System.out.println("No Sync: " + envConf.getTxnNoSync() );
-			System.out.println("envConf: " + envConf);
-			System.out.println("Locking: " + envConf.getLocking());
-			System.out.println("Transactional: " + envConf.getTransactional());
-			dbEnv = new Environment(new File("BerkDBTester.db"), envConf);
-			UserDatabase udb = new UserDatabase(dbEnv);
+			db = new BannerViewDatabase(); 
+			
 			Random r = new Random(1);
+			/*
 			for (int i=0; i<20000; i++) {
 				int userid = i;
 				byte age = (byte)(14+r.nextInt(86));
@@ -48,11 +72,22 @@ public class BerkDBTester {
 				short loc = (short)r.nextInt();
 				String interests = "1,4";
 				User u = new User(userid, age, sex, loc, interests);
-				udb.insert(u);
+				Banner b = new Banner(2);
+				BannerView bv = new BannerView(u,b,3);
+				db.insert(bv);
 			}
-			userDb.close();
+			db.close();
 			dbEnv.close();
 			/*/
+			BannerViewCursor c = db.getCursor(0,0);
+			BannerView bv = c.getCurrent();
+			int i=0;
+			while (bv != null) {
+				System.out.println("Line: " + i + " - BannerID: " + bv.getBanner().getID() + " - TimeStamp: " + bv.getTime());
+				i++;
+				bv = c.getNext();
+			}
+			/*
 			Cursor c = rawDb.openCursor(null,null);
 			DatabaseEntry key = new DatabaseEntry();
 			DatabaseEntry data = new DatabaseEntry();
@@ -72,14 +107,7 @@ public class BerkDBTester {
 				User u = udb.getUser(i);
 				System.out.println(u);
 			}
-			/*BannerViewCursor c = db.getCursor(0,0);
-			BannerView bv = c.getCurrent();
-			int i=0;
-			while (bv != null) {
-				System.out.println("Line: " + i + " - BannerID: " + bv.getBanner().getID() + " - TimeStamp: " + bv.getTime());
-				i++;
-				bv = c.getNext();
-			}*/
+			/**/
 		} catch (Exception e) {
 			System.err.println("Exception: " + e);
 			e.printStackTrace();

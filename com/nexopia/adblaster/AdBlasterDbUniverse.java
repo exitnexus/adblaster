@@ -45,9 +45,9 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 			UserDatabase user_db;
 			BannerDatabase banner_db;
 			banner_db = new BannerDatabase();
-			user_db = new UserDatabase(dbEnv);
+			user_db = new UserDatabase();
 			this.init(user_db.getUserCount(), banner_db.banners.size());
-			for (int i = 0; i < b10100anner_db.banners.size(); i++){
+			for (int i = 0; i < banner_db.banners.size(); i++){
 				this.setBanner(i, (Banner)banner_db.banners.get(i));
 			}
 			user_db.refreshUserCount();

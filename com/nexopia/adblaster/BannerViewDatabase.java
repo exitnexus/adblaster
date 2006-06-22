@@ -6,12 +6,15 @@
  */
 package com.nexopia.adblaster;
 
+import java.io.File;
+
 import com.sleepycat.je.Cursor;
 import com.sleepycat.je.Database;
 import com.sleepycat.je.DatabaseConfig;
 import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
+import com.sleepycat.je.EnvironmentConfig;
 import com.sleepycat.je.SecondaryConfig;
 import com.sleepycat.je.SecondaryCursor;
 import com.sleepycat.je.SecondaryDatabase;
@@ -25,14 +28,18 @@ import com.sleepycat.je.SecondaryDatabase;
 public class BannerViewDatabase {
 	Database db;
 	SecondaryDatabase bannerTimeDb;
+	Environment env;
 	int lastid;
 	int bannerviewcount;
 	
-	public BannerViewDatabase(Environment dbEnv) throws DatabaseException {
+	public BannerViewDatabase() throws DatabaseException {
 		//Create our primary database keyed by a unique ID
+		EnvironmentConfig envConf = new EnvironmentConfig();
+		envConf.setAllowCreate(true);
+		env = new Environment(new File("BannerView.db"), envConf);
 		DatabaseConfig dbConf = new DatabaseConfig();
 		dbConf.setAllowCreate(true);
-		this.db = dbEnv.openDatabase(null, "PrimaryBannerViews", dbConf);
+		this.db = env.openDatabase(null, "PrimaryBannerViews", dbConf);
 		Cursor cur = db.openCursor(null, null);
 		DatabaseEntry lastKey = new DatabaseEntry();
 		cur.getLast(lastKey, new DatabaseEntry(), null);
@@ -51,7 +58,7 @@ public class BannerViewDatabase {
 		bannerTimeConf.setAllowCreate(true);
 		bannerTimeConf.setSortedDuplicates(true);
 		bannerTimeConf.setKeyCreator(bannerTimeKey);
-		bannerTimeDb = dbEnv.openSecondaryDatabase(null, "BannerTimeViews", db, bannerTimeConf);
+		bannerTimeDb = env.openSecondaryDatabase(null, "BannerTimeViews", db, bannerTimeConf);
 	}
 	
 	public void insert(BannerView bv) throws DatabaseException  {
@@ -87,5 +94,6 @@ public class BannerViewDatabase {
 	public void close() throws DatabaseException {
 		bannerTimeDb.close();
 		db.close();
+		env.close();
 	}
 }

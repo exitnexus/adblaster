@@ -28,12 +28,16 @@ import com.sleepycat.je.OperationStatus;
 
 public class UserDatabase {
 	private Database db;
+	private Environment env;
 	int userCount;
 	
-	public UserDatabase(Environment dbEnv) throws DatabaseException {
+	public UserDatabase() throws DatabaseException {
+		EnvironmentConfig envConf = new EnvironmentConfig();
+		envConf.setAllowCreate(true);
+		env = new Environment(new File("User.db"), envConf);
 		DatabaseConfig dbConf = new DatabaseConfig();
 		dbConf.setAllowCreate(true);
-		db = dbEnv.openDatabase(null, "PrimaryBannerViews", dbConf);
+		db = env.openDatabase(null, "PrimaryBannerViews", dbConf);
 		this.refreshUserCount();
 	}
 	
@@ -142,17 +146,14 @@ public class UserDatabase {
 	
 	public void close() throws DatabaseException {
 		this.db.close();
+		this.env.close();
 	}
 	
 	public static void main(String args[]){
 		UserDatabase user_db = null;
 		Environment dbEnv = null;
 		try {
-			EnvironmentConfig envConf = new EnvironmentConfig();
-			envConf.setAllowCreate(true);
-			dbEnv = new Environment(new File("BerkDBTester.db"), envConf);
-			
-			user_db = new UserDatabase(dbEnv);
+			user_db = new UserDatabase();
 			
 			System.out.println(user_db.userCount);
 			
@@ -180,7 +181,6 @@ public class UserDatabase {
 		} finally {
 			try {
 				user_db.close();
-				dbEnv.close();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
