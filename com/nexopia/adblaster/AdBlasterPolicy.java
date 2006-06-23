@@ -57,12 +57,11 @@ public class AdBlasterPolicy {
 			int totalAvailable = 1;
 			int totalUsed = 0;
 			Banner b = campaign.getBanner(i);
-			for (Iterator it = instance.views.iterator(); it.hasNext();){
-				BannerView bv = (BannerView)it.next();
-				if (instance.isValidBannerForUser(bv.u,b)){
+			for (int j = 0; j < instance.getViewCount(); j++){
+				if (instance.isValidBannerForUser(instance.getUserForView(j),b)){
 					totalAvailable++;
 				}
-				if (bv.b == b){
+				if (instance.getBannerForView(j) == b){
 					totalUsed++;
 				}
 			}

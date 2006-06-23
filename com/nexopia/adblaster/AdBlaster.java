@@ -8,7 +8,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
-import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.JFrame;
@@ -25,22 +24,13 @@ import com.sleepycat.je.EnvironmentConfig;
 
 public class AdBlaster {
 
-	static int num_serves = 10000;
-	static int num_users = 100;
+	static int num_serves = 100000;
+	static int num_users = 1000;
 	static int num_banners = 10;
 	static AbstractAdBlasterUniverse ac;
 	
 	public static void main(String args[]){
-		EnvironmentConfig envConf = new EnvironmentConfig();
-		envConf.setAllowCreate(true);
-
-		Environment dbEnv = null;
-		try {
-			dbEnv = new Environment(new File("BerkDBTester.db"), envConf);
-		} catch (DatabaseException e1) {
-			e1.printStackTrace();
-		}
-		
+				
 		JFrame frame = new JFrame("AdBlaster Test");
 		JPanel panel = new JPanel(new BorderLayout());
 		
@@ -48,15 +38,16 @@ public class AdBlaster {
 
 		JTabbedPane tab = new JTabbedPane();
 		panel.add(tab, BorderLayout.CENTER);
+		JPanel resultPanel = new JPanel(new BorderLayout());
 		
 		//ac = AdBlasterUniverse.generateTestData(num_banners, num_users);
 		//((AdBlasterUniverse)ac).makeMeADatabase(dbEnv);
 		
-		ac = new AdBlasterDbUniverse(dbEnv);
+		ac = new AdBlasterDbUniverse();
+		
 		AdBlasterPolicy pol = AdBlasterPolicy.randomPolicy(ac);
 		
-		JPanel resultPanel = new JPanel(new BorderLayout());
-		
+		/*
 		//AdBlasterInstance instance1 = AdBlasterInstance.randomInstance(num_serves, ac);
 		//instance1.fillInstance(pol);
 		//instance1.makeMeADatabase(dbEnv);
@@ -71,13 +62,13 @@ public class AdBlaster {
 			e1.printStackTrace();
 		}
 		System.exit(0);
-
+		*/
 		for (int day = 0; day < 1; day++){
 			System.out.println("Day "+ day);
 			//AdBlasterInstance instance = AdBlasterInstance.randomInstance(num_serves, ac);
-			AbstractAdBlasterInstance instance = new AdBlasterDbInstance(ac, dbEnv);
+			AbstractAdBlasterInstance instance = new AdBlasterDbInstance(ac);
 			System.out.println("Instances generated.");
-			for (int i = 0; i < 1; i++){
+			for (int i = 0; i < 2; i++){
 				instance.fillInstance(pol);
 				//instance.makeMeADatabase();
 
@@ -87,9 +78,9 @@ public class AdBlaster {
 				DefaultTableModel model = new DefaultTableModel(num_serves,3);
 				JTable table = new JTable(model);
 				for (int j = 0; j < num_serves; j++){
-					model.setValueAt(((BannerView)instance.views.get(j)).u, j,0);
-					model.setValueAt(((BannerView)instance.views.get(j)).b, j,1);
-					model.setValueAt(outputTime(((BannerView)instance.views.get(j)).time), j,2);
+					model.setValueAt(instance.getUserForView(j), j,0);
+					model.setValueAt(instance.getBannerForView(j), j,1);
+					model.setValueAt(outputTime(instance.getTimeForView(j)), j,2);
 				}
 				resultPanel.add(table, BorderLayout.CENTER);
 				JPanel statPanel = new JPanel(new FlowLayout());
@@ -140,26 +131,25 @@ public class AdBlaster {
 			Tuple t = (Tuple)unserved.get(i);
 			Banner b = (Banner)t.data.get(0); 
 			int c = ((Integer)t.data.get(1)).intValue(); 
-			for (int j = 0; j < instance.views.size() && c > 0; j++){
+			for (int j = 0; j < instance.getViewCount() && c > 0; j++){
 				//System.out.println("Trying bannerview " + j);
-				BannerView bv = (BannerView) instance.views.get(j);
-				if (bv.b.getPayrate() < b.getPayrate()){
-					if (instance.isValidBannerForUser(bv.u,b)){
+				if (instance.getBannerForView(j).getPayrate() < b.getPayrate()){
+					if (instance.isValidBannerForUser(instance.getUserForView(j),b)){
 						//single swapbreak;
 						c--;
-						bv.b = b;
+						instance.setBannerView(j, b);
 					} else {
 						Vector swaps = null;
 						int swap_max = 2;
 						for (int l = 1; l < swap_max; l+=2){
-								Vector path = depthLimitedDFS(bv, b, instance, l);
+								Vector path = instance.depthLimitedDFS(j, b, l);
 								if (path != null){
 									swaps = path;
 									break;
 								}
 						}
 						if (swaps != null){
-							doSwap(swaps, b, instance);
+							instance.doSwap(swaps, b);
 							c--;
 						}
 					}
@@ -171,57 +161,6 @@ public class AdBlaster {
 					
 				
 			
-	private static void doSwap(Vector swaps, Banner endBanner, AbstractAdBlasterInstance instance) {
-		//System.out.println("Swapping " + swaps);
-		Iterator it = swaps.iterator();
-		BannerView second = (BannerView)it.next();
-		for (; it.hasNext(); ){
-			BannerView first = second;
-			second = (BannerView)it.next();
-			
-			if (instance.isValidBannerForUser(first.u, second.b)){
-				first.b = second.b;
-			} else {
-				System.err.println("Error:  Bad switch.");
-			}
-			
-		}
-		second.b = endBanner;
-		
-	}
-
-	private static Vector depthLimitedDFS(BannerView src, Banner b, AbstractAdBlasterInstance instance, int depth) {
-		if (instance.isValidBannerForUser(src.u,b)){
-			Vector path = new Vector();
-			path.add(src);
-			return path;
-		}
-		if (depth < 0){
-			return null;
-		}
-		Vector v2 = getAllBannerViewsThatCanSwapWith(src.b, instance);
-		for (Iterator it = v2.iterator(); it.hasNext() ;){
-			BannerView next_vert = (BannerView)it.next();
-			Vector result = depthLimitedDFS(next_vert, b, instance, depth-1);
-			if (result != null && !result.contains(src)){
-				result.add(src);
-				return result;
-			}
-		}
-		return null;
-	}
-
-	private static Vector getAllBannerViewsThatCanSwapWith(Banner b, AbstractAdBlasterInstance instance) {
-		Vector v = new Vector();
-		for (Iterator it = instance.views.iterator(); it.hasNext() ;){
-			BannerView bv = (BannerView)it.next();
-			if (instance.isValidBannerForUser(bv.u, b)){
-				v.add(bv);
-			}
-		}
-		return v;
-	}
-
 	private static float maxProfit(AbstractAdBlasterInstance instance){
 		float count = -1;
 		AbstractAdBlasterInstance i2 = instance.copy();

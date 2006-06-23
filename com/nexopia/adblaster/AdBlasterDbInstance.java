@@ -9,12 +9,9 @@ import com.sleepycat.je.EnvironmentConfig;
 
 public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 
-	Environment dbEnv;
 
-	public AdBlasterDbInstance(AbstractAdBlasterUniverse c, Environment dbEnv){
+	public AdBlasterDbInstance(AbstractAdBlasterUniverse c){
 		super(c);
-		this.dbEnv = dbEnv;
-		
 	}
 
 	public void fillInstance(AdBlasterPolicy pol) {
@@ -24,13 +21,15 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 			BannerViewCursor cursor = db.getCursor(0,0);
 			int i = 0;
 			BannerView bv = null;
-			while((bv = cursor.getNext()) != null){
+			bv = cursor.getCurrent();
+			while(bv  != null){
 				i++;
 				if (i%100 == 0){
 					System.out.println("Loaded bannerview " + i + ": " + bv);
 				}
-				//bv.b = pol.getBestBanner(this, bv);
-				this.views.add(bv);
+				bv.b = pol.getBestBanner(this, bv);
+				this.addView(bv);
+				bv = cursor.getNext();
 			}
 			cursor.close();
 			db.close();
@@ -41,10 +40,10 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	}
 
 	public AbstractAdBlasterInstance copy() {
-		AdBlasterDbInstance instance = new AdBlasterDbInstance(this.campaign, this.dbEnv);
-		instance.views = new Vector();
-		for (int i = 0; i < this.views.size(); i++){
-			instance.views.add(((BannerView)this.views.get(i)).copy());
+		AdBlasterDbInstance instance = new AdBlasterDbInstance(this.campaign);
+		//xxx:clear out original instance.views
+		for (int i = 0; i < this.getViewCount(); i++){
+			instance.addView(new BannerView(getUserForView(i), getBannerForView(i), getTimeForView(i)));
 		}
 		return instance;
 
@@ -61,8 +60,8 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 			e1.printStackTrace();
 		}
 
-		AdBlasterDbUniverse abu = new AdBlasterDbUniverse(dbEnv);
-		AdBlasterDbInstance abdbi = new AdBlasterDbInstance(abu, dbEnv);
+		AdBlasterDbUniverse abu = new AdBlasterDbUniverse();
+		AdBlasterDbInstance abdbi = new AdBlasterDbInstance(abu);
 		AdBlasterPolicy pol = AdBlasterPolicy.randomPolicy(abu);
 		abdbi.fillInstance(pol);
 		
