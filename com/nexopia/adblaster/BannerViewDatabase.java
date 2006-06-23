@@ -18,6 +18,7 @@ import com.sleepycat.je.EnvironmentConfig;
 import com.sleepycat.je.SecondaryConfig;
 import com.sleepycat.je.SecondaryCursor;
 import com.sleepycat.je.SecondaryDatabase;
+import com.sleepycat.je.SecondaryKeyCreator;
 
 /**
  * @author wolfe
@@ -28,6 +29,7 @@ import com.sleepycat.je.SecondaryDatabase;
 public class BannerViewDatabase {
 	Database db;
 	SecondaryDatabase bannerTimeDb;
+	SecondaryDatabase userDb; //maps users to bannerviews
 	Environment env;
 	int lastid;
 	int bannerviewcount;
@@ -59,6 +61,14 @@ public class BannerViewDatabase {
 		bannerTimeConf.setSortedDuplicates(true);
 		bannerTimeConf.setKeyCreator(bannerTimeKey);
 		bannerTimeDb = env.openSecondaryDatabase(null, "BannerTimeViews", db, bannerTimeConf);
+
+		//Create a database keyed by userid
+		SecondaryKeyCreator userKey = new UserBinding();
+		SecondaryConfig userConf = new SecondaryConfig();
+		bannerTimeConf.setAllowCreate(true);
+		bannerTimeConf.setSortedDuplicates(true);
+		bannerTimeConf.setKeyCreator(userKey);
+		bannerTimeDb = env.openSecondaryDatabase(null, "UserViews", db, bannerTimeConf);
 	}
 	
 	public void insert(BannerView bv) throws DatabaseException  {

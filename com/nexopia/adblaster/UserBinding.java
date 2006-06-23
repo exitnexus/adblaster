@@ -20,7 +20,7 @@ import com.sleepycat.je.SecondaryKeyCreator;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-class UserBinding extends TupleBinding {
+class UserBinding extends TupleBinding implements SecondaryKeyCreator {
 
 	/* (non-Javadoc)
 	 * @see com.sleepycat.bind.tuple.TupleBinding#entryToObject(com.sleepycat.bind.tuple.TupleInput)
@@ -57,5 +57,15 @@ class UserBinding extends TupleBinding {
 		to.writeByte(u.getSex());
 		to.writeShort(u.getLocation());
 		to.writeString(u.getInterests().toString());
+	}
+
+	/* (non-Javadoc)
+	 * @see com.sleepycat.je.SecondaryKeyCreator#createSecondaryKey(com.sleepycat.je.SecondaryDatabase, com.sleepycat.je.DatabaseEntry, com.sleepycat.je.DatabaseEntry, com.sleepycat.je.DatabaseEntry)
+	 */
+	public boolean createSecondaryKey(SecondaryDatabase userKeyDB, DatabaseEntry key, DatabaseEntry data, DatabaseEntry secondaryKey) throws DatabaseException {
+		User u = (User)entryToObject(data);
+		IntegerBinding ib = new IntegerBinding();
+		ib.objectToEntry(new Integer(u.getID()), secondaryKey);
+		return true;
 	}
 }
