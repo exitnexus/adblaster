@@ -15,6 +15,34 @@ import com.sleepycat.je.EnvironmentConfig;
  */
 public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 	protected int num_interests;
+	private User u[];
+	private Banner b[];
+
+	protected void init(int u_num, int b_num){
+		u = new User[u_num];
+		b = new Banner[b_num];
+	}
+	
+	public Banner getBanner(int i) {
+		return b[i];
+	}
+	public int getBannerCount(){
+		return b.length;
+	}
+	protected void setBanner(int i, Banner banner) {
+		b[i] = banner;
+	}
+
+	public User getUser(int i) {
+		return u[i];
+	}
+
+	public int getUserCount(){
+		return u.length;
+	}
+	protected void setUser(int i, User user) {
+		u[i] = user;
+	}
 
 	public AdBlasterUniverse(int interests, int num_banners, int num_users){
 		this.init(num_users, num_banners);

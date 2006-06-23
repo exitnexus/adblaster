@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
@@ -53,10 +54,10 @@ import java.util.Vector;
  */
 
 public class BannerDatabase {
-	Vector banners;
+	private HashMap banners;
 	
 	public BannerDatabase() {
-		banners = new Vector();
+		banners = new HashMap();
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			String url = "jdbc:mysql://192.168.0.50:3307/banner";
@@ -71,17 +72,8 @@ public class BannerDatabase {
 			int i = 0;
 			while (rs.next()) {
 				i++;
-				String title = rs.getString("TITLE");
 				int id = rs.getInt("ID");
-				System.out.println(id + ": " + title);
-				int payrate = rs.getInt("PAYRATE");
-				int maxHits = rs.getInt("MAXVIEWS");
-				int campaignID = rs.getInt("CAMPAIGNID");
-				Vector location = parseCommaDelimitedInt(rs.getString("LOC"));
-				Vector ages = parseCommaDelimitedInt(rs.getString("AGE"));
-				Vector sexes = parseCommaDelimitedInt(rs.getString("SEX"));
-				Interests interests = new Interests(rs.getString("INTERESTS"));
-				banners.add(new Banner(id,payrate,maxHits,campaignID,location, ages, sexes, interests));
+				banners.put(new Integer(id), new Banner(rs));
 			}
 			System.out.println("Total: " + i);
 		} catch (Exception e) {
@@ -98,6 +90,13 @@ public class BannerDatabase {
 		return v;
 	}
 
+	public Banner getBanner(int i) {
+		return (Banner)this.banners.get(new Integer(i));
+	}
+	
+	public int getBannerCount() {
+		return banners.size();
+	}
 	public static void main(String args[]){
 		new BannerDatabase();	
 	}
