@@ -1,6 +1,7 @@
 package com.nexopia.adblaster;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Vector;
 
 import com.sleepycat.je.DatabaseException;
@@ -8,46 +9,34 @@ import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
 
 public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
-
-
+	HashMap swappedViews; //always look for a view here before checking the database
+	BannerViewDatabase db;
+	
 	public AdBlasterDbInstance(AbstractAdBlasterUniverse c){
 		super(c);
-	}
-
-	public void fillInstance(AdBlasterPolicy pol) {
 		try {
-			BannerViewDatabase db;
 			db = new BannerViewDatabase();
-			BannerViewCursor cursor = db.getCursor(0,0);
-			int i = 0;
-			BannerView bv = null;
-			bv = cursor.getCurrent();
-			while(bv  != null){
-				i++;
-				if (i%100 == 0){
-					System.out.println("Loaded bannerview " + i + ": " + bv);
-				}
-				bv.b = pol.getBestBanner(this, bv);
-				this.addView(bv);
-				bv = cursor.getNext();
-			}
-			cursor.close();
-			db.close();
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
+			System.err.println("Failed to make a BannerViewDatabase object: " + e);
 			e.printStackTrace();
 		}
 	}
 
-	public AbstractAdBlasterInstance copy() {
-		AdBlasterDbInstance instance = new AdBlasterDbInstance(this.campaign);
+	//TODO Don't know how this should behave, it needs to be dealt with
+	public void fillInstance(AdBlasterPolicy pol) {
+		System.err.println("Someone write a fillInstance method.");
+		System.exit(0);
+	}
+
+	/*public AbstractAdBlasterInstance copy() {
+		AdBlasterDbInstance instance = new AdBlasterDbInstance(this.universe);
 		//xxx:clear out original instance.views
 		for (int i = 0; i < this.getViewCount(); i++){
 			instance.addView(new BannerView(getUserForView(i), getBannerForView(i), getTimeForView(i)));
 		}
 		return instance;
 
-	}
+	}*/
 	
 	public static void main(String args[]){
 		EnvironmentConfig envConf = new EnvironmentConfig();
@@ -65,6 +54,53 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 		AdBlasterPolicy pol = AdBlasterPolicy.randomPolicy(abu);
 		abdbi.fillInstance(pol);
 		
+	}
+
+	/* (non-Javadoc)
+	 * @see com.nexopia.adblaster.AbstractAdBlasterInstance#setBannerView(int, com.nexopia.adblaster.Banner)
+	 */
+	public void setBannerView(int j, Banner b) {
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see com.nexopia.adblaster.AbstractAdBlasterInstance#getBannerForView(int)
+	 */
+	public Banner getBannerForView(int i) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.nexopia.adblaster.AbstractAdBlasterInstance#getUserForView(int)
+	 */
+	public User getUserForView(int i) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.nexopia.adblaster.AbstractAdBlasterInstance#getTimeForView(int)
+	 */
+	public int getTimeForView(int i) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.nexopia.adblaster.AbstractAdBlasterInstance#totalProfit()
+	 */
+	public float totalProfit() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.nexopia.adblaster.AbstractAdBlasterInstance#getViewCount()
+	 */
+	public int getViewCount() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 

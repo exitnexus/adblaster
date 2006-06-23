@@ -1,5 +1,6 @@
 package com.nexopia.adblaster;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
@@ -11,8 +12,7 @@ import com.sleepycat.je.EnvironmentConfig;
 
 public abstract class AbstractAdBlasterInstance {
 
-	private Vector views;
-	AbstractAdBlasterUniverse campaign;
+	AbstractAdBlasterUniverse universe;
 	HashMap bannerCountMap = null;
 	
 	public AbstractAdBlasterInstance(AbstractAdBlasterUniverse ac){
@@ -20,8 +20,7 @@ public abstract class AbstractAdBlasterInstance {
 		for (int i = 0; i < ac.getBannerCount(); i++){
 			bannerCountMap.put(ac.getBanner(i), new Integer(0));
 		}
-		campaign = ac;
-		views = new Vector();
+		universe = ac;
 	}
 	
 	public abstract void fillInstance(AdBlasterPolicy pol);
@@ -32,49 +31,19 @@ public abstract class AbstractAdBlasterInstance {
 	
 	public BannerView randomView(AbstractAdBlasterUniverse ac) {
 		// TODO Auto-generated method stub
-		User randomPick = campaign.getUser((int) (Math.random()*campaign.getUserCount()));
+		User randomPick = universe.getUser((int) (Math.random()*universe.getUserCount()));
 		int time = (int) (Math.random()*60*60*24);
 		return new BannerView(randomPick, null, time);
 	}
 
-	public void addView(BannerView bv) {
-		this.views.add(bv);
-		if (bv.b != null){
-			this.bannerCountMap.put(bv.b, new Integer(((Integer)bannerCountMap.get(bv.b)).intValue()+1));
-		}
-	}
+	abstract public void setBannerView(int j, Banner b);
 
-	public void setBannerView(int j, Banner b) {
-		BannerView bv = (BannerView)views.get(j);
-		if (bv.b != null){
-			this.bannerCountMap.put(bv.b, new Integer(((Integer)bannerCountMap.get(bv.b)).intValue()-1));
-		}
-		if (b != null){
-			this.bannerCountMap.put(b, new Integer(((Integer)bannerCountMap.get(b)).intValue()-1));
-		}
-		
-		bv.b = b;
-	}
+	abstract public Banner getBannerForView(int i);
 
-	public Banner getBannerForView(int i){
-		return ((BannerView)this.views.get(i)).b;
-	}
-	public User getUserForView(int i){
-		return ((BannerView)this.views.get(i)).u;
-	}
-	public int getTimeForView(int i){
-		return ((BannerView)this.views.get(i)).time;
-	}
+	abstract public User getUserForView(int i);
+
+	abstract public int getTimeForView(int i);
 	
-	public static AdBlasterInstance randomInstance(int num, AbstractAdBlasterUniverse ac) {
-		AdBlasterInstance instance = new AdBlasterInstance(ac);
-		for (int i = 0; i < num; i++){
-			BannerView bv = instance.randomView(ac);
-			instance.addView(bv);
-		}
-		return instance;
-	}
-
 	public Vector getUnserved() {
 		/**Loaded bannervie
 		 * For a particular instance, get a list of all of the banners that were not served
@@ -82,15 +51,15 @@ public abstract class AbstractAdBlasterInstance {
 		 * @return A vector of banners.
 		 */
 		Vector unserved = new Vector();
-		for (int i = 0; i < this.campaign.getBannerCount(); i++){
-			Banner b = (Banner)this.campaign.getBanner(i);
+		Collection banners = this.universe.getBanners();
+		Banner b = null;
+		for (Iterator i = banners.iterator(); i.hasNext(); b = (Banner)i.next()){
 			int count = count(b);
 			if (count < b.getMaxHits()){
 				unserved.add(new Tuple(b, new Integer(b.getMaxHits() - count)));
 			}
 		}
 		return unserved;
-
 	}
 
 	int count(Banner banner) {
@@ -98,22 +67,11 @@ public abstract class AbstractAdBlasterInstance {
 		
 	}
 
-	public float totalProfit() {
-		float count = 0;
-		for (int i = 0; i < views.size(); i++){
-			if (((BannerView)views.get(i)).b != null){
-				count += ((BannerView)views.get(i)).b.getPayrate();
-			}
-		}
-		return count;
-	}
+	abstract public float totalProfit();
 
-	abstract public AbstractAdBlasterInstance copy();
+	abstract public int getViewCount();
 
-	public int getViewCount() {
-		return this.views.size();
-	}
-
+	/*//These functions need to be redesigned based on new indexes plan 
 	static Vector getAllBannerViewsThatCanSwapWith(Banner b, AbstractAdBlasterInstance instance) {
 		Vector v = new Vector();
 		for (Iterator it = instance.views.iterator(); it.hasNext() ;){
@@ -149,27 +107,8 @@ public abstract class AbstractAdBlasterInstance {
 	public Vector depthLimitedDFS(int j, Banner b, int l) {
 		return this.depthLimitedDFS((BannerView)views.get(j), b, this, l);
 	}
+	*/
 	
-	public void makeMeADatabase(Environment dbEnv){
-		try {			
-
-			EnvironmentConfig envConf = new EnvironmentConfig();
-			envConf.setAllowCreate(true);
-			
-			BannerViewDatabase db = new BannerViewDatabase();
-
-			Random r = new Random(1);
-			System.out.println("Should be inserting " + this.getViewCount() + " BannerViews.");
-			for (int i=0; i<this.getViewCount(); i++) {
-				db.insert((BannerView)this.views.get(i));
-			}
-			
-			db.close();
-		} catch (DatabaseException e) {
-			System.err.println("DatabaseException: " + e);
-			e.printStackTrace();
-		}
-	}
 
 	void doSwap(Vector swaps, Banner endBanner) {
 		//System.out.println("Swapping " + swaps);

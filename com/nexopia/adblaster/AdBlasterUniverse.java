@@ -3,7 +3,10 @@
  */
 package com.nexopia.adblaster;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Random;
+import java.util.Vector;
 
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
@@ -130,6 +133,13 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 			}
 		}
 		return ac;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.nexopia.adblaster.AbstractAdBlasterUniverse#getBanners()
+	 */
+	public Collection getBanners() {
+		return Arrays.asList(b);
 	}
 	
 

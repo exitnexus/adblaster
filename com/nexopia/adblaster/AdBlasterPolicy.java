@@ -7,11 +7,11 @@ import java.util.Vector;
 
 public class AdBlasterPolicy {
 	HashMap coefficients;
-	AbstractAdBlasterUniverse campaign;
+	AbstractAdBlasterUniverse universe;
 	
 	public AdBlasterPolicy(AbstractAdBlasterUniverse ac) {
 		coefficients = new HashMap();
-		campaign = ac;
+		universe = ac;
 		for (int i = 0; i < ac.getBannerCount(); i++){
 			coefficients.put(ac.getBanner(i), new Float(Math.random()));
 		}
@@ -53,10 +53,10 @@ public class AdBlasterPolicy {
 			count = instance.totalProfit();
 			AdBlaster.iterativeImprove(instance);
 		}
-		for (int i = 0; i < campaign.getBannerCount(); i++){
+		for (int i = 0; i < universe.getBannerCount(); i++){
 			int totalAvailable = 1;
 			int totalUsed = 0;
-			Banner b = campaign.getBanner(i);
+			Banner b = universe.getBanner(i);
 			for (int j = 0; j < instance.getViewCount(); j++){
 				if (instance.isValidBannerForUser(instance.getUserForView(j),b)){
 					totalAvailable++;
@@ -78,8 +78,8 @@ public class AdBlasterPolicy {
 		
 		int bestMatch = -1;
 		float bestScore = Float.NEGATIVE_INFINITY;
-		for (int j = 0; j < instance.campaign.getBannerCount(); j++){
-			Banner b = instance.campaign.getBanner(j);
+		for (int j = 0; j < instance.universe.getBannerCount(); j++){
+			Banner b = instance.universe.getBanner(j);
 			float score = ((Float)coefficients.get(b)).floatValue();
 			if (instance.isValidBannerForUser(u, b) && (instance.count(b) < b.getMaxHits())){
 				if (score > bestScore){
@@ -89,7 +89,7 @@ public class AdBlasterPolicy {
 			}
 		}
 		
-		Banner banner = instance.campaign.getBanner(bestMatch);
+		Banner banner = instance.universe.getBanner(bestMatch);
 		return banner;
 	}
 

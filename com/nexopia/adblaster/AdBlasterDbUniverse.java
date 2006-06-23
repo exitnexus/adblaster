@@ -1,6 +1,7 @@
 package com.nexopia.adblaster;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.Random;
 import java.util.Vector;
 
@@ -64,5 +65,12 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 	 */
 	public int getUserCount() {
 		return userDB.getUserCount();
+	}
+
+	/* (non-Javadoc)
+	 * @see com.nexopia.adblaster.AbstractAdBlasterUniverse#getBanners()
+	 */
+	public Collection getBanners() {
+		return bannerDB.getBanners();
 	}
 }

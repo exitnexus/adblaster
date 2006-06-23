@@ -1,6 +1,7 @@
 package com.nexopia.adblaster;
 
 import java.awt.AWTEvent;
+import java.util.Collection;
 import java.util.Random;
 
 import com.sleepycat.je.DatabaseException;
@@ -19,6 +20,8 @@ public abstract class AbstractAdBlasterUniverse {
 
 	abstract public int getUserCount();
 
+	abstract public Collection getBanners();
+	
 	public Banner getRandomBannerMatching(Banner bvb, User u, int t, AdBlasterInstance instance) {
 		Banner match = null;
 		while (match == null){

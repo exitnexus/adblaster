@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.Vector;
@@ -80,22 +81,16 @@ public class BannerDatabase {
 			e.printStackTrace();
 		}
 	}
-	
-	private Vector parseCommaDelimitedInt(String string) {
-		Vector v = new Vector();
-		StringTokenizer st = new StringTokenizer(string, ",");
-		while (st.hasMoreTokens()) {
-			v.add(new Integer(Integer.parseInt(st.nextToken())));
-		}
-		return v;
-	}
-
-	public Banner getBanner(int i) {
+		public Banner getBanner(int i) {
 		return (Banner)this.banners.get(new Integer(i));
 	}
 	
 	public int getBannerCount() {
 		return banners.size();
+	}
+	
+	public Collection getBanners() {
+		return banners.values(); 
 	}
 	public static void main(String args[]){
 		new BannerDatabase();	
