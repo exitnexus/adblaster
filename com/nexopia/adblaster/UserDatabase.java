@@ -8,6 +8,8 @@ package com.nexopia.adblaster;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 
@@ -35,13 +37,19 @@ public class UserDatabase {
 	private Database db;
 	private SecondaryDatabase bannerDb;
 	private Environment env;
+	private Collection banners;
 	int userCount;
 	
 	public UserDatabase(Collection banners) throws DatabaseException {
+		this.banners = banners;
 		EnvironmentConfig envConf = new EnvironmentConfig();
 		envConf.setAllowCreate(true);
 		env = new Environment(new File("User.db"), envConf);
-		
+		openDatabases();
+		this.refreshUserCount();
+	}
+	
+	private void openDatabases() throws DatabaseException {
 		//Create primary database, keyed by uid
 		DatabaseConfig dbConf = new DatabaseConfig();
 		dbConf.setAllowCreate(true);
@@ -54,8 +62,6 @@ public class UserDatabase {
 		bannerConf.setSortedDuplicates(true);
 		bannerConf.setMultiKeyCreator(bannerKey);
 		bannerDb = env.openSecondaryDatabase(null, "BannerUsers", db, bannerConf);
-		
-		this.refreshUserCount();
 	}
 	
 	public void insert(User u) throws DatabaseException {
@@ -66,6 +72,7 @@ public class UserDatabase {
 		DatabaseEntry data = new DatabaseEntry();
 		ub.objectToEntry(u, data);
 		db.put(null, key, data);
+		//db.put(null, key, data);
 		this.userCount++;
 	}
 	
@@ -162,20 +169,29 @@ public class UserDatabase {
 	}
 	
 	public void close() throws DatabaseException {
-		this.db.close();
+		this.closeDatabases();
+		this.env.sync();
 		this.env.close();
+		this.env = null;
 	}
+	
+	private void closeDatabases() throws DatabaseException {
+		this.db.close();
+		this.bannerDb.close();
+	}
+	
 	
 	public static void main(String args[]){
 		UserDatabase user_db = null;
 		Environment dbEnv = null;
 		try {
-			user_db = new UserDatabase(new Vector()); //we're passing in an empty banners set here
+			BannerDatabase bdb = new BannerDatabase();
+			user_db = new UserDatabase(bdb.getBanners()); //we're passing in an empty banners set here
 			
 			System.out.println(user_db.userCount);
 			
-			Random r = new Random ();
-			/*for (int i = 0; i < 100; i++){
+			/*Random r = new Random ();
+			for (int i = 0; i < 100; i++){
 				
 				int userid = i;
 				byte age = (byte)(14+r.nextInt(86));
@@ -202,5 +218,41 @@ public class UserDatabase {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	/**
+	 * 
+	 */
+	public void empty() {
+		try {
+			this.closeDatabases();
+			/*String name = "Users";
+			System.out.println("Truncating " +name+ "... ");
+			System.out.println(env.truncateDatabase(null, "Users", true) + " records truncated.");
+			name = "BannerUsers";
+			System.out.println("Truncating " +name+ "... ");
+			System.out.println(env.truncateDatabase(null, "Users", true) + " records truncated.");*/
+			List databaseNames = env.getDatabaseNames();
+			for (Iterator i=databaseNames.iterator(); i.hasNext(); ) {
+				String name = (String)i.next();
+				System.out.println("Truncating " +name+ "... ");
+				System.out.println(env.truncateDatabase(null, "Users", true) + " records truncated.");
+			}
+			this.openDatabases();
+		} catch (DatabaseException e) {
+			System.err.println("Unable to truncate user databases: " +e);
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 
+	 */
+	public void dump() {
+		Vector v = getAllUsers();
+		for (int i=0; i<v.size(); i++) {
+			System.out.println((User)v.get(i));
+		}
+		System.out.println("Total users: " + v.size());
 	}
 }

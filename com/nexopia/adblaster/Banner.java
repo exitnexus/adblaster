@@ -133,7 +133,7 @@ class Banner{
 	 * @return
 	 */
 	private boolean validInterests(Interests userInterests) {
-		return interests.isSubsetOf(userInterests);
+		return interests.containsAny(userInterests);
 	}
 
 	/**

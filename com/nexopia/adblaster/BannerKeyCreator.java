@@ -26,8 +26,8 @@ public class BannerKeyCreator implements SecondaryMultiKeyCreator {
 		UserBinding ub = new UserBinding();
 		IntegerBinding ib = new IntegerBinding();
 		User u = (User)ub.entryToObject(data);
-		Banner banner = null;
-		for (Iterator i=banners.iterator(); i.hasNext(); banner=(Banner)i.next()) {
+		for (Iterator i=banners.iterator(); i.hasNext(); ) {
+			Banner banner=(Banner)i.next();
 			if (banner.validUser(u)) {
 				DatabaseEntry secondaryKey = new DatabaseEntry();
 				ib.objectToEntry(new Integer(banner.getID()), secondaryKey);

@@ -6,6 +6,8 @@
  */
 package com.nexopia.adblaster;
 
+import java.util.Random;
+
 
 
 class User {
@@ -30,13 +32,15 @@ class User {
 	}
 	
 	User(int id, byte age, byte sex, short location, String interests) {
+		this(id,age,sex,location,new Interests(interests));
+	}
+
+	User(int id, byte age, byte sex, short location, Interests interests) {
 		this.id = id;
 		this.age = age;
 		this.sex = sex;
 		this.location = location;
-		this.interests = new Interests(interests);
-		System.out.println("Creating user with interests:"+ interests);
-
+		this.interests = interests;
 	}
 
 	int getID() {
@@ -70,5 +74,29 @@ class User {
 	}
 	void setSex(byte sex) {
 		this.sex = sex;
+	}
+
+	/**
+	 * @return
+	 */
+	public static User generateRandomUser() {
+		int id;
+		byte sex;
+		byte age;
+		short location;
+		Interests interests;
+		
+		Random r = new Random();
+		id = r.nextInt(Integer.MAX_VALUE);
+		if (r.nextBoolean()) {
+			sex = 1; //male
+		} else {
+			sex = 2; //female
+		}
+		age = (byte)(14+r.nextInt(90));
+		location = (short)r.nextInt(60);
+		interests = Interests.generateRandomInterests();
+		User u = new User(id, age, sex, location, interests);
+		return u;
 	}
 }

@@ -8,6 +8,7 @@ package com.nexopia.adblaster;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Random;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
@@ -83,14 +84,27 @@ class Interests{
 	 * @param userInterests
 	 * @return
 	 */
-	public boolean isSubsetOf(Interests userInterests) {
+	public boolean containsAny(Interests userInterests) {
 		for (Iterator it = userInterests.getChecked().iterator(); it.hasNext(); ){
 			Integer interest = (Integer)it.next();
-			if (!checked.containsKey(interest)){
-				return false;
+			if (checked.containsKey(interest)){
+				return true;
 			}
 		}
-		return true;
+		return false;
+	}
+
+	/**
+	 * @return
+	 */
+	public static Interests generateRandomInterests() {
+		Random r = new Random();
+		Interests interests = new Interests();
+		int numberOfInterests = r.nextInt(20);
+		for (int i=0;i<numberOfInterests;i++) {
+			interests.add(new Integer(r.nextInt(200)));
+		}
+		return interests;
 	}
 	
 }
