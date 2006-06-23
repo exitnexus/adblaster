@@ -16,7 +16,7 @@ import java.util.Vector;
 
 class Interests{
 	HashMap checked;
-	
+	private static final Random rand = new Random();
 	Interests(){
 	  checked = new HashMap();
 	}
@@ -98,11 +98,10 @@ class Interests{
 	 * @return
 	 */
 	public static Interests generateRandomInterests() {
-		Random r = new Random();
 		Interests interests = new Interests();
-		int numberOfInterests = r.nextInt(20);
+		int numberOfInterests = rand.nextInt(20);
 		for (int i=0;i<numberOfInterests;i++) {
-			interests.add(new Integer(r.nextInt(200)));
+			interests.add(new Integer(rand.nextInt(200)));
 		}
 		return interests;
 	}

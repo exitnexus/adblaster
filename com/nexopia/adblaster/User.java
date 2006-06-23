@@ -16,6 +16,7 @@ class User {
 	byte age;
 	byte sex;
 	short location;
+	static final Random rand = new Random();
 	
 	User(int id, UserDatabase db) {
 		try {
@@ -86,15 +87,14 @@ class User {
 		short location;
 		Interests interests;
 		
-		Random r = new Random();
-		id = r.nextInt(Integer.MAX_VALUE);
-		if (r.nextBoolean()) {
+		id = rand.nextInt(Integer.MAX_VALUE);
+		if (rand.nextBoolean()) {
 			sex = 1; //male
 		} else {
 			sex = 2; //female
 		}
-		age = (byte)(14+r.nextInt(90));
-		location = (short)r.nextInt(60);
+		age = (byte)(14+rand.nextInt(90));
+		location = (short)rand.nextInt(60);
 		interests = Interests.generateRandomInterests();
 		User u = new User(id, age, sex, location, interests);
 		return u;

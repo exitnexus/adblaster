@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 
+import com.sleepycat.je.CheckpointConfig;
 import com.sleepycat.je.Cursor;
 import com.sleepycat.je.Database;
 import com.sleepycat.je.DatabaseConfig;
@@ -171,6 +172,10 @@ public class UserDatabase {
 	public void close() throws DatabaseException {
 		this.closeDatabases();
 		this.env.sync();
+		env.cleanLog();
+		CheckpointConfig force = new CheckpointConfig();
+        force.setForce(true);
+        env.checkpoint(force);
 		this.env.close();
 		this.env = null;
 	}
