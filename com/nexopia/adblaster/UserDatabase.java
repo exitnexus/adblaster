@@ -231,17 +231,11 @@ public class UserDatabase {
 	public void empty() {
 		try {
 			this.closeDatabases();
-			/*String name = "Users";
-			System.out.println("Truncating " +name+ "... ");
-			System.out.println(env.truncateDatabase(null, "Users", true) + " records truncated.");
-			name = "BannerUsers";
-			System.out.println("Truncating " +name+ "... ");
-			System.out.println(env.truncateDatabase(null, "Users", true) + " records truncated.");*/
 			List databaseNames = env.getDatabaseNames();
 			for (Iterator i=databaseNames.iterator(); i.hasNext(); ) {
 				String name = (String)i.next();
 				System.out.println("Truncating " +name+ "... ");
-				System.out.println(env.truncateDatabase(null, "Users", true) + " records truncated.");
+				System.out.println(env.truncateDatabase(null, name, true) + " records truncated.");
 			}
 			this.openDatabases();
 		} catch (DatabaseException e) {
@@ -259,5 +253,6 @@ public class UserDatabase {
 			System.out.println((User)v.get(i));
 		}
 		System.out.println("Total users: " + v.size());
+		
 	}
 }

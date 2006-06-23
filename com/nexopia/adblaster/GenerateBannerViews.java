@@ -6,7 +6,9 @@
  */
 package com.nexopia.adblaster;
 
+import java.util.Collection;
 import java.util.Random;
+import java.util.Vector;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -16,30 +18,38 @@ import com.sleepycat.je.DatabaseException;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class GenerateUsers {
-	static final int NUM_USERS = 10000;
+public class GenerateBannerViews {
+	static final int NUM_BANNERVIEWS = 10000;
 	
 	public static void main(String[] args) {
 		UserDatabase uDb = null;
+		BannerViewDatabase bvDb = null;
 		try {
 			BannerDatabase bdb = new BannerDatabase();
 			uDb = new UserDatabase(bdb.getBanners());
+			Vector users = uDb.getAllUsers();
+			Object[] banners = bdb.getBanners().toArray();
 			
-			System.out.println(uDb.getUserCount());
+			bvDb = new BannerViewDatabase();
 			
-			uDb.empty(); //wipe the current contents of the user database
-			
-			for (int i = 0; i < NUM_USERS; i++){
-				User u =User.generateRandomUser();
-				uDb.insert(u);
+			System.out.println(bvDb.getBannerViewCount());
+			bvDb.empty();
+
+			Random r = new Random();
+			for (int i = 0; i < NUM_BANNERVIEWS; i++){
+				User u = (User)users.get(r.nextInt(users.size()));
+				Banner b = (Banner)banners[r.nextInt(banners.length)];
+				int t = r.nextInt(86400); //seconds in the day
+				bvDb.insert(new BannerView(u,b,t));
 			}
-			uDb.dump();
+			bvDb.dump();
 		} catch (DatabaseException dbe) {
 			System.err.println("DatabaseException: " + dbe);
 			dbe.printStackTrace();
 		} finally {
 			try {
 				uDb.close();
+				bvDb.close();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

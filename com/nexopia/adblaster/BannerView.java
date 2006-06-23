@@ -27,6 +27,6 @@ class BannerView{
 		return new BannerView(u,b,time);
 	}
 	public String toString(){
-		return u.toString() + " : " + b.toString() + ":" + time;
+		return "Banner ID: " + b.getID() + " - Time: " + time + " User ID: " + u.getID(); 
 	}
 }

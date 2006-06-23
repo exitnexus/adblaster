@@ -63,7 +63,9 @@ class UserBinding extends TupleBinding implements SecondaryKeyCreator {
 	 * @see com.sleepycat.je.SecondaryKeyCreator#createSecondaryKey(com.sleepycat.je.SecondaryDatabase, com.sleepycat.je.DatabaseEntry, com.sleepycat.je.DatabaseEntry, com.sleepycat.je.DatabaseEntry)
 	 */
 	public boolean createSecondaryKey(SecondaryDatabase userKeyDB, DatabaseEntry key, DatabaseEntry data, DatabaseEntry secondaryKey) throws DatabaseException {
-		User u = (User)entryToObject(data);
+		BannerViewBinding bvb = new BannerViewBinding();
+		BannerView bv = (BannerView) bvb.entryToObject(data);
+		User u = bv.getUser();
 		IntegerBinding ib = new IntegerBinding();
 		ib.objectToEntry(new Integer(u.getID()), secondaryKey);
 		return true;
