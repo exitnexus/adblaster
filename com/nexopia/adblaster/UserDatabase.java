@@ -7,6 +7,7 @@
 package com.nexopia.adblaster;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.Random;
 import java.util.Vector;
 
@@ -18,6 +19,10 @@ import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
 import com.sleepycat.je.OperationStatus;
+import com.sleepycat.je.SecondaryConfig;
+import com.sleepycat.je.SecondaryDatabase;
+import com.sleepycat.je.SecondaryKeyCreator;
+import com.sleepycat.je.SecondaryMultiKeyCreator;
 
 /**
  * @author wolfe
@@ -28,16 +33,28 @@ import com.sleepycat.je.OperationStatus;
 
 public class UserDatabase {
 	private Database db;
+	private SecondaryDatabase bannerDb;
 	private Environment env;
 	int userCount;
 	
-	public UserDatabase() throws DatabaseException {
+	public UserDatabase(Collection banners) throws DatabaseException {
 		EnvironmentConfig envConf = new EnvironmentConfig();
 		envConf.setAllowCreate(true);
 		env = new Environment(new File("User.db"), envConf);
+		
+		//Create primary database, keyed by uid
 		DatabaseConfig dbConf = new DatabaseConfig();
 		dbConf.setAllowCreate(true);
-		db = env.openDatabase(null, "PrimaryBannerViews", dbConf);
+		db = env.openDatabase(null, "Users", dbConf);
+		
+		//Create index keyed by bannerid, maps bannerid to valid users for the banner
+		SecondaryMultiKeyCreator bannerKey = new BannerKeyCreator(banners);
+		SecondaryConfig bannerConf = new SecondaryConfig();
+		bannerConf.setAllowCreate(true);
+		bannerConf.setSortedDuplicates(true);
+		bannerConf.setMultiKeyCreator(bannerKey);
+		bannerDb = env.openSecondaryDatabase(null, "BannerUsers", db, bannerConf);
+		
 		this.refreshUserCount();
 	}
 	
@@ -153,7 +170,7 @@ public class UserDatabase {
 		UserDatabase user_db = null;
 		Environment dbEnv = null;
 		try {
-			user_db = new UserDatabase();
+			user_db = new UserDatabase(new Vector()); //we're passing in an empty banners set here
 			
 			System.out.println(user_db.userCount);
 			

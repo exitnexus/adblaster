@@ -74,7 +74,7 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 			EnvironmentConfig envConf = new EnvironmentConfig();
 			envConf.setAllowCreate(true);
 			
-			UserDatabase db = new UserDatabase();
+			UserDatabase db = new UserDatabase(getBanners());
 
 			Random r = new Random(1);
 			System.out.println("Should be inserting " + this.getUserCount() + " users.");

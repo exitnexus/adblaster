@@ -78,5 +78,19 @@ class Interests{
 		}
 		return interests;
 	}
+
+	/**
+	 * @param userInterests
+	 * @return
+	 */
+	public boolean isSubsetOf(Interests userInterests) {
+		for (Iterator it = userInterests.getChecked().iterator(); it.hasNext(); ){
+			Integer interest = (Integer)it.next();
+			if (!checked.containsKey(interest)){
+				return false;
+			}
+		}
+		return true;
+	}
 	
 }

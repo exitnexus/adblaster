@@ -3,33 +3,36 @@
  */
 package com.nexopia.adblaster;
 
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Set;
+
 import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.SecondaryDatabase;
 import com.sleepycat.je.SecondaryKeyCreator;
+import com.sleepycat.je.SecondaryMultiKeyCreator;
 
-public class BannerKeyCreator implements SecondaryKeyCreator {
-	public BannerKeyCreator() {
+public class BannerKeyCreator implements SecondaryMultiKeyCreator {
+	Collection banners;
+	public BannerKeyCreator(Collection banners) {
+		this.banners = banners;
 	}
 	
 	/* (non-Javadoc)
-	 * @see com.sleepycat.je.SecondaryKeyCreator#createSecondaryKey(com.sleepycat.je.SecondaryDatabase, com.sleepycat.je.DatabaseEntry, com.sleepycat.je.DatabaseEntry, com.sleepycat.je.DatabaseEntry)
+	 * @see com.sleepycat.je.SecondaryMultiKeyCreator#createSecondaryKeys(com.sleepycat.je.SecondaryDatabase, com.sleepycat.je.DatabaseEntry, com.sleepycat.je.DatabaseEntry, java.util.Set)
 	 */
-	public boolean createSecondaryKey(SecondaryDatabase db,
-			DatabaseEntry key, DatabaseEntry data, DatabaseEntry secondaryKey)
-			throws DatabaseException {
-		BannerViewBinding bvb = new BannerViewBinding();
-		BannerView bv = (BannerView)bvb.entryToObject(data);
-		secondaryKey.setData(intToByteArray(bv.getBanner().getID()));
-		return true;
+	public void createSecondaryKeys(SecondaryDatabase db, DatabaseEntry key, DatabaseEntry data, Set secondaryKeys) throws DatabaseException {
+		UserBinding ub = new UserBinding();
+		IntegerBinding ib = new IntegerBinding();
+		User u = (User)ub.entryToObject(data);
+		Banner banner = null;
+		for (Iterator i=banners.iterator(); i.hasNext(); banner=(Banner)i.next()) {
+			if (banner.validUser(u)) {
+				DatabaseEntry secondaryKey = new DatabaseEntry();
+				ib.objectToEntry(new Integer(banner.getID()), secondaryKey);
+				secondaryKeys.add(secondaryKey);
+			}
+		}
 	}
-
-	private static byte[] intToByteArray(int value) {
-        byte[] b = new byte[4];
-        for (int i = 0; i < 4; i++) {
-            int offset = (b.length - 1 - i) * 8;
-            b[i] = (byte) ((value >>> offset) & 0xFF);
-        }
-        return b;
-    }
 }

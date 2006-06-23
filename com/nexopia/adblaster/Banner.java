@@ -115,4 +115,48 @@ class Banner{
 	public void setPayrate(int payrate) {
 		this.payrate = payrate;
 	}
+
+	/**
+	 * @param u
+	 * @return
+	 */
+	public boolean validUser(User u) {
+		return (validLocation(u.getLocation()) &&
+				validAge(u.getAge()) &&
+				validSex(u.getSex()) &&
+				validInterests(u.getInterests()));
+		
+	}
+
+	/**
+	 * @param interests2
+	 * @return
+	 */
+	private boolean validInterests(Interests userInterests) {
+		return interests.isSubsetOf(userInterests);
+	}
+
+	/**
+	 * @param sex
+	 * @return
+	 */
+	private boolean validSex(byte sex) {
+		return sexes.contains(new Integer(sex));
+	}
+
+	/**
+	 * @param location
+	 * @return
+	 */
+	private boolean validLocation(short location) {
+		return locations.contains(new Integer(location));
+	}
+
+	/**
+	 * @param age
+	 * @return
+	 */
+	private boolean validAge(byte age) {
+		return ages.contains(new Integer(age));
+	}
 }

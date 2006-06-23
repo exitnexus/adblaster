@@ -65,10 +65,10 @@ public class BannerViewDatabase {
 		//Create a database keyed by userid
 		SecondaryKeyCreator userKey = new UserBinding();
 		SecondaryConfig userConf = new SecondaryConfig();
-		bannerTimeConf.setAllowCreate(true);
-		bannerTimeConf.setSortedDuplicates(true);
-		bannerTimeConf.setKeyCreator(userKey);
-		bannerTimeDb = env.openSecondaryDatabase(null, "UserViews", db, bannerTimeConf);
+		userConf.setAllowCreate(true);
+		userConf.setSortedDuplicates(true);
+		userConf.setKeyCreator(userKey);
+		userDb = env.openSecondaryDatabase(null, "UserViews", db, userConf);
 	}
 	
 	public void insert(BannerView bv) throws DatabaseException  {

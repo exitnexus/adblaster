@@ -16,7 +16,7 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 	public AdBlasterDbUniverse(){
 		try {
 			bannerDB = new BannerDatabase();
-			userDB = new UserDatabase();
+			userDB = new UserDatabase(getBanners());
 		} catch (DatabaseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
