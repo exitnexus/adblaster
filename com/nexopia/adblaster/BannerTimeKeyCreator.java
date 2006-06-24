@@ -21,7 +21,9 @@ public class BannerTimeKeyCreator extends TupleBinding implements SecondaryKeyCr
 	public boolean createSecondaryKey(SecondaryDatabase db,
 			DatabaseEntry key, DatabaseEntry data, DatabaseEntry secondaryKey)
 			throws DatabaseException {
-		BannerViewBinding bvb = new BannerViewBinding();
+		BannerViewBinding bvb = AdBlaster.instanceBinding;
+		Integer i = (Integer)(new IntegerBinding().entryToObject(key));
+		bvb.setIndex(i.intValue());
 		BannerView bv = (BannerView)bvb.entryToObject(data);
 		int[] a = { bv.getBanner().getID(), bv.getTime() };
 		objectToEntry(a, secondaryKey);

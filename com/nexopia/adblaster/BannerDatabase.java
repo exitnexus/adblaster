@@ -81,8 +81,12 @@ public class BannerDatabase {
 			e.printStackTrace();
 		}
 	}
-		public Banner getBanner(int i) {
+	
+	public Banner getBannerByID(int i) {
 		return (Banner)this.banners.get(new Integer(i));
+	}
+	public Banner getBannerByIndex(int i) {
+		return (Banner)this.banners.get(this.banners.keySet().toArray()[i]);
 	}
 	
 	public int getBannerCount() {

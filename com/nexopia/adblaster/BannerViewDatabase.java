@@ -34,7 +34,6 @@ public class BannerViewDatabase {
 	SecondaryDatabase userDb; //maps users to bannerviews
 	Environment env;
 	int lastid;
-	int bannerviewcount;
 	
 	public BannerViewDatabase() throws DatabaseException {
 		//Create our primary database keyed by a unique ID
@@ -50,7 +49,7 @@ public class BannerViewDatabase {
 			IntegerBinding ib = new IntegerBinding();
 			DatabaseEntry key = new DatabaseEntry();
 			ib.objectToEntry(new Integer(lastid), key);
-			BannerViewBinding bvb = new BannerViewBinding();
+			BannerViewBinding bvb = AdBlaster.instanceBinding;
 			DatabaseEntry data = new DatabaseEntry();
 			bvb.objectToEntry(bv, data);
 			db.put(null, key, data);
@@ -60,7 +59,7 @@ public class BannerViewDatabase {
 		}
 	}
 	
-	public BannerViewCursor getCursor(int bannerID, int initialTime) throws DatabaseException {
+	public BannerViewCursor getCursor(int bannerID, int initialTime, int index) throws DatabaseException {
 		SecondaryCursor c = bannerTimeDb.openSecondaryCursor(null, null);
 		BannerTimeKeyCreator bt = new BannerTimeKeyCreator();
 		DatabaseEntry searchKey = new DatabaseEntry();
@@ -147,13 +146,13 @@ public class BannerViewDatabase {
 		db.close();
 	}
 
-	/**
+	/**index;
 	 * 
 	 */
 	public void dump() {
 		BannerViewCursor c;
 		try {
-			c = this.getCursor(0,0);
+			c = this.getCursor(0,0,0);
 			BannerView bv = c.getCurrent();
 			while (bv != null) {
 				System.out.println(bv);
@@ -165,6 +164,24 @@ public class BannerViewDatabase {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public BannerView get(int index) {
+		IntegerBinding ib = new IntegerBinding();
+		DatabaseEntry key = new DatabaseEntry();
+		ib.objectToEntry(new Integer(Math.max(index,1)), key);
+		DatabaseEntry data = new DatabaseEntry();
+		try {
+			db.get(null, key, data, null);
+		} catch (DatabaseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		BannerViewBinding bvb = AdBlaster.instanceBinding;
+		bvb.setIndex(index);
+		BannerView bv = (BannerView)bvb.entryToObject(data);
+		return bv;
 	}
 }
 

@@ -16,23 +16,25 @@ class Banner{
 	Interests interests;
 	int id;
 	int payrate;
-	int maxHits;
+	private int maxHits;
 	int campaignID;
 	Vector locations;
 	Vector ages;
 	Vector sexes;
+	private int viewsperuser;
+	private int limitbyperiod;
 	
 	static int count = 0;
 	public static int counter(){
 		return count++;
 	}
 	
-	Banner() {
+	/*Banner() {
 		interests = new Interests();
 		id = counter(); //TODO Banners need an ID we can track them by
 		maxHits = (int) (Math.pow((Math.random()-0.5) * 2,2) * 200) + 1;
 		this.payrate = (int)(Math.random()*10);
-	}
+	}*/
 	
 	/**
 	 * @return Returns the campaignID.
@@ -46,15 +48,15 @@ class Banner{
 	public void setCampaignID(int campaignID) {
 		this.campaignID = campaignID;
 	}
-	Banner(int id) {
+	/*Banner(int id) {
 		this();
 		this.id = id;
-	}
+	}*/
 	
 	Banner(int id, int payrate, int maxHits, int campaignID, Vector locations, Vector ages, Vector sexes, Interests interests) {
 		this.id = id;
 		this.payrate = payrate;
-		this.maxHits = maxHits;
+		this.maxHits = (maxHits==0?Integer.MAX_VALUE:maxHits);
 		this.campaignID = campaignID;
 		this.locations = locations;
 		this.ages = ages;
@@ -65,11 +67,21 @@ class Banner{
 	Banner(ResultSet rs) throws SQLException {
 		this.id = rs.getInt("ID");
 		this.payrate = rs.getInt("PAYRATE");
-		this.maxHits = rs.getInt("MAXVIEWS");
+		this.maxHits = rs.getInt("VIEWSPERDAY");
+		maxHits = (maxHits==0?Integer.MAX_VALUE:maxHits);
 		this.campaignID = rs.getInt("CAMPAIGNID");
 		this.locations = Utilities.stringToVector(rs.getString("LOC"));
 		this.ages = Utilities.stringToVector(rs.getString("AGE"));
 		this.sexes = Utilities.stringToVector(rs.getString("SEX"));
+		/* INTEGER viewsperday
+		 * INTEGER clicksperday
+		 * INTEGER UNSIGNED viewsperuser
+		 * CHAR limitbyhour
+		 * INTEGER UNSIGNED limitbyperiod
+		 */
+		this.viewsperuser = rs.getInt("VIEWSPERUSER"); 
+		this.limitbyperiod = rs.getInt("LIMITBYPERIOD"); 
+
 		this.interests = new Interests(rs.getString("INTERESTS"));
 	}
 	
@@ -77,7 +89,15 @@ class Banner{
 		return id;
 	}
 	public String toString(){
-		return "" + this.id + "," + this.getPayrate();
+		String s = "" + this.id + '\n';
+		s += "Payrate:" + this.getPayrate() + '\n' ;
+		s += "max hits:" + this.maxHits + '\n' ;
+		s += "locations:" + this.locations + '\n' ;
+		s += "ages:" + this.ages + '\n' ;
+		s += "sexes:" + this.sexes + '\n' ;
+		s += "views per user:" + this.viewsperuser + '\n' ;
+		s += "views period:" + this.limitbyperiod + '\n' ;
+		return s;
 	}
 	public Vector getAges() {
 		return ages;
@@ -114,6 +134,22 @@ class Banner{
 	}
 	public void setPayrate(int payrate) {
 		this.payrate = payrate;
+	}
+
+	public int getLimitbyperiod() {
+		return limitbyperiod;
+	}
+
+	public void setLimitbyperiod(int limitbyperiod) {
+		this.limitbyperiod = limitbyperiod;
+	}
+
+	public int getViewsperuser() {
+		return viewsperuser;
+	}
+
+	public void setViewsperuser(int viewsperuser) {
+		this.viewsperuser = viewsperuser;
 	}
 
 	/**

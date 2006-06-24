@@ -3,7 +3,7 @@ package com.nexopia.adblaster;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
-
+import java.util.Arrays;
 
 public class AdBlasterPolicy {
 	HashMap coefficients;
@@ -13,7 +13,7 @@ public class AdBlasterPolicy {
 		coefficients = new HashMap();
 		universe = ac;
 		for (int i = 0; i < ac.getBannerCount(); i++){
-			coefficients.put(ac.getBanner(i), new Float(Math.random()));
+			coefficients.put(ac.getBannerByIndex(i), new Float(Math.random()));
 		}
 	}
 
@@ -56,32 +56,32 @@ public class AdBlasterPolicy {
 		for (int i = 0; i < universe.getBannerCount(); i++){
 			int totalAvailable = 1;
 			int totalUsed = 0;
-			Banner b = universe.getBanner(i);
+			Banner b = universe.getBannerByIndex(i);
+			System.out.println("Calculating banner " + i + "/" + universe.getBannerCount());
 			for (int j = 0; j < instance.getViewCount(); j++){
-				if (instance.isValidBannerForUser(instance.getUserForView(j),b)){
+				if (instance.isValidBannerForView(b,j)){
 					totalAvailable++;
 				}
-				if (instance.getBannerForView(j) == b){
+				if (instance.getView(j).getBanner() == b){
 					totalUsed++;
 				}
 			}
-			float f = ((float)totalUsed)/(float)Math.min(b.maxHits,totalAvailable);
-			System.out.println(totalUsed +","+Math.min(totalAvailable,b.maxHits));
+			float f = ((float)totalUsed)/(float)Math.min(b.getMaxHits(),totalAvailable);
 			coefficients.put(b, new Float(f)); 
 		}
 
 	}
 
 	Banner getBestBanner(AbstractAdBlasterInstance instance, BannerView bv) {
-		User u = bv.u;
+		User u = bv.getUser();
 		int t = bv.getTime();
 		
 		int bestMatch = -1;
 		float bestScore = Float.NEGATIVE_INFINITY;
 		for (int j = 0; j < instance.universe.getBannerCount(); j++){
-			Banner b = instance.universe.getBanner(j);
+			Banner b = instance.universe.getBannerByIndex(j);
 			float score = ((Float)coefficients.get(b)).floatValue();
-			if (instance.isValidBannerForUser(u, b) && (instance.count(b) < b.getMaxHits())){
+			if (instance.isValidBannerForView(bv, b) && (instance.count(b) < b.getMaxHits())){
 				if (score > bestScore){
 					bestScore = score;
 					bestMatch = j;
@@ -89,7 +89,7 @@ public class AdBlasterPolicy {
 			}
 		}
 		
-		Banner banner = instance.universe.getBanner(bestMatch);
+		Banner banner = instance.universe.getBannerByIndex(bestMatch);
 		return banner;
 	}
 

@@ -26,9 +26,6 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 		b = new Banner[b_num];
 	}
 	
-	public Banner getBanner(int i) {
-		return b[i];
-	}
 	public int getBannerCount(){
 		return b.length;
 	}
@@ -63,12 +60,24 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 		}
 		
 		for(int i = 0; i < num_banners; i++){
-			setBanner(i, new Banner());
+			Random r = new Random(System.currentTimeMillis());
+			int payrate = (1+r.nextInt(99));
+			Interests inter = new Interests("1,4");
+			//System.out.println(userid + ":" + age + ":" + sex + ":" + loc + ":" + inter);
+			
+			int campaignID=1;
+			int maxHits=1;
+			Vector location = new Vector();
+			Vector sexes = new Vector();
+			Vector loc = new Vector();
+			Vector ages = new Vector();
+			
+			setBanner(i, new Banner(i, payrate, maxHits, campaignID, loc, sexes, ages, inter));
 		}
 		num_interests = interests;
 	}
 	
-	public void makeMeADatabase(Environment dbEnv){
+	public void makeMeADatabase(){
 		try {			
 
 			EnvironmentConfig envConf = new EnvironmentConfig();
@@ -140,6 +149,17 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 	 */
 	public Collection getBanners() {
 		return Arrays.asList(b);
+	}
+
+	public Banner getBanner(int i) {
+		return b[i];
+	}
+	public Banner getBannerByIndex(int i) {
+		return b[i];
+	}
+
+	public Banner getBannerByID(int i) {
+		return b[i];
 	}
 	
 

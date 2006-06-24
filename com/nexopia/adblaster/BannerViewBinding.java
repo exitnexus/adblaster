@@ -17,16 +17,36 @@ import com.sleepycat.bind.tuple.TupleOutput;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 class BannerViewBinding extends TupleBinding {
+	
+	AbstractAdBlasterUniverse ac;
+	AbstractAdBlasterInstance inst;
+	int currentIndex;
+	boolean indexFresh = false;
+	
+	BannerViewBinding(AbstractAdBlasterUniverse universe, AbstractAdBlasterInstance i){
+		ac = universe;
+		inst = i;
+	}
+
+	/*Must be called before entryToObject is called.*/
+	void setIndex(int i){
+		currentIndex = i;
+		indexFresh = true;
+	}
 
 	/* (non-Javadoc)
 	 * @see com.sleepycat.bind.tuple.TupleBinding#entryToObject(com.sleepycat.bind.tuple.TupleInput)
 	 */
 	public Object entryToObject(TupleInput ti) {
-		//TODO need to get Banner and User out from inside AdCampaign so this works
-		Banner b = new Banner(ti.readInt());//, BerkDBTester.bannerMap);
+		if (!indexFresh)
+			throw new UnsupportedOperationException("You must call setIndex() first.");
+		
+		indexFresh = false;
+		int index = ti.readInt();
+		Banner b = ac.getBannerByID(index);//, BerkDBTester.bannerMap);
 		int time = ti.readInt();
-		User u = new User(ti.readInt(), BerkDBTester.userDb);
-		return new BannerView(u,b,time);
+		User u = ac.getUser(ti.readInt());
+		return new BannerView(inst, currentIndex, u, b,time);
 	}
 
 	/* (non-Javadoc)
@@ -46,4 +66,5 @@ class BannerViewBinding extends TupleBinding {
 		to.writeInt(bv.getUser().getID());
 
 	}
+
 }

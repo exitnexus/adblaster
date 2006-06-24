@@ -34,8 +34,14 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 	/* (non-Javadoc)
 	 * @see com.nexopia.adblaster.AbstractAdBlasterUniverse#getBanner(int)
 	 */
-	public Banner getBanner(int i) {
-		return bannerDB.getBanner(i);
+	public Banner getBannerByIndex(int i) {
+		/*XXX: This is by index...*/
+		return bannerDB.getBannerByIndex(i);
+	}
+
+	public Banner getBannerByID(int i) {
+		/*XXX: This is by index...*/
+		return bannerDB.getBannerByID(i);
 	}
 
 	/* (non-Javadoc)

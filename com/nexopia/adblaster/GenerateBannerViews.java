@@ -40,7 +40,7 @@ public class GenerateBannerViews {
 				User u = (User)users.get(r.nextInt(users.size()));
 				Banner b = (Banner)banners[r.nextInt(banners.length)];
 				int t = r.nextInt(86400); //seconds in the day
-				bvDb.insert(new BannerView(u,b,t));
+				bvDb.insert(new BannerView(null,i,u,b,t));
 			}
 			bvDb.dump();
 		} catch (DatabaseException dbe) {

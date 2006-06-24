@@ -79,7 +79,7 @@ public class BerkDBTester {
 			db.close();
 			dbEnv.close();
 			/*/
-			BannerViewCursor c = db.getCursor(0,0);
+			BannerViewCursor c = db.getCursor(0,0,0);
 			BannerView bv = c.getCurrent();
 			int i=0;
 			while (bv != null) {

@@ -12,7 +12,8 @@ public abstract class AbstractAdBlasterUniverse {
 	
 	abstract protected void init(int u_num, int b_num);
 	
-	abstract public Banner getBanner(int i);
+	abstract public Banner getBannerByIndex(int i);
+	abstract public Banner getBannerByID(int i);
 
 	abstract public int getBannerCount();
 
@@ -22,11 +23,15 @@ public abstract class AbstractAdBlasterUniverse {
 
 	abstract public Collection getBanners();
 	
-	public Banner getRandomBannerMatching(Banner bvb, User u, int t, AdBlasterInstance instance) {
+public Banner getRandomBannerMatching(int i, AbstractAdBlasterInstance instance) {
 		Banner match = null;
 		while (match == null){
-			Banner b = getBanner((int)(Math.random()*getBannerCount()));
-			if (instance.isValidBannerForUser(u, b) && (instance.count(b) < b.getMaxHits())){
+			int index = (int)(Math.random()*getBannerCount());
+			Banner b = getBannerByIndex(index);
+			if (b == null){
+				System.err.println("There is an error here (null banner in the database at " + index);
+			}
+			if (b != null && instance.isValidBannerForView(b,i) && (instance.count(b) < b.getMaxHits())){
 				match = b;
 			}
 		}

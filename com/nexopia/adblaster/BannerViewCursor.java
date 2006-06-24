@@ -33,7 +33,8 @@ public class BannerViewCursor {
 			return null;
 		}
 		if (data.getData() != null) {
-			BannerViewBinding bvb = new BannerViewBinding();
+			BannerViewBinding bvb = AdBlaster.instanceBinding;
+			bvb.setIndex(((Integer)(new IntegerBinding()).entryToObject(key)).intValue());
 			BannerView bv = (BannerView)bvb.entryToObject(data);
 			return bv;
 		} else {
@@ -43,15 +44,17 @@ public class BannerViewCursor {
 	
 	public BannerView getCurrent() {
 		DatabaseEntry data = new DatabaseEntry();
+		DatabaseEntry key = new DatabaseEntry();
 		try {
-			c.getCurrent(new DatabaseEntry(), data, null);
+			c.getCurrent(key, data, null);
 		} catch (DatabaseException e) {
 			System.out.println("Database Exception: " + e);
 			e.printStackTrace();
 			return null;
 		}
 		if (data.getData() != null) {
-			BannerViewBinding bvb = new BannerViewBinding();
+			BannerViewBinding bvb = AdBlaster.instanceBinding;
+			bvb.setIndex(((Integer)(new IntegerBinding()).entryToObject(key)).intValue());
 			BannerView bv = (BannerView)bvb.entryToObject(data);
 			return bv;
 		} else {

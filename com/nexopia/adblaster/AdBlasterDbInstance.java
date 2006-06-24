@@ -16,16 +16,65 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 		super(c);
 		try {
 			db = new BannerViewDatabase();
+			
 		} catch (DatabaseException e) {
 			System.err.println("Failed to make a BannerViewDatabase object: " + e);
+			e.printStackTrace();
+		}
+	}
+	
+	public void test(){
+		BannerViewCursor cursor;
+		try {
+			cursor = db.getCursor(0,0,0);
+			int i = 0;
+			BannerView bv = null;
+			bv = cursor.getCurrent();
+			while(bv  != null && i < 10000){
+				i++;
+				if (i%100 == 0){
+					System.out.println("Loaded bannerview " + i + ": " + bv);
+				}
+				
+				//bv.b = pol.getBestBanner(this, bv);
+				bv = cursor.getNext();
+			}
+			cursor.close();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+	
+	public void close(){
+		try {
+			db.close();
+		} catch (DatabaseException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
 	//TODO Don't know how this should behave, it needs to be dealt with
 	public void fillInstance(AdBlasterPolicy pol) {
-		System.err.println("Someone write a fillInstance method.");
-		System.exit(0);
+		/* Doesn't really do anything */
+		System.out.println("Filling " + getViewCount() + " instances.");
+		for (int i = 0; i < getViewCount(); i++){
+			getView(i).setBanner(null);
+		}
+		long time = System.currentTimeMillis();
+		for (int i = 0; i < getViewCount(); i++){
+			BannerView bv = getView(i);
+			if ((System.currentTimeMillis() - time) > 5000){
+				System.out.println("..." + ((float)i/(float)getViewCount())*100 + "% complete.");
+				time = System.currentTimeMillis();
+			}
+			//Banner b = pol.getBestBanner(this, bv);
+			Banner b = universe.getRandomBannerMatching(i, this);
+			bv.setBanner(b);
+		}
+		
 	}
 
 	/*public AbstractAdBlasterInstance copy() {
@@ -53,55 +102,24 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 		AdBlasterDbInstance abdbi = new AdBlasterDbInstance(abu);
 		AdBlasterPolicy pol = AdBlasterPolicy.randomPolicy(abu);
 		abdbi.fillInstance(pol);
-		
 	}
 
-	/* (non-Javadoc)
-	 * @see com.nexopia.adblaster.AbstractAdBlasterInstance#setBannerView(int, com.nexopia.adblaster.Banner)
-	 */
-	public void setBannerView(int j, Banner b) {
-		
+	protected BannerView getView(int index) {
+		BannerView bv = db.get(index);
+		return bv;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.nexopia.adblaster.AbstractAdBlasterInstance#getBannerForView(int)
-	 */
-	public Banner getBannerForView(int i) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.nexopia.adblaster.AbstractAdBlasterInstance#getUserForView(int)
-	 */
-	public User getUserForView(int i) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.nexopia.adblaster.AbstractAdBlasterInstance#getTimeForView(int)
-	 */
-	public int getTimeForView(int i) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.nexopia.adblaster.AbstractAdBlasterInstance#totalProfit()
-	 */
-	public float totalProfit() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.nexopia.adblaster.AbstractAdBlasterInstance#getViewCount()
-	 */
 	public int getViewCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return db.lastid;
 	}
 
+	/*XXX: Next three should update the database.*/
+	public void notifyChange(BannerView view, Banner b) {
+		super.notifyChange(view,b);
+	}
+	public void notifyChangeUser(BannerView view) {
+	}
+	public void notifyChangeTime(BannerView view) {
+	}
 
 }
