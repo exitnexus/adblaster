@@ -107,7 +107,8 @@ public abstract class AbstractAdBlasterInstance {
 		Vector unserved = new Vector();
 		Collection banners = this.universe.getBanners();
 		Banner b = null;
-		for (Iterator i = banners.iterator(); i.hasNext(); b = (Banner)i.next()){
+		for (Iterator i = banners.iterator(); i.hasNext(); ){
+			b = (Banner)i.next();
 			if (b == null){
 				System.err.println("Another error here: null banners in the list?");
 			}  else {
@@ -196,6 +197,11 @@ public abstract class AbstractAdBlasterInstance {
 		
 	}
 
+	/**
+	 * NotifyChange must be called BEFORE the actual change occurs.
+	 * @param bv
+	 * @param b
+	 */
 	protected void notifyChange(BannerView bv, Banner b){
 		if (bv.getBanner() != null){
 			this.bannerCountMap.put(bv.getBanner(), 

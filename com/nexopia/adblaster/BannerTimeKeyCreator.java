@@ -25,7 +25,7 @@ public class BannerTimeKeyCreator extends TupleBinding implements SecondaryKeyCr
 		Integer i = (Integer)(new IntegerBinding().entryToObject(key));
 		bvb.setIndex(i.intValue());
 		BannerView bv = (BannerView)bvb.entryToObject(data);
-		int[] a = { bv.getBanner().getID(), bv.getTime() };
+		int[] a = { bv.getBanner()==null?-1:bv.getBanner().getID(), bv.getTime() };
 		objectToEntry(a, secondaryKey);
 		return true;
 	}

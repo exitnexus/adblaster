@@ -61,7 +61,7 @@ class BannerViewBinding extends TupleBinding {
 		to.writeString(u.getInterests().toString());
 		*/
 		BannerView bv = (BannerView)obj;
-		to.writeInt(bv.getBanner().getID());
+		to.writeInt(bv.getBanner()==null?-1:bv.getBanner().getID());
 		to.writeInt(bv.getTime());
 		to.writeInt(bv.getUser().getID());
 

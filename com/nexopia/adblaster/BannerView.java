@@ -26,8 +26,8 @@ class BannerView{
 	
 	
 	public void setBanner(Banner b) {
-		this.b = b;
 		this.inst.notifyChange(this, b);
+		this.b = b;
 	}
 
 	User getUser() {
@@ -54,5 +54,9 @@ class BannerView{
 	
 	public String toString(){
 		return "Banner ID: " + b.getID() + " - Time: " + time + " User ID: " + u.getID(); 
+	}
+
+	public void setBannerWithoutFire(Banner b) {
+		this.b = b;
 	}
 }

@@ -54,11 +54,11 @@ public class AdBlaster {
 		instanceBinding = new BannerViewBinding(ac, instance1);
 		instance1.makeMeADatabase();
 
-		AdBlasterDbInstance instance2 = new AdBlasterDbInstance(ac);
-		instanceBinding = new BannerViewBinding(ac, instance2);
-		instance2.test();
+		//AdBlasterDbInstance instance2 = new AdBlasterDbInstance(ac);
+		//instanceBinding = new BannerViewBinding(ac, instance2);
+		//instance2.test();
 		System.out.println("Filling...");
-		instance2.fillInstance(pol);
+		//instance2.fillInstance(pol);
 		System.out.println("done.");
 
 		System.exit(0);

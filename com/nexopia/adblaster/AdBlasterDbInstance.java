@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Vector;
 
+import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
@@ -116,10 +117,29 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	/*XXX: Next three should update the database.*/
 	public void notifyChange(BannerView view, Banner b) {
 		super.notifyChange(view,b);
+		updateDB(view,b);
+	}
+
+	private void updateDB(BannerView view, Banner b) {
+		try {
+			IntegerBinding ib = new IntegerBinding();
+			DatabaseEntry key = new DatabaseEntry();
+			ib.objectToEntry(new Integer(view.getIndex()), key);
+			BannerViewBinding bvb = AdBlaster.instanceBinding;
+			DatabaseEntry data = new DatabaseEntry();
+			bvb.objectToEntry(view, data);
+			db.db.delete(null, key);
+			view.setBannerWithoutFire(b);
+			db.db.put(null, key, data);
+		} catch (DatabaseException e) {
+			e.printStackTrace();
+		}
 	}
 	public void notifyChangeUser(BannerView view) {
+		updateDB(view, view.getBanner());
 	}
 	public void notifyChangeTime(BannerView view) {
+		updateDB(view, view.getBanner());
 	}
 
 }
