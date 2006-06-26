@@ -49,28 +49,16 @@ public class AdBlaster {
 		
 		AdBlasterPolicy pol = AdBlasterPolicy.randomPolicy(ac);
 
-		/*AdBlasterInstance instance1 = AdBlasterInstance.randomInstance(num_serves, ac);
-		instance1.fillInstance(pol);
-		instanceBinding = new BannerViewBinding(ac, instance1);
-		instance1.makeMeADatabase();
 
-		//AdBlasterDbInstance instance2 = new AdBlasterDbInstance(ac);
-		//instanceBinding = new BannerViewBinding(ac, instance2);
-		//instance2.test();
-		System.out.println("Filling...");
-		//instance2.fillInstance(pol);
-		System.out.println("done.");
-
-		System.exit(0);
-		*/
 		for (int day = 0; day < 1; day++){
 			System.out.println("Day "+ day);
 			//AdBlasterInstance instance = AdBlasterInstance.randomInstance(num_serves, ac);
 			AbstractAdBlasterInstance instance = new AdBlasterDbInstance(ac);
 			instanceBinding = new BannerViewBinding(ac, instance);
 			System.out.println("Instances generated.");
-			for (int i = 0; i < 2; i++){
+			for (int i = 0; i < 1; i++){
 				instance.fillInstance(pol);
+				System.out.println("Total profit:" + instance.totalProfit());
 				//instance.makeMeADatabase();
 
 				resultPanel = new JPanel(new BorderLayout());
@@ -142,7 +130,7 @@ public class AdBlaster {
 						bv.setBanner(b);
 					} else {
 						Vector swaps = null;
-						int swap_max = 2;
+						int swap_max = 1;
 						for (int l = 1; l < swap_max; l+=2){
 								Vector path = instance.depthLimitedDFS(j, b, l);
 								if (path != null){

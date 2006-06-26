@@ -20,39 +20,32 @@ import com.sleepycat.je.DatabaseException;
  */
 public class GenerateBannerViews {
 	static final int NUM_BANNERVIEWS = 10000;
+	static int num_serves = 10000;
 	
 	public static void main(String[] args) {
 		UserDatabase uDb = null;
 		BannerViewDatabase bvDb = null;
-		try {
-			BannerDatabase bdb = new BannerDatabase();
-			uDb = new UserDatabase(bdb.getBanners());
-			Vector users = uDb.getAllUsers();
-			Object[] banners = bdb.getBanners().toArray();
-			
-			bvDb = new BannerViewDatabase();
-			
-			System.out.println(bvDb.getBannerViewCount());
-			bvDb.empty();
+		
+		boolean generateViews = false;
+		if (generateViews){
+			AbstractAdBlasterUniverse ac;
+			ac = new AdBlasterDbUniverse();
+			AdBlasterPolicy pol = AdBlasterPolicy.randomPolicy(ac);
 
-			Random r = new Random();
-			for (int i = 0; i < NUM_BANNERVIEWS; i++){
-				User u = (User)users.get(r.nextInt(users.size()));
-				Banner b = (Banner)banners[r.nextInt(banners.length)];
-				int t = r.nextInt(86400); //seconds in the day
-				bvDb.insert(new BannerView(null,i,u,b,t));
-			}
-			bvDb.dump();
-		} catch (DatabaseException dbe) {
-			System.err.println("DatabaseException: " + dbe);
-			dbe.printStackTrace();
-		} finally {
-			try {
-				uDb.close();
-				bvDb.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			AdBlasterInstance instance1 = AdBlasterInstance.randomInstance(num_serves, ac);
+			instance1.fillInstance(pol);
+			BannerViewBinding instanceBinding = new BannerViewBinding(ac, instance1);
+			instance1.makeMeADatabase();
+
+			//AdBlasterDbInstance instance2 = new AdBlasterDbInstance(ac);
+			//instanceBinding = new BannerViewBinding(ac, instance2);
+			//instance2.test();
+			System.out.println("Filling...");
+			//instance2.fillInstance(pol);
+			System.out.println("done.");
+
+			System.exit(0);
+			
 		}
 	}
 }
