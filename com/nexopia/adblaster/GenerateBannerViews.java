@@ -26,26 +26,21 @@ public class GenerateBannerViews {
 		UserDatabase uDb = null;
 		BannerViewDatabase bvDb = null;
 		
-		boolean generateViews = false;
-		if (generateViews){
-			AbstractAdBlasterUniverse ac;
-			ac = new AdBlasterDbUniverse();
-			AdBlasterPolicy pol = AdBlasterPolicy.randomPolicy(ac);
+		AbstractAdBlasterUniverse ac;
+		ac = new AdBlasterDbUniverse();
+		AdBlasterPolicy pol = AdBlasterPolicy.randomPolicy(ac);
 
-			AdBlasterInstance instance1 = AdBlasterInstance.randomInstance(num_serves, ac);
-			instance1.fillInstance(pol);
-			BannerViewBinding instanceBinding = new BannerViewBinding(ac, instance1);
-			instance1.makeMeADatabase();
+		AdBlasterInstance instance1 = AdBlasterInstance.randomInstance(num_serves, ac);
+		instance1.fillInstance(pol);
+		BannerViewBinding instanceBinding = new BannerViewBinding(ac, instance1);
+		instance1.makeMeADatabase();
 
-			//AdBlasterDbInstance instance2 = new AdBlasterDbInstance(ac);
-			//instanceBinding = new BannerViewBinding(ac, instance2);
-			//instance2.test();
-			System.out.println("Filling...");
-			//instance2.fillInstance(pol);
-			System.out.println("done.");
+		//AdBlasterDbInstance instance2 = new AdBlasterDbInstance(ac);
+		//instanceBinding = new BannerViewBinding(ac, instance2);
+		//instance2.test();
+		System.out.println("Filling...");
+		//instance2.fillInstance(pol);
+		System.out.println("done.");
 
-			System.exit(0);
-			
-		}
 	}
 }
