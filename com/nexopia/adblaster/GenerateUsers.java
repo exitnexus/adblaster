@@ -6,8 +6,6 @@
  */
 package com.nexopia.adblaster;
 
-import java.util.Random;
-
 import com.sleepycat.je.DatabaseException;
 
 /**
@@ -17,13 +15,12 @@ import com.sleepycat.je.DatabaseException;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class GenerateUsers {
-	static final int NUM_USERS = 10000;
+	static final int NUM_USERS = 100;
 	
 	public static void main(String[] args) {
 		UserDatabase uDb = null;
 		try {
-			BannerDatabase bdb = new BannerDatabase();
-			uDb = new UserDatabase(bdb.getBanners());
+			uDb = new UserDatabase();
 			
 			System.out.println(uDb.getUserCount());
 			

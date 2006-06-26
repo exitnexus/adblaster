@@ -7,10 +7,8 @@
 package com.nexopia.adblaster;
 
 import java.io.File;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 import java.util.Vector;
 
 import com.sleepycat.je.CheckpointConfig;
@@ -22,10 +20,6 @@ import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
 import com.sleepycat.je.OperationStatus;
-import com.sleepycat.je.SecondaryConfig;
-import com.sleepycat.je.SecondaryDatabase;
-import com.sleepycat.je.SecondaryKeyCreator;
-import com.sleepycat.je.SecondaryMultiKeyCreator;
 
 /**
  * @author wolfe
@@ -36,13 +30,10 @@ import com.sleepycat.je.SecondaryMultiKeyCreator;
 
 public class UserDatabase {
 	private Database db;
-	private SecondaryDatabase bannerDb;
 	private Environment env;
-	private Collection banners;
 	int userCount;
 	
-	public UserDatabase(Collection banners) throws DatabaseException {
-		this.banners = banners;
+	public UserDatabase() throws DatabaseException {
 		EnvironmentConfig envConf = new EnvironmentConfig();
 		envConf.setAllowCreate(true);
 		env = new Environment(new File("User.db"), envConf);
@@ -56,6 +47,7 @@ public class UserDatabase {
 		dbConf.setAllowCreate(true);
 		db = env.openDatabase(null, "Users", dbConf);
 		
+		/*
 		//Create index keyed by bannerid, maps bannerid to valid users for the banner
 		SecondaryMultiKeyCreator bannerKey = new BannerKeyCreator(banners);
 		SecondaryConfig bannerConf = new SecondaryConfig();
@@ -63,6 +55,7 @@ public class UserDatabase {
 		bannerConf.setSortedDuplicates(true);
 		bannerConf.setMultiKeyCreator(bannerKey);
 		bannerDb = env.openSecondaryDatabase(null, "BannerUsers", db, bannerConf);
+		*/
 	}
 	
 	public void insert(User u) throws DatabaseException {
@@ -182,7 +175,7 @@ public class UserDatabase {
 	
 	private void closeDatabases() throws DatabaseException {
 		this.db.close();
-		this.bannerDb.close();
+		//this.bannerDb.close();
 	}
 	
 	
@@ -191,7 +184,7 @@ public class UserDatabase {
 		Environment dbEnv = null;
 		try {
 			BannerDatabase bdb = new BannerDatabase();
-			user_db = new UserDatabase(bdb.getBanners()); //we're passing in an empty banners set here
+			user_db = new UserDatabase();
 			
 			System.out.println(user_db.userCount);
 			
