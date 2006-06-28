@@ -52,16 +52,17 @@ public class AdBlasterInstance extends AbstractAdBlasterInstance{
 		//xxx:clear out original instance.views
 		for (int i = 0; i < this.getViewCount(); i++){
 			BannerView bv = getView(i);
-			instance.addView(new BannerView(instance, bv.getIndex(), bv.getUser(), bv.getBanner(), bv.getTime()));
+			instance.addView(new BannerView(instance, bv.getUserID(), bv.getUser(), bv.getBanner(), bv.getTime()));
 		}
 		return instance;
 
 	}
 
 	static int index = 0;
+
 	public BannerView randomView(AdBlasterDbUniverse ac, 
 			AdBlasterInstance instance) {
-		User randomPick = ac.getRandomUser();
+		int randomPick = (int) (Math.random()*universe.getUserCount());
 		int time = (int) (Math.random()*60*60*24);
 		return new BannerView(instance, index++, randomPick, null, time);
 	}

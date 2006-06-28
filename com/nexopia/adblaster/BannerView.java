@@ -9,16 +9,22 @@ package com.nexopia.adblaster;
  * change.
  */
 class BannerView{
-	private User u;
+	private int uid;
 	private Banner b;
 	private int time;
 	private int index;
 	AbstractAdBlasterInstance inst;
 	
 	BannerView(AbstractAdBlasterInstance instance, int index, User u, Banner b, int t){
-		this.u = u; this.b = b; time = t; inst = instance;
+		this.uid = u.getID(); this.b = b; time = t; inst = instance;
 		this.index = index;
 	}
+	
+	BannerView(AbstractAdBlasterInstance instance, int index, int id, Banner b, int t){
+		this.uid = id; this.b = b; time = t; inst = instance;
+		this.index = index;
+	}
+	
 	
 	Banner getBanner() {
 		return b;
@@ -31,14 +37,19 @@ class BannerView{
 	}
 
 	User getUser() {
-		return u;
+		return inst.universe.getUser(this.uid);
 	}
 
 	public void setU(User u) {
-		this.u = u;
+		this.uid = u.getID();
 		this.inst.notifyChangeUser(this);
 	}
 
+	public void setU(int id) {
+		this.uid = id;
+		this.inst.notifyChangeUser(this);
+	}
+	
 	int getTime() {
 		return time;
 	}
@@ -53,10 +64,17 @@ class BannerView{
 	}
 	
 	public String toString(){
-		return "Banner ID: " + b.getID() + " - Time: " + time + " User ID: " + u.getID(); 
+		return "Banner ID: " + b.getID() + " - Time: " + time + " User ID: " + uid; 
 	}
 
 	public void setBannerWithoutFire(Banner b) {
 		this.b = b;
+	}
+
+	/**
+	 * @return
+	 */
+	public int getUserID() {
+		return this.uid;
 	}
 }
