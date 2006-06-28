@@ -25,44 +25,69 @@ public abstract class AbstractAdBlasterInstance {
 	
 	
 	public boolean isValidBannerForView(BannerView bv, Banner b) {
-		return bv.getBanner().interests.hasAllIn(b.interests) && 
-			this.nearestWithinTimeRange(b, bv);
+		boolean age = doesAgeMatch(bv, b);
+		if (age){
+			boolean sex = b.sexes.isEmpty() || b.sexes.contains(new Integer(bv.getUser().sex));
+			if (sex){
+				boolean interests = bv.getUser().interests.hasAnyIn(b.interests);
+				if (interests){
+					boolean timerange = true;
+					//boolean timerange = this.nearestWithinTimeRange(b, bv);
+						return interests && timerange && age && sex;
+				}
+			}
+		}
+		return false;
 	}
 
-	public boolean isValidBannerForView(Banner b, int i) {
-		return getView(i).getUser().interests.hasAllIn(b.interests) && 
-			this.nearestWithinTimeRange(b, getView(i));
+
+	private boolean doesAgeMatch(BannerView bv, Banner b) {
+		if (b.ages.contains(new Integer(0))){
+			return !(b.ages.contains(new Integer(bv.getUser().age)));
+		} else {
+			return b.ages.isEmpty() || b.ages.contains(new Integer(bv.getUser().age));
+		}
 	}
 
 	private boolean nearestWithinTimeRange(Banner b, BannerView bv) {
-		return true;
-		
+		//return true;
 		//XXX: should tell us if we've overrun the interval
-		/*
-		 Doesn't work right now because we need more bannerview data
+		// Doesn't work right now because we need more bannerview data
 		
 		
-		int cursor = this.indexOfView(bv);
 		if (((Integer)bannerCountMap.get(b)).intValue()+1 >= b.getViewsperuser()){
-			Vector range = scan(b.getViewsperuser(), b.getViewsperuser(), b, cursor);
+			Vector range = scan(b.getViewsperuser(), b.getViewsperuser(), b, bv);
 			
-			for (int i = 0; i < b.getViewsperuser() && i < range.size(); i++){
-				int index1 = ((Integer)range.get(i)).intValue();
-				int index2 = ((Integer)range.get(i + b.getViewsperuser())).intValue();
-				BannerView first = getView(index1);
-				BannerView last = getView(index2);
+			for (int i = 0; (i + b.getViewsperuser()) < range.size(); i++){
+				//int index1 = ((Integer)range.get(i)).intValue();
+				//int index2 = ((Integer)range.get(i + b.getViewsperuser())).intValue();
+				BannerView first = (BannerView) range.get(i);
+				BannerView last = (BannerView) range.get(i+b.getViewsperuser());
 				if (last.getTime() - first.getTime() < b.getLimitbyperiod()){
 					return false;
 				}
 			}
 		}
 		return true;
-		*/
+		
 	}
 
 
-	private Vector scan(int before, int after, Banner b, int startIndex) {
-		Vector matches = new Vector();
+	private Vector getAllMatching(Banner b, User u, int time, int range){
+		Vector vec = new Vector();
+		for (int i = 0; i < this.getViewCount(); i++){
+			BannerView bv = getView(i);
+			if (bv.getUser() == u && bv.getTime() > time - range && bv.getTime() < time + range){
+				vec.add(bv);
+			}
+		}
+		return vec;
+		
+	}
+	
+	private Vector scan(int before, int after, Banner b, BannerView bv) {
+		/*Vector matches = new Vector();
+		
 		
 		int count = 0;
 		int index = startIndex-1;
@@ -85,7 +110,31 @@ public abstract class AbstractAdBlasterInstance {
 			}
 			index += 1;
 		}
-		return matches;
+		*/	
+		Vector vec = getAllMatching(b, bv.getUser(), bv.getTime(), b.getLimitbyperiod() );
+		vec.add(bv);
+		//return orderBannersByTime(vec);
+		return vec;
+	}
+
+	private Vector orderBannersByTime(Vector input) {
+		Vector vec = new Vector();
+		int bestMatch = -1;
+		float bestScore = Float.NEGATIVE_INFINITY;
+		for (int j = 0; j < input.size(); j++){
+			BannerView bv = (BannerView) input.get(j);
+			int score = bv.getTime();
+			int i = 0;
+			int score2 = Integer.MIN_VALUE;
+			while (i < vec.size() && score2 < score){
+				BannerView b2 = (BannerView) vec.get(i);
+				score2 = b2.getTime();
+				i++;
+			}
+			vec.insertElementAt(bv, i);
+			
+		}
+		return vec;
 	}
 
 	/*
@@ -99,7 +148,7 @@ public abstract class AbstractAdBlasterInstance {
 	
 	
 	public Vector getUnserved() {
-		/**Loaded bannervie
+		/**Loaded bannerview
 		 * For a particular instance, get a list of all of the banners that were not served
 		 * that could have made a profit.
 		 * @return A vector of banners.
@@ -110,7 +159,7 @@ public abstract class AbstractAdBlasterInstance {
 		for (Iterator i = banners.iterator(); i.hasNext(); ){
 			b = (Banner)i.next();
 			if (b == null){
-				System.err.println("Another error here: null banners in the list?");
+				System.err.println("Error here: null banners in the list?");
 			}  else {
 				int count = count(b);
 				if (count < b.getMaxHits()){
@@ -218,5 +267,6 @@ public abstract class AbstractAdBlasterInstance {
 	public abstract void fillInstance(AdBlasterPolicy pol);
 	protected abstract BannerView getView(int i);
 	public abstract int getViewCount();
+
 
 }

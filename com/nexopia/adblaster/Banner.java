@@ -93,8 +93,8 @@ class Banner{
 		s += "Payrate:" + this.getPayrate() + '\n' ;
 		s += "max hits:" + this.maxHits + '\n' ;
 		s += "locations:" + this.locations + '\n' ;
-		s += "ages:" + this.ages + '\n' ;
-		s += "sexes:" + this.sexes + '\n' ;
+		s += "ages:" + this.ages + this.ages.isEmpty() + '\n' ;
+		s += "sexes:" + this.sexes + this.sexes.isEmpty() + '\n' ;
 		s += "views per user:" + this.viewsperuser + '\n' ;
 		s += "views period:" + this.limitbyperiod + '\n' ;
 		return s;

@@ -7,6 +7,7 @@
 package com.nexopia.adblaster;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -32,12 +33,14 @@ public class UserDatabase {
 	private Database db;
 	private Environment env;
 	int userCount;
+	HashMap cache;
 	
 	public UserDatabase() throws DatabaseException {
 		EnvironmentConfig envConf = new EnvironmentConfig();
 		envConf.setAllowCreate(true);
 		env = new Environment(new File("User.db"), envConf);
 		openDatabases();
+		cache = new HashMap();
 		this.refreshUserCount();
 	}
 	
@@ -70,7 +73,19 @@ public class UserDatabase {
 		this.userCount++;
 	}
 	
+	public User getUser(Integer i){
+		User u = (User)cache.get(i);
+		if (u != null){
+			return u;
+		}
+		throw new UnsupportedOperationException();
+	}
+
 	public User getUser(int userid) throws DatabaseException {
+		User u = (User)cache.get(new Integer(userid));
+		if (u != null){
+			return u;
+		}/*
 		IntegerBinding ib = new IntegerBinding();
 		DatabaseEntry key = new DatabaseEntry();
 		ib.objectToEntry(new Integer(userid), key);
@@ -78,14 +93,17 @@ public class UserDatabase {
 		db.get(null, key, data, null);
 		if (data.getData() != null) {
 			UserBinding ub = new UserBinding();
-			User u = (User)ub.entryToObject(data);
+			u = (User)ub.entryToObject(data);
+			cache.put(new Integer(userid), u);
 			return u;
 		} else {
 			System.out.println("Invalid user.");
 			return null;
-		}
+		}*/
+		throw new UnsupportedOperationException();
 	}
 	
+	Vector keys = null;
 	public void refreshUserCount() {
 		Cursor c = null;
 		try {
@@ -96,6 +114,11 @@ public class UserDatabase {
 				int i = 1;
 				while (c.getNext(key, value, null) == OperationStatus.SUCCESS) {
 					i++;
+					if (value.getData() != null) {
+						UserBinding ub = new UserBinding();
+						User u = (User)ub.entryToObject(value);
+						cache.put(new Integer(u.id), u);
+					}
 				}
 				this.userCount = i;
 			} else {
@@ -113,6 +136,8 @@ public class UserDatabase {
 				e.printStackTrace();
 			}
 		}
+		keys = new Vector();
+		keys.addAll(cache.keySet());
 	}
 
 	public Vector getAllUsers() {
@@ -247,5 +272,9 @@ public class UserDatabase {
 		}
 		System.out.println("Total users: " + v.size());
 		
+	}
+
+	public User getUserByIndex(int i) {
+		return getUser((Integer)keys.get(i));
 	}
 }

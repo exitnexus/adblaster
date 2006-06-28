@@ -22,9 +22,10 @@ public class BannerViewCursor {
 		this.c = c;
 	}
 	
+	DatabaseEntry data = new DatabaseEntry();
+	DatabaseEntry key = new DatabaseEntry();
+	IntegerBinding ib = new IntegerBinding();
 	public BannerView getNext() {
-		DatabaseEntry data = new DatabaseEntry();
-		DatabaseEntry key = new DatabaseEntry();
 		try {
 			c.getNext(key, data, null);
 		} catch (DatabaseException e) {
@@ -34,7 +35,7 @@ public class BannerViewCursor {
 		}
 		if (data.getData() != null) {
 			BannerViewBinding bvb = AdBlaster.instanceBinding;
-			bvb.setIndex(((Integer)(new IntegerBinding()).entryToObject(key)).intValue());
+			bvb.setIndex(ib.entryToInt(key));
 			BannerView bv = (BannerView)bvb.entryToObject(data);
 			return bv;
 		} else {
@@ -43,8 +44,6 @@ public class BannerViewCursor {
 	}
 	
 	public BannerView getCurrent() {
-		DatabaseEntry data = new DatabaseEntry();
-		DatabaseEntry key = new DatabaseEntry();
 		try {
 			c.getCurrent(key, data, null);
 		} catch (DatabaseException e) {
@@ -54,7 +53,7 @@ public class BannerViewCursor {
 		}
 		if (data.getData() != null) {
 			BannerViewBinding bvb = AdBlaster.instanceBinding;
-			bvb.setIndex(((Integer)(new IntegerBinding()).entryToObject(key)).intValue());
+			bvb.setIndex(ib.entryToInt(key));
 			BannerView bv = (BannerView)bvb.entryToObject(data);
 			return bv;
 		} else {

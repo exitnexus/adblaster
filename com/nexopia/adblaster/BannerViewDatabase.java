@@ -34,6 +34,9 @@ public class BannerViewDatabase {
 	SecondaryDatabase userDb; //maps users to bannerviews
 	Environment env;
 	int lastid;
+	private DatabaseEntry key = new DatabaseEntry();
+	private DatabaseEntry data = new DatabaseEntry();
+	private IntegerBinding ib = new IntegerBinding();
 	
 	public BannerViewDatabase() throws DatabaseException {
 		//Create our primary database keyed by a unique ID
@@ -46,11 +49,9 @@ public class BannerViewDatabase {
 	public void insert(BannerView bv) throws DatabaseException  {
 		try {
 			lastid++;
-			IntegerBinding ib = new IntegerBinding();
-			DatabaseEntry key = new DatabaseEntry();
-			ib.objectToEntry(new Integer(lastid), key);
+			//ib.intToEntry(new Integer(lastid), key);
+			ib.intToEntry(lastid, key);
 			BannerViewBinding bvb = AdBlaster.instanceBinding;
-			DatabaseEntry data = new DatabaseEntry();
 			bvb.objectToEntry(bv, data);
 			db.put(null, key, data);
 		} catch (DatabaseException dbe) {
@@ -59,13 +60,14 @@ public class BannerViewDatabase {
 		}
 	}
 	
+	BannerTimeKeyCreator bt = new BannerTimeKeyCreator();
+	DatabaseEntry searchKey = new DatabaseEntry();
+	DatabaseEntry searchData = new DatabaseEntry();
 	public BannerViewCursor getCursor(int bannerID, int initialTime, int index) throws DatabaseException {
 		SecondaryCursor c = bannerTimeDb.openSecondaryCursor(null, null);
-		BannerTimeKeyCreator bt = new BannerTimeKeyCreator();
-		DatabaseEntry searchKey = new DatabaseEntry();
 		int[] a = { bannerID, initialTime };
 		bt.objectToEntry(a, searchKey);
-		c.getSearchKeyRange(searchKey, new DatabaseEntry(), null);
+		c.getSearchKeyRange(searchKey, searchData, null);
 		return new BannerViewCursor(c);
 	}
 	
@@ -134,6 +136,7 @@ public class BannerViewDatabase {
 		userConf.setSortedDuplicates(true);
 		userConf.setKeyCreator(userKey);
 		userDb = env.openSecondaryDatabase(null, "UserViews", db, userConf);
+		
 	}
 
 	/**
@@ -167,10 +170,7 @@ public class BannerViewDatabase {
 	}
 
 	public BannerView get(int index) {
-		IntegerBinding ib = new IntegerBinding();
-		DatabaseEntry key = new DatabaseEntry();
-		ib.objectToEntry(new Integer(Math.max(index,1)), key);
-		DatabaseEntry data = new DatabaseEntry();
+		ib.intToEntry(Math.max(index,1), key);
 		try {
 			db.get(null, key, data, null);
 		} catch (DatabaseException e) {

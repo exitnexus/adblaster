@@ -56,6 +56,7 @@ import java.util.Vector;
 
 public class BannerDatabase {
 	private HashMap banners;
+	Vector keyset = new Vector();
 	
 	public BannerDatabase() {
 		banners = new HashMap();
@@ -76,6 +77,7 @@ public class BannerDatabase {
 				int id = rs.getInt("ID");
 				banners.put(new Integer(id), new Banner(rs));
 			}
+			keyset.addAll(this.banners.keySet());
 			System.out.println("Total: " + i);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -86,7 +88,7 @@ public class BannerDatabase {
 		return (Banner)this.banners.get(new Integer(i));
 	}
 	public Banner getBannerByIndex(int i) {
-		return (Banner)this.banners.get(this.banners.keySet().toArray()[i]);
+		return (Banner)this.banners.get(keyset.get(i));
 	}
 	
 	public int getBannerCount() {

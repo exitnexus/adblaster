@@ -34,7 +34,7 @@ public class AdBlasterInstance extends AbstractAdBlasterInstance{
 				time = System.currentTimeMillis();
 			}
 			//Banner b = pol.getBestBanner(this, bv);
-			Banner b = universe.getRandomBannerMatching(i, this);
+			Banner b = universe.getRandomBannerMatching(bv, this);
 			bv.setBanner(b);
 		}
 	}
@@ -59,17 +59,22 @@ public class AdBlasterInstance extends AbstractAdBlasterInstance{
 	}
 
 	static int index = 0;
-	public BannerView randomView(AbstractAdBlasterUniverse ac, 
-			AbstractAdBlasterInstance instance) {
-		User randomPick = universe.getUser((int) (Math.random()*universe.getUserCount()));
+	public BannerView randomView(AdBlasterDbUniverse ac, 
+			AdBlasterInstance instance) {
+		User randomPick = ac.getRandomUser();
 		int time = (int) (Math.random()*60*60*24);
 		return new BannerView(instance, index++, randomPick, null, time);
 	}
 
-	public static AdBlasterInstance randomInstance(int num, AbstractAdBlasterUniverse ac) {
+	public static AdBlasterInstance randomInstance(int num, AdBlasterDbUniverse ac) {
 		AdBlasterInstance instance = new AdBlasterInstance(ac);
+		long time = System.currentTimeMillis();
 		for (int i = 0; i < num; i++){
 			BannerView bv = instance.randomView(ac, instance);
+			if (System.currentTimeMillis() - time > 5000){
+				System.out.println("" + ((float)i/(float)num) * 100 + "%");
+				time = System.currentTimeMillis();
+			}
 			instance.addView(bv);
 		}
 		return instance;
@@ -86,8 +91,12 @@ public class AdBlasterInstance extends AbstractAdBlasterInstance{
 
 			Random r = new Random(1);
 			System.out.println("Should be inserting " + this.getViewCount() + " BannerViews.");
+			long time = System.currentTimeMillis();
 			for (int i=0; i<this.getViewCount(); i++) {
-				System.out.println(this.views.get(i));
+				if (System.currentTimeMillis() - time > 5000){
+					System.out.println(""+((float)i)/(float)this.getViewCount() * 100+"% done making database");
+					time = System.currentTimeMillis();
+				}
 				db.insert((BannerView)this.views.get(i));
 			}
 			

@@ -99,7 +99,7 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 	}
 
 	public static AdBlasterUniverse generateTestData(int num_banners, int num_users){
-		/*Generate a set of test banners and parameters
+		/*Generate ab set of test banners and parameters
 		 * 
 		 * data: 
 		 * 	num_banners (int)
@@ -160,6 +160,11 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 
 	public Banner getBannerByID(int i) {
 		return b[i];
+	}
+
+	public User getRandomUser() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 

@@ -21,6 +21,7 @@ import com.sleepycat.je.SecondaryKeyCreator;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 class UserBinding extends TupleBinding implements SecondaryKeyCreator {
+	IntegerBinding ib = new IntegerBinding();
 
 	/* (non-Javadoc)
 	 * @see com.sleepycat.bind.tuple.TupleBinding#entryToObject(com.sleepycat.bind.tuple.TupleInput)
@@ -42,7 +43,7 @@ class UserBinding extends TupleBinding implements SecondaryKeyCreator {
 				s = "";   
 			}
 		}
-		
+		//System.out.println("Creating user " + id);
 		User u = new User(id, age, sex, loc, s);
 		return u;
 	}
@@ -62,13 +63,55 @@ class UserBinding extends TupleBinding implements SecondaryKeyCreator {
 	/* (non-Javadoc)
 	 * @see com.sleepycat.je.SecondaryKeyCreator#createSecondaryKey(com.sleepycat.je.SecondaryDatabase, com.sleepycat.je.DatabaseEntry, com.sleepycat.je.DatabaseEntry, com.sleepycat.je.DatabaseEntry)
 	 */
+	TwoIntegerBinding tib = new TwoIntegerBinding();
 	public boolean createSecondaryKey(SecondaryDatabase userKeyDB, DatabaseEntry key, DatabaseEntry data, DatabaseEntry secondaryKey) throws DatabaseException {
 		BannerViewBinding bvb = AdBlaster.instanceBinding;
-		bvb.setIndex(((Integer)(new IntegerBinding()).entryToObject(key)).intValue());
+		bvb.setIndex(ib.entryToInt(key));
 		BannerView bv = (BannerView) bvb.entryToObject(data);
 		User u = bv.getUser();
-		IntegerBinding ib = new IntegerBinding();
-		ib.objectToEntry(new Integer(u.getID()), secondaryKey);
+		tib.intsToEntry(u.getID(), bv.getIndex(), secondaryKey);
 		return true;
 	}
+
+	private class TwoIntegerBinding extends TupleBinding {
+
+		/* (non-Javadoc)
+		 * @see com.sleepycat.bind.tuple.TupleBinding#entryToObject(com.sleepycat.bind.tuple.TupleInput)
+		 */
+		public Object entryToObject(TupleInput ti) {
+			return new Integer(ti.readInt());
+		}
+
+		public int entryToInt(DatabaseEntry entry) {
+	        return entryToInput(entry).readInt();
+		}
+
+		/* (non-Javadoc)
+		 * @see com.sleepycat.bind.tuple.TupleBinding#objectToEntry(java.lang.Object, com.sleepycat.bind.tuple.TupleOutput)
+		 */
+		public void objectToEntry(Object o, TupleOutput to) {
+			Integer i = (Integer)o;
+			to.writeInt(i.intValue());
+		}
+
+	    protected TupleOutput getTupleOutput(int i) {
+	        int byteSize = getTupleBufferSize();
+	        if (byteSize != 0) {
+	            return new TupleOutput(new byte[byteSize]);
+	        } else {
+	            return new TupleOutput();
+	        }
+	    }
+
+		public void intsToEntry(int i, int j, DatabaseEntry entry) {
+	        TupleOutput output = getTupleOutput(i);
+			output.writeInt(i);
+			output.writeInt(j);
+	        outputToEntry(output, entry);
+		}
+
+	}
+
 }
+
+

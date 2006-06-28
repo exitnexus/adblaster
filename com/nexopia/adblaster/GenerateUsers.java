@@ -15,7 +15,7 @@ import com.sleepycat.je.DatabaseException;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class GenerateUsers {
-	static final int NUM_USERS = 100;
+	static final int NUM_USERS = 200000;
 	
 	public static void main(String[] args) {
 		UserDatabase uDb = null;

@@ -23,7 +23,7 @@ public abstract class AbstractAdBlasterUniverse {
 
 	abstract public Collection getBanners();
 	
-public Banner getRandomBannerMatching(int i, AbstractAdBlasterInstance instance) {
+	public Banner getRandomBannerMatching(BannerView bv, AbstractAdBlasterInstance instance) {
 		Banner match = null;
 		while (match == null){
 			int index = (int)(Math.random()*getBannerCount());
@@ -31,11 +31,11 @@ public Banner getRandomBannerMatching(int i, AbstractAdBlasterInstance instance)
 			if (b == null){
 				System.err.println("There is an error here (null banner in the database at " + index);
 			}
-			if (b != null && instance.isValidBannerForView(b,i) && (instance.count(b) < b.getMaxHits())){
+			if (b != null && instance.isValidBannerForView(bv, b) && (instance.count(b) < b.getMaxHits())){
 				match = b;
 			}
 		}
 		return match;	
 	}
-	
+
 }

@@ -6,8 +6,9 @@ import java.util.Vector;
 import java.util.Arrays;
 
 public class AdBlasterPolicy {
-	HashMap coefficients;
+	private HashMap coefficients;
 	AbstractAdBlasterUniverse universe;
+	Vector banners = null;
 	
 	public AdBlasterPolicy(AbstractAdBlasterUniverse ac) {
 		coefficients = new HashMap();
@@ -23,6 +24,7 @@ public class AdBlasterPolicy {
 
 	public void increment(Banner b, double d) {
 		coefficients.put(b, new Float(((Float)coefficients.get(b)).floatValue() + d));
+		banners = null;
 	}
 
 	public void upgradePolicy(AbstractAdBlasterInstance instance) {
@@ -59,15 +61,17 @@ public class AdBlasterPolicy {
 			Banner b = universe.getBannerByIndex(i);
 			System.out.println("Calculating banner " + i + "/" + universe.getBannerCount());
 			for (int j = 0; j < instance.getViewCount(); j++){
-				if (instance.isValidBannerForView(b,j)){
+				BannerView bv = instance.getView(j);
+				if (instance.isValidBannerForView(bv,b)){
 					totalAvailable++;
 				}
-				if (instance.getView(j).getBanner() == b){
+				if (bv.getBanner() == b){
 					totalUsed++;
 				}
 			}
 			float f = ((float)totalUsed)/(float)Math.min(b.getMaxHits(),totalAvailable);
 			coefficients.put(b, new Float(f)); 
+			banners = null;
 		}
 
 	}
@@ -75,22 +79,52 @@ public class AdBlasterPolicy {
 	Banner getBestBanner(AbstractAdBlasterInstance instance, BannerView bv) {
 		User u = bv.getUser();
 		int t = bv.getTime();
-		
+		if (banners == null){
+			banners = orderBannersByScore(instance);
+		}
 		int bestMatch = -1;
 		float bestScore = Float.NEGATIVE_INFINITY;
 		for (int j = 0; j < instance.universe.getBannerCount(); j++){
-			Banner b = instance.universe.getBannerByIndex(j);
+			Banner b = (Banner) banners.get(j);
 			float score = ((Float)coefficients.get(b)).floatValue();
-			if (instance.isValidBannerForView(bv, b) && (instance.count(b) < b.getMaxHits())){
-				if (score > bestScore){
-					bestScore = score;
-					bestMatch = j;
+			if (score > bestScore){
+				if ( instance.count(b) < b.getMaxHits() ){
+					if (instance.isValidBannerForView(bv, b)){
+						bestScore = score;
+						bestMatch = j;
+					}
 				}
 			}
 		}
 		
 		Banner banner = instance.universe.getBannerByIndex(bestMatch);
 		return banner;
+	}
+
+	private Vector orderBannersByScore(AbstractAdBlasterInstance instance) {
+		Vector vec = new Vector();
+		int bestMatch = -1;
+		float bestScore = Float.NEGATIVE_INFINITY;
+		for (int j = 0; j < instance.universe.getBannerCount(); j++){
+			Banner b = instance.universe.getBannerByIndex(j);
+			float score = ((Float)coefficients.get(b)).floatValue();
+			int i = 0;
+			Banner b2 = (Banner) vec.get(i);
+			if (true) throw new UnsupportedOperationException();
+			float score2 = ((Float)coefficients.get(b2)).floatValue();
+			while (b2 != null && score2 > score){
+				i++;
+				b2 = (Banner) vec.get(i);
+				score2 = ((Float)coefficients.get(b2)).floatValue();
+			}
+			vec.insertElementAt(b, i);
+			
+		}
+		return vec;
+	}
+
+	public Float getCoefficient(Banner bannerByIndex) {
+		return (Float)coefficients.get(bannerByIndex);
 	}
 
 }

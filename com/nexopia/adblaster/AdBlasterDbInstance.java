@@ -11,12 +11,14 @@ import com.sleepycat.je.EnvironmentConfig;
 
 public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	HashMap swappedViews; //always look for a view here before checking the database
-	BannerViewDatabase db;
+	CacheBannerViewDatabase db;
 	
 	public AdBlasterDbInstance(AbstractAdBlasterUniverse c){
 		super(c);
+	}
+	public void load() {
 		try {
-			db = new BannerViewDatabase();
+			db = new CacheBannerViewDatabase();
 			
 		} catch (DatabaseException e) {
 			System.err.println("Failed to make a BannerViewDatabase object: " + e);
@@ -24,7 +26,7 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 		}
 	}
 	
-	public void test(){
+	/*public void test(){
 		BannerViewCursor cursor;
 		try {
 			cursor = db.getCursor(0,0,0);
@@ -46,7 +48,7 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 			e.printStackTrace();
 		}
 
-	}
+	}*/
 	
 	public void close(){
 		try {
@@ -71,11 +73,10 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 				System.out.println("..." + ((float)i/(float)getViewCount())*100 + "% complete.");
 				time = System.currentTimeMillis();
 			}
-			//Banner b = pol.getBestBanner(this, bv);
-			Banner b = universe.getRandomBannerMatching(i, this);
+			Banner b = pol.getBestBanner(this, bv);
+			//Banner b = universe.getRandomBannerMatching(bv, this);
 			bv.setBanner(b);
 		}
-		
 	}
 
 	/*public AbstractAdBlasterInstance copy() {
@@ -121,7 +122,7 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	}
 
 	private void updateDB(BannerView view, Banner b) {
-		try {
+		/*try {
 			IntegerBinding ib = new IntegerBinding();
 			DatabaseEntry key = new DatabaseEntry();
 			ib.objectToEntry(new Integer(view.getIndex()), key);
@@ -133,7 +134,7 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 			db.db.put(null, key, data);
 		} catch (DatabaseException e) {
 			e.printStackTrace();
-		}
+		}*/
 	}
 	public void notifyChangeUser(BannerView view) {
 		updateDB(view, view.getBanner());
@@ -141,5 +142,6 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	public void notifyChangeTime(BannerView view) {
 		updateDB(view, view.getBanner());
 	}
+
 
 }

@@ -15,10 +15,13 @@ import java.util.Vector;
 
 
 class Interests{
-	HashMap checked;
+	private HashMap checked;
 	private static final Random rand = new Random();
+	private int count;
+	
 	Interests(){
 	  checked = new HashMap();
+	  count = 0;
 	}
 	
 	Interests(String interests) {
@@ -37,28 +40,38 @@ class Interests{
 				//do nothing for any value that can't be parsed as an in
 			}
 		}
+		count = getChecked().size();
 	}
 	
 	boolean has(Integer k) {
 		return checked.containsKey(k);
 	}
 	
-	void add(Integer i) {
+	public void add(Integer i) {
 		checked.put(i, Boolean.TRUE);
+		count++;
 	}
 	
 	Set getChecked() {
 		return checked.keySet();
 	}
+	
+	int getCount(){
+		return count;
+	}
 
-	public boolean hasAllIn(Interests interests) {
+	public boolean hasAnyIn(Interests interests) {
+		if (interests.getChecked().size() < 1){
+			return true;
+		}
+		
 		for (Iterator it = interests.getChecked().iterator(); it.hasNext(); ){
 			Integer interest = (Integer)it.next();
-			if (!has(interest)){
-				return false;
+			if (has(interest)){
+				return true;
 			}
 		}
-		return true;
+		return false;
 	}
 
 	public void putAll(Vector vector) {
@@ -105,5 +118,6 @@ class Interests{
 		}
 		return interests;
 	}
+
 	
 }

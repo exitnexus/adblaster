@@ -55,8 +55,10 @@ public class AdBlaster {
 			//AdBlasterInstance instance = AdBlasterInstance.randomInstance(num_serves, ac);
 			AbstractAdBlasterInstance instance = new AdBlasterDbInstance(ac);
 			instanceBinding = new BannerViewBinding(ac, instance);
+			((AdBlasterDbInstance)instance).load();
 			System.out.println("Instances generated.");
 			for (int i = 0; i < 1; i++){
+				System.out.println("Total profit:" + instance.totalProfit());
 				instance.fillInstance(pol);
 				System.out.println("Total profit:" + instance.totalProfit());
 				//instance.makeMeADatabase();
@@ -119,18 +121,16 @@ public class AdBlaster {
 			System.out.println("Unserved: " + i +" /" + unserved.size());
 			Tuple t = (Tuple)unserved.get(i);
 			Banner b = (Banner)t.data.get(0); 
-			int c = ((Integer)t.data.get(1)).intValue(); 
-			for (int j = 0; j < instance.getViewCount() && c > 0; j++){
+			for (int j = 0; j < instance.getViewCount() && ((Integer)instance.bannerCountMap.get(b)).intValue() < b.getMaxHits(); j++){
 				//System.out.println("Trying bannerview " + j);
 				BannerView bv = instance.getView(j);
 				if (bv.getBanner().getPayrate() < b.getPayrate()){
-					if (instance.isValidBannerForView(b,j)){
+					if (instance.isValidBannerForView(bv,b)){
 						//single swapbreak;
-						c--;
 						bv.setBanner(b);
-					} else {
+					} else if (false){
 						Vector swaps = null;
-						int swap_max = 1;
+						int swap_max = 0;
 						for (int l = 1; l < swap_max; l+=2){
 								Vector path = instance.depthLimitedDFS(j, b, l);
 								if (path != null){
@@ -140,7 +140,6 @@ public class AdBlaster {
 						}
 						if (swaps != null){
 							instance.doSwap(swaps, b);
-							c--;
 						}
 					}
 				}
@@ -157,7 +156,7 @@ public class AdBlaster {
 			model.setValueAt(""+ac.getBannerByIndex(i).getID(), i,0);
 			model.setValueAt(""+ac.getBannerByIndex(i).getPayrate(), i,1);
 			model.setValueAt(""+ac.getBannerByIndex(i).getMaxHits(), i,2);
-			model.setValueAt((Float)pol.coefficients.get(ac.getBannerByIndex(i)), i,3);
+			model.setValueAt(pol.getCoefficient(ac.getBannerByIndex(i)), i,3);
 		}
 		// TODO Auto-generated method stub
 		
