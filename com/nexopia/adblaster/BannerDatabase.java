@@ -75,7 +75,9 @@ public class BannerDatabase {
 			while (rs.next()) {
 				i++;
 				int id = rs.getInt("ID");
-				banners.put(new Integer(id), new Banner(rs));
+				if (rs.getString("ENABLED").equals("y")) {
+					banners.put(new Integer(id), new Banner(rs));
+				}
 			}
 			keyset.addAll(this.banners.keySet());
 			System.out.println("Total: " + i);
