@@ -7,6 +7,7 @@
 package com.nexopia.adblaster;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -33,14 +34,14 @@ public class UserDatabase {
 	private Database db;
 	private Environment env;
 	int userCount;
-	HashMap cache;
+	IntObjectHashMap cache;
 	
 	public UserDatabase() throws DatabaseException {
 		EnvironmentConfig envConf = new EnvironmentConfig();
 		envConf.setAllowCreate(true);
 		env = new Environment(new File("User.db"), envConf);
 		openDatabases();
-		cache = new HashMap();
+		cache = new IntObjectHashMap();
 		this.refreshUserCount();
 	}
 	
@@ -82,7 +83,7 @@ public class UserDatabase {
 	}
 
 	public User getUser(int userid) throws DatabaseException {
-		User u = (User)cache.get(new Integer(userid));
+		User u = (User)cache.get(userid);
 		if (u != null){
 			return u;
 		}/*
@@ -117,7 +118,7 @@ public class UserDatabase {
 					if (value.getData() != null) {
 						UserBinding ub = new UserBinding();
 						User u = (User)ub.entryToObject(value);
-						cache.put(new Integer(u.id), u);
+						cache.put(u.id, u);
 					}
 				}
 				this.userCount = i;
@@ -137,7 +138,7 @@ public class UserDatabase {
 			}
 		}
 		keys = new Vector();
-		keys.addAll(cache.keySet());
+		keys.addAll(Arrays.asList(cache.m_keyTable));
 	}
 
 	public Vector getAllUsers() {

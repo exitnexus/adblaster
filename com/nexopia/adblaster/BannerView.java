@@ -40,16 +40,6 @@ class BannerView{
 		return inst.universe.getUser(this.uid);
 	}
 
-	public void setU(User u) {
-		this.uid = u.getID();
-		this.inst.notifyChangeUser(this);
-	}
-
-	public void setU(int id) {
-		this.uid = id;
-		this.inst.notifyChangeUser(this);
-	}
-	
 	int getTime() {
 		return time;
 	}

@@ -14,11 +14,11 @@ import com.sleepycat.je.EnvironmentConfig;
  * fill with learning data.
  */
 public class AdBlasterInstance extends AbstractAdBlasterInstance{
-	private Vector views;
+	private Vector<BannerView> views;
 	
 	public AdBlasterInstance(AbstractAdBlasterUniverse ac) {
 		super(ac);
-		views = new Vector();
+		views = new Vector<BannerView>();
 		
 	}
 
@@ -62,9 +62,9 @@ public class AdBlasterInstance extends AbstractAdBlasterInstance{
 
 	public BannerView randomView(AdBlasterDbUniverse ac, 
 			AdBlasterInstance instance) {
-		int randomPick = (int) (Math.random()*universe.getUserCount());
+		int randomPick = (int) (Math.random()*(universe.getUserCount()-1.0));
 		int time = (int) (Math.random()*60*60*24);
-		return new BannerView(instance, index++, randomPick, null, time);
+		return new BannerView(instance, index++, ac.getUserByIndex(randomPick), null, time);
 	}
 
 	public static AdBlasterInstance randomInstance(int num, AdBlasterDbUniverse ac) {
@@ -98,7 +98,7 @@ public class AdBlasterInstance extends AbstractAdBlasterInstance{
 					System.out.println(""+((float)i)/(float)this.getViewCount() * 100+"% done making database");
 					time = System.currentTimeMillis();
 				}
-				db.insert((BannerView)this.views.get(i));
+				db.insert(this.views.get(i));
 			}
 			
 			db.close();
@@ -113,7 +113,7 @@ public class AdBlasterInstance extends AbstractAdBlasterInstance{
 	}
 
 	protected BannerView getView(int i) {
-		return (BannerView) this.views.get(i);
+		return this.views.get(i);
 	}
 
 	public void notifyChangeUser(BannerView view) {

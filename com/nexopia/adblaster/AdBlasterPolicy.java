@@ -100,6 +100,7 @@ public class AdBlasterPolicy {
 		Banner banner = instance.universe.getBannerByIndex(bestMatch);
 		return banner;
 	}
+	
 
 	private Vector orderBannersByScore(AbstractAdBlasterInstance instance) {
 		Vector vec = new Vector();
@@ -109,13 +110,11 @@ public class AdBlasterPolicy {
 			Banner b = instance.universe.getBannerByIndex(j);
 			float score = ((Float)coefficients.get(b)).floatValue();
 			int i = 0;
-			Banner b2 = (Banner) vec.get(i);
-			if (true) throw new UnsupportedOperationException();
-			float score2 = ((Float)coefficients.get(b2)).floatValue();
-			while (b2 != null && score2 > score){
-				i++;
-				b2 = (Banner) vec.get(i);
+			float score2 = Float.NEGATIVE_INFINITY;
+			while (i < vec.size() && score2 > score){
+				Banner b2 = (Banner) vec.get(i);
 				score2 = ((Float)coefficients.get(b2)).floatValue();
+				i++;
 			}
 			vec.insertElementAt(b, i);
 			

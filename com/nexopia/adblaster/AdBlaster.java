@@ -57,6 +57,12 @@ public class AdBlaster {
 			instanceBinding = new BannerViewBinding(ac, instance);
 			((AdBlasterDbInstance)instance).load();
 			System.out.println("Instances generated.");
+			long time = System.currentTimeMillis();
+			//for (int i = 0; i < 100000; i++){
+			//	instance.getView(i);
+			//}
+			//System.out.println(System.currentTimeMillis() - time);
+			//System.exit(0);
 			for (int i = 0; i < 1; i++){
 				System.out.println("Total profit:" + instance.totalProfit());
 				instance.fillInstance(pol);
@@ -115,38 +121,55 @@ public class AdBlaster {
 
 	}
 	
-	public static void iterativeImprove(AbstractAdBlasterInstance instance) {
-		Vector unserved = instance.getUnserved();
+	public static void iterativeImprove(AbstractAdBlasterInstance instanc) {
+		Vector unserved = instanc.getUnserved();
+		
+		AdBlasterInstance chunk = new AdBlasterInstance(ac);
+		getChunk(chunk, instanc);
+		
 		for (int i = 0; i < unserved.size(); i++){
 			System.out.println("Unserved: " + i +" /" + unserved.size());
 			Tuple t = (Tuple)unserved.get(i);
 			Banner b = (Banner)t.data.get(0); 
-			for (int j = 0; j < instance.getViewCount() && ((Integer)instance.bannerCountMap.get(b)).intValue() < b.getMaxHits(); j++){
-				//System.out.println("Trying bannerview " + j);
-				BannerView bv = instance.getView(j);
-				if (bv.getBanner().getPayrate() < b.getPayrate()){
-					if (instance.isValidBannerForView(bv,b)){
-						//single swapbreak;
-						bv.setBanner(b);
-					} else if (false){
-						Vector swaps = null;
-						int swap_max = 0;
-						for (int l = 1; l < swap_max; l+=2){
-								Vector path = instance.depthLimitedDFS(j, b, l);
-								if (path != null){
-									swaps = path;
-									break;
-								}
-						}
-						if (swaps != null){
-							instance.doSwap(swaps, b);
+			//while (((Integer)instance.bannerCountMap.get(b)).intValue() < b.getMaxHits()){
+				int depth = 0;
+				for (int j = 0; j < chunk.getViewCount() && ((Integer)instanc.bannerCountMap.get(b)).intValue() < b.getMaxHits(); j++){
+					//System.out.println("Trying bannerview " + j);
+					BannerView bv = chunk.getView(j);
+					if (bv.getBanner().getPayrate() < b.getPayrate()){
+						if (depth == 0 && chunk.isValidBannerForView(bv,b)){
+							//single swapbreak;
+							bv.setBanner(b);
+						} else if (depth > 0 && false){
+							Vector swaps = null;
+							int swap_max = 0;
+							for (int l = 1; l < swap_max; l+=2){
+									Vector path = chunk.depthLimitedDFS(bv, b, l);
+									if (path != null){
+										swaps = path;
+										break;
+									}
+							}
+							if (swaps != null){
+								chunk.doSwap(swaps, b);
+							}
 						}
 					}
-				}
+				//}
+				//depth++;
 			}
 		}
 	}
-						
+	private static void getChunk(AdBlasterInstance chunk, AbstractAdBlasterInstance instance) {
+		for (int i = 0; i < instance.getViewCount(); i++){
+			BannerView bv = instance.getView(i);
+			if (bv.getUser().id % 10 == 0){
+				chunk.addView(bv);
+			}
+		}
+	}
+
+								
 					
 	private static JTable getBannerTable(AbstractAdBlasterUniverse ac2, AdBlasterPolicy pol) {
 		// TODO Auto-generated method stub

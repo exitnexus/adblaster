@@ -14,6 +14,13 @@ public abstract class AbstractAdBlasterInstance {
 
 	AbstractAdBlasterUniverse universe;
 	HashMap bannerCountMap = null;
+	static Integer pool[];
+	static {
+		pool = new Integer[200];
+		for (int i = 0; i < 200; i++){
+			pool[i] = new Integer(i);
+		}
+	}
 	
 	public AbstractAdBlasterInstance(AbstractAdBlasterUniverse ac){
 		bannerCountMap = new HashMap();
@@ -27,12 +34,12 @@ public abstract class AbstractAdBlasterInstance {
 	public boolean isValidBannerForView(BannerView bv, Banner b) {
 		boolean age = doesAgeMatch(bv, b);
 		if (age){
-			boolean sex = b.sexes.isEmpty() || b.sexes.contains(new Integer(bv.getUser().sex));
+			boolean sex = b.sexes.isEmpty() || b.sexes.contains(pool[bv.getUser().sex]);
 			if (sex){
 				boolean interests = bv.getUser().interests.hasAnyIn(b.interests);
 				if (interests){
-					boolean timerange = true;
-					//boolean timerange = this.nearestWithinTimeRange(b, bv);
+					//boolean timerange = true;
+					boolean timerange = this.nearestWithinTimeRange(b, bv);
 						return interests && timerange && age && sex;
 				}
 			}
@@ -41,86 +48,74 @@ public abstract class AbstractAdBlasterInstance {
 	}
 
 
+	Integer zero = new Integer(0);
 	private boolean doesAgeMatch(BannerView bv, Banner b) {
-		if (b.ages.contains(new Integer(0))){
-			return !(b.ages.contains(new Integer(bv.getUser().age)));
+		if (b.ages.contains(zero)){
+			return !(b.ages.contains(pool[bv.getUser().age]));
 		} else {
-			return b.ages.isEmpty() || b.ages.contains(new Integer(bv.getUser().age));
+			return b.ages.isEmpty() || b.ages.contains(pool[bv.getUser().age]);
 		}
 	}
 
 	private boolean nearestWithinTimeRange(Banner b, BannerView bv) {
-		//return true;
-		//XXX: should tell us if we've overrun the interval
-		// Doesn't work right now because we need more bannerview data
-		
-		
-		if (((Integer)bannerCountMap.get(b)).intValue()+1 >= b.getViewsperuser()){
-			Vector range = scan(b.getViewsperuser(), b.getViewsperuser(), b, bv);
+		//if (((Integer)bannerCountMap.get(b)).intValue()+1 >= b.getViewsperuser()){
+			Vector<BannerView> range = scan(b.getViewsperuser(), b.getViewsperuser(), b, bv);
 			
 			for (int i = 0; (i + b.getViewsperuser()) < range.size(); i++){
-				//int index1 = ((Integer)range.get(i)).intValue();
-				//int index2 = ((Integer)range.get(i + b.getViewsperuser())).intValue();
 				BannerView first = (BannerView) range.get(i);
 				BannerView last = (BannerView) range.get(i+b.getViewsperuser());
 				if (last.getTime() - first.getTime() < b.getLimitbyperiod()){
 					return false;
 				}
 			}
-		}
+		//}
 		return true;
 		
 	}
 
-
-	private Vector getAllMatching(Banner b, User u, int time, int range){
-		Vector vec = new Vector();
-		for (int i = 0; i < this.getViewCount(); i++){
-			BannerView bv = getView(i);
-			if (bv.getUser() == u && bv.getTime() > time - range && bv.getTime() < time + range){
-				vec.add(bv);
+	private Vector<BannerView> getAllMatching(Vector<BannerView> vec, int time, int range) {
+		Vector<BannerView> vec2 = new Vector<BannerView>();
+		for (int i = 0; i < vec.size(); i++){
+			BannerView bv = vec.get(i);
+			if (bv.getTime() > time - range && bv.getTime() < time + range){
+				vec2.add(bv);
 			}
 		}
-		return vec;
+		return vec2;
+	}
+
+	private HashMap<User, Vector<BannerView>> getAllMatching(){
+		HashMap<User, Vector<BannerView>> map = new HashMap<User, Vector<BannerView>>();
+		for (int i = 0; i < this.getViewCount(); i++){
+			BannerView bv = getView(i);
+			User u = bv.getUser();
+			Vector <BannerView>vec = map.get(u);
+			if (vec == null){
+				vec = new Vector<BannerView>();
+				map.put(u, vec);
+			}
+			vec.add(bv);
+		}
+		return map;
 		
 	}
 	
-	private Vector scan(int before, int after, Banner b, BannerView bv) {
-		/*Vector matches = new Vector();
-		
-		
-		int count = 0;
-		int index = startIndex-1;
-		while (count < before && index > 0){
-			BannerView bv = (BannerView)getView(index);
-			if (bv.getBanner() == b){
-				matches.add(new Integer(index));
-				count++;
-			}
-			index -= 1;
+	private Vector<BannerView> scan(int before, int after, Banner b, BannerView bv) {
+
+		if (allMatching == null){
+			System.out.println("Building map." + this.getClass());
+			allMatching = getAllMatching();
 		}
-		
-		count = 0;
-		index = startIndex+1;
-		while (count < after && index < getViewCount()){
-			BannerView bv = (BannerView)getView(index);
-			if (bv.getBanner() == b){
-				matches.add(new Integer(index));
-				count++;
-			}
-			index += 1;
-		}
-		*/	
-		Vector vec = getAllMatching(b, bv.getUser(), bv.getTime(), b.getLimitbyperiod() );
-		vec.add(bv);
+		User user = bv.getUser();
+		Vector <BannerView> vec = (Vector<BannerView>) getAllMatching(allMatching.get(user), bv.getTime(), b.getLimitbyperiod());
 		//return orderBannersByTime(vec);
 		return vec;
 	}
 
-	private Vector orderBannersByTime(Vector input) {
-		Vector vec = new Vector();
-		int bestMatch = -1;
-		float bestScore = Float.NEGATIVE_INFINITY;
+	HashMap <User, Vector<BannerView>>allMatching = null;
+	
+	private Vector<BannerView> orderBannersByTime(Vector input) {
+		Vector<BannerView> vec = new Vector<BannerView>();
 		for (int j = 0; j < input.size(); j++){
 			BannerView bv = (BannerView) input.get(j);
 			int score = bv.getTime();
@@ -177,9 +172,15 @@ public abstract class AbstractAdBlasterInstance {
 
 	public float totalProfit() {
 		float count = 0;
+		long time = System.currentTimeMillis();
 		for (int i = 0; i < getViewCount(); i++){
-			if (((BannerView)getView(i)).getBanner() != null){
-				count += ((BannerView)getView(i)).getBanner().getPayrate();
+			if (System.currentTimeMillis() - time > 5000){
+				System.out.println(""+ (float)i/(float)getViewCount()*100 + "% done calculating profit.");
+				time = System.currentTimeMillis();
+			}
+			BannerView bv =((BannerView)getView(i)); 
+			if (bv.getBanner() != null){
+				count += bv.getBanner().getPayrate();
 			}
 		}
 		return count;
@@ -197,8 +198,8 @@ public abstract class AbstractAdBlasterInstance {
 		return v;
 	}
 
-	public Vector depthLimitedDFS(BannerView src, Banner b, AbstractAdBlasterInstance instance, int depth) {
-		if (instance.isValidBannerForView(src,b)){
+	public Vector depthLimitedDFS(BannerView src, Banner b, int depth) {
+		if (isValidBannerForView(src,b)){
 			Vector path = new Vector();
 			path.add(src);
 			return path;
@@ -206,10 +207,10 @@ public abstract class AbstractAdBlasterInstance {
 		if (depth < 0){
 			return null;
 		}
-		Vector v2 = instance.getAllBannerViewsThatCanSwapWith(src.getBanner());
+		Vector v2 = getAllBannerViewsThatCanSwapWith(src.getBanner());
 		for (Iterator it = v2.iterator(); it.hasNext() ;){
 			BannerView next_vert = (BannerView)it.next();
-			Vector result = depthLimitedDFS(next_vert, b, instance, depth-1);
+			Vector result = depthLimitedDFS(next_vert, b, depth-1);
 			if (result != null && !result.contains(src)){
 				result.add(src);
 				return result;
@@ -217,12 +218,6 @@ public abstract class AbstractAdBlasterInstance {
 		}
 		return null;
 	}
-
-	public Vector depthLimitedDFS(int j, Banner b, int l) {
-		return this.depthLimitedDFS(getView(j), b, this, l);
-	}
-	/************************************************************/
-	
 
 	void doSwap(Vector swaps, Banner endBanner) {
 		//System.out.println("Swapping " + swaps);

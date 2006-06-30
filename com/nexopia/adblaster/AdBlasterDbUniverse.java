@@ -83,4 +83,8 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 	public User getRandomUser() {
 		return userDB.getUserByIndex((int)(Math.random()*(userDB.userCount-1)));
 	}
+
+	public User getUserByIndex(int randomPick) {
+		return userDB.getUserByIndex(randomPick);
+	}
 }
