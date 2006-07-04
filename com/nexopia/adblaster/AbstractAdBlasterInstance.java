@@ -259,7 +259,7 @@ public abstract class AbstractAdBlasterInstance {
 
 	public abstract void notifyChangeUser(BannerView view);
 	public abstract void notifyChangeTime(BannerView view);
-	public abstract void fillInstance(AdBlasterPolicy pol);
+	public abstract void fillInstance(I_Policy pol);
 	protected abstract BannerView getView(int i);
 	public abstract int getViewCount();
 

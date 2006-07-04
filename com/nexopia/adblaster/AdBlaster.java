@@ -47,7 +47,7 @@ public class AdBlaster {
 		ac = new AdBlasterDbUniverse();
 		
 		
-		AdBlasterPolicy pol = AdBlasterPolicy.randomPolicy(ac);
+		I_Policy pol = AdBlasterPolicy.randomPolicy(ac);
 
 
 		for (int day = 0; day < 1; day++){
@@ -171,7 +171,7 @@ public class AdBlaster {
 
 								
 					
-	private static JTable getBannerTable(AbstractAdBlasterUniverse ac2, AdBlasterPolicy pol) {
+	private static JTable getBannerTable(AbstractAdBlasterUniverse ac2, I_Policy pol) {
 		// TODO Auto-generated method stub
 		DefaultTableModel model = new DefaultTableModel(ac.getBannerCount(),4);
 		final JTable table = new JTable(model);

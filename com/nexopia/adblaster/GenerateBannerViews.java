@@ -26,7 +26,7 @@ public class GenerateBannerViews {
 		UserDatabase uDb = null;
 		BannerViewDatabase bvDb = null;
 		AdBlasterDbUniverse ac = new AdBlasterDbUniverse();
-		AdBlasterPolicy pol = AdBlasterPolicy.randomPolicy(ac);
+		I_Policy pol = AdBlasterPolicy.randomPolicy(ac);
 
 		System.out.println("Making random instance.");
 		AdBlasterInstance instance1 = AdBlasterInstance.randomInstance(num_serves, ac);

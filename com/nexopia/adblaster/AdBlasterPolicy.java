@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.Vector;
 import java.util.Arrays;
 
-public class AdBlasterPolicy {
+public class AdBlasterPolicy implements I_Policy {
 	private HashMap coefficients;
 	AbstractAdBlasterUniverse universe;
 	Vector banners = null;
@@ -18,7 +18,7 @@ public class AdBlasterPolicy {
 		}
 	}
 
-	public static AdBlasterPolicy randomPolicy(AbstractAdBlasterUniverse ac) {
+	public static I_Policy randomPolicy(AbstractAdBlasterUniverse ac) {
 		return new AdBlasterPolicy(ac);
 	}
 
@@ -76,7 +76,7 @@ public class AdBlasterPolicy {
 
 	}
 
-	Banner getBestBanner(AbstractAdBlasterInstance instance, BannerView bv) {
+	public Banner getBestBanner(AbstractAdBlasterInstance instance, BannerView bv) {
 		User u = bv.getUser();
 		int t = bv.getTime();
 		if (banners == null){

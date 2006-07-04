@@ -60,7 +60,7 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	}
 
 	//TODO Don't know how this should behave, it needs to be dealt with
-	public void fillInstance(AdBlasterPolicy pol) {
+	public void fillInstance(I_Policy pol) {
 		/* Doesn't really do anything */
 		System.out.println("Filling " + getViewCount() + " instances.");
 		for (int i = 0; i < getViewCount(); i++){
@@ -102,7 +102,7 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 
 		AdBlasterDbUniverse abu = new AdBlasterDbUniverse();
 		AdBlasterDbInstance abdbi = new AdBlasterDbInstance(abu);
-		AdBlasterPolicy pol = AdBlasterPolicy.randomPolicy(abu);
+		I_Policy pol = AdBlasterPolicy.randomPolicy(abu);
 		abdbi.fillInstance(pol);
 	}
 

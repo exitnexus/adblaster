@@ -22,7 +22,7 @@ public class AdBlasterInstance extends AbstractAdBlasterInstance{
 		
 	}
 
-	public void fillInstance(AdBlasterPolicy pol){
+	public void fillInstance(I_Policy pol){
 		for (int i = 0; i < getViewCount(); i++){
 			getView(i).setBanner(null);
 		}
