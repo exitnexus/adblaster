@@ -65,18 +65,18 @@ public abstract class AbstractAdBlasterInstance {
 
 
 
-	private Vector<BannerView> getAllMatching(Vector<BannerView> vec, int time, int period) {
+	private Vector<BannerView> getAllMatching(Vector<BannerView> vec, Banner b, int time, int period) {
 		Vector<BannerView> vec2 = new Vector<BannerView>();
 		for (int i = 0; i < vec.size(); i++){
 			BannerView bv = vec.get(i);
-			if (bv.getTime() > time - period && bv.getTime() < time + period){
+			if (bv.getTime() > time - period && bv.getTime() < time + period && bv.getBanner() == b){
 				vec2.add(bv);
 			}
 		}
 		return vec2;
 	}
 
-	private HashMap<User, HashMap<Banner, Vector<BannerView>>> getAllMatching(){
+/*	private HashMap<User, HashMap<Banner, Vector<BannerView>>> getAllMatching(){
 		HashMap<User, HashMap<Banner, Vector<BannerView>>> userHash = new HashMap<User, HashMap<Banner, Vector<BannerView>>>();
 		for (int i = 0; i < this.getViewCount(); i++){
 			BannerView bv = getView(i);
@@ -94,7 +94,22 @@ public abstract class AbstractAdBlasterInstance {
 			vec.add(bv);
 		}
 		return userHash;
-		
+	
+	}
+*/
+	private HashMap<User, Vector<BannerView>> getAllMatching() {
+		HashMap<User, Vector<BannerView>> userHash = new HashMap<User, Vector<BannerView>>();
+		for (int i = 0; i < this.getViewCount(); i++) {
+			BannerView bv = getView(i);
+			User u = bv.getUser();
+			Vector<BannerView> vec = userHash.get(bv.getBanner());
+			if (vec == null) {
+				vec = new Vector<BannerView>();
+				userHash.put(u, vec);
+			}
+			vec.add(bv);
+		}
+		return userHash;
 	}
 	
 	//returns a time sorted vector of bannerviews that are from the same user and banner that could 
@@ -105,14 +120,15 @@ public abstract class AbstractAdBlasterInstance {
 			allMatching = getAllMatching();
 		}
 		User user = bv.getUser();
-		Vector <BannerView> vec = (Vector<BannerView>) getAllMatching(allMatching.get(user).get(b), bv.getTime(), b.getLimitbyperiod());
+		Vector<BannerView>hb = allMatching.get(user);
+		Vector <BannerView> vec = (Vector<BannerView>) getAllMatching(hb, b, bv.getTime(), b.getLimitbyperiod());
 		
 		//put bv in the list as well
 		vec.add(bv);
 		return orderBannersByTime(vec);
 	}
 
-	HashMap <User, HashMap<Banner, Vector<BannerView>>> allMatching = null;
+	HashMap <User, Vector<BannerView>> allMatching = null;
 	
 	private Vector<BannerView> orderBannersByTime(Vector input) {
 		Vector<BannerView> vec = new Vector<BannerView>();

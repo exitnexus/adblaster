@@ -39,8 +39,10 @@ public class AdBlaster {
 		((AdBlasterDbInstance)instanc).load();
 		GlobalData gd = new GlobalData(instanc, pol);
 		
+		System.out.println("Chunking.");
 		AdBlasterThreadedInstance chunk = new AdBlasterThreadedInstance(gd);
 		getChunk(chunk, instanc);
+		System.out.println("Starting thread.");
 		Runnable r = new AdBlasterThreadedOperation(gd, chunk);
 		Thread t = new Thread(r, "operateOnChunk");
 		t.start();
