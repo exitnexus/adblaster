@@ -11,6 +11,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -18,7 +19,8 @@ import java.util.Vector;
 class Campaign{
 	private static HashMap<Integer, Campaign> campaigns;
 	
-	public static void init() {
+	static {
+		System.out.println("Initing campagins.");
 		campaigns = new HashMap<Integer, Campaign>();
 		//Database connection stuff here.
 		try {
@@ -148,7 +150,7 @@ class Campaign{
 	 * @return
 	 */
 	private boolean validInterests(Interests userInterests) {
-		return interests.hasAnyIn(userInterests);
+		return userInterests.hasAnyIn(interests);
 	}
 
 	/**

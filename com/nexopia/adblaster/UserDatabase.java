@@ -33,17 +33,18 @@ public class UserDatabase {
 	private Database db;
 	private Environment env;
 	int userCount;
-	HashMap <Integer, User>cache;
-	//int keys[] = null;
-	Vector <Integer>keys = null;
+	IntObjectHashMap cache;
+	int keys[] = null;
+	//Vector <Integer>keys = null;
 	
 	public UserDatabase() throws DatabaseException {
 		EnvironmentConfig envConf = new EnvironmentConfig();
 		envConf.setAllowCreate(true);
 		env = new Environment(new File("User.db"), envConf);
 		openDatabases();
-		cache = new HashMap<Integer, User>();
-		keys = new Vector<Integer>();
+		//cache = new HashMap<Integer, User>();
+		//keys = new Vector<Integer>();
+		cache = new IntObjectHashMap();
 		this.refreshUserCount();
 	}
 	
@@ -73,11 +74,12 @@ public class UserDatabase {
 		ib.intToEntry(u.getID(), key);
 		ub.objectToEntry(u, data);
 		db.put(null, key, data);
-		cache.put(Integer.valueOf(this.userCount++), u);
+		//cache.put(Integer.valueOf(this.userCount++), u);
+		cache.put(this.userCount++, u);
 	}
 	
-	public User getUser(Integer i){
-		User u = cache.get(i);
+	public User getUser(int i){
+		User u = (User)cache.get(i);
 		if (u != null){
 			return u;
 		}
@@ -95,18 +97,25 @@ public class UserDatabase {
 				while (c.getNext(key, value, null) == OperationStatus.SUCCESS) {
 					i++;
 					if (value.getData() != null) {
-						UserBinding ub = new UserBinding();
 						User u = (User)ub.entryToObject(value);
-						cache.put(Integer.valueOf(u.id), u);
+						cache.put(u.id, u);
 					}
 				}
 				this.userCount = i;
 			} else {
 				this.userCount = 0;
 			}
-			keys.clear();
-			keys.addAll(cache.keySet());
-			//keys = cache.getKeyArray();
+			//keys.clear();
+			//keys.addAll(cache.keySet());
+			int size = 0;
+			keys = new int[cache.m_entryCount];
+			System.out.println("Building map...");
+			for (int i = 0; i < cache.getKeyArray().length; i++){
+				if (cache.getKeyArray()[i] != 0){
+					keys[size++] = cache.getKeyArray()[i];
+				}
+			}
+			System.out.println(size + ":" + cache.m_entryCount);
 		} catch (Exception dbe) {
 			this.userCount = 0;
 			System.err.println("Database Exception in refreshUserCount(): " + dbe);
@@ -209,7 +218,7 @@ public class UserDatabase {
 			user_db.refreshUserCount();
 			System.out.println(user_db.getUserCount());
 			for (int i = 0; i < 100; i++){
-				User u = user_db.getUser(Integer.valueOf(i));
+				User u = user_db.getUser(i);
 				System.out.println(u);
 			}
 		} catch (DatabaseException dbe) {
@@ -256,6 +265,6 @@ public class UserDatabase {
 	}
 
 	public User getUserByIndex(int i) {
-		return getUser(keys.get(i));
+		return getUser(keys[i]);
 	}
 }

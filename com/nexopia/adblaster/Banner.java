@@ -70,7 +70,8 @@ class Banner{
 		this.payrate = rs.getInt("PAYRATE");
 		this.maxHits = rs.getInt("VIEWSPERDAY");
 		maxHits = (maxHits==0?Integer.MAX_VALUE:maxHits);
-		this.campaign = Campaign.get(rs.getInt("CAMPAIGNID"));
+		int ci = rs.getInt("CAMPAIGNID");
+		this.campaign = Campaign.get(ci);
 		this.locations = Utilities.stringToNegationVector(rs.getString("LOC"));
 		this.ages = Utilities.stringToNegationVector(rs.getString("AGE"));
 		this.sexes = Utilities.stringToVector(rs.getString("SEX"));
@@ -172,7 +173,7 @@ class Banner{
 	 * @return
 	 */
 	private boolean validInterests(Interests userInterests) {
-		return interests.hasAnyIn(userInterests);
+		return userInterests.hasAnyIn(interests);
 	}
 
 	/**

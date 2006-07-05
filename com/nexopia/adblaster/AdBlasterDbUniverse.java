@@ -12,7 +12,7 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 		try {
 			bannerDB = new BannerDatabase();
 			userDB = new UserDatabase();
-			Campaign.init();
+//			Campaign.init();
 		} catch (DatabaseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -51,9 +51,9 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 	 * @see com.nexopia.adblaster.AbstractAdBlasterUniverse#getUser(int)
 	 */
 	public User getUser(int i) {
-		Integer I = Integer.valueOf(i);
-		User u = userDB.getUser(I);
-		I.free();
+		//Integer I = Integer.valueOf(i);
+		User u = userDB.getUser(i);
+		//I.free();
 		return u;
 	}
 

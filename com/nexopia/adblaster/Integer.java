@@ -4,7 +4,7 @@ import java.util.Stack;
 
 public class Integer {
 	//static portion
-	private static Stack<Integer> pool;
+	private static Stack<Integer> pool = new Stack<Integer>();
 	public static final int MIN_VALUE = java.lang.Integer.MIN_VALUE;
 	public static final Integer NEGATE = new Integer(MIN_VALUE);;
 	public static final int MAX_VALUE = java.lang.Integer.MAX_VALUE;
@@ -48,6 +48,14 @@ public class Integer {
 			return this.i == i.i;
 		}
 		return false;
+	}
+	
+	public String toString(){
+		return "" + i;
+	}
+	
+	public int hashCode(){
+		return i;
 	}
 	
 }
