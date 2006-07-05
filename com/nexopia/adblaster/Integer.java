@@ -5,8 +5,10 @@ import java.util.Stack;
 public class Integer {
 	//static portion
 	private static Stack<Integer> pool;
-	public static int MIN_VALUE = java.lang.Integer.MIN_VALUE;
-	public static int MAX_VALUE = java.lang.Integer.MAX_VALUE;
+	public static final int MIN_VALUE = java.lang.Integer.MIN_VALUE;
+	public static final Integer NEGATE = new Integer(MIN_VALUE);;
+	public static final int MAX_VALUE = java.lang.Integer.MAX_VALUE;
+	public static final Integer IDENTITY = new Integer(0);
 	
 	public static int parseInt(String s) {
 		return java.lang.Integer.parseInt(s);

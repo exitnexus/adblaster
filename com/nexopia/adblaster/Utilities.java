@@ -24,4 +24,22 @@ public class Utilities {
 		}
 		return v;
 	}
+	
+	public static Vector<Integer> stringToNegationVector(String string) {
+		StringTokenizer st = new StringTokenizer(string, ",");
+		Vector<Integer> v = new Vector<Integer>();
+		while (st.hasMoreElements()) {
+			v.add(new Integer(Integer.parseInt(st.nextToken())));
+		}
+		
+		if (v.isEmpty()) {
+			v.add((Integer.NEGATE));
+		} else if (v.get(0).intValue() == 0) {
+			v.setElementAt(Integer.NEGATE, 0);
+		} else {
+			v.insertElementAt(Integer.IDENTITY, 0);
+		}
+		
+		return v;
+	}
 }

@@ -85,8 +85,8 @@ class Campaign{
 		this.payrate = rs.getInt("PAYRATE");
 		this.maxHits = rs.getInt("VIEWSPERDAY");
 		maxHits = (maxHits==0?Integer.MAX_VALUE:maxHits);
-		this.locations = Utilities.stringToVector(rs.getString("LOC"));
-		this.ages = Utilities.stringToVector(rs.getString("AGE"));
+		this.locations = Utilities.stringToNegationVector(rs.getString("LOC"));
+		this.ages = Utilities.stringToNegationVector(rs.getString("AGE"));
 		this.sexes = Utilities.stringToVector(rs.getString("SEX"));
 		this.viewsPerUser = rs.getInt("VIEWSPERUSER"); 
 		this.limitByPeriod = rs.getInt("LIMITBYPERIOD"); 
@@ -156,6 +156,9 @@ class Campaign{
 	 * @return
 	 */
 	private boolean validSex(byte sex) {
+		if (sexes.isEmpty()) {
+			return true;
+		}
 		Integer I = Integer.valueOf(sex);
 		boolean valid = sexes.contains(I); 
 		I.free();
@@ -169,10 +172,14 @@ class Campaign{
 	 */
 	private boolean validLocation(short location) {
 		Integer I = Integer.valueOf(location);
-		boolean valid = locations.contains(I); 
+		boolean valid;
+		if (locations.get(0).equals(Integer.NEGATE)) {
+			valid = !locations.contains(I); 
+		} else {
+			valid = locations.contains(I);
+		}
 		I.free();
 		return valid;
-		
 	}
 
 	/**
@@ -181,10 +188,14 @@ class Campaign{
 	 */
 	private boolean validAge(byte age) {
 		Integer I = Integer.valueOf(age);
-		boolean valid = ages.contains(I); 
+		boolean valid;
+		if (ages.get(0).equals(Integer.NEGATE)) {
+			valid = !ages.contains(I); 
+		} else {
+			valid = ages.contains(I);
+		}
 		I.free();
 		return valid;
-		
 	}
 
 	public static Campaign get(int campaignID) {
