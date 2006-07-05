@@ -6,13 +6,49 @@
  */
 package com.nexopia.adblaster;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.HashMap;
 import java.util.Vector;
 
+
 class Campaign{
+	private static HashMap<Integer, Campaign> campaigns;
+	
+	public static void init() {
+		campaigns = new HashMap<Integer, Campaign>();
+		//Database connection stuff here.
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			String url = "jdbc:mysql://192.168.0.50:3307/banner";
+			Connection con = DriverManager.getConnection(url, "nathan", "nathan");
+			String sql = "SELECT * FROM bannercampaigns";
+			Statement stmt = con.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+			int i = 0;
+			while (rs.next()) {
+				int id = rs.getInt("ID");
+				if (rs.getString("ENABLED").equals("y")) {
+					campaigns.put(Integer.valueOf(id), new Campaign(rs));
+					i++;
+				}
+			}
+			System.out.println("Campaigns Total: " + i);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	Interests interests;
 	int id;
 	int payrate;
 	int maxHits;
+	int viewsPerUser;
+	int limitByPeriod;
+	
 	Vector<Integer> locations;
 	Vector<Integer> ages;
 	Vector<Integer> sexes;
@@ -42,6 +78,19 @@ class Campaign{
 		this.ages = ages;
 		this.sexes = sexes;
 		this.interests = interests;
+	}
+	
+	Campaign(ResultSet rs) throws SQLException {
+		this.id = rs.getInt("ID");
+		this.payrate = rs.getInt("PAYRATE");
+		this.maxHits = rs.getInt("VIEWSPERDAY");
+		maxHits = (maxHits==0?Integer.MAX_VALUE:maxHits);
+		this.locations = Utilities.stringToVector(rs.getString("LOC"));
+		this.ages = Utilities.stringToVector(rs.getString("AGE"));
+		this.sexes = Utilities.stringToVector(rs.getString("SEX"));
+		this.viewsPerUser = rs.getInt("VIEWSPERUSER"); 
+		this.limitByPeriod = rs.getInt("LIMITBYPERIOD"); 
+		this.interests = new Interests(rs.getString("INTERESTS"));
 	}
 	
 	int getID() {
@@ -137,5 +186,11 @@ class Campaign{
 		return valid;
 		
 	}
-	
+
+	public static Campaign get(int campaignID) {
+		Integer I = Integer.valueOf(campaignID);
+		Campaign c = campaigns.get(I);
+		I.free();
+		return c;
+	}
 }

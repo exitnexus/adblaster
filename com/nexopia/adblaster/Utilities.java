@@ -16,7 +16,7 @@ import java.util.Vector;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class Utilities {
-	public static Vector stringToVector(String string) {
+	public static Vector<Integer> stringToVector(String string) {
 		StringTokenizer st = new StringTokenizer(string, ",");
 		Vector<Integer> v = new Vector<Integer>();
 		while (st.hasMoreElements()) {

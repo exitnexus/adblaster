@@ -17,12 +17,12 @@ class Banner{
 	int id;
 	int payrate;
 	private int maxHits;
-	int campaignID;
 	Vector locations;
 	Vector ages;
 	Vector sexes;
 	private int viewsperuser;
 	private int limitbyperiod;
+	Campaign campaign;
 	
 	static int count = 0;
 	public static int counter(){
@@ -39,19 +39,15 @@ class Banner{
 	/**
 	 * @return Returns the campaignID.
 	 */
-	public int getCampaignID() {
-		return campaignID;
+	public Campaign getCampaign() {
+		return campaign;
 	}
 	/**
 	 * @param campaignID The campaignID to set.
 	 */
-	public void setCampaignID(int campaignID) {
-		this.campaignID = campaignID;
+	public void setCampaign(Campaign campaign) {
+		this.campaign = campaign;
 	}
-	/*Banner(int id) {
-		this();
-		this.id = id;
-	}*/
 	
 	int index;
 	private int size;
@@ -61,7 +57,7 @@ class Banner{
 		this.id = id;
 		this.payrate = payrate;
 		this.maxHits = (maxHits==0?Integer.MAX_VALUE:maxHits);
-		this.campaignID = campaignID;
+		this.campaign = Campaign.get(campaignID);
 		this.locations = locations;
 		this.ages = ages;
 		this.sexes = sexes;
@@ -74,7 +70,7 @@ class Banner{
 		this.payrate = rs.getInt("PAYRATE");
 		this.maxHits = rs.getInt("VIEWSPERDAY");
 		maxHits = (maxHits==0?Integer.MAX_VALUE:maxHits);
-		this.campaignID = rs.getInt("CAMPAIGNID");
+		this.campaign = Campaign.get(rs.getInt("CAMPAIGNID"));
 		this.locations = Utilities.stringToVector(rs.getString("LOC"));
 		this.ages = Utilities.stringToVector(rs.getString("AGE"));
 		this.sexes = Utilities.stringToVector(rs.getString("SEX"));
@@ -164,7 +160,8 @@ class Banner{
 	 * @return
 	 */
 	public boolean validUser(User u) {
-		return (validLocation(u.getLocation()) &&
+		return (campaign.validUser(u) && 
+				validLocation(u.getLocation()) &&
 				validAge(u.getAge()) &&
 				validSex(u.getSex()) &&
 				validInterests(u.getInterests()));
