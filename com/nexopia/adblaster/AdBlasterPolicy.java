@@ -1,17 +1,16 @@
 package com.nexopia.adblaster;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Vector;
 import java.util.Arrays;
 
 public class AdBlasterPolicy implements I_Policy {
-	private HashMap coefficients;
+	private HashMap<Banner, Float> coefficients;
 	AbstractAdBlasterUniverse universe;
 	Vector banners = null;
 	
 	public AdBlasterPolicy(AbstractAdBlasterUniverse ac) {
-		coefficients = new HashMap();
+		coefficients = new HashMap<Banner, Float>();
 		universe = ac;
 		for (int i = 0; i < ac.getBannerCount(); i++){
 			coefficients.put(ac.getBannerByIndex(i), new Float(Math.random()));
@@ -60,8 +59,8 @@ public class AdBlasterPolicy implements I_Policy {
 	}
 
 	public Banner getBestBanner(AbstractAdBlasterInstance instance, BannerView bv) {
-		User u = bv.getUser();
-		int t = bv.getTime();
+		//User u = bv.getUser();
+		//int t = bv.getTime();
 		if (banners == null){
 			banners = orderBannersByScore(instance);
 		}
@@ -91,8 +90,8 @@ public class AdBlasterPolicy implements I_Policy {
 
 	private Vector orderBannersByScore(AbstractAdBlasterInstance instance) {
 		Vector<Banner> vec = new Vector<Banner>();
-		int bestMatch = -1;
-		float bestScore = Float.NEGATIVE_INFINITY;
+		//int bestMatch = -1;
+		//float bestScore = Float.NEGATIVE_INFINITY;
 		for (int j = 0; j < instance.universe.getBannerCount(); j++){
 			Banner b = instance.universe.getBannerByIndex(j);
 			float score = ((Float)coefficients.get(b)).floatValue();
@@ -122,9 +121,9 @@ public class AdBlasterPolicy implements I_Policy {
 		for (int i = 0; i < 10; i++){
 			coefficients[i] = (float) (Math.random() * 10);
 		}
-		Vector vec = new Vector();
-		int bestMatch = -1;
-		float bestScore = Float.NEGATIVE_INFINITY;
+		Vector<Integer> vec = new Vector<Integer>();
+		//int bestMatch = -1;
+		//float bestScore = Float.NEGATIVE_INFINITY;
 		for (int j = 0; j < 10; j++){
 			float score = ((Float)coefficients[j]).floatValue();
 			int i = -1;

@@ -1,13 +1,8 @@
 package com.nexopia.adblaster;
 
-import java.io.File;
 import java.util.Collection;
-import java.util.Random;
-import java.util.Vector;
 
 import com.sleepycat.je.DatabaseException;
-import com.sleepycat.je.Environment;
-import com.sleepycat.je.EnvironmentConfig;
 
 public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 	private BannerDatabase bannerDB;

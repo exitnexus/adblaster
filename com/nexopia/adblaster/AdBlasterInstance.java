@@ -1,12 +1,8 @@
 package com.nexopia.adblaster;
 
-import java.io.File;
-import java.util.Random;
 import java.util.Vector;
 
 import com.sleepycat.je.DatabaseException;
-import com.sleepycat.je.Environment;
-import com.sleepycat.je.EnvironmentConfig;
 
 
 /*
@@ -94,7 +90,6 @@ public class AdBlasterInstance extends AbstractAdBlasterInstance{
 			
 			BannerViewDatabase db = new BannerViewDatabase();
 
-			Random r = new Random(1);
 			System.out.println("Should be inserting " + this.getViewCount() + " BannerViews.");
 			long time = System.currentTimeMillis();
 			for (int i=0; i<this.getViewCount(); i++) {

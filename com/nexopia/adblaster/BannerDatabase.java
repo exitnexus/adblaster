@@ -10,7 +10,6 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.StringTokenizer;
 import java.util.Vector;
 
 /**
@@ -55,11 +54,11 @@ import java.util.Vector;
  */
 
 public class BannerDatabase {
-	private HashMap banners;
-	Vector keyset = new Vector();
+	private HashMap<Integer, Banner> banners;
+	Vector<Integer> keyset = new Vector<Integer>();
 	
 	public BannerDatabase() {
-		banners = new HashMap();
+		banners = new HashMap<Integer, Banner>();
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			String url = "jdbc:mysql://192.168.0.50:3307/banner";

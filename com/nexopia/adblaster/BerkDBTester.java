@@ -3,24 +3,11 @@
  */
 package com.nexopia.adblaster;
 
-import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Random;
-
-import com.sleepycat.je.Cursor;
-import com.sleepycat.je.Database;
-import com.sleepycat.je.DatabaseConfig;
-import com.sleepycat.je.DatabaseEntry;
-import com.sleepycat.je.DatabaseException;
-import com.sleepycat.je.Environment;
-import com.sleepycat.je.EnvironmentConfig;
-import com.sleepycat.je.OperationStatus;
-import com.sleepycat.je.StatsConfig;
 
 /**
  * @author wolfe
@@ -42,7 +29,7 @@ public class BerkDBTester {
 			Statement stmt = con.createStatement();
 			ResultSet rs = stmt.executeQuery(sql);
 			System.out.println(rs.getFetchSize());
-			HashMap banners = new HashMap();
+			HashMap<Integer, Banner> banners = new HashMap<Integer, Banner>();
 			for (int i=0; rs.next(); i++) {
 				banners.put(new Integer(rs.getInt("ID")), new Banner(rs));
 			}
@@ -56,14 +43,14 @@ public class BerkDBTester {
 		}
 		
 		//Create our UserDB and BannerViewDB
-		Environment dbEnv = null;
+		//Environment dbEnv = null;
 		BannerViewDatabase db = null;
 		//userDb = null;
 		//try {
 		try {
 			db = new BannerViewDatabase(); 
 			
-			Random r = new Random(1);
+			//Random r = new Random(1);
 			/*
 			for (int i=0; i<20000; i++) {
 				int userid = i;

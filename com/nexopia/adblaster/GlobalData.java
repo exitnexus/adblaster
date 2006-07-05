@@ -15,7 +15,7 @@ public class GlobalData {
 		
 	}
 
-	public Vector getUnserved() {
+	public Vector<Tuple<Banner,Integer>> getUnserved() {
 		return instance.getUnserved();
 	}
 }

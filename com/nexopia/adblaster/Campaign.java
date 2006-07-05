@@ -6,7 +6,6 @@
  */
 package com.nexopia.adblaster;
 
-import java.util.Random;
 import java.util.Vector;
 
 

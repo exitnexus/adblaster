@@ -139,12 +139,12 @@ final class AdBlasterThreadedOperation implements Runnable {
 	}
 	
 	public void iterativeImprove(AbstractAdBlasterInstance instanc) {
-		Vector unserved = gd.getUnserved();
+		Vector<Tuple<Banner,Integer>> unserved = gd.getUnserved();
 		
 		for (int i = 0; i < unserved.size(); i++){
 			System.out.println("Unserved: " + i +" /" + unserved.size());
-			Tuple t = (Tuple)unserved.get(i);
-			Banner b = (Banner)t.data.get(0); 
+			Tuple<Banner, Integer> t = unserved.get(i);
+			Banner b = (Banner)t.getFirst(0); 
 			//while (((Integer)instance.bannerCountMap.get(b)).intValue() < b.getMaxHits()){
 				int depth = 0;
 				for (int j = 0; j < instanc.getViewCount() && ((Integer)instanc.bannerCountMap.get(b)).intValue() < b.getMaxHits(); j++){

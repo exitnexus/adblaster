@@ -15,12 +15,12 @@ import java.util.Vector;
 
 
 class Interests{
-	private HashMap checked;
+	private HashMap<Integer, Boolean> checked;
 	private static final Random rand = new Random();
 	private int count;
 	
 	Interests(){
-	  checked = new HashMap();
+	  checked = new HashMap<Integer, Boolean>();
 	  count = 0;
 	}
 	

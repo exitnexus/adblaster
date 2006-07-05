@@ -1,13 +1,7 @@
 package com.nexopia.adblaster;
 
-import java.io.File;
 import java.util.HashMap;
-import java.util.Vector;
-
-import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.DatabaseException;
-import com.sleepycat.je.Environment;
-import com.sleepycat.je.EnvironmentConfig;
 
 public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	HashMap swappedViews; //always look for a view here before checking the database
@@ -94,15 +88,14 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	}*/
 	
 	public static void main(String args[]){
-		EnvironmentConfig envConf = new EnvironmentConfig();
+		/*EnvironmentConfig envConf = new EnvironmentConfig();
 		envConf.setAllowCreate(true);
 
-		Environment dbEnv = null;
 		try {
-			dbEnv = new Environment(new File("BerkDBTester.db"), envConf);
+			Environment dbEnv = new Environment(new File("BerkDBTester.db"), envConf);
 		} catch (DatabaseException e1) {
 			e1.printStackTrace();
-		}
+		}*/
 
 		AdBlasterDbUniverse abu = new AdBlasterDbUniverse();
 		AdBlasterDbInstance abdbi = new AdBlasterDbInstance(abu);

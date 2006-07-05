@@ -24,7 +24,7 @@ public class JDBCTester {
 			Statement stmt = con.createStatement();
 			ResultSet rs = stmt.executeQuery(sql);
 			System.out.println(rs.getFetchSize());
-			HashMap banners = new HashMap();
+			HashMap<Integer, Banner> banners = new HashMap<Integer, Banner>();
 			for (int i=0; rs.next(); i++) {
 				banners.put(new Integer(rs.getInt("ID")), new Banner(rs));
 			}

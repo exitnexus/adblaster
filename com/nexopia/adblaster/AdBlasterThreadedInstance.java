@@ -51,7 +51,7 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 	}
 
 	@Override
-	public Vector getUnserved() {
+	public Vector<Tuple<Banner,Integer>> getUnserved() {
 		return gd.getUnserved();
 	}
 

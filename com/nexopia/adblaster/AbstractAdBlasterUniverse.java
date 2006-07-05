@@ -1,12 +1,6 @@
 package com.nexopia.adblaster;
 
-import java.awt.AWTEvent;
 import java.util.Collection;
-import java.util.Random;
-
-import com.sleepycat.je.DatabaseException;
-import com.sleepycat.je.Environment;
-import com.sleepycat.je.EnvironmentConfig;
 
 public abstract class AbstractAdBlasterUniverse {
 	

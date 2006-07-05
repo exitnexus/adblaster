@@ -18,7 +18,7 @@ import java.util.Vector;
 public class Utilities {
 	public static Vector stringToVector(String string) {
 		StringTokenizer st = new StringTokenizer(string, ",");
-		Vector v = new Vector();
+		Vector<Integer> v = new Vector<Integer>();
 		while (st.hasMoreElements()) {
 			v.add(new Integer(Integer.parseInt(st.nextToken())));
 		}

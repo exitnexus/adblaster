@@ -10,7 +10,6 @@ import java.util.Set;
 import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.SecondaryDatabase;
-import com.sleepycat.je.SecondaryKeyCreator;
 import com.sleepycat.je.SecondaryMultiKeyCreator;
 
 public class BannerKeyCreator implements SecondaryMultiKeyCreator {
@@ -26,6 +25,7 @@ public class BannerKeyCreator implements SecondaryMultiKeyCreator {
 	/* (non-Javadoc)
 	 * @see com.sleepycat.je.SecondaryMultiKeyCreator#createSecondaryKeys(com.sleepycat.je.SecondaryDatabase, com.sleepycat.je.DatabaseEntry, com.sleepycat.je.DatabaseEntry, java.util.Set)
 	 */
+	@SuppressWarnings("unchecked")
 	public void createSecondaryKeys(SecondaryDatabase db, DatabaseEntry key, DatabaseEntry data, Set secondaryKeys) throws DatabaseException {
 		User u = (User)ub.entryToObject(data);
 		for (Iterator i=banners.iterator(); i.hasNext(); ) {

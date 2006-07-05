@@ -22,8 +22,6 @@
 
 package com.nexopia.adblaster;
 
-import java.util.Iterator;
-
 
 /**
  * Hash map using primitive <code>int</code> values as keys mapped to

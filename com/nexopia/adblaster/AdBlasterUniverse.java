@@ -9,7 +9,6 @@ import java.util.Random;
 import java.util.Vector;
 
 import com.sleepycat.je.DatabaseException;
-import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
 
 /* Represents a whole system (typically a website) of users with a set of banners, and \
@@ -67,7 +66,7 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 			
 			int campaignID=1;
 			int maxHits=1;
-			Vector location = new Vector();
+			//Vector location = new Vector();
 			Vector sexes = new Vector();
 			Vector loc = new Vector();
 			Vector ages = new Vector();
@@ -85,7 +84,6 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 			
 			UserDatabase db = new UserDatabase();
 
-			Random r = new Random(1);
 			System.out.println("Should be inserting " + this.getUserCount() + " users.");
 			for (int i=0; i<this.getUserCount(); i++) {
 				db.insert((User)this.getUser(i));

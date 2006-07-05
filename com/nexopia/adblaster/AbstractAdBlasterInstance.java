@@ -3,12 +3,7 @@ package com.nexopia.adblaster;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Random;
 import java.util.Vector;
-
-import com.sleepycat.je.DatabaseException;
-import com.sleepycat.je.Environment;
-import com.sleepycat.je.EnvironmentConfig;
 
 public abstract class AbstractAdBlasterInstance {
 
@@ -55,7 +50,7 @@ public abstract class AbstractAdBlasterInstance {
 		
 	}
 
-	private boolean nearestBeforeTimeRange(Banner b, BannerView bv) {
+	/*private boolean nearestBeforeTimeRange(Banner b, BannerView bv) {
 		Vector<BannerView> range = scan(b, bv);
 		
 		for (int i = 0; (i + b.getViewsperuser()) < range.size(); i++){
@@ -66,7 +61,7 @@ public abstract class AbstractAdBlasterInstance {
 			}
 		}
 		return true;
-	}
+	}*/
 
 
 
@@ -102,8 +97,8 @@ public abstract class AbstractAdBlasterInstance {
 		
 	}
 	
-	//returns a vector of bannerviews that are from the same user and banner that could potentially have frequency conflicts
-	//the vector also contains @param bv in sorted order.
+	//returns a time sorted vector of bannerviews that are from the same user and banner that could 
+	//potentially have frequency conflicts the vector also contains @param bv.
 	private Vector<BannerView> scan(Banner b, BannerView bv) {
 		if (allMatching == null){
 			System.out.println("Building map." + this.getClass());
@@ -147,13 +142,13 @@ public abstract class AbstractAdBlasterInstance {
 	}*/
 	
 	
-	public Vector getUnserved() {
+	public Vector<Tuple<Banner,Integer>> getUnserved() {
 		/**Loaded bannerview
 		 * For a particular instance, get a list of all of the banners that were not served
 		 * that could have made a profit.
 		 * @return A vector of banners.
 		 */
-		Vector unserved = new Vector();
+		Vector<Tuple<Banner,Integer>> unserved = new Vector<Tuple<Banner,Integer>>();
 		Collection banners = this.universe.getBanners();
 		Banner b = null;
 		for (Iterator i = banners.iterator(); i.hasNext(); ){
@@ -163,7 +158,7 @@ public abstract class AbstractAdBlasterInstance {
 			}  else {
 				int count = count(b);
 				if (count < b.getMaxHits()){
-					unserved.add(new Tuple(b, new Integer(b.getMaxHits() - count)));
+					unserved.add(new Tuple<Banner, Integer>(b, new Integer(b.getMaxHits() - count)));
 				}
 			}
 		}
@@ -192,8 +187,8 @@ public abstract class AbstractAdBlasterInstance {
 	}
 
 	/*//These functions need to be redesigned based on new indexes plan*/ 
-	Vector getAllBannerViewsThatCanSwapWith(Banner b) {
-		Vector v = new Vector();
+	Vector<BannerView> getAllBannerViewsThatCanSwapWith(Banner b) {
+		Vector<BannerView> v = new Vector<BannerView>();
 		for (int i = 0; i < getViewCount(); i++){
 			BannerView bv = getView(i);
 			if (isValidBannerForView(bv, b)){
@@ -203,19 +198,19 @@ public abstract class AbstractAdBlasterInstance {
 		return v;
 	}
 
-	public Vector depthLimitedDFS(BannerView src, Banner b, int depth) {
+	public Vector<BannerView> depthLimitedDFS(BannerView src, Banner b, int depth) {
 		if (isValidBannerForView(src,b)){
-			Vector path = new Vector();
+			Vector<BannerView> path = new Vector<BannerView>();
 			path.add(src);
 			return path;
 		}
 		if (depth < 0){
 			return null;
 		}
-		Vector v2 = getAllBannerViewsThatCanSwapWith(src.getBanner());
+		Vector<BannerView> v2 = getAllBannerViewsThatCanSwapWith(src.getBanner());
 		for (Iterator it = v2.iterator(); it.hasNext() ;){
 			BannerView next_vert = (BannerView)it.next();
-			Vector result = depthLimitedDFS(next_vert, b, depth-1);
+			Vector<BannerView> result = depthLimitedDFS(next_vert, b, depth-1);
 			if (result != null && !result.contains(src)){
 				result.add(src);
 				return result;

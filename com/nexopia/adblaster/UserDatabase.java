@@ -7,7 +7,6 @@
 package com.nexopia.adblaster;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -190,9 +189,9 @@ public class UserDatabase {
 	
 	public static void main(String args[]){
 		UserDatabase user_db = null;
-		Environment dbEnv = null;
+		//Environment dbEnv = null;
 		try {
-			BannerDatabase bdb = new BannerDatabase();
+			//BannerDatabase bdb = new BannerDatabase();
 			user_db = new UserDatabase();
 			
 			System.out.println(user_db.userCount);

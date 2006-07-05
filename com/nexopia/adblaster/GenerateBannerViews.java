@@ -6,12 +6,6 @@
  */
 package com.nexopia.adblaster;
 
-import java.util.Collection;
-import java.util.Random;
-import java.util.Vector;
-
-import com.sleepycat.je.DatabaseException;
-
 /**
  * @author wolfe
  *
@@ -23,8 +17,8 @@ public class GenerateBannerViews {
 	static int num_serves = 2000000;
 	
 	public static void main(String[] args) {
-		UserDatabase uDb = null;
-		BannerViewDatabase bvDb = null;
+		//UserDatabase uDb = null;
+		//BannerViewDatabase bvDb = null;
 		AdBlasterDbUniverse ac = new AdBlasterDbUniverse();
 		I_Policy pol = AdBlasterPolicy.randomPolicy(ac);
 
