@@ -93,20 +93,7 @@ class Interests{
 		return interests;
 	}
 
-	/**
-	 * @param userInterests
-	 * @return
-	 */
-	public boolean containsAny(Interests userInterests) {
-		for (Iterator it = userInterests.getChecked().iterator(); it.hasNext(); ){
-			Integer interest = (Integer)it.next();
-			if (checked.containsKey(interest)){
-				return true;
-			}
-		}
-		return false;
-	}
-
+	
 	/**
 	 * @return
 	 */

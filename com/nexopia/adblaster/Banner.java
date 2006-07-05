@@ -168,7 +168,6 @@ class Banner{
 				validAge(u.getAge()) &&
 				validSex(u.getSex()) &&
 				validInterests(u.getInterests()));
-		
 	}
 
 	/**
@@ -176,15 +175,19 @@ class Banner{
 	 * @return
 	 */
 	private boolean validInterests(Interests userInterests) {
-		return interests.containsAny(userInterests);
+		return interests.hasAnyIn(userInterests);
 	}
 
+	/**
 	/**
 	 * @param sex
 	 * @return
 	 */
 	private boolean validSex(byte sex) {
-		return sexes.contains(new Integer(sex));
+		Integer I = Integer.valueOf(sex);
+		boolean valid = sexes.contains(I); 
+		I.free();
+		return valid;
 	}
 
 	/**
@@ -192,7 +195,10 @@ class Banner{
 	 * @return
 	 */
 	private boolean validLocation(short location) {
-		return locations.contains(new Integer(location));
+		Integer I = Integer.valueOf(location);
+		boolean valid = locations.contains(I); 
+		I.free();
+		return valid;
 	}
 
 	/**
@@ -200,6 +206,9 @@ class Banner{
 	 * @return
 	 */
 	private boolean validAge(byte age) {
-		return ages.contains(new Integer(age));
+		Integer I = Integer.valueOf(age);
+		boolean valid = ages.contains(I); 
+		I.free();
+		return valid;
 	}
 }

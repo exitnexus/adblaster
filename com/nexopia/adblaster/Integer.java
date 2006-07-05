@@ -37,7 +37,7 @@ public class Integer {
 	}
 	
 	public void free() {
-		pool.add(this);
+		pool.push(this);
 	}
 	
 	public boolean equals(Object o) {

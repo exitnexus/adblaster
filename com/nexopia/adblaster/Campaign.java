@@ -8,16 +8,14 @@ package com.nexopia.adblaster;
 
 import java.util.Vector;
 
-
-
 class Campaign{
 	Interests interests;
 	int id;
 	int payrate;
 	int maxHits;
-	Vector locations;
-	Vector ages;
-	Vector sexes;
+	Vector<Integer> locations;
+	Vector<Integer> ages;
+	Vector<Integer> sexes;
 	
 	static int count = 0;
 	public static int counter(){
@@ -36,7 +34,7 @@ class Campaign{
 		this.id = id;
 	}
 	
-	Campaign(int id, int payrate, int maxHits, Vector locations, Vector ages, Vector sexes, Interests interests) {
+	Campaign(int id, int payrate, int maxHits, Vector<Integer> locations, Vector<Integer> ages, Vector<Integer> sexes, Interests interests) {
 		this.id = id;
 		this.payrate = payrate;
 		this.maxHits = maxHits;
@@ -55,7 +53,7 @@ class Campaign{
 	public Vector getAges() {
 		return ages;
 	}
-	public void setAges(Vector ages) {
+	public void setAges(Vector<Integer> ages) {
 		this.ages = ages;
 	}
 	public Interests getInterests() {
@@ -67,7 +65,7 @@ class Campaign{
 	public Vector getLocations() {
 		return locations;
 	}
-	public void setLocations(Vector locations) {
+	public void setLocations(Vector<Integer> locations) {
 		this.locations = locations;
 	}
 	public int getMaxHits() {
@@ -79,7 +77,7 @@ class Campaign{
 	public Vector getSexes() {
 		return sexes;
 	}
-	public void setSexes(Vector sexes) {
+	public void setSexes(Vector<Integer> sexes) {
 		this.sexes = sexes;
 	}
 	public int getPayrate() {
@@ -88,4 +86,56 @@ class Campaign{
 	public void setPayrate(int payrate) {
 		this.payrate = payrate;
 	}
+	public boolean validUser(User u) {
+		return (validLocation(u.getLocation()) &&
+				validAge(u.getAge()) &&
+				validSex(u.getSex()) &&
+				validInterests(u.getInterests()));
+		
+	}
+
+	/**
+	 * @param interests2
+	 * @return
+	 */
+	private boolean validInterests(Interests userInterests) {
+		return interests.hasAnyIn(userInterests);
+	}
+
+	/**
+	 * @param sex
+	 * @return
+	 */
+	private boolean validSex(byte sex) {
+		Integer I = Integer.valueOf(sex);
+		boolean valid = sexes.contains(I); 
+		I.free();
+		return valid;
+		
+	}
+
+	/**
+	 * @param location
+	 * @return
+	 */
+	private boolean validLocation(short location) {
+		Integer I = Integer.valueOf(location);
+		boolean valid = locations.contains(I); 
+		I.free();
+		return valid;
+		
+	}
+
+	/**
+	 * @param age
+	 * @return
+	 */
+	private boolean validAge(byte age) {
+		Integer I = Integer.valueOf(age);
+		boolean valid = ages.contains(I); 
+		I.free();
+		return valid;
+		
+	}
+	
 }
