@@ -73,11 +73,11 @@ public class UserDatabase {
 		ib.intToEntry(u.getID(), key);
 		ub.objectToEntry(u, data);
 		db.put(null, key, data);
-		cache.put(this.userCount++, u);
+		cache.put(Integer.valueOf(this.userCount++), u);
 	}
 	
 	public User getUser(Integer i){
-		User u = (User)cache.get(i);
+		User u = cache.get(i);
 		if (u != null){
 			return u;
 		}
@@ -97,7 +97,7 @@ public class UserDatabase {
 					if (value.getData() != null) {
 						UserBinding ub = new UserBinding();
 						User u = (User)ub.entryToObject(value);
-						cache.put(u.id, u);
+						cache.put(Integer.valueOf(u.id), u);
 					}
 				}
 				this.userCount = i;
@@ -209,7 +209,7 @@ public class UserDatabase {
 			user_db.refreshUserCount();
 			System.out.println(user_db.getUserCount());
 			for (int i = 0; i < 100; i++){
-				User u = user_db.getUser(i);
+				User u = user_db.getUser(Integer.valueOf(i));
 				System.out.println(u);
 			}
 		} catch (DatabaseException dbe) {

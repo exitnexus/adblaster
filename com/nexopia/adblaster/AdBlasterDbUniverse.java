@@ -50,7 +50,9 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 	 * @see com.nexopia.adblaster.AbstractAdBlasterUniverse#getUser(int)
 	 */
 	public User getUser(int i) {
-		User u = userDB.getUser(i);
+		Integer I = Integer.valueOf(i);
+		User u = userDB.getUser(I);
+		I.free();
 		return u;
 	}
 
