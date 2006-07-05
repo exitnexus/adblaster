@@ -21,6 +21,7 @@ public class BerkDBTester {
 	
 	public static void main(String[] args) {
 		//load all banners into memory
+		System.out.println("1");
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			String url = "jdbc:mysql://192.168.0.50:3307/banner";
@@ -31,7 +32,9 @@ public class BerkDBTester {
 			System.out.println(rs.getFetchSize());
 			HashMap<Integer, Banner> banners = new HashMap<Integer, Banner>();
 			for (int i=0; rs.next(); i++) {
-				banners.put(new Integer(rs.getInt("ID")), new Banner(rs));
+				Banner b = new Banner(rs);
+				System.out.println(b);
+				banners.put(new Integer(rs.getInt("ID")), b);
 			}
 			/*//Display the Banners
 			for (Iterator it = banners.values().iterator(); it.hasNext(); ){
@@ -42,6 +45,7 @@ public class BerkDBTester {
 			e.printStackTrace();
 		}
 		
+		System.out.println("2");
 		//Create our UserDB and BannerViewDB
 		//Environment dbEnv = null;
 		BannerViewDatabase db = null;
@@ -67,6 +71,7 @@ public class BerkDBTester {
 			dbEnv.close();
 			/*/
 			BannerViewCursor c = db.getCursor(0,0,0);
+			c.getNext();
 			BannerView bv = c.getCurrent();
 			int i=0;
 			while (bv != null) {

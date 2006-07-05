@@ -65,7 +65,7 @@ public class BannerViewDatabase {
 	DatabaseEntry searchData = new DatabaseEntry();
 	public BannerViewCursor getCursor(int bannerID, int initialTime, int index) throws DatabaseException {
 		SecondaryCursor c = bannerTimeDb.openSecondaryCursor(null, null);
-		int[] a = { bannerID, initialTime };
+		int[] a = { bannerID, initialTime, index };
 		bt.objectToEntry(a, searchKey);
 		c.getSearchKeyRange(searchKey, searchData, null);
 		return new BannerViewCursor(c);

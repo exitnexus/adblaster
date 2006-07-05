@@ -44,12 +44,12 @@ public class AdBlaster {
 		Runnable r = new AdBlasterThreadedOperation(gd, chunk);
 		Thread t = new Thread(r, "operateOnChunk");
 		t.start();
-		try {
+		/*try {
 			t.wait();
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 			System.exit(0);
-		}
+		}*/
 
 		JFrame frame = new JFrame("AdBlaster Test Main Window");
 		JPanel panel = new JPanel(new BorderLayout());
@@ -65,7 +65,7 @@ public class AdBlaster {
 			resultPanel = new JPanel(new BorderLayout());
 			JScrollPane scroll = new JScrollPane(resultPanel);
 			tab.addTab("Perfect", scroll);
-			DefaultTableModel model = new DefaultTableModel(AdBlaster.num_serves,3);
+			DefaultTableModel model = new DefaultTableModel(chunk.getViewCount(),3);
 			JTable table = new JTable(model);
 			for (int j = 0; j < chunk.getViewCount(); j++){
 				model.setValueAt(chunk.getView(j).getUser(), j,0);
@@ -85,9 +85,9 @@ public class AdBlaster {
 			resultPanel = new JPanel(new BorderLayout());
 			JScrollPane scroll = new JScrollPane(resultPanel);
 			tab.addTab("Final", scroll);
-			DefaultTableModel model = new DefaultTableModel(AdBlaster.num_serves,3);
+			DefaultTableModel model = new DefaultTableModel(chunk.getViewCount(),3);
 			JTable table = new JTable(model);
-			for (int j = 0; j < AdBlaster.num_serves; j++){
+			for (int j = 0; j < chunk.getViewCount(); j++){
 				model.setValueAt(chunk.getView(j).getUser(), j,0);
 				model.setValueAt(chunk.getView(j).getBanner(), j,1);
 				model.setValueAt(AdBlaster.outputTime(chunk.getView(j).getTime()), j,2);

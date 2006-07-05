@@ -51,6 +51,7 @@ public class AdBlasterPolicy implements I_Policy {
 			System.out.println("Calculating banner " + i + "/" + universe.getBannerCount());
 			int after = instance.count(b);
 			int before = sbefore[i];
+			System.out.println("" + after + "  :  " + before + "  :  " + (float)after/(float)before);
 			float f = ((float)((1.0f + after) / (1.0f + before)));
 			this.incrementMultiply(b, f); 
 			banners = null;
