@@ -74,8 +74,6 @@ public class UserDatabase {
 		ub.objectToEntry(u, data);
 		db.put(null, key, data);
 		cache.put(this.userCount++, u);
-		keys.clear();
-		keys.addAll(cache.keySet());
 	}
 	
 	public User getUser(Integer i){

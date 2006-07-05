@@ -27,6 +27,9 @@ public class GenerateUsers {
 			uDb.empty(); //wipe the current contents of the user database
 			
 			for (int i = 0; i < NUM_USERS; i++){
+				if (i % 1000 == 0){
+					System.out.println("Generating " + i + " / " + NUM_USERS + " users.");
+				}
 				User u =User.generateRandomUser();
 				uDb.insert(u);
 			}
