@@ -89,12 +89,13 @@ class UserBinding extends TupleBinding implements SecondaryKeyCreator {
 		/* (non-Javadoc)
 		 * @see com.sleepycat.bind.tuple.TupleBinding#objectToEntry(java.lang.Object, com.sleepycat.bind.tuple.TupleOutput)
 		 */
+		/*WARNING: This is incorrect, but its never called*/
 		public void objectToEntry(Object o, TupleOutput to) {
 			Integer i = (Integer)o;
 			to.writeInt(i.intValue());
 		}
 
-	    protected TupleOutput getTupleOutput(int i) {
+	    protected TupleOutput getTupleOutput() {
 	        int byteSize = getTupleBufferSize();
 	        if (byteSize != 0) {
 	            return new TupleOutput(new byte[byteSize]);
@@ -104,7 +105,7 @@ class UserBinding extends TupleBinding implements SecondaryKeyCreator {
 	    }
 
 		public void intsToEntry(int i, int j, DatabaseEntry entry) {
-	        TupleOutput output = getTupleOutput(i);
+	        TupleOutput output = getTupleOutput();
 			output.writeInt(i);
 			output.writeInt(j);
 	        outputToEntry(output, entry);

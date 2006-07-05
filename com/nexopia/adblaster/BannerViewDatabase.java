@@ -125,7 +125,7 @@ public class BannerViewDatabase {
 		BannerTimeKeyCreator bannerTimeKey = new BannerTimeKeyCreator();
 		SecondaryConfig bannerTimeConf = new SecondaryConfig();
 		bannerTimeConf.setAllowCreate(true);
-		bannerTimeConf.setSortedDuplicates(true);
+		//bannerTimeConf.setSortedDuplicates(true);
 		bannerTimeConf.setKeyCreator(bannerTimeKey);
 		bannerTimeDb = env.openSecondaryDatabase(null, "BannerTimeViews", db, bannerTimeConf);
 
@@ -133,7 +133,7 @@ public class BannerViewDatabase {
 		SecondaryKeyCreator userKey = new UserBinding();
 		SecondaryConfig userConf = new SecondaryConfig();
 		userConf.setAllowCreate(true);
-		userConf.setSortedDuplicates(true);
+		//userConf.setSortedDuplicates(true);
 		userConf.setKeyCreator(userKey);
 		userDb = env.openSecondaryDatabase(null, "UserViews", db, userConf);
 		

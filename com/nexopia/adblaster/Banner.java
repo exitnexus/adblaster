@@ -53,7 +53,11 @@ class Banner{
 		this.id = id;
 	}*/
 	
+	int index;
+	private int size;
+	
 	Banner(int id, int payrate, int maxHits, int campaignID, Vector locations, Vector ages, Vector sexes, Interests interests) {
+		this.index = counter();
 		this.id = id;
 		this.payrate = payrate;
 		this.maxHits = (maxHits==0?Integer.MAX_VALUE:maxHits);
@@ -65,6 +69,7 @@ class Banner{
 	}
 	
 	Banner(ResultSet rs) throws SQLException {
+		this.index = counter();
 		this.id = rs.getInt("ID");
 		this.payrate = rs.getInt("PAYRATE");
 		this.maxHits = rs.getInt("VIEWSPERDAY");
@@ -73,6 +78,7 @@ class Banner{
 		this.locations = Utilities.stringToVector(rs.getString("LOC"));
 		this.ages = Utilities.stringToVector(rs.getString("AGE"));
 		this.sexes = Utilities.stringToVector(rs.getString("SEX"));
+		this.size = rs.getInt("BANNERSIZE");
 		/* INTEGER viewsperday
 		 * INTEGER clicksperday
 		 * INTEGER UNSIGNED viewsperuser
@@ -89,7 +95,7 @@ class Banner{
 		return id;
 	}
 	public String toString(){
-		String s = "" + this.id + '\n';
+		String s = "" + this.index + ":" + this.id + '\n';
 		s += "Payrate:" + this.getPayrate() + '\n' ;
 		s += "max hits:" + this.maxHits + '\n' ;
 		s += "locations:" + this.locations + '\n' ;
@@ -97,6 +103,7 @@ class Banner{
 		s += "sexes:" + this.sexes + this.sexes.isEmpty() + '\n' ;
 		s += "views per user:" + this.viewsperuser + '\n' ;
 		s += "views period:" + this.limitbyperiod + '\n' ;
+		s += this.size;
 		return s;
 	}
 	public Vector getAges() {

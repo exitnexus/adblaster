@@ -34,14 +34,17 @@ public class UserDatabase {
 	private Database db;
 	private Environment env;
 	int userCount;
-	IntObjectHashMap cache;
+	HashMap <Integer, User>cache;
+	//int keys[] = null;
+	Vector <Integer>keys = null;
 	
 	public UserDatabase() throws DatabaseException {
 		EnvironmentConfig envConf = new EnvironmentConfig();
 		envConf.setAllowCreate(true);
 		env = new Environment(new File("User.db"), envConf);
 		openDatabases();
-		cache = new IntObjectHashMap();
+		cache = new HashMap<Integer, User>();
+		keys = new Vector<Integer>();
 		this.refreshUserCount();
 	}
 	
@@ -62,16 +65,18 @@ public class UserDatabase {
 		*/
 	}
 	
+	IntegerBinding ib = new IntegerBinding();
+	DatabaseEntry key = new DatabaseEntry();
+	UserBinding ub = new UserBinding();
+	DatabaseEntry data = new DatabaseEntry();
+
 	public void insert(User u) throws DatabaseException {
-		IntegerBinding ib = new IntegerBinding();
-		DatabaseEntry key = new DatabaseEntry();
-		ib.objectToEntry(new Integer(u.getID()), key);
-		UserBinding ub = new UserBinding();
-		DatabaseEntry data = new DatabaseEntry();
+		ib.intToEntry(u.getID(), key);
 		ub.objectToEntry(u, data);
 		db.put(null, key, data);
-		//db.put(null, key, data);
-		this.userCount++;
+		cache.put(this.userCount++, u);
+		keys.clear();
+		keys.addAll(cache.keySet());
 	}
 	
 	public User getUser(Integer i){
@@ -81,30 +86,7 @@ public class UserDatabase {
 		}
 		throw new UnsupportedOperationException();
 	}
-
-	public User getUser(int userid) throws DatabaseException {
-		User u = (User)cache.get(userid);
-		if (u != null){
-			return u;
-		}/*
-		IntegerBinding ib = new IntegerBinding();
-		DatabaseEntry key = new DatabaseEntry();
-		ib.objectToEntry(new Integer(userid), key);
-		DatabaseEntry data = new DatabaseEntry();
-		db.get(null, key, data, null);
-		if (data.getData() != null) {
-			UserBinding ub = new UserBinding();
-			u = (User)ub.entryToObject(data);
-			cache.put(new Integer(userid), u);
-			return u;
-		} else {
-			System.out.println("Invalid user.");
-			return null;
-		}*/
-		throw new UnsupportedOperationException();
-	}
 	
-	Vector keys = null;
 	public void refreshUserCount() {
 		Cursor c = null;
 		try {
@@ -125,7 +107,10 @@ public class UserDatabase {
 			} else {
 				this.userCount = 0;
 			}
-		} catch (DatabaseException dbe) {
+			keys.clear();
+			keys.addAll(cache.keySet());
+			//keys = cache.getKeyArray();
+		} catch (Exception dbe) {
 			this.userCount = 0;
 			System.err.println("Database Exception in refreshUserCount(): " + dbe);
 			dbe.printStackTrace();
@@ -137,12 +122,10 @@ public class UserDatabase {
 				e.printStackTrace();
 			}
 		}
-		keys = new Vector();
-		keys.addAll(Arrays.asList(cache.m_keyTable));
 	}
 
-	public Vector getAllUsers() {
-		Vector users = new Vector();
+	public Vector<User> getAllUsers() {
+		Vector<User> users = new Vector<User>();
 		Cursor c = null;
 		try {
 			DatabaseEntry key = new DatabaseEntry();
@@ -276,6 +259,6 @@ public class UserDatabase {
 	}
 
 	public User getUserByIndex(int i) {
-		return getUser((Integer)keys.get(i));
+		return getUser(keys.get(i));
 	}
 }

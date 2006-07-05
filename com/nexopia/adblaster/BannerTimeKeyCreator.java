@@ -3,6 +3,8 @@
  */
 package com.nexopia.adblaster;
 
+import java.util.Arrays;
+
 import com.sleepycat.bind.tuple.TupleBinding;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -26,7 +28,7 @@ public class BannerTimeKeyCreator extends TupleBinding implements SecondaryKeyCr
 		Integer i = (Integer)(IBinstance.entryToObject(key));
 		bvb.setIndex(i.intValue());
 		BannerView bv = (BannerView)bvb.entryToObject(data);
-		int[] a = { bv.getBanner()==null?-1:bv.getBanner().getID(), bv.getTime() };
+		int[] a = { bv.getBanner()==null?-1:bv.getBanner().getID(), bv.getTime(), bv.getIndex() };
 		objectToEntry(a, secondaryKey);
 		return true;
 	}
@@ -38,6 +40,7 @@ public class BannerTimeKeyCreator extends TupleBinding implements SecondaryKeyCr
 		int[] obj = new int[2];
 		obj[0] = ti.readInt(); //bannerID
 		obj[1] = ti.readInt(); //time
+		obj[2] = ti.readInt(); //index
 		return obj;
 	}
 
@@ -48,5 +51,6 @@ public class BannerTimeKeyCreator extends TupleBinding implements SecondaryKeyCr
 		int[] a = (int[])obj;
 		to.writeInt(a[0]); //bannerid
 		to.writeInt(a[1]); //time
+		to.writeInt(a[2]); //index
 	}
 }

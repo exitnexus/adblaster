@@ -20,7 +20,7 @@ class User {
 	
 	User(int id, UserDatabase db) {
 		try {
-			User u = db.getUser(id);
+			User u = db.getUser(Integer.valueOf(id));
 			id = u.id;
 			age = u.age;
 			sex = u.sex;

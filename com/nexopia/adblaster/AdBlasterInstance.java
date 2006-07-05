@@ -23,14 +23,18 @@ public class AdBlasterInstance extends AbstractAdBlasterInstance{
 	}
 
 	public void fillInstance(I_Policy pol){
+		long time = System.currentTimeMillis();
 		for (int i = 0; i < getViewCount(); i++){
+			if ((System.currentTimeMillis() - time) > 5000){
+				System.out.println("..." + ((float)i/(float)getViewCount())*100 + "% complete clearing.");
+				time = System.currentTimeMillis();
+			}
 			getView(i).setBanner(null);
 		}
-		long time = System.currentTimeMillis();
 		for (int i = 0; i < getViewCount(); i++){
 			BannerView bv = getView(i);
 			if ((System.currentTimeMillis() - time) > 5000){
-				System.out.println("..." + ((float)i/(float)getViewCount())*100 + "% complete.");
+				System.out.println("..." + ((float)i/(float)getViewCount())*100 + "% complete filling.");
 				time = System.currentTimeMillis();
 			}
 			//Banner b = pol.getBestBanner(this, bv);
@@ -47,7 +51,7 @@ public class AdBlasterInstance extends AbstractAdBlasterInstance{
 		}
 	}
 	
-	public AbstractAdBlasterInstance copy() {
+/*	public AbstractAdBlasterInstance copy() {
 		AdBlasterInstance instance = new AdBlasterInstance(this.universe);
 		//xxx:clear out original instance.views
 		for (int i = 0; i < this.getViewCount(); i++){
@@ -57,7 +61,7 @@ public class AdBlasterInstance extends AbstractAdBlasterInstance{
 		return instance;
 
 	}
-
+*/
 	static int index = 0;
 
 	public BannerView randomView(AdBlasterDbUniverse ac, 

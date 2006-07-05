@@ -13,7 +13,7 @@ import com.sleepycat.je.EnvironmentConfig;
 public abstract class AbstractAdBlasterInstance {
 
 	AbstractAdBlasterUniverse universe;
-	HashMap bannerCountMap = null;
+	HashMap <Banner, Integer>bannerCountMap = null;
 	static Integer pool[];
 	static {
 		pool = new Integer[200];
@@ -23,7 +23,7 @@ public abstract class AbstractAdBlasterInstance {
 	}
 	
 	public AbstractAdBlasterInstance(AbstractAdBlasterUniverse ac){
-		bannerCountMap = new HashMap();
+		bannerCountMap = new HashMap<Banner, Integer>();
 		for (int i = 0; i < ac.getBannerCount(); i++){
 			bannerCountMap.put(ac.getBannerByIndex(i), new Integer(0));
 		}
@@ -38,6 +38,7 @@ public abstract class AbstractAdBlasterInstance {
 
 	Integer zero = new Integer(0);
 	
+	/*Poorly named... detects whether a bannerview satisfies time period per user*/
 	private boolean nearestWithinTimeRange(Banner b, BannerView bv) {
 		//if (((Integer)bannerCountMap.get(b)).intValue()+1 >= b.getViewsperuser()){
 			Vector<BannerView> range = scan(b, bv);
@@ -45,7 +46,7 @@ public abstract class AbstractAdBlasterInstance {
 			for (int i = 0; (i + b.getViewsperuser()) < range.size(); i++){
 				BannerView first = (BannerView) range.get(i);
 				BannerView last = (BannerView) range.get(i+b.getViewsperuser());
-				if (last.getTime() - first.getTime() < b.getLimitbyperiod()){
+				if (last.getTime() - first.getTime() <= b.getLimitbyperiod()){
 					return false;
 				}
 			}
@@ -54,11 +55,26 @@ public abstract class AbstractAdBlasterInstance {
 		
 	}
 
-	private Vector<BannerView> getAllMatching(Vector<BannerView> vec, int time, int range) {
+	private boolean nearestBeforeTimeRange(Banner b, BannerView bv) {
+		Vector<BannerView> range = scan(b, bv);
+		
+		for (int i = 0; (i + b.getViewsperuser()) < range.size(); i++){
+			BannerView first = (BannerView) range.get(i);
+			BannerView last = (BannerView) range.get(i+b.getViewsperuser());
+			if (last.getTime() - first.getTime() <= b.getLimitbyperiod()){
+				return false;
+			}
+		}
+		return true;
+	}
+
+
+
+	private Vector<BannerView> getAllMatching(Vector<BannerView> vec, int time, int period) {
 		Vector<BannerView> vec2 = new Vector<BannerView>();
 		for (int i = 0; i < vec.size(); i++){
 			BannerView bv = vec.get(i);
-			if (bv.getTime() > time - range && bv.getTime() < time + range){
+			if (bv.getTime() > time - period && bv.getTime() < time + period){
 				vec2.add(bv);
 			}
 		}
@@ -246,8 +262,6 @@ public abstract class AbstractAdBlasterInstance {
 		}
 	}
 
-	public abstract void notifyChangeUser(BannerView view);
-	public abstract void notifyChangeTime(BannerView view);
 	public abstract void fillInstance(I_Policy pol);
 	protected abstract BannerView getView(int i);
 	public abstract int getViewCount();

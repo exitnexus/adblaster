@@ -55,14 +55,7 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 	 * @see com.nexopia.adblaster.AbstractAdBlasterUniverse#getUser(int)
 	 */
 	public User getUser(int i) {
-		User u;
-		try {
-			u = userDB.getUser(i);
-		} catch (DatabaseException dbe) {
-			System.err.println("Unable to retrieve user " + i + ": " + dbe);
-			dbe.printStackTrace();
-			return null;
-		}
+		User u = userDB.getUser(i);
 		return u;
 	}
 

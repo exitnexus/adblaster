@@ -63,14 +63,18 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	public void fillInstance(I_Policy pol) {
 		/* Doesn't really do anything */
 		System.out.println("Filling " + getViewCount() + " instances.");
+		long time = System.currentTimeMillis();
 		for (int i = 0; i < getViewCount(); i++){
 			getView(i).setBanner(null);
+			if ((System.currentTimeMillis() - time) > 5000){
+				System.out.println("..." + ((float)i/(float)getViewCount())*100 + "% complete clearing.");
+				time = System.currentTimeMillis();
+			}
 		}
-		long time = System.currentTimeMillis();
 		for (int i = 0; i < getViewCount(); i++){
 			BannerView bv = getView(i);
 			if ((System.currentTimeMillis() - time) > 5000){
-				System.out.println("..." + ((float)i/(float)getViewCount())*100 + "% complete.");
+				System.out.println("..." + ((float)i/(float)getViewCount())*100 + "% complete filling.");
 				time = System.currentTimeMillis();
 			}
 			Banner b = pol.getBestBanner(this, bv);

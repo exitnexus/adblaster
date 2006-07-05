@@ -44,17 +44,12 @@ class BannerView{
 		return time;
 	}
 
-	public void setTime(int time) {
-		this.time = time;
-		this.inst.notifyChangeTime(this);
-	}
-
 	public int getIndex(){
 		return index;
 	}
 	
 	public String toString(){
-		return "Banner ID: " + b.getID() + " - Time: " + time + " User ID: " + uid; 
+		return "Banner ID: " + ((b == null)?null:b.getID()) + " - Time: " + time + " User ID: " + uid; 
 	}
 
 	public void setBannerWithoutFire(Banner b) {

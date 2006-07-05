@@ -18,7 +18,7 @@ public class AdBlasterPolicy implements I_Policy {
 		}
 	}
 
-	public static I_Policy randomPolicy(AbstractAdBlasterUniverse ac) {
+	public static AdBlasterPolicy randomPolicy(AbstractAdBlasterUniverse ac) {
 		return new AdBlasterPolicy(ac);
 	}
 
@@ -27,50 +27,33 @@ public class AdBlasterPolicy implements I_Policy {
 		banners = null;
 	}
 
-	public void upgradePolicy(AbstractAdBlasterInstance instance) {
-		/*boolean changed = true;
-		while (changed){
-			changed = false;
-			Vector unserved = instance.getUnserved();
-			for (int i = 0; i < unserved.size(); i++){
-				Tuple t = (Tuple)unserved.get(i);
-				Banner b = (Banner)t.data.get(0); 
-				int c = ((Integer)t.data.get(1)).intValue();
-				if (b.getPayrate() > 0){
-					for (int j = 0; j < instance.views.size() && c > 0; j++){
-						BannerView bv = (BannerView) instance.views.get(j);
-						if (bv.b.getPayrate() < b.getPayrate() && instance.isValidBannerForUser(bv.u,b)){
-							changed = true;
-							c--;
-							this.increment(b, 0.1);
-							this.increment(bv.b, -0.1);
-							bv.b = b;
-						}
-					}
-				}
-			}
-		}*/
+	public void incrementMultiply(Banner b, double d) {
+		coefficients.put(b, new Float(((Float)coefficients.get(b)).floatValue() * d));
+		banners = null;
+	}
+
+	public void upgradePolicy(AbstractAdBlasterInstance instance, AdBlasterThreadedOperation op) {
+
+		int sbefore[] = new int[universe.getBannerCount()];
+		for (int i = 0; i < universe.getBannerCount(); i++){
+			Banner b = universe.getBannerByIndex(i);
+			sbefore[i] = instance.count(b);
+		}
+		
+
 		float count = -1;
-		while(instance.totalProfit() != count){
-			count = instance.totalProfit();
-			AdBlaster.iterativeImprove(instance);
+		float newcount = 0;
+		while((newcount = instance.totalProfit()) != count){
+			count = newcount;
+			op.iterativeImprove(instance);
 		}
 		for (int i = 0; i < universe.getBannerCount(); i++){
-			int totalAvailable = 1;
-			int totalUsed = 0;
 			Banner b = universe.getBannerByIndex(i);
 			System.out.println("Calculating banner " + i + "/" + universe.getBannerCount());
-			for (int j = 0; j < instance.getViewCount(); j++){
-				BannerView bv = instance.getView(j);
-				if (instance.isValidBannerForView(bv,b)){
-					totalAvailable++;
-				}
-				if (bv.getBanner() == b){
-					totalUsed++;
-				}
-			}
-			float f = ((float)totalUsed)/(float)Math.min(b.getMaxHits(),totalAvailable);
-			coefficients.put(b, new Float(f)); 
+			int after = instance.count(b);
+			int before = sbefore[i];
+			float f = ((float)((1.0f + after) / (1.0f + before)));
+			this.incrementMultiply(b, f); 
 			banners = null;
 		}
 
@@ -90,6 +73,10 @@ public class AdBlasterPolicy implements I_Policy {
 			if (score > bestScore){
 				if ( instance.count(b) < b.getMaxHits() ){
 					if (instance.isValidBannerForView(bv, b)){
+						/* If everything is working properly, this should be fine...
+						 * 
+						 */
+						if (true) return b;
 						bestScore = score;
 						bestMatch = j;
 					}
@@ -103,27 +90,59 @@ public class AdBlasterPolicy implements I_Policy {
 	
 
 	private Vector orderBannersByScore(AbstractAdBlasterInstance instance) {
-		Vector vec = new Vector();
+		Vector<Banner> vec = new Vector<Banner>();
 		int bestMatch = -1;
 		float bestScore = Float.NEGATIVE_INFINITY;
 		for (int j = 0; j < instance.universe.getBannerCount(); j++){
 			Banner b = instance.universe.getBannerByIndex(j);
 			float score = ((Float)coefficients.get(b)).floatValue();
-			int i = 0;
-			float score2 = Float.NEGATIVE_INFINITY;
-			while (i < vec.size() && score2 > score){
-				Banner b2 = (Banner) vec.get(i);
-				score2 = ((Float)coefficients.get(b2)).floatValue();
+			int i = -1;
+			while (true){
 				i++;
+				if (i >= vec.size()){
+					break;
+				}
+				Banner b2 = vec.get(i);
+				if (((Float)coefficients.get(b2)).floatValue() < score)
+					break;
 			}
 			vec.insertElementAt(b, i);
 			
 		}
+		System.out.println(vec.get(0));
 		return vec;
 	}
 
 	public Float getCoefficient(Banner bannerByIndex) {
 		return (Float)coefficients.get(bannerByIndex);
+	}
+
+	public static void main(String args[]){
+		float coefficients[] = new float[10];
+		for (int i = 0; i < 10; i++){
+			coefficients[i] = (float) (Math.random() * 10);
+		}
+		Vector vec = new Vector();
+		int bestMatch = -1;
+		float bestScore = Float.NEGATIVE_INFINITY;
+		for (int j = 0; j < 10; j++){
+			float score = ((Float)coefficients[j]).floatValue();
+			int i = -1;
+			float score2 = Float.POSITIVE_INFINITY;
+			while (score < score2){
+				i++;
+				if (i >= vec.size()){
+					break;
+				}
+				if (((Float)coefficients[((Integer)vec.get(i)).intValue()]).floatValue() < score)
+					break;
+			}
+			vec.insertElementAt(new Integer(j), i);
+			System.out.println(Arrays.toString(vec.toArray()));
+			
+		}
+		System.out.println(Arrays.toString(coefficients));
+		System.out.println(Arrays.toString(vec.toArray()));
 	}
 
 }
