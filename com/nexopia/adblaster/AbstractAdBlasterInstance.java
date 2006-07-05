@@ -32,34 +32,15 @@ public abstract class AbstractAdBlasterInstance {
 	
 	
 	public boolean isValidBannerForView(BannerView bv, Banner b) {
-		boolean age = doesAgeMatch(bv, b);
-		if (age){
-			boolean sex = b.sexes.isEmpty() || b.sexes.contains(pool[bv.getUser().sex]);
-			if (sex){
-				boolean interests = bv.getUser().interests.hasAnyIn(b.interests);
-				if (interests){
-					//boolean timerange = true;
-					boolean timerange = this.nearestWithinTimeRange(b, bv);
-						return interests && timerange && age && sex;
-				}
-			}
-		}
-		return false;
+		return (b.validUser(bv.getUser()) && this.nearestWithinTimeRange(b, bv));
 	}
 
 
 	Integer zero = new Integer(0);
-	private boolean doesAgeMatch(BannerView bv, Banner b) {
-		if (b.ages.contains(zero)){
-			return !(b.ages.contains(pool[bv.getUser().age]));
-		} else {
-			return b.ages.isEmpty() || b.ages.contains(pool[bv.getUser().age]);
-		}
-	}
-
+	
 	private boolean nearestWithinTimeRange(Banner b, BannerView bv) {
 		//if (((Integer)bannerCountMap.get(b)).intValue()+1 >= b.getViewsperuser()){
-			Vector<BannerView> range = scan(b.getViewsperuser(), b.getViewsperuser(), b, bv);
+			Vector<BannerView> range = scan(b, bv);
 			
 			for (int i = 0; (i + b.getViewsperuser()) < range.size(); i++){
 				BannerView first = (BannerView) range.get(i);
@@ -84,35 +65,43 @@ public abstract class AbstractAdBlasterInstance {
 		return vec2;
 	}
 
-	private HashMap<User, Vector<BannerView>> getAllMatching(){
-		HashMap<User, Vector<BannerView>> map = new HashMap<User, Vector<BannerView>>();
+	private HashMap<User, HashMap<Banner, Vector<BannerView>>> getAllMatching(){
+		HashMap<User, HashMap<Banner, Vector<BannerView>>> userHash = new HashMap<User, HashMap<Banner, Vector<BannerView>>>();
 		for (int i = 0; i < this.getViewCount(); i++){
 			BannerView bv = getView(i);
 			User u = bv.getUser();
-			Vector <BannerView>vec = map.get(u);
-			if (vec == null){
+			HashMap<Banner,Vector<BannerView>> bannerHash = userHash.get(u);
+			if (bannerHash == null){
+				bannerHash = new HashMap<Banner, Vector<BannerView>>();
+				userHash.put(u, bannerHash);
+			}
+			Vector<BannerView> vec = bannerHash.get(bv.getBanner());
+			if (vec == null) {
 				vec = new Vector<BannerView>();
-				map.put(u, vec);
+				bannerHash.put(bv.getBanner(), vec);
 			}
 			vec.add(bv);
 		}
-		return map;
+		return userHash;
 		
 	}
 	
-	private Vector<BannerView> scan(int before, int after, Banner b, BannerView bv) {
-
+	//returns a vector of bannerviews that are from the same user and banner that could potentially have frequency conflicts
+	//the vector also contains @param bv in sorted order.
+	private Vector<BannerView> scan(Banner b, BannerView bv) {
 		if (allMatching == null){
 			System.out.println("Building map." + this.getClass());
 			allMatching = getAllMatching();
 		}
 		User user = bv.getUser();
-		Vector <BannerView> vec = (Vector<BannerView>) getAllMatching(allMatching.get(user), bv.getTime(), b.getLimitbyperiod());
-		//return orderBannersByTime(vec);
-		return vec;
+		Vector <BannerView> vec = (Vector<BannerView>) getAllMatching(allMatching.get(user).get(b), bv.getTime(), b.getLimitbyperiod());
+		
+		//put bv in the list as well
+		vec.add(bv);
+		return orderBannersByTime(vec);
 	}
 
-	HashMap <User, Vector<BannerView>>allMatching = null;
+	HashMap <User, HashMap<Banner, Vector<BannerView>>> allMatching = null;
 	
 	private Vector<BannerView> orderBannersByTime(Vector input) {
 		Vector<BannerView> vec = new Vector<BannerView>();
