@@ -40,9 +40,19 @@ public abstract class AbstractAdBlasterInstance {
 			Vector<BannerView> range = scan(b, bv);
 			System.out.println(Arrays.toString(range.toArray()));
 			for (int i = 0; (i + b.getViewsperuser()) < range.size(); i++){
-				BannerView first = (BannerView) range.get(i);
-				BannerView last = (BannerView) range.get(i+b.getViewsperuser());
+				BannerView first = range.get(i);
+				BannerView last = range.get(i+b.getViewsperuser());
 				if (last.getTime() - first.getTime() <= b.getLimitbyperiod()){
+					return false;
+				}
+			}
+			Campaign c = b.getCampaign();
+			range = scan(c, bv);
+			System.out.println(Arrays.toString(range.toArray()));
+			for (int i = 0; (i + c.getViewsPerUser()) < range.size(); i++){
+				BannerView first = range.get(i);
+				BannerView last = range.get(i+c.getViewsPerUser());
+				if (last.getTime() - first.getTime() <= c.getLimitByPeriod()){
 					return false;
 				}
 			}
@@ -129,6 +139,35 @@ public abstract class AbstractAdBlasterInstance {
 		vec.add(bv);
 		return orderBannersByTime(vec);
 	}
+
+	//returns a time sorted vector of bannerviews that are from the same user and campaign that could 
+	//potentially have frequency conflicts the vector also contains @param bv.
+	private Vector<BannerView> scan(Campaign c, BannerView bv) {
+		if (allMatching == null){
+			System.out.println("Building map." + this.getClass());
+			allMatching = getAllMatching();
+		}
+		User user = bv.getUser();
+		Vector<BannerView>hb = allMatching.get(user);
+		
+		Vector <BannerView> vec = getAllMatching(hb, c, bv.getTime(), c.getLimitByPeriod());
+		
+		//put bv in the list as well
+		vec.add(bv);
+		return orderBannersByTime(vec);
+	}
+	
+	private Vector<BannerView> getAllMatching(Vector<BannerView> vec, Campaign c, int time, int period) {
+		Vector<BannerView> vec2 = new Vector<BannerView>();
+		for (int i = 0; i < vec.size(); i++){
+			BannerView bv = vec.get(i);
+			if (bv.getTime() > time - period && bv.getTime() < time + period && bv.getBanner().getCampaign() == c){
+				vec2.add(bv);
+			}
+		}
+		return vec2;
+	}
+
 
 	HashMap <User, Vector<BannerView>> allMatching = null;
 	

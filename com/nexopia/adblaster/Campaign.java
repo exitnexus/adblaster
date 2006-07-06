@@ -11,7 +11,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -197,6 +196,14 @@ class Campaign{
 
 	public byte getPayType() {
 		return this.paytype;
+	}
+
+	public int getLimitByPeriod() {
+		return this.limitByPeriod;
+	}
+
+	public int getViewsPerUser() {
+		return this.viewsPerUser;
 	}
 	
 }
