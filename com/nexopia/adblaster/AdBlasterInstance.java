@@ -42,8 +42,7 @@ public class AdBlasterInstance extends AbstractAdBlasterInstance{
 	public void addView(BannerView bv) {
 		this.views.add(bv);
 		if (bv.getBanner() != null){
-			this.bannerCountMap.put(bv.getBanner(), 
-					new Integer(((Integer)bannerCountMap.get(bv.getBanner())).intValue()+1));
+			updateMap(bv);
 		}
 	}
 	

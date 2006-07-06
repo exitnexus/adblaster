@@ -147,7 +147,7 @@ final class AdBlasterThreadedOperation implements Runnable {
 			Banner b = (Banner)t.getFirst(0); 
 			//while (((Integer)instance.bannerCountMap.get(b)).intValue() < b.getMaxHits()){
 				int depth = 0;
-				for (int j = 0; j < instanc.getViewCount() && ((Integer)instanc.bannerCountMap.get(b)).intValue() < b.getMaxHits(); j++){
+				for (int j = 0; j < instanc.getViewCount() && instanc.count(b) < b.getMaxHits(); j++){
 					//System.out.println("Trying bannerview " + j);
 					BannerView bv = instanc.getView(j);
 					

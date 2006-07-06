@@ -9,6 +9,7 @@ package com.nexopia.adblaster;
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Vector;
 
 import com.sleepycat.je.Cursor;
 import com.sleepycat.je.Database;
@@ -17,6 +18,8 @@ import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
+import com.sleepycat.je.LockMode;
+import com.sleepycat.je.OperationStatus;
 import com.sleepycat.je.SecondaryConfig;
 import com.sleepycat.je.SecondaryCursor;
 import com.sleepycat.je.SecondaryDatabase;
@@ -182,6 +185,36 @@ public class BannerViewDatabase {
 		bvb.setIndex(index);
 		BannerView bv = (BannerView)bvb.entryToObject(data);
 		return bv;
+	}
+	
+	UserBinding userKey = new UserBinding();
+	public Vector <BannerView> getByUser(int uID) {
+		Vector <BannerView>vec = new Vector<BannerView>();
+		userKey.tib.intsToEntry(uID, 0, key);
+		Cursor cursor = null;
+		try {
+			cursor = userDb.openCursor(null, null);
+			cursor.getSearchKeyRange(key, data, LockMode.DEFAULT);
+
+			while (cursor.getNext(key, data, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
+				if (data.getData() != null) {
+					BannerViewBinding bvb = AdBlaster.instanceBinding;
+					bvb.setIndex(ib.entryToInt(key));
+					BannerView bv = (BannerView)bvb.entryToObject(data);
+					//System.out.println(bv);
+					if (bv.getUserID() != uID){
+						break;
+					}
+					vec.add(bv);
+				}
+			}
+			cursor.close();
+		} catch (DatabaseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return vec;
 	}
 }
 

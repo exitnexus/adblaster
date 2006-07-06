@@ -73,7 +73,7 @@ class UserBinding extends TupleBinding implements SecondaryKeyCreator {
 		return true;
 	}
 
-	private class TwoIntegerBinding extends TupleBinding {
+	public class TwoIntegerBinding extends TupleBinding {
 
 		/* (non-Javadoc)
 		 * @see com.sleepycat.bind.tuple.TupleBinding#entryToObject(com.sleepycat.bind.tuple.TupleInput)

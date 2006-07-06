@@ -7,6 +7,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.Vector;
 
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
@@ -20,7 +21,7 @@ import javax.swing.table.DefaultTableModel;
 public class AdBlaster {
 
 	static int num_serves = 10;
-	static AbstractAdBlasterUniverse ac;
+	static AdBlasterDbUniverse ac;
 	static BannerViewBinding instanceBinding;
 	
 	public static void main(String args[]){
@@ -34,7 +35,7 @@ public class AdBlaster {
 		
 		AdBlasterPolicy pol = AdBlasterPolicy.randomPolicy(ac);
 
-		AbstractAdBlasterInstance instanc = new AdBlasterDbInstance(ac);
+		AdBlasterDbInstance instanc = new AdBlasterDbInstance(ac);
 		instanceBinding = new BannerViewBinding(ac, instanc);
 		((AdBlasterDbInstance)instanc).load();
 		GlobalData gd = new GlobalData(instanc, pol);
@@ -137,8 +138,17 @@ public class AdBlaster {
 
 	}
 
-	private static void getChunk(AdBlasterThreadedInstance chunk, AbstractAdBlasterInstance instance) {
-		for (int i = 0; i < instance.getViewCount(); i++){
+	private static void getChunk(AdBlasterThreadedInstance chunk, AdBlasterDbInstance instance) {
+		for (int i = 0; i < ac.getUserCount()-1; i++){
+			ProgressIndicator.show(i, ac.getUserCount());
+			if (ac.getUserByIndex(i).getID() % 1000 == 0){
+				Vector <BannerView>vec = instance.db.bv_db.getByUser(ac.getUserByIndex(i).getID());
+				for (BannerView bv : vec){
+					chunk.addView(bv);
+				}
+			}
+		}
+		/*for (int i = 0; i < instance.getViewCount(); i++){
 			BannerView bv = instance.getView(i);
 			if (bv.getUser().id % 1000 == 0){
 				chunk.addView(bv);
@@ -147,7 +157,7 @@ public class AdBlaster {
 				System.out.println("Loaded bannerview " + i + ": " + bv);
 			}
 		}
-		chunk.bannerCountMap = instance.bannerCountMap;
+		*/
 	}								
 					
 	static JTable getBannerTable(AbstractAdBlasterUniverse ac2, AdBlasterPolicy pol) {

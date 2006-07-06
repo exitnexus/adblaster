@@ -9,7 +9,7 @@ import java.util.Vector;
 public abstract class AbstractAdBlasterInstance {
 
 	AbstractAdBlasterUniverse universe;
-	HashMap <Banner, Integer>bannerCountMap = null;
+	private HashMap <Banner, Integer>bannerCountMap = null;
 	static Integer pool[];
 	static {
 		pool = new Integer[200];
@@ -229,6 +229,11 @@ public abstract class AbstractAdBlasterInstance {
 	int count(Banner banner) {
 		return ((Integer)bannerCountMap.get(banner)).intValue();
 		
+	}
+	
+	protected void updateMap(BannerView bv) {
+		Integer count = this.bannerCountMap.get(bv.getBanner());
+		this.bannerCountMap.put(bv.getBanner(), Integer.valueOf(count.intValue() + 1));
 	}
 
 	public float totalProfit() {

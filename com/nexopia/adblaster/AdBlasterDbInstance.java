@@ -17,8 +17,7 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 			for (int i = 0; i < db.vec.size(); i++){
 				BannerView bv = db.get(i);
 				if (bv.getBanner() != null){
-					Integer count = this.bannerCountMap.get(bv.getBanner());
-					this.bannerCountMap.put(bv.getBanner(), Integer.valueOf(count.intValue() + 1));
+					updateMap(bv);
 				}
 			}
 			System.out.println("Done.");
