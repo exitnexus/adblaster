@@ -29,8 +29,8 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 				System.out.println("..." + ((float)i/(float)getViewCount())*100 + "% complete filling.");
 				time = System.currentTimeMillis();
 			}
-			//Banner b = pol.getBestBanner(this, bv);
-			Banner b = universe.getRandomBannerMatching(bv, this);
+			Banner b = pol.getBestBanner(this, bv);
+			//Banner b = universe.getRandomBannerMatching(bv, this);
 			bv.setBanner(b);
 		}
 	}

@@ -1,5 +1,6 @@
 package com.nexopia.adblaster;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -37,7 +38,7 @@ public abstract class AbstractAdBlasterInstance {
 	private boolean nearestWithinTimeRange(Banner b, BannerView bv) {
 		//if (((Integer)bannerCountMap.get(b)).intValue()+1 >= b.getViewsperuser()){
 			Vector<BannerView> range = scan(b, bv);
-			
+			System.out.println(Arrays.toString(range.toArray()));
 			for (int i = 0; (i + b.getViewsperuser()) < range.size(); i++){
 				BannerView first = (BannerView) range.get(i);
 				BannerView last = (BannerView) range.get(i+b.getViewsperuser());
@@ -102,7 +103,7 @@ public abstract class AbstractAdBlasterInstance {
 		for (int i = 0; i < this.getViewCount(); i++) {
 			BannerView bv = getView(i);
 			User u = bv.getUser();
-			Vector<BannerView> vec = userHash.get(bv.getBanner());
+			Vector<BannerView> vec = userHash.get(u);
 			if (vec == null) {
 				vec = new Vector<BannerView>();
 				userHash.put(u, vec);
@@ -121,6 +122,7 @@ public abstract class AbstractAdBlasterInstance {
 		}
 		User user = bv.getUser();
 		Vector<BannerView>hb = allMatching.get(user);
+		
 		Vector <BannerView> vec = (Vector<BannerView>) getAllMatching(hb, b, bv.getTime(), b.getLimitbyperiod());
 		
 		//put bv in the list as well
@@ -144,6 +146,10 @@ public abstract class AbstractAdBlasterInstance {
 			}
 			vec.insertElementAt(bv, i);
 			
+		}
+		if (input.size() != vec.size()){
+			
+			throw new UnsupportedOperationException();
 		}
 		return vec;
 	}

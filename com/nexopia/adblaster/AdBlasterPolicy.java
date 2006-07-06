@@ -13,7 +13,7 @@ public class AdBlasterPolicy implements I_Policy {
 		coefficients = new HashMap<Banner, Float>();
 		universe = ac;
 		for (int i = 0; i < ac.getBannerCount(); i++){
-			coefficients.put(ac.getBannerByIndex(i), new Float(Math.random()));
+			coefficients.put(ac.getBannerByIndex(i), new Float(1.0/*Math.random()*/));
 		}
 	}
 
@@ -31,25 +31,25 @@ public class AdBlasterPolicy implements I_Policy {
 		banners = null;
 	}
 
-	public void upgradePolicy(AbstractAdBlasterInstance instance, AdBlasterThreadedOperation op) {
+	public void upgradePolicy(AbstractAdBlasterInstance chunk, AdBlasterThreadedOperation op) {
 
 		int sbefore[] = new int[universe.getBannerCount()];
 		for (int i = 0; i < universe.getBannerCount(); i++){
 			Banner b = universe.getBannerByIndex(i);
-			sbefore[i] = instance.count(b);
+			sbefore[i] = chunk.count(b);
 		}
 		
 
 		float count = -1;
 		float newcount = 0;
-		while((newcount = instance.totalProfit()) != count){
+		while((newcount = chunk.totalProfit()) != count){
 			count = newcount;
-			op.iterativeImprove(instance);
+			op.iterativeImprove(chunk);
 		}
 		for (int i = 0; i < universe.getBannerCount(); i++){
 			Banner b = universe.getBannerByIndex(i);
 			System.out.println("Calculating banner " + i + "/" + universe.getBannerCount());
-			int after = instance.count(b);
+			int after = chunk.count(b);
 			int before = sbefore[i];
 			System.out.println("" + after + "  :  " + before + "  :  " + (float)after/(float)before);
 			float f = ((float)((1.0f + after) / (1.0f + before)));

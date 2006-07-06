@@ -34,7 +34,7 @@ final class AdBlasterThreadedOperation implements Runnable {
 		operateOnChunk(chunk);
 	}
 	
-	public void operateOnChunk(AdBlasterThreadedInstance chunk) {
+	public synchronized void operateOnChunk(AdBlasterThreadedInstance chunk) {
 		JFrame frame = new JFrame("AdBlaster Test");
 		JPanel panel = new JPanel(new BorderLayout());
 		
@@ -150,7 +150,8 @@ final class AdBlasterThreadedOperation implements Runnable {
 				for (int j = 0; j < instanc.getViewCount() && ((Integer)instanc.bannerCountMap.get(b)).intValue() < b.getMaxHits(); j++){
 					//System.out.println("Trying bannerview " + j);
 					BannerView bv = instanc.getView(j);
-					if (bv.getBanner().getPayrate() < b.getPayrate()){
+					
+					if (bv.getBanner() == null || bv.getBanner().getPayrate() < b.getPayrate()){
 						if (depth == 0 && instanc.isValidBannerForView(bv,b)){
 							//single swapbreak;
 							bv.setBanner(b);

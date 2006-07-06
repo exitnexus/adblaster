@@ -7,6 +7,7 @@ package com.nexopia.adblaster;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
 import java.util.HashMap;
@@ -74,7 +75,11 @@ public class BannerDatabase {
 			while (rs.next()) {
 				int id = rs.getInt("ID");
 				if (rs.getString("ENABLED").equals("y")) {
-					banners.put(new Integer(id), new Banner(rs));
+					try {
+						banners.put(new Integer(id), new Banner(rs));
+					} catch (SQLException e){
+						System.out.println("This probably indicates a bad campaign. Continue if you know what you're doing.");
+					}
 					i++;
 				}
 			}

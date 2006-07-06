@@ -72,6 +72,10 @@ class Banner{
 		maxHits = (maxHits==0?Integer.MAX_VALUE:maxHits);
 		int ci = rs.getInt("CAMPAIGNID");
 		this.campaign = Campaign.get(ci);
+		if (campaign == null){
+			System.out.println(ci + ":" + this.id);
+			throw new SQLException();
+		}
 		this.locations = Utilities.stringToNegationVector(rs.getString("LOC"));
 		this.ages = Utilities.stringToNegationVector(rs.getString("AGE"));
 		this.sexes = Utilities.stringToVector(rs.getString("SEX"));

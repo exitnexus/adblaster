@@ -44,14 +44,18 @@ public class AdBlaster {
 		getChunk(chunk, instanc);
 		System.out.println("Starting thread.");
 		Runnable r = new AdBlasterThreadedOperation(gd, chunk);
-		Thread t = new Thread(r, "operateOnChunk");
-		t.start();
-		/*try {
-			t.wait();
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
-			System.exit(0);
-		}*/
+		for (int i = 0; i < 5; i++){
+			Thread t = new Thread(r, "operateOnChunk");
+			t.start();
+			synchronized (t){
+				try {
+					t.wait();
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+					System.exit(0);
+				}
+			}
+		}
 
 		JFrame frame = new JFrame("AdBlaster Test Main Window");
 		JPanel panel = new JPanel(new BorderLayout());
@@ -136,7 +140,7 @@ public class AdBlaster {
 	private static void getChunk(AdBlasterThreadedInstance chunk, AbstractAdBlasterInstance instance) {
 		for (int i = 0; i < instance.getViewCount(); i++){
 			BannerView bv = instance.getView(i);
-			if (bv.getUser().id % 10 == 0){
+			if (bv.getUser().id % 1000 == 0){
 				chunk.addView(bv);
 			}
 			if (i%1000 == 0){
