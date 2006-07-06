@@ -13,9 +13,15 @@ import java.util.Vector;
 
 
 class Banner{
+	public static final int PAYRATE_INHERIT = -1;
+	public static final int PAYTYPE_CPM = 0;
+	public static final int PAYTYPE_CPC = 1;
+	public static final int PAYTYPE_INHERIT = 2;
+	
 	Interests interests;
 	int id;
 	int payrate;
+	byte paytype;
 	private int maxHits;
 	Vector locations;
 	Vector ages;
@@ -67,7 +73,6 @@ class Banner{
 	Banner(ResultSet rs) throws SQLException {
 		this.index = counter();
 		this.id = rs.getInt("ID");
-		this.payrate = rs.getInt("PAYRATE");
 		this.maxHits = rs.getInt("VIEWSPERDAY");
 		maxHits = (maxHits==0?Integer.MAX_VALUE:maxHits);
 		int ci = rs.getInt("CAMPAIGNID");
@@ -80,6 +85,16 @@ class Banner{
 		this.ages = Utilities.stringToNegationVector(rs.getString("AGE"));
 		this.sexes = Utilities.stringToVector(rs.getString("SEX"));
 		this.size = rs.getInt("BANNERSIZE");
+		this.paytype = rs.getByte("PAYTYPE");
+		this.payrate = rs.getInt("PAYRATE");
+		if (this.getPayType() == Banner.PAYTYPE_CPC) {
+			try {
+				this.payrate = (int)(this.getPayrate()*((double)rs.getInt("CLICKS")/(double)rs.getInt("VIEWS")));
+			} catch (Exception e) {
+				e.printStackTrace();
+				this.payrate = rs.getInt("PAYRATE")/100; //assume 1% clickthrough if we have no data
+			}
+		}
 		/* INTEGER viewsperday
 		 * INTEGER clicksperday
 		 * INTEGER UNSIGNED viewsperuser
@@ -138,7 +153,11 @@ class Banner{
 		this.sexes = sexes;
 	}
 	public int getPayrate() {
-		return payrate;
+		if (payrate == PAYRATE_INHERIT) {
+			return campaign.getPayrate();
+		} else {
+			return payrate;
+		}
 	}
 	public void setPayrate(int payrate) {
 		this.payrate = payrate;
@@ -225,5 +244,13 @@ class Banner{
 		}
 		I.free();
 		return valid;
+	}
+	
+	private byte getPayType() {
+		if (this.paytype == Banner.PAYTYPE_INHERIT) {
+			return campaign.getPayType();
+		} else {
+			return this.paytype;
+		}
 	}
 }

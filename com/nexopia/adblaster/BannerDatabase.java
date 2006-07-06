@@ -74,7 +74,8 @@ public class BannerDatabase {
 			int i = 0;
 			while (rs.next()) {
 				int id = rs.getInt("ID");
-				if (rs.getString("ENABLED").equals("y")) {
+				if (rs.getString("ENABLED").equals("y") &&
+						Campaign.get(rs.getInt("CAMPAIGNID")).precheck()) {
 					try {
 						banners.put(new Integer(id), new Banner(rs));
 					} catch (SQLException e){

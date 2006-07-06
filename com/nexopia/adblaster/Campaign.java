@@ -33,10 +33,8 @@ class Campaign{
 			int i = 0;
 			while (rs.next()) {
 				int id = rs.getInt("ID");
-				if (rs.getString("ENABLED").equals("y")) {
-					campaigns.put(Integer.valueOf(id), new Campaign(rs));
-					i++;
-				}
+				campaigns.put(Integer.valueOf(id), new Campaign(rs));
+				i++;
 			}
 			System.out.println("Campaigns Total: " + i);
 		} catch (Exception e) {
@@ -44,12 +42,23 @@ class Campaign{
 		}
 	}
 	
-	Interests interests;
-	int id;
-	int payrate;
-	int maxHits;
-	int viewsPerUser;
-	int limitByPeriod;
+	public static Campaign get(int campaignID) {
+		Integer I = Integer.valueOf(campaignID);
+		Campaign c = campaigns.get(I);
+		I.free();
+		return c;
+	}
+	
+	
+	private Interests interests;
+	private int id;
+	private int payrate;
+	private byte paytype;
+	private int maxHits;
+	private int viewsPerUser;
+	private int limitByPeriod;
+	private boolean enabled;
+	
 	
 	Vector<Integer> locations;
 	Vector<Integer> ages;
@@ -60,39 +69,19 @@ class Campaign{
 		return count++;
 	}
 	
-	Campaign() {
-		interests = new Interests();
-		id = counter(); //TODO Banners need an ID we can track them by
-		maxHits = (int) (Math.pow((Math.random()-0.5) * 2,2) * 200) + 1;
-		this.payrate = (int)(Math.random()*10);
-	}
-	
-	Campaign(int id) {
-		this();
-		this.id = id;
-	}
-	
-	Campaign(int id, int payrate, int maxHits, Vector<Integer> locations, Vector<Integer> ages, Vector<Integer> sexes, Interests interests) {
-		this.id = id;
-		this.payrate = payrate;
-		this.maxHits = maxHits;
-		this.locations = locations;
-		this.ages = ages;
-		this.sexes = sexes;
-		this.interests = interests;
-	}
-	
 	Campaign(ResultSet rs) throws SQLException {
 		this.id = rs.getInt("ID");
 		this.payrate = rs.getInt("PAYRATE");
 		this.maxHits = rs.getInt("VIEWSPERDAY");
-		maxHits = (maxHits==0?Integer.MAX_VALUE:maxHits);
+		this.maxHits = (maxHits==0?Integer.MAX_VALUE:maxHits);
 		this.locations = Utilities.stringToNegationVector(rs.getString("LOC"));
 		this.ages = Utilities.stringToNegationVector(rs.getString("AGE"));
 		this.sexes = Utilities.stringToVector(rs.getString("SEX"));
 		this.viewsPerUser = rs.getInt("VIEWSPERUSER"); 
 		this.limitByPeriod = rs.getInt("LIMITBYPERIOD"); 
 		this.interests = new Interests(rs.getString("INTERESTS"));
+		this.enabled = rs.getString("ENABLED").equals("y");
+		this.paytype = rs.getByte("PAYTYPE");
 	}
 	
 	int getID() {
@@ -200,10 +189,14 @@ class Campaign{
 		return valid;
 	}
 
-	public static Campaign get(int campaignID) {
-		Integer I = Integer.valueOf(campaignID);
-		Campaign c = campaigns.get(I);
-		I.free();
-		return c;
+	//this does basic checks like enabled and within date range
+	//if it returns false then its banners will never be displayable today
+	public boolean precheck() {
+		return enabled;
 	}
+
+	public byte getPayType() {
+		return this.paytype;
+	}
+	
 }
