@@ -38,7 +38,7 @@ public abstract class AbstractAdBlasterInstance {
 	private boolean nearestWithinTimeRange(Banner b, BannerView bv) {
 		//if (((Integer)bannerCountMap.get(b)).intValue()+1 >= b.getViewsperuser()){
 			Vector<BannerView> range = scan(b, bv);
-			System.out.println(Arrays.toString(range.toArray()));
+			//System.out.println(Arrays.toString(range.toArray()));
 			for (int i = 0; (i + b.getViewsperuser()) < range.size(); i++){
 				BannerView first = range.get(i);
 				BannerView last = range.get(i+b.getViewsperuser());
@@ -48,7 +48,7 @@ public abstract class AbstractAdBlasterInstance {
 			}
 			Campaign c = b.getCampaign();
 			range = scan(c, bv);
-			System.out.println(Arrays.toString(range.toArray()));
+			//System.out.println(Arrays.toString(range.toArray()));
 			for (int i = 0; (i + c.getViewsPerUser()) < range.size(); i++){
 				BannerView first = range.get(i);
 				BannerView last = range.get(i+c.getViewsPerUser());
@@ -161,7 +161,7 @@ public abstract class AbstractAdBlasterInstance {
 		Vector<BannerView> vec2 = new Vector<BannerView>();
 		for (int i = 0; i < vec.size(); i++){
 			BannerView bv = vec.get(i);
-			if (bv.getTime() > time - period && bv.getTime() < time + period && bv.getBanner().getCampaign() == c){
+			if (bv.getTime() > time - period && bv.getTime() < time + period && bv.getBanner() != null && bv.getBanner().getCampaign() == c){
 				vec2.add(bv);
 			}
 		}
