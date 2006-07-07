@@ -20,9 +20,11 @@ import javax.swing.table.DefaultTableModel;
 
 public class AdBlaster {
 
+	private static final int THREAD_COUNT = 10;
 	static int num_serves = 10;
 	static AdBlasterDbUniverse ac;
 	static BannerViewBinding instanceBinding;
+	private static int offset = 0;
 	
 	public static void main(String args[]){
 		long start_time = System.currentTimeMillis();
@@ -41,98 +43,112 @@ public class AdBlaster {
 		GlobalData gd = new GlobalData(instanc, pol);
 		
 		System.out.println("Chunking.");
-		AdBlasterThreadedInstance chunk = new AdBlasterThreadedInstance(gd);
-		getChunk(chunk, instanc);
-		System.out.println("Starting thread.");
-		Runnable r = new AdBlasterThreadedOperation(gd, chunk);
+		AdBlasterThreadedInstance[] chunk = new AdBlasterThreadedInstance[THREAD_COUNT];
+		for (int j=0; j<THREAD_COUNT; j++) {
+			chunk[j] = new AdBlasterThreadedInstance(gd);
+			getChunk(chunk[j], instanc);
+		}
+		Runnable[] r = new Runnable[THREAD_COUNT];
+		Thread[] t = new Thread[THREAD_COUNT];
 		for (int i = 0; i < 5; i++){
-			Thread t = new Thread(r, "operateOnChunk");
-			t.start();
-			synchronized (t){
-				try {
-					t.wait();
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
-					System.exit(0);
+			for (int j=0; j<THREAD_COUNT; j++) {
+				r[j] = new AdBlasterThreadedOperation(gd, chunk[j], "ThreadSet " + j);
+				t[j] = new Thread(r[j], "operateOnChunk");
+				
+				t[j].start();
+			}
+			for (int j=0; j<THREAD_COUNT; j++) {
+				synchronized (t[j]){
+					AdBlasterThreadedOperation op = (AdBlasterThreadedOperation)r[j];
+					if (!op.isFinished()) {
+						try {
+							t.wait();
+						} catch (Exception e1) {
+							e1.printStackTrace();
+							System.exit(0);
+						}
+					}
 				}
 			}
 		}
 
-		JFrame frame = new JFrame("AdBlaster Test Main Window");
-		JPanel panel = new JPanel(new BorderLayout());
+		for (int k=0; k<THREAD_COUNT; k++) {
+			
+			JFrame frame = new JFrame("AdBlaster Test Main Window");
+			JPanel panel = new JPanel(new BorderLayout());
+			
+			frame.setContentPane(panel);
 		
-		frame.setContentPane(panel);
-	
-		JTabbedPane tab = new JTabbedPane();
-		panel.add(tab, BorderLayout.CENTER);
-		JPanel resultPanel = new JPanel(new BorderLayout());
+			JTabbedPane tab = new JTabbedPane();
+			panel.add(tab, BorderLayout.CENTER);
+			JPanel resultPanel = new JPanel(new BorderLayout());
+			
+			{
+				//Perfect results panel
+				resultPanel = new JPanel(new BorderLayout());
+				JScrollPane scroll = new JScrollPane(resultPanel);
+				tab.addTab("Perfect", scroll);
+				DefaultTableModel model = new DefaultTableModel(chunk[k].getViewCount(),3);
+				JTable table = new JTable(model);
+				for (int j = 0; j < chunk[k].getViewCount(); j++){
+					model.setValueAt(chunk[k].getView(j).getUser(), j,0);
+					model.setValueAt(chunk[k].getView(j).getBanner(), j,1);
+					model.setValueAt(AdBlaster.outputTime(chunk[k].getView(j).getTime()), j,2);
+				}
+				resultPanel.add(table, BorderLayout.CENTER);
+				JPanel statsPanel = new JPanel(new FlowLayout());
+				statsPanel.add(new JTextField(""+chunk[k].totalProfit()));
+				statsPanel.add(new JTextField(""+chunk[k].totalProfit()));
+				resultPanel.add(statsPanel, BorderLayout.PAGE_START);
 		
-		{
-			//Perfect results panel
-			resultPanel = new JPanel(new BorderLayout());
-			JScrollPane scroll = new JScrollPane(resultPanel);
-			tab.addTab("Perfect", scroll);
-			DefaultTableModel model = new DefaultTableModel(chunk.getViewCount(),3);
-			JTable table = new JTable(model);
-			for (int j = 0; j < chunk.getViewCount(); j++){
-				model.setValueAt(chunk.getView(j).getUser(), j,0);
-				model.setValueAt(chunk.getView(j).getBanner(), j,1);
-				model.setValueAt(AdBlaster.outputTime(chunk.getView(j).getTime()), j,2);
+			}		
+			{
+				//Actual final results.
+				chunk[k].fillInstance(gd.pol);
+				resultPanel = new JPanel(new BorderLayout());
+				JScrollPane scroll = new JScrollPane(resultPanel);
+				tab.addTab("Final", scroll);
+				DefaultTableModel model = new DefaultTableModel(chunk[k].getViewCount(),3);
+				JTable table = new JTable(model);
+				for (int j = 0; j < chunk[k].getViewCount(); j++){
+					model.setValueAt(chunk[k].getView(j).getUser(), j,0);
+					model.setValueAt(chunk[k].getView(j).getBanner(), j,1);
+					model.setValueAt(AdBlaster.outputTime(chunk[k].getView(j).getTime()), j,2);
+				}
+				resultPanel.add(table, BorderLayout.CENTER);
+				JPanel statsPanel = new JPanel(new FlowLayout());
+				statsPanel.add(new JTextField(""+chunk[k].totalProfit()));
+				statsPanel.add(new JTextField(""+chunk[k].totalProfit()));
+				resultPanel.add(statsPanel, BorderLayout.PAGE_START);
+		
 			}
-			resultPanel.add(table, BorderLayout.CENTER);
-			JPanel statsPanel = new JPanel(new FlowLayout());
-			statsPanel.add(new JTextField(""+chunk.totalProfit()));
-			statsPanel.add(new JTextField(""+chunk.totalProfit()));
-			resultPanel.add(statsPanel, BorderLayout.PAGE_START);
-	
-		}		
-		{
-			//Actual final results.
-			chunk.fillInstance(gd.pol);
-			resultPanel = new JPanel(new BorderLayout());
-			JScrollPane scroll = new JScrollPane(resultPanel);
-			tab.addTab("Final", scroll);
-			DefaultTableModel model = new DefaultTableModel(chunk.getViewCount(),3);
-			JTable table = new JTable(model);
-			for (int j = 0; j < chunk.getViewCount(); j++){
-				model.setValueAt(chunk.getView(j).getUser(), j,0);
-				model.setValueAt(chunk.getView(j).getBanner(), j,1);
-				model.setValueAt(AdBlaster.outputTime(chunk.getView(j).getTime()), j,2);
-			}
-			resultPanel.add(table, BorderLayout.CENTER);
-			JPanel statsPanel = new JPanel(new FlowLayout());
-			statsPanel.add(new JTextField(""+chunk.totalProfit()));
-			statsPanel.add(new JTextField(""+chunk.totalProfit()));
-			resultPanel.add(statsPanel, BorderLayout.PAGE_START);
-	
-		}
-		JPanel statPanel = new JPanel();
-		statPanel.setLayout(new BoxLayout(statPanel, BoxLayout.PAGE_AXIS));
-		statPanel.add(new JScrollPane(AdBlaster.getBannerTable(AdBlaster.ac, gd.pol)));
-		panel.add(statPanel, BorderLayout.SOUTH);
-	
-		panel.setPreferredSize(new Dimension(800,600));
-		frame.setSize(800,600);
-		frame.addWindowListener(new WindowListener(){
-			public void windowOpened(WindowEvent e) {			}
-	
-			public void windowClosing(WindowEvent e) {			
-				System.exit(0);
-			}
-	
-			public void windowClosed(WindowEvent e) {		
-				System.exit(0);
-			}
-	
-			public void windowIconified(WindowEvent e) {			}
-			public void windowDeiconified(WindowEvent e) {			}
-			public void windowActivated(WindowEvent e) {			}
-			public void windowDeactivated(WindowEvent e) {			}}
-		);
-		frame.pack();
-		frame.setVisible(true);
+			JPanel statPanel = new JPanel();
+			statPanel.setLayout(new BoxLayout(statPanel, BoxLayout.PAGE_AXIS));
+			statPanel.add(new JScrollPane(AdBlaster.getBannerTable(AdBlaster.ac, gd.pol)));
+			panel.add(statPanel, BorderLayout.SOUTH);
+		
+			panel.setPreferredSize(new Dimension(800,600));
+			frame.setSize(800,600);
+			frame.addWindowListener(new WindowListener(){
+				public void windowOpened(WindowEvent e) {			}
+		
+				public void windowClosing(WindowEvent e) {			
+					System.exit(0);
+				}
+		
+				public void windowClosed(WindowEvent e) {		
+					System.exit(0);
+				}
+		
+				public void windowIconified(WindowEvent e) {			}
+				public void windowDeiconified(WindowEvent e) {			}
+				public void windowActivated(WindowEvent e) {			}
+				public void windowDeactivated(WindowEvent e) {			}}
+			);
+			frame.pack();
+			frame.setVisible(true);
 
-		
+		}
 		System.out.println("Total time:" + (System.currentTimeMillis()- start_time));
 		// TODO Auto-generated method stub
 
@@ -141,23 +157,25 @@ public class AdBlaster {
 	private static void getChunk(AdBlasterThreadedInstance chunk, AdBlasterDbInstance instance) {
 		for (int i = 0; i < ac.getUserCount()-1; i++){
 			ProgressIndicator.show(i, ac.getUserCount());
-			if (ac.getUserByIndex(i).getID() % 1000 == 0){
+			if (ac.getUserByIndex(i).getID() % 1000 == offset){
 				Vector <BannerView>vec = instance.db.bv_db.getByUser(ac.getUserByIndex(i).getID());
 				for (BannerView bv : vec){
 					chunk.addView(bv);
 				}
 			}
 		}
+		offset++;
 		/*for (int i = 0; i < instance.getViewCount(); i++){
 			BannerView bv = instance.getView(i);
-			if (bv.getUser().id % 1000 == 0){
+			if (bv.getUser().id % 1000 == offset){
 				chunk.addView(bv);
 			}
-			if (i%1000 == 0){
+			if (i%1000 == offset){
 				System.out.println("Loaded bannerview " + i + ": " + bv);
 			}
 		}
-		*/
+		chunk.bannerCountMap = instance.bannerCountMap;
+		offset++;*/
 	}								
 					
 	static JTable getBannerTable(AbstractAdBlasterUniverse ac2, AdBlasterPolicy pol) {

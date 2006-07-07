@@ -285,7 +285,7 @@ public abstract class AbstractAdBlasterInstance {
 		return null;
 	}
 
-	void doSwap(Vector swaps, Banner endBanner) {
+	synchronized void doSwap(Vector swaps, Banner endBanner) {
 		//System.out.println("Swapping " + swaps);
 		Iterator it = swaps.iterator();
 		BannerView second = (BannerView)it.next();
