@@ -84,6 +84,7 @@ public class InsertServer implements Runnable {
 			//get usertime size userid age sex location interests page passback => bannerid
 			if (command.equals("get") && words.length == 12) {
 				int time = Integer.parseInt(words[1]);
+				byte size = Byte.parseByte(words[1]);
 				int userid = Integer.parseInt(words[3]);
 				int age = Integer.parseInt(words[4]);
 				int sex = Integer.parseInt(words[5]);
@@ -96,7 +97,7 @@ public class InsertServer implements Runnable {
 					//we don't create a new user object here to save on object creation overhead, just reuse one user repeatedly
 					user.fill(userid, age, sex, location, interests);
 					userDb.insert(user);
-					bannerViewDb.insert(userid, bannerid, time);
+					bannerViewDb.insert(userid, bannerid, time, size);
 					if (bannerViewDb.getBannerViewCount()%1000 == 0) {
 						System.out.println("Banner Count: " + bannerViewDb.getBannerViewCount());
 					}

@@ -63,12 +63,12 @@ public class BannerViewDatabase {
 		}
 	}
 	
-	public void insert(int uid, int bid, int time) throws DatabaseException {
+	public void insert(int uid, int bid, int time, byte size) throws DatabaseException {
 		try {
 			lastid++;
 			//ib.intToEntry(new Integer(lastid), key);
 			ib.intToEntry(lastid, key);
-			ib.intToEntry(bid,time,uid, data);
+			ib.intToEntry(bid,time,uid,size, data);
 			db.put(null, key, data);
 		} catch (DatabaseException dbe) {
 			lastid--;
