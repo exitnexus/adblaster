@@ -63,7 +63,8 @@ public class AdBlasterInstance extends AbstractAdBlasterInstance{
 			AdBlasterInstance instance) {
 		int randomPick = (int) (Math.random()*(universe.getUserCount()-1.0));
 		int time = (int) (Math.random()*60*60*24);
-		return new BannerView(instance, index++, ac.getUserByIndex(randomPick), null, time);
+		byte size = (byte) (Math.random()*8);
+		return new BannerView(instance, index++, ac.getUserByIndex(randomPick), null, time, size);
 	}
 
 	public static AdBlasterInstance randomInstance(int num, AdBlasterDbUniverse ac) {

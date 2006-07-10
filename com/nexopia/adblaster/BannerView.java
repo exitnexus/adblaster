@@ -13,15 +13,18 @@ class BannerView{
 	private Banner b;
 	private int time;
 	private int index;
+	private byte size;
 	private AbstractAdBlasterInstance inst;
 	
-	BannerView(AbstractAdBlasterInstance instance, int index, User u, Banner b, int t){
+	BannerView(AbstractAdBlasterInstance instance, int index, User u, Banner b, int t, byte size){
 		this.uid = u.getID(); this.b = b; time = t; inst = instance;
+		this.size = size;
 		this.index = index;
 	}
 	
-	BannerView(AbstractAdBlasterInstance instance, int index, int id, Banner b, int t){
+	BannerView(AbstractAdBlasterInstance instance, int index, int id, Banner b, int t, byte size){
 		this.uid = id; this.b = b; time = t; inst = instance;
+		this.size = size;
 		this.index = index;
 	}
 	
@@ -61,5 +64,9 @@ class BannerView{
 	 */
 	public int getUserID() {
 		return this.uid;
+	}
+
+	public byte getSize() {
+		return this.size;
 	}
 }

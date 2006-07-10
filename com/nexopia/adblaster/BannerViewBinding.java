@@ -46,7 +46,8 @@ class BannerViewBinding extends TupleBinding {
 		Banner b = ac.getBannerByID(index);//, BerkDBTester.bannerMap);
 		int time = ti.readInt();
 		int uid = ti.readInt();
-		return new BannerView(inst, currentIndex, uid, b,time);
+		byte size = ti.readByte();
+		return new BannerView(inst, currentIndex, uid, b,time, size);
 	}
 
 	/* (non-Javadoc)
@@ -64,6 +65,7 @@ class BannerViewBinding extends TupleBinding {
 		to.writeInt(bv.getBanner()==null?-1:bv.getBanner().getID());
 		to.writeInt(bv.getTime());
 		to.writeInt(bv.getUser().getID());
+		to.writeByte(bv.getSize());
 
 	}
 

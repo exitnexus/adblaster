@@ -56,7 +56,7 @@ class Banner{
 	}
 	
 	int index;
-	private int size;
+	private byte size;
 	
 	Banner(int id, int payrate, int maxHits, int campaignID, Vector locations, Vector ages, Vector sexes, Interests interests) {
 		this.index = counter();
@@ -84,7 +84,7 @@ class Banner{
 		this.locations = Utilities.stringToNegationVector(rs.getString("LOC"));
 		this.ages = Utilities.stringToNegationVector(rs.getString("AGE"));
 		this.sexes = Utilities.stringToVector(rs.getString("SEX"));
-		this.size = rs.getInt("BANNERSIZE");
+		this.size = rs.getByte("BANNERSIZE");
 		this.paytype = rs.getByte("PAYTYPE");
 		this.payrate = rs.getInt("PAYRATE");
 		if (this.getPayType() == Banner.PAYTYPE_CPC) {
@@ -252,5 +252,9 @@ class Banner{
 		} else {
 			return this.paytype;
 		}
+	}
+
+	public byte getSize() {
+		return this.size;
 	}
 }

@@ -97,6 +97,9 @@ public class InsertServer implements Runnable {
 					user.fill(userid, age, sex, location, interests);
 					userDb.insert(user);
 					bannerViewDb.insert(userid, bannerid, time);
+					if (bannerViewDb.getBannerViewCount()%1000 == 0) {
+						System.out.println("Banner Count: " + bannerViewDb.getBannerViewCount());
+					}
 				} catch (DatabaseException e) {
 					System.err.println("Failed to insert into bannerview database: "+Integer.parseInt(words[1])+" "+Integer.parseInt(words[2])+" "+Integer.parseInt(words[3]));
 					e.printStackTrace();

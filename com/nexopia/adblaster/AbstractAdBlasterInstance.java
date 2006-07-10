@@ -28,7 +28,9 @@ public abstract class AbstractAdBlasterInstance {
 	
 	
 	public boolean isValidBannerForView(BannerView bv, Banner b) {
-		return (b.validUser(bv.getUser()) && this.nearestWithinTimeRange(b, bv));
+		return (bv.getSize() == b.getSize() &&
+				b.validUser(bv.getUser()) &&
+				this.nearestWithinTimeRange(b, bv));
 	}
 
 
