@@ -7,7 +7,7 @@ import java.util.Arrays;
 public class AdBlasterPolicy implements I_Policy {
 	private HashMap<Banner, Float> coefficients;
 	AbstractAdBlasterUniverse universe;
-	Vector banners = null;
+	Vector<Banner> banners = null;
 	
 	public AdBlasterPolicy(AbstractAdBlasterUniverse ac) {
 		coefficients = new HashMap<Banner, Float>();
@@ -68,7 +68,7 @@ public class AdBlasterPolicy implements I_Policy {
 		int bestMatch = -1;
 		float bestScore = Float.NEGATIVE_INFINITY;
 		for (int j = 0; j < instance.universe.getBannerCount(); j++){
-			Banner b = (Banner) banners.get(j);
+			Banner b = banners.get(j);
 			float score = ((Float)coefficients.get(b)).floatValue();
 			if (score > bestScore){
 				if ( instance.count(b) < b.getMaxHits() ){
@@ -89,7 +89,7 @@ public class AdBlasterPolicy implements I_Policy {
 	}
 	
 
-	private Vector orderBannersByScore(AbstractAdBlasterInstance instance) {
+	private Vector<Banner> orderBannersByScore(AbstractAdBlasterInstance instance) {
 		Vector<Banner> vec = new Vector<Banner>();
 		//int bestMatch = -1;
 		//float bestScore = Float.NEGATIVE_INFINITY;

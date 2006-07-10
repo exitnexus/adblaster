@@ -17,11 +17,9 @@ import java.util.Vector;
 class Interests{
 	private HashMap<Integer, Boolean> checked;
 	private static final Random rand = new Random();
-	private int count;
 	
 	Interests(){
 	  checked = new HashMap<Integer, Boolean>();
-	  count = 0;
 	}
 	
 	Interests(String interests) {
@@ -33,15 +31,32 @@ class Interests{
 				continue;
 			}
 			try {
-				checked.put(new Integer(Integer.parseInt(token)), Boolean.TRUE);
+				checked.put(Integer.valueOf(Integer.parseInt(token)), Boolean.TRUE);
 			} catch (NumberFormatException nfe) {
 				System.err.println("Number Format Exception creating Interests: "+ nfe);
 				nfe.printStackTrace();
 				//do nothing for any value that can't be parsed as an in
 			}
 		}
-		count = getChecked().size();
 	}
+	
+	public void fill(String interests) {
+		String[] split = interests.split(",");
+		if (checked == null) {
+			checked = new HashMap<Integer, Boolean>();
+		}
+		if (!checked.isEmpty()) {
+			for (Integer integer : checked.keySet()) {
+				integer.free();
+			}
+			checked.clear();
+		}
+		for (int i=0; i<split.length; i++) {
+			checked.put(Integer.valueOf(Integer.parseInt(split[i])), Boolean.TRUE);
+		}
+	}
+
+	
 	
 	boolean has(Integer k) {
 		return checked.containsKey(k);
@@ -49,7 +64,6 @@ class Interests{
 	
 	public void add(Integer i) {
 		checked.put(i, Boolean.TRUE);
-		count++;
 	}
 	
 	Set getChecked() {
@@ -57,7 +71,7 @@ class Interests{
 	}
 	
 	int getCount(){
-		return count;
+		return checked.size();
 	}
 
 	public boolean hasAnyIn(Interests interests) {
@@ -106,5 +120,6 @@ class Interests{
 		return interests;
 	}
 
+	
 	
 }

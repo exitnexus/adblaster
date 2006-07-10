@@ -20,12 +20,20 @@ import javax.swing.table.DefaultTableModel;
 
 public class AdBlaster {
 
+	
+	
 	private static final int THREAD_COUNT = 10;
 	static int num_serves = 10;
 	static AdBlasterDbUniverse ac;
 	static BannerViewBinding instanceBinding;
 	private static int offset = 0;
-	
+	static {
+		ac = new AdBlasterDbUniverse();
+		AdBlasterDbInstance instanc = new AdBlasterDbInstance(ac);
+		instanceBinding = new BannerViewBinding(ac, instanc);
+		
+		
+	}
 	public static void main(String args[]){
 		long start_time = System.currentTimeMillis();
 		
@@ -62,7 +70,7 @@ public class AdBlaster {
 					AdBlasterThreadedOperation op = (AdBlasterThreadedOperation)r[j];
 					if (!op.isFinished()) {
 						try {
-							t.wait();
+							t[j].wait();
 						} catch (Exception e1) {
 							e1.printStackTrace();
 							System.exit(0);

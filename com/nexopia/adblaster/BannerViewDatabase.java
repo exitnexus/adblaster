@@ -63,6 +63,19 @@ public class BannerViewDatabase {
 		}
 	}
 	
+	public void insert(int uid, int bid, int time) throws DatabaseException {
+		try {
+			lastid++;
+			//ib.intToEntry(new Integer(lastid), key);
+			ib.intToEntry(lastid, key);
+			ib.intToEntry(bid,time,uid, data);
+			db.put(null, key, data);
+		} catch (DatabaseException dbe) {
+			lastid--;
+			throw dbe;
+		}
+	}
+	
 	BannerTimeKeyCreator bt = new BannerTimeKeyCreator();
 	DatabaseEntry searchKey = new DatabaseEntry();
 	DatabaseEntry searchData = new DatabaseEntry();
@@ -78,7 +91,7 @@ public class BannerViewDatabase {
 		return lastid;
 	}
 	
-	public void close() throws DatabaseException {
+	public synchronized void close() throws DatabaseException {
 		this.closeDatabases();
 		env.close();
 	}

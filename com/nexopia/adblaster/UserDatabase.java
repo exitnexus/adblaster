@@ -177,7 +177,7 @@ public class UserDatabase {
 		return this.userCount;
 	}
 	
-	public void close() throws DatabaseException {
+	public synchronized void close() throws DatabaseException {
 		this.closeDatabases();
 		this.env.sync();
 		env.cleanLog();

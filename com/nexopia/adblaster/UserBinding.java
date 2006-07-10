@@ -68,8 +68,8 @@ class UserBinding extends TupleBinding implements SecondaryKeyCreator {
 		BannerViewBinding bvb = AdBlaster.instanceBinding;
 		bvb.setIndex(ib.entryToInt(key));
 		BannerView bv = (BannerView) bvb.entryToObject(data);
-		User u = bv.getUser();
-		tib.intsToEntry(u.getID(), bv.getIndex(), secondaryKey);
+		int uid = bv.getUserID();
+		tib.intsToEntry(uid, bv.getIndex(), secondaryKey);
 		return true;
 	}
 

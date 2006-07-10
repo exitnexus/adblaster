@@ -38,7 +38,7 @@ public class IntegerBinding extends TupleBinding {
 		to.writeInt(i.intValue());
 	}
 
-    protected TupleOutput getTupleOutput(int i) {
+    protected TupleOutput getTupleOutput() {
         int byteSize = getTupleBufferSize();
         if (byteSize != 0) {
             return new TupleOutput(new byte[byteSize]);
@@ -48,9 +48,16 @@ public class IntegerBinding extends TupleBinding {
     }
 
 	public void intToEntry(int i, DatabaseEntry entry) {
-        TupleOutput output = getTupleOutput(i);
+        TupleOutput output = getTupleOutput();
 		output.writeInt(i);
         outputToEntry(output, entry);
 	}
 
+	public void intToEntry(int i, int j, int k, DatabaseEntry entry) {
+        TupleOutput output = getTupleOutput();
+		output.writeInt(i);
+		output.writeInt(j);
+		output.writeInt(k);
+        outputToEntry(output, entry);
+	}
 }

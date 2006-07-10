@@ -32,10 +32,30 @@ class User {
 		}
 	}
 	
+	User() {
+		interests = null;
+		id=0;
+		age=0;
+		sex=0;
+		location=0;
+	}
+	
 	User(int id, byte age, byte sex, short location, String interests) {
 		this(id,age,sex,location,new Interests(interests));
 	}
 
+	public void fill(int userid, int age, int sex, int location, String interests) {
+		this.id = userid;
+		this.age = (byte)age;
+		this.sex = (byte)sex;
+		this.location = (short)location;
+		if (this.interests == null) {
+			this.interests = new Interests(interests);
+		} else {
+			this.interests.fill(interests);
+		}
+	}
+	
 	User(int id, byte age, byte sex, short location, Interests interests) {
 		this.id = id;
 		this.age = age;
@@ -99,4 +119,6 @@ class User {
 		User u = new User(id, age, sex, location, interests);
 		return u;
 	}
+
+	
 }

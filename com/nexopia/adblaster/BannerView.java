@@ -13,7 +13,7 @@ class BannerView{
 	private Banner b;
 	private int time;
 	private int index;
-	AbstractAdBlasterInstance inst;
+	private AbstractAdBlasterInstance inst;
 	
 	BannerView(AbstractAdBlasterInstance instance, int index, User u, Banner b, int t){
 		this.uid = u.getID(); this.b = b; time = t; inst = instance;
