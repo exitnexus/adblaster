@@ -71,10 +71,16 @@ public class Utilities {
 					v.add(Integer.NEGATE);
 				} else {
 					v.add(Integer.IDENTITY);
-					v.add(Integer.valueOf(Utilities.pageDb.getPage(pages[i])));
+					int page = Utilities.pageDb.getPage(pages[i]);
+					if (page != 0) {
+						v.add(Integer.valueOf(Utilities.pageDb.getPage(pages[i])));
+					}
 				}
 			} else {
-				v.add(Integer.valueOf(Utilities.pageDb.getPage(pages[i])));
+				int page = Utilities.pageDb.getPage(pages[i]);
+				if (page != 0) {
+					v.add(Integer.valueOf(Utilities.pageDb.getPage(pages[i])));
+				}
 			}
 		}
 		return v;

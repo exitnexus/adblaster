@@ -84,8 +84,11 @@ public class PageDatabase {
 	public int getPage(String page) {
 		sb.objectToEntry(page, key);
 		try {
-			db.get(null, key, data, null);
-			return ib.entryToInt(data);
+			if (db.get(null, key, data, null) == OperationStatus.SUCCESS) {
+				return ib.entryToInt(data);
+			} else {
+				return 0;
+			}
 		} catch (DatabaseException dbe) {
 			System.err.println("Database error loading page from database, returning 0 index.");
 			return 0;

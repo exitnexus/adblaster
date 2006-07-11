@@ -156,11 +156,4 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 	public Banner getBannerByID(int i) {
 		return b.get(new Integer(i));
 	}
-
-	public User getRandomUser() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-
 }
