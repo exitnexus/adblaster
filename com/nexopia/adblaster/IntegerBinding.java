@@ -53,12 +53,13 @@ public class IntegerBinding extends TupleBinding {
         outputToEntry(output, entry);
 	}
 
-	public void intToEntry(int i, int j, int k, byte l, DatabaseEntry entry) {
+	public void intBannerViewToEntry(int i, int j, int k, byte l, int m, DatabaseEntry entry) {
         TupleOutput output = getTupleOutput();
 		output.writeInt(i);
 		output.writeInt(j);
 		output.writeInt(k);
 		output.writeByte(l);
-        outputToEntry(output, entry);
+		output.writeInt(m);
+		outputToEntry(output, entry);
 	}
 }

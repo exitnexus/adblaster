@@ -47,7 +47,8 @@ class BannerViewBinding extends TupleBinding {
 		int time = ti.readInt();
 		int uid = ti.readInt();
 		byte size = ti.readByte();
-		return new BannerView(inst, currentIndex, uid, b,time, size);
+		int page = ti.readInt();
+		return new BannerView(inst, currentIndex, uid, b,time, size, page);
 	}
 
 	/* (non-Javadoc)
@@ -66,6 +67,7 @@ class BannerViewBinding extends TupleBinding {
 		to.writeInt(bv.getTime());
 		to.writeInt(bv.getUser().getID());
 		to.writeByte(bv.getSize());
+		to.writeInt(bv.getPage());
 
 	}
 

@@ -8,7 +8,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.MissingResourceException;
-import java.util.StringTokenizer;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -84,7 +83,7 @@ public class InsertServer implements Runnable {
 			//get usertime size userid age sex location interests page passback => bannerid
 			if (command.equals("get") && words.length == 12) {
 				int time = Integer.parseInt(words[1]);
-				byte size = Byte.parseByte(words[1]);
+				byte size = Byte.parseByte(words[2]);
 				int userid = Integer.parseInt(words[3]);
 				int age = Integer.parseInt(words[4]);
 				int sex = Integer.parseInt(words[5]);
@@ -97,7 +96,8 @@ public class InsertServer implements Runnable {
 					//we don't create a new user object here to save on object creation overhead, just reuse one user repeatedly
 					user.fill(userid, age, sex, location, interests);
 					userDb.insert(user);
-					bannerViewDb.insert(userid, bannerid, time, size);
+					int pageIndex = pageDb.insert(page);
+					bannerViewDb.insert(userid, bannerid, time, size, pageIndex);
 					if (bannerViewDb.getBannerViewCount()%1000 == 0) {
 						System.out.println("Banner Count: " + bannerViewDb.getBannerViewCount());
 					}
@@ -112,8 +112,10 @@ public class InsertServer implements Runnable {
 				out.println("Shutting down...");
 				shutdown = true;
 				try {
+					pageDb.dump();
 					userDb.close();
 					bannerViewDb.close();
+					pageDb.close();
 				} catch (DatabaseException dbe) {
 					System.err.println("Databases not closed properly at shutdown.");
 					dbe.printStackTrace();
@@ -140,6 +142,7 @@ public class InsertServer implements Runnable {
 	private static BannerViewDatabase bannerViewDb;
 	private static User user; //We just keep reusing this object when inserting into the user db
 	private static UserDatabase userDb;
+	private static PageDatabase pageDb;
 	
 	/**
 	 * @param args
@@ -148,6 +151,7 @@ public class InsertServer implements Runnable {
 		try {
 			bannerViewDb = new BannerViewDatabase();
 			userDb = new UserDatabase();
+			pageDb = new PageDatabase();
 			user = new User();
 		} catch (DatabaseException dbe) {
 			System.err.println("Unable to open databases: " + dbe);
