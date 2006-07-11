@@ -1,6 +1,5 @@
 package com.nexopia.adblaster;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -30,6 +29,7 @@ public abstract class AbstractAdBlasterInstance {
 	public boolean isValidBannerForView(BannerView bv, Banner b) {
 		return (bv.getSize() == b.getSize() &&
 				b.validUser(bv.getUser()) &&
+				b.validPage(bv.getPage()) &&
 				this.nearestWithinTimeRange(b, bv));
 	}
 

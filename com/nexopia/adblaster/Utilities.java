@@ -9,6 +9,8 @@ package com.nexopia.adblaster;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+import com.sleepycat.je.DatabaseException;
+
 /**
  * @author wolfe
  *
@@ -16,6 +18,17 @@ import java.util.Vector;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class Utilities {
+	public static PageDatabase pageDb;
+	static {
+		try {
+			pageDb = new PageDatabase();
+		} catch (DatabaseException dbe) {
+			System.err.println("Unable to open the page database, terminating.");
+			dbe.printStackTrace();
+			System.exit(-1);
+		}
+	}
+	
 	public static Vector<Integer> stringToVector(String string) {
 		StringTokenizer st = new StringTokenizer(string, ",");
 		Vector<Integer> v = new Vector<Integer>();
@@ -40,6 +53,24 @@ public class Utilities {
 			v.insertElementAt(Integer.IDENTITY, 0);
 		}
 		
+		return v;
+	}
+
+	public static Vector<Integer> stringToPageNegationVector(String string) {
+		String[] pages = string.split(",");
+		Vector<Integer> v = new Vector<Integer>();
+		for (int i=0; i<pages.length; i++) {
+			if (i==0) {
+				if (Integer.parseInt(pages[i]) == 0) {
+					v.add(Integer.NEGATE);
+				} else {
+					v.add(Integer.IDENTITY);
+					v.add(Integer.valueOf(Utilities.pageDb.getPage(pages[i])));
+				}
+			} else {
+				v.add(Integer.valueOf(Utilities.pageDb.getPage(pages[i])));
+			}
+		}
 		return v;
 	}
 }

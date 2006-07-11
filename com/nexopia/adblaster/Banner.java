@@ -23,9 +23,10 @@ class Banner{
 	int payrate;
 	byte paytype;
 	private int maxHits;
-	Vector locations;
-	Vector ages;
-	Vector sexes;
+	Vector<Integer> locations;
+	Vector<Integer> ages;
+	Vector<Integer> sexes;
+	Vector<Integer> pages;
 	private int viewsperuser;
 	private int limitbyperiod;
 	Campaign campaign;
@@ -58,7 +59,7 @@ class Banner{
 	int index;
 	private byte size;
 	
-	Banner(int id, int payrate, int maxHits, int campaignID, Vector locations, Vector ages, Vector sexes, Interests interests) {
+	Banner(int id, int payrate, int maxHits, int campaignID, Vector<Integer> locations, Vector<Integer> ages, Vector<Integer> sexes, Interests interests) {
 		this.index = counter();
 		this.id = id;
 		this.payrate = payrate;
@@ -84,6 +85,7 @@ class Banner{
 		this.locations = Utilities.stringToNegationVector(rs.getString("LOC"));
 		this.ages = Utilities.stringToNegationVector(rs.getString("AGE"));
 		this.sexes = Utilities.stringToVector(rs.getString("SEX"));
+		this.pages = Utilities.stringToPageNegationVector(rs.getString("PAGE"));
 		this.size = rs.getByte("BANNERSIZE");
 		this.paytype = rs.getByte("PAYTYPE");
 		this.payrate = rs.getInt("PAYRATE");
@@ -122,10 +124,10 @@ class Banner{
 		s += this.size;
 		return s;
 	}
-	public Vector getAges() {
+	public Vector<Integer> getAges() {
 		return ages;
 	}
-	public void setAges(Vector ages) {
+	public void setAges(Vector<Integer> ages) {
 		this.ages = ages;
 	}
 	public Interests getInterests() {
@@ -134,10 +136,10 @@ class Banner{
 	public void setInterests(Interests interests) {
 		this.interests = interests;
 	}
-	public Vector getLocations() {
+	public Vector<Integer> getLocations() {
 		return locations;
 	}
-	public void setLocations(Vector locations) {
+	public void setLocations(Vector<Integer> locations) {
 		this.locations = locations;
 	}
 	public int getMaxHits() {
@@ -146,10 +148,10 @@ class Banner{
 	public void setMaxHits(int maxHits) {
 		this.maxHits = maxHits;
 	}
-	public Vector getSexes() {
+	public Vector<Integer> getSexes() {
 		return sexes;
 	}
-	public void setSexes(Vector sexes) {
+	public void setSexes(Vector<Integer> sexes) {
 		this.sexes = sexes;
 	}
 	public int getPayrate() {
@@ -256,5 +258,23 @@ class Banner{
 
 	public byte getSize() {
 		return this.size;
+	}
+
+	public boolean validPage(int page) {
+		if (pages.get(0) == Integer.NEGATE) {
+			for (int i=1; i<pages.size(); i++) {
+				if (pages.get(i).intValue() == page) {
+					return false;
+				}
+			}
+			return true;
+		} else {
+			for (int i=1; i<pages.size(); i++) {
+				if (pages.get(i).intValue() == page) {
+					return true;
+				}
+			}
+			return false;
+		}
 	}
 }
