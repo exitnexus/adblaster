@@ -57,6 +57,12 @@ public class Utilities {
 	}
 
 	public static Vector<Integer> stringToPageNegationVector(String string) {
+		if (string.equals("")){
+			Vector<Integer> vec = new Vector<Integer>();
+			vec.add(Integer.NEGATE);
+			return vec;
+		}				
+
 		String[] pages = string.split(",");
 		Vector<Integer> v = new Vector<Integer>();
 		for (int i=0; i<pages.length; i++) {

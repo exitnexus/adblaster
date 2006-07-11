@@ -46,6 +46,7 @@ public class AdBlaster {
 		AdBlasterDbInstance instanc = new AdBlasterDbInstance(ac);
 		instanceBinding = new BannerViewBinding(ac, instanc);
 		((AdBlasterDbInstance)instanc).load();
+		System.out.println("Total original profit: " + instanc.totalProfit());
 		GlobalData gd = new GlobalData(instanc, pol);
 		
 		System.out.println("Chunking.");
