@@ -61,7 +61,7 @@ public class Utilities {
 		Vector<Integer> v = new Vector<Integer>();
 		for (int i=0; i<pages.length; i++) {
 			if (i==0) {
-				if (Integer.parseInt(pages[i]) == 0) {
+				if (pages[i].equals("0")) {
 					v.add(Integer.NEGATE);
 				} else {
 					v.add(Integer.IDENTITY);
