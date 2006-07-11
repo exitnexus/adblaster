@@ -27,7 +27,7 @@ public abstract class AbstractAdBlasterInstance {
 	
 	
 	public boolean isValidBannerForView(BannerView bv, Banner b) {
-		return (bv.getSize() == b.getSize() &&
+		return (b == null) || (bv.getSize() == b.getSize() &&
 				b.validUser(bv.getUser()) &&
 				b.validPage(bv.getPage()) &&
 				this.nearestWithinTimeRange(b, bv));
@@ -38,6 +38,9 @@ public abstract class AbstractAdBlasterInstance {
 	
 	/*Poorly named... detects whether a bannerview satisfies time period per user*/
 	private boolean nearestWithinTimeRange(Banner b, BannerView bv) {
+		if (b.getViewsperuser() == 0){
+			return true;
+		}
 		//if (((Integer)bannerCountMap.get(b)).intValue()+1 >= b.getViewsperuser()){
 			Vector<BannerView> range = scan(b, bv);
 			//System.out.println(Arrays.toString(range.toArray()));
@@ -129,7 +132,7 @@ public abstract class AbstractAdBlasterInstance {
 	//potentially have frequency conflicts the vector also contains @param bv.
 	private Vector<BannerView> scan(Banner b, BannerView bv) {
 		if (allMatching == null){
-			System.out.println("Building map." + this.getClass());
+			System.out.println("Building map: " + this.getClass());
 			allMatching = getAllMatching();
 		}
 		User user = bv.getUser();
@@ -139,7 +142,8 @@ public abstract class AbstractAdBlasterInstance {
 		
 		//put bv in the list as well
 		vec.add(bv);
-		return orderBannersByTime(vec);
+		//return orderBannersByTime(vec);
+		return vec;
 	}
 
 	//returns a time sorted vector of bannerviews that are from the same user and campaign that could 
@@ -156,7 +160,8 @@ public abstract class AbstractAdBlasterInstance {
 		
 		//put bv in the list as well
 		vec.add(bv);
-		return orderBannersByTime(vec);
+		//return orderBannersByTime(vec);
+		return vec;
 	}
 	
 	private Vector<BannerView> getAllMatching(Vector<BannerView> vec, Campaign c, int time, int period) {

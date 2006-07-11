@@ -82,7 +82,8 @@ public class UserDatabase {
 		if (u != null){
 			return u;
 		}
-		throw new UnsupportedOperationException();
+		return null;
+		//throw new UnsupportedOperationException();
 	}
 	
 	public void refreshUserCount() {

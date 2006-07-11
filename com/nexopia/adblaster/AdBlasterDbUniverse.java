@@ -6,7 +6,7 @@ import com.sleepycat.je.DatabaseException;
 
 public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 	private BannerDatabase bannerDB;
-	private UserDatabase userDB;
+	UserDatabase userDB;
 	
 	public AdBlasterDbUniverse(){
 		try {
@@ -77,5 +77,10 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 
 	public User getUserByIndex(int randomPick) {
 		return userDB.getUserByIndex(randomPick);
+	}
+
+	public void addUser(User u) {
+		userDB.cache.put(u.id, u);
+		
 	}
 }

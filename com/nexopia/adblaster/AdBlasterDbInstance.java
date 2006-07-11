@@ -60,9 +60,7 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 		}
 	}
 
-	//TODO Don't know how this should behave, it needs to be dealt with
 	public void fillInstance(I_Policy pol) {
-		/* Doesn't really do anything */
 		System.out.println("Filling " + getViewCount() + " instances.");
 		long time = System.currentTimeMillis();
 		for (int i = 0; i < getViewCount(); i++){

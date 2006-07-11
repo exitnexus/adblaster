@@ -16,13 +16,13 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 	@Override
 	public void fillInstance(I_Policy pol) {
 		long time = System.currentTimeMillis();
-		for (int i = 0; i < getViewCount(); i++){
+		/*for (int i = 0; i < getViewCount(); i++){
 			if ((System.currentTimeMillis() - time) > 5000){
 				System.out.println("..." + ((float)i/(float)getViewCount())*100 + "% complete clearing.");
 				time = System.currentTimeMillis();
 			}
 			getView(i).setBanner(null);
-		}
+		}*/
 		for (int i = 0; i < getViewCount(); i++){
 			BannerView bv = getView(i);
 			if ((System.currentTimeMillis() - time) > 5000){

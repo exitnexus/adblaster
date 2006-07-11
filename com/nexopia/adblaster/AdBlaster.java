@@ -20,9 +20,7 @@ import javax.swing.table.DefaultTableModel;
 
 public class AdBlaster {
 
-	
-	
-	private static final int THREAD_COUNT = 10;
+	private static final int THREAD_COUNT = 4;
 	static int num_serves = 10;
 	static AdBlasterDbUniverse ac;
 	static BannerViewBinding instanceBinding;
@@ -59,18 +57,26 @@ public class AdBlaster {
 		Runnable[] r = new Runnable[THREAD_COUNT];
 		Thread[] t = new Thread[THREAD_COUNT];
 		for (int i = 0; i < 5; i++){
+			for (int j = 0; j < instanc.getViewCount(); j++){
+				BannerView bv = instanc.getView(j);
+				bv.setBanner(null);
+			}
 			for (int j=0; j<THREAD_COUNT; j++) {
-				r[j] = new AdBlasterThreadedOperation(gd, chunk[j], "ThreadSet " + j);
+				if (i == 0 || i == 4){
+					r[j] = new AdBlasterThreadedOperation(gd, chunk[j], "ThreadSet " + j, true);
+				} else {
+					r[j] = new AdBlasterThreadedOperation(gd, chunk[j], "ThreadSet " + j, false);
+				}
 				t[j] = new Thread(r[j], "operateOnChunk");
 				
 				t[j].start();
 			}
 			for (int j=0; j<THREAD_COUNT; j++) {
-				synchronized (t[j]){
+				synchronized (r[j]){
 					AdBlasterThreadedOperation op = (AdBlasterThreadedOperation)r[j];
 					if (!op.isFinished()) {
 						try {
-							t[j].wait();
+							r[j].wait();
 						} catch (Exception e1) {
 							e1.printStackTrace();
 							System.exit(0);
@@ -80,8 +86,6 @@ public class AdBlaster {
 			}
 		}
 
-		for (int k=0; k<THREAD_COUNT; k++) {
-			
 			JFrame frame = new JFrame("AdBlaster Test Main Window");
 			JPanel panel = new JPanel(new BorderLayout());
 			
@@ -92,41 +96,44 @@ public class AdBlaster {
 			JPanel resultPanel = new JPanel(new BorderLayout());
 			
 			{
-				//Perfect results panel
-				resultPanel = new JPanel(new BorderLayout());
-				JScrollPane scroll = new JScrollPane(resultPanel);
-				tab.addTab("Perfect", scroll);
-				DefaultTableModel model = new DefaultTableModel(chunk[k].getViewCount(),3);
-				JTable table = new JTable(model);
-				for (int j = 0; j < chunk[k].getViewCount(); j++){
-					model.setValueAt(chunk[k].getView(j).getUser(), j,0);
-					model.setValueAt(chunk[k].getView(j).getBanner(), j,1);
-					model.setValueAt(AdBlaster.outputTime(chunk[k].getView(j).getTime()), j,2);
-				}
-				resultPanel.add(table, BorderLayout.CENTER);
-				JPanel statsPanel = new JPanel(new FlowLayout());
-				statsPanel.add(new JTextField(""+chunk[k].totalProfit()));
-				statsPanel.add(new JTextField(""+chunk[k].totalProfit()));
-				resultPanel.add(statsPanel, BorderLayout.PAGE_START);
-		
-			}		
-			{
 				//Actual final results.
-				chunk[k].fillInstance(gd.pol);
+				//instanc.fillInstance(gd.pol);
 				resultPanel = new JPanel(new BorderLayout());
 				JScrollPane scroll = new JScrollPane(resultPanel);
 				tab.addTab("Final", scroll);
-				DefaultTableModel model = new DefaultTableModel(chunk[k].getViewCount(),3);
+				DefaultTableModel model = new DefaultTableModel(instanc.getViewCount(),3);
 				JTable table = new JTable(model);
-				for (int j = 0; j < chunk[k].getViewCount(); j++){
-					model.setValueAt(chunk[k].getView(j).getUser(), j,0);
-					model.setValueAt(chunk[k].getView(j).getBanner(), j,1);
-					model.setValueAt(AdBlaster.outputTime(chunk[k].getView(j).getTime()), j,2);
+				for (int j = 0; j < Math.min(instanc.getViewCount(),1000); j++){
+					model.setValueAt(instanc.getView(j).getUser(), j,0);
+					model.setValueAt(instanc.getView(j).getBanner(), j,1);
+					model.setValueAt(AdBlaster.outputTime(instanc.getView(j).getTime()), j,2);
 				}
 				resultPanel.add(table, BorderLayout.CENTER);
 				JPanel statsPanel = new JPanel(new FlowLayout());
-				statsPanel.add(new JTextField(""+chunk[k].totalProfit()));
-				statsPanel.add(new JTextField(""+chunk[k].totalProfit()));
+				//statsPanel.add(new JTextField(""+instanc.totalProfit()));
+				/*
+				for (int j = 0; j < instanc.getViewCount(); j++){
+					BannerView bv = instanc.getView(j);
+					bv.setBanner(null);
+				}
+				float pro = 0;
+				for (int j = 0; j < 10000; j++){
+					System.out.println((float)j/100.0f + "% calculating final profit.");
+					AdBlasterThreadedInstance f = new AdBlasterThreadedInstance(gd);
+					for (int i = 0; i < ac.getUserCount()-1; i++){
+						ProgressIndicator.show(i, ac.getUserCount());
+						if (ac.getUserByIndex(i).getID() % 10000 == j){
+							Vector <BannerView>vec = instanc.db.bv_db.getByUser(ac.getUserByIndex(i).getID());
+							for (BannerView bv : vec){
+								f.addView(bv);
+							}
+						}
+					}
+					f.fillInstance(pol);
+					pro += f.totalProfit();
+				}
+				statsPanel.add(new JTextField(""+pro));
+				*/
 				resultPanel.add(statsPanel, BorderLayout.PAGE_START);
 		
 			}
@@ -156,7 +163,6 @@ public class AdBlaster {
 			frame.pack();
 			frame.setVisible(true);
 
-		}
 		System.out.println("Total time:" + (System.currentTimeMillis()- start_time));
 		// TODO Auto-generated method stub
 
@@ -165,7 +171,7 @@ public class AdBlaster {
 	private static void getChunk(AdBlasterThreadedInstance chunk, AdBlasterDbInstance instance) {
 		for (int i = 0; i < ac.getUserCount()-1; i++){
 			ProgressIndicator.show(i, ac.getUserCount());
-			if (ac.getUserByIndex(i).getID() % 1000 == offset){
+			if (ac.getUserByIndex(i).getID() % 10000 == offset){
 				Vector <BannerView>vec = instance.db.bv_db.getByUser(ac.getUserByIndex(i).getID());
 				for (BannerView bv : vec){
 					chunk.addView(bv);

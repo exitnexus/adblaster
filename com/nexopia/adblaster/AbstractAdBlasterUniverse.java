@@ -4,8 +4,6 @@ import java.util.Collection;
 
 public abstract class AbstractAdBlasterUniverse {
 	
-	abstract protected void init(int u_num, int b_num);
-	
 	abstract public Banner getBannerByIndex(int i);
 	abstract public Banner getBannerByID(int i);
 

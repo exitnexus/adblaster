@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Vector;
 import java.util.Arrays;
 
+import javax.swing.JOptionPane;
+
 public class AdBlasterPolicy implements I_Policy {
 	private HashMap<Banner, Float> coefficients;
 	AbstractAdBlasterUniverse universe;
@@ -21,14 +23,16 @@ public class AdBlasterPolicy implements I_Policy {
 		return new AdBlasterPolicy(ac);
 	}
 
-	public void increment(Banner b, double d) {
+	public void increment(Banner b, float d) {
 		coefficients.put(b, new Float(((Float)coefficients.get(b)).floatValue() + d));
-		banners = null;
 	}
 
-	public void incrementMultiply(Banner b, double d) {
-		coefficients.put(b, new Float(((Float)coefficients.get(b)).floatValue() * d));
-		banners = null;
+	public void incrementMultiply(Banner b, float d) {
+		float f = ((Float)coefficients.get(b)).floatValue() * d;
+		f = Math.min(f, 100000000.0f);
+		f = Math.max(f, 0.00000001f);
+		Float new_coef = new Float(f);
+		coefficients.put(b, new_coef);
 	}
 
 	public void upgradePolicy(AbstractAdBlasterInstance chunk, AdBlasterThreadedOperation op) {
@@ -42,7 +46,9 @@ public class AdBlasterPolicy implements I_Policy {
 
 		float count = -1;
 		float newcount = 0;
-		while((newcount = chunk.totalProfit()) != count){
+		int iterations = 0;
+		while((newcount = chunk.totalProfit()) != count && iterations < 50){
+			iterations++;
 			count = newcount;
 			op.iterativeImprove(chunk);
 		}
@@ -53,39 +59,76 @@ public class AdBlasterPolicy implements I_Policy {
 			int before = sbefore[i];
 			System.out.println("" + after + "  :  " + before + "  :  " + (float)after/(float)before);
 			float f = ((float)((1.0f + after) / (1.0f + before)));
-			this.incrementMultiply(b, f); 
+			this.incrementMultiply(b, (float)Math.pow(f, 1.0f)); 
+		}
+		
+		synchronized(banners) {
 			banners = null;
+			banners = orderBannersByScore(chunk);
 		}
 
 	}
 
 	public Banner getBestBanner(AbstractAdBlasterInstance instance, BannerView bv) {
-		//User u = bv.getUser();
-		//int t = bv.getTime();
 		if (banners == null){
 			banners = orderBannersByScore(instance);
 		}
-		int bestMatch = -1;
-		float bestScore = Float.NEGATIVE_INFINITY;
-		for (int j = 0; j < instance.universe.getBannerCount(); j++){
-			Banner b = banners.get(j);
-			float score = ((Float)coefficients.get(b)).floatValue();
-			if (score > bestScore){
-				if ( instance.count(b) < b.getMaxHits() ){
-					if (instance.isValidBannerForView(bv, b)){
-						/* If everything is working properly, this should be fine...
-						 * 
-						 */
-						if (true) return b;
-						bestScore = score;
-						bestMatch = j;
+		double total = 0;
+		for (int i = 0; i < banners.size(); i++){
+			Banner b = (Banner) banners.get(i);
+			total += ((Float)coefficients.get(b)).floatValue();
+		}
+
+		int number_loops = 0;
+		User u = bv.getUser();
+		while (true){
+			double r = Math.random() * total;
+			double density = 0;
+			int banner = -1;
+			for (int i = 0; i < banners.size(); i++){
+				Banner b = (Banner) banners.get(i);
+				density += ((Float)coefficients.get(b)).floatValue();
+				if (density > r){
+					banner = i;
+					break;
+				}
+			}
+			if (number_loops > 101){
+				//JOptionPane.showConfirmDialog(null, {""});
+				return null;
+			} 
+
+			if (number_loops++ > 100){
+				banner = 0;
+			} 
+
+			
+			if (banner == -1){
+				continue;
+			}
+			
+			int bestMatch = -1;
+			float bestScore = Float.NEGATIVE_INFINITY;
+			for (int j = banner; j < banners.size(); j++){
+				Banner b = (Banner) banners.get(j);
+				float score = ((Float)coefficients.get(b)).floatValue();
+				if (score > bestScore){
+					if ( instance.count(b) < b.getMaxHits() ){
+						if (instance.isValidBannerForView(bv, b)){
+							/* If everything is working properly, this should be fine...
+							 * 
+							 */
+							if (true) return b;
+							bestScore = score;
+							bestMatch = j;
+						}
 					}
 				}
 			}
 		}
-		
-		Banner banner = instance.universe.getBannerByIndex(bestMatch);
-		return banner;
+
+		//Banner banner = instance.universe.getBannerByIndex(bestMatch);
+		//return banner;
 	}
 	
 

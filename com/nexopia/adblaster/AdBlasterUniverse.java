@@ -5,6 +5,7 @@ package com.nexopia.adblaster;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.Vector;
 
@@ -16,35 +17,31 @@ import com.sleepycat.je.EnvironmentConfig;
  * 
  */
 public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
-	protected int num_interests;
-	private User u[];
-	private Banner b[];
+	private HashMap <Integer, User> u;
+	private HashMap <Integer, Banner> b;
 
-	protected void init(int u_num, int b_num){
-		u = new User[u_num];
-		b = new Banner[b_num];
-	}
-	
 	public int getBannerCount(){
-		return b.length;
+		return b.size();
 	}
-	protected void setBanner(int i, Banner banner) {
-		b[i] = banner;
+	protected void addBanner(Banner banner) {
+		b.put(new Integer(banner.id), banner);
 	}
 
 	public User getUser(int i) {
-		return u[i];
+		return u.get(new Integer(i));
 	}
 
 	public int getUserCount(){
-		return u.length;
+		return u.size();
 	}
-	protected void setUser(int i, User user) {
-		u[i] = user;
+	
+	protected void addUser(User user) {
+		u.put(new Integer(user.id), user);
 	}
 
 	public AdBlasterUniverse(int interests, int num_banners, int num_users){
-		this.init(num_users, num_banners);
+		u = new HashMap<Integer, User>();
+		b = new HashMap<Integer, Banner>();
 		
 		for (int i = 0; i < num_users; i++){
 			Random r = new Random(System.currentTimeMillis());
@@ -55,7 +52,7 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 			String inter = "1,4";
 			System.out.println(userid + ":" + age + ":" + sex + ":" + loc + ":" + inter);
 			
-			setUser(i, new User(userid, age, sex, loc, inter)); //TODO we're passing in a null database here which is bad in the long run
+			addUser(new User(userid, age, sex, loc, inter)); //TODO we're passing in a null database here which is bad in the long run
 		}
 		
 		for(int i = 0; i < num_banners; i++){
@@ -71,11 +68,15 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 			Vector<Integer> loc = new Vector<Integer>();
 			Vector<Integer> ages = new Vector<Integer>();
 			
-			setBanner(i, new Banner(i, payrate, maxHits, campaignID, loc, sexes, ages, inter));
+			addBanner(new Banner(i, payrate, maxHits, campaignID, loc, sexes, ages, inter));
 		}
-		num_interests = interests;
 	}
 	
+	public AdBlasterUniverse() {
+		u = new HashMap<Integer, User>();
+		b = new HashMap<Integer, Banner>();
+	}
+
 	public void makeMeADatabase(){
 		try {			
 
@@ -96,7 +97,7 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 		}
 	}
 
-	public static AdBlasterUniverse generateTestData(int num_banners, int num_users){
+	public static AdBlasterUniverse generateTestData(int num_banners, int num_users, int num_interests){
 		/*Generate ab set of test banners and parameters
 		 * 
 		 * data: 
@@ -115,7 +116,7 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 		 * */
 		AdBlasterUniverse ac = new AdBlasterUniverse(20,num_banners,num_users);
 		for (int i = 0; i < num_users; i++){
-			for (int j = 0; j < ac.num_interests; j++){
+			for (int j = 0; j < num_interests; j++){
 				if (Math.random() > 0.5){
 					ac.getUser(i).interests.add(new Integer(j));
 				}
@@ -126,16 +127,15 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 		/* Add a foolproof banner that never pays and never runs out.
 		 * 
 		 */
-		ac.getBanner(0).setPayrate(0);
-		ac.getBanner(0).setMaxHits(Integer.MAX_VALUE);
-
-		ac.getBanner(0).interests.getChecked().clear();
+		ac.getBannerByIndex(0).setPayrate(0);
+		ac.getBannerByIndex(0).setMaxHits(Integer.MAX_VALUE);
+		ac.getBannerByIndex(0).interests.getChecked().clear();
 
 		for(int i = 1; i < num_banners; i++){
-			ac.getBanner(i).setPayrate((int)(Math.random()*10));
-			for (int j = 0; j < ac.num_interests; j++){
+			ac.getBannerByIndex(i).setPayrate((int)(Math.random()*10));
+			for (int j = 0; j < num_interests; j++){
 				if (Math.random() > 0.95){
-					ac.getBanner(i).interests.add(new Integer(j));
+					ac.getBannerByIndex(i).interests.add(new Integer(j));
 				}
 			}
 		}
@@ -149,15 +149,12 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 		return Arrays.asList(b);
 	}
 
-	public Banner getBanner(int i) {
-		return b[i];
-	}
 	public Banner getBannerByIndex(int i) {
-		return b[i];
+		return (Banner) b.keySet().toArray()[i];
 	}
 
 	public Banner getBannerByID(int i) {
-		return b[i];
+		return b.get(new Integer(i));
 	}
 
 	public User getRandomUser() {
