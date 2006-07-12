@@ -38,46 +38,43 @@ public abstract class AbstractAdBlasterInstance {
 	
 	/*Poorly named... detects whether a bannerview satisfies time period per user*/
 	private boolean nearestWithinTimeRange(Banner b, BannerView bv) {
-		if (b.getViewsperuser() == 0){
-			return true;
+		Vector<BannerView> range = null;
+		if (b.getViewsperuser() != 0){
+			range = scan(b, bv);
+			for (int i = 0; (i + b.getViewsperuser()) < range.size(); i++) {
+				BannerView first = range.get(i);
+				BannerView last = range.get(i + b.getViewsperuser());
+				if (last.getTime() - first.getTime() <= b.getLimitbyperiod()) {
+					return false;
+				}
+			}
 		}
-		//if (((Integer)bannerCountMap.get(b)).intValue()+1 >= b.getViewsperuser()){
-			Vector<BannerView> range = scan(b, bv);
-			//System.out.println(Arrays.toString(range.toArray()));
-			for (int i = 0; (i + b.getViewsperuser()) < range.size(); i++){
-				BannerView first = range.get(i);
-				BannerView last = range.get(i+b.getViewsperuser());
-				if (last.getTime() - first.getTime() <= b.getLimitbyperiod()){
-					return false;
-				}
-			}
+		if (b.campaign.getViewsPerUser() != 0) {
 			Campaign c = b.getCampaign();
-			range = scan(c, bv);
-			//System.out.println(Arrays.toString(range.toArray()));
-			for (int i = 0; (i + c.getViewsPerUser()) < range.size(); i++){
+			if (range == null){
+				range = scan(c, bv);
+			}
+			for (int i = 0; (i + c.getViewsPerUser()) < range.size(); i++) {
 				BannerView first = range.get(i);
-				BannerView last = range.get(i+c.getViewsPerUser());
-				if (last.getTime() - first.getTime() <= c.getLimitByPeriod()){
+				BannerView last = range.get(i + c.getViewsPerUser());
+				if (last.getTime() - first.getTime() <= c.getLimitByPeriod()) {
 					return false;
 				}
 			}
-		//}
+		}
 		return true;
 		
 	}
 
-	/*private boolean nearestBeforeTimeRange(Banner b, BannerView bv) {
-		Vector<BannerView> range = scan(b, bv);
-		
-		for (int i = 0; (i + b.getViewsperuser()) < range.size(); i++){
-			BannerView first = (BannerView) range.get(i);
-			BannerView last = (BannerView) range.get(i+b.getViewsperuser());
-			if (last.getTime() - first.getTime() <= b.getLimitbyperiod()){
-				return false;
-			}
-		}
-		return true;
-	}*/
+	/*
+	 * private boolean nearestBeforeTimeRange(Banner b, BannerView bv) { Vector<BannerView>
+	 * range = scan(b, bv);
+	 * 
+	 * for (int i = 0; (i + b.getViewsperuser()) < range.size(); i++){
+	 * BannerView first = (BannerView) range.get(i); BannerView last =
+	 * (BannerView) range.get(i+b.getViewsperuser()); if (last.getTime() -
+	 * first.getTime() <= b.getLimitbyperiod()){ return false; } } return true; }
+	 */
 
 
 
@@ -238,7 +235,7 @@ public abstract class AbstractAdBlasterInstance {
 		
 	}
 	
-	protected void updateMap(BannerView bv) {
+	synchronized protected void updateMap(BannerView bv) {
 		Integer count = this.bannerCountMap.get(bv.getBanner());
 		this.bannerCountMap.put(bv.getBanner(), Integer.valueOf(count.intValue() + 1));
 	}
@@ -298,6 +295,9 @@ public abstract class AbstractAdBlasterInstance {
 		BannerView second = (BannerView)it.next();
 		this.bannerCountMap.put(second.getBanner(), 
 				new Integer(((Integer)bannerCountMap.get(second.getBanner())).intValue()-1));
+		if (bannerCountMap.get(second.getBanner()).intValue() < 0){
+			throw new UnsupportedOperationException();
+		}
 		for (; it.hasNext(); ){
 			BannerView first = second;
 			second = (BannerView)it.next();
@@ -319,14 +319,18 @@ public abstract class AbstractAdBlasterInstance {
 	 * @param bv
 	 * @param b
 	 */
-	protected void notifyChange(BannerView bv, Banner b){
+	synchronized protected void notifyChange(BannerView bv, Banner b){
 		if (bv.getBanner() != null){
 			this.bannerCountMap.put(bv.getBanner(), 
-					new Integer(((Integer)bannerCountMap.get(bv.getBanner())).intValue()-1));
+					new Integer((bannerCountMap.get(bv.getBanner())).intValue()-1));
+
+			if (bannerCountMap.get(bv.getBanner()).intValue() < 0){
+				throw new UnsupportedOperationException();
+			}
 		}
 		if (b != null){
 			this.bannerCountMap.put(b, 
-					new Integer(((Integer)bannerCountMap.get(b)).intValue()+1));
+					new Integer((bannerCountMap.get(b)).intValue()+1));
 		}
 	}
 

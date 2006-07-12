@@ -20,7 +20,7 @@ import javax.swing.table.DefaultTableModel;
 
 public class AdBlaster {
 
-	private static final int THREAD_COUNT = 4;
+	private static final int THREAD_COUNT = 10;
 	static int num_serves = 10;
 	static AdBlasterDbUniverse ac;
 	static BannerViewBinding instanceBinding;
@@ -173,7 +173,7 @@ public class AdBlaster {
 		for (int i = 0; i < ac.getUserCount()-1; i++){
 			ProgressIndicator.show(i, ac.getUserCount());
 			if (ac.getUserByIndex(i).getID() % 10000 == offset){
-				Vector <BannerView>vec = instance.db.bv_db.getByUser(ac.getUserByIndex(i).getID());
+				Vector <BannerView>vec = instance.db.getByUser(ac.getUserByIndex(i).getID());
 				for (BannerView bv : vec){
 					chunk.addView(bv);
 				}

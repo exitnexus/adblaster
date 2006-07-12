@@ -70,7 +70,7 @@ public class AdBlasterPolicy implements I_Policy {
 	}
 
 	public Banner getBestBanner(AbstractAdBlasterInstance instance, BannerView bv) {
-		synchronized (banners) {
+		synchronized(banners){
 			if (banners.isEmpty()){
 				banners = orderBannersByScore(instance);
 			}

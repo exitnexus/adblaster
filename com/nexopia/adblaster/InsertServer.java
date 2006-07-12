@@ -77,6 +77,7 @@ public class InsertServer implements Runnable {
 	private void processInput() throws IOException {
 		String input;
 		while ((input=in.readLine()) != null && !shutdown) {
+			//System.out.println("Received command " + input);
 			String[] words = input.split("\\s");
 			if (words.length == 0) continue;
 			String command = words[0];
@@ -129,6 +130,10 @@ public class InsertServer implements Runnable {
 				out.print("\n");
 			}
 			out.flush();
+			//if (!client.isConnected()){
+			//	System.out.println("Disconnected");
+			//	break;
+			//}
 		}
 		in.close();
 		out.close();
@@ -136,7 +141,7 @@ public class InsertServer implements Runnable {
 	}
  
 	
-	private static final int SERVER_PORT = 5555;
+	private static final int SERVER_PORT = 5556;
 	private static final int SOCKET_TIMEOUT = 500; //ms
 	private static boolean shutdown = false;
 	private static BannerViewDatabase bannerViewDb;

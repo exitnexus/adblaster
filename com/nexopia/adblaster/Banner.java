@@ -138,7 +138,7 @@ class Banner {
 		s += "sexes:" + this.sexes + this.sexes.isEmpty() + '\n' ;
 		s += "views per user:" + this.viewsperuser + '\n' ;
 		s += "views period:" + this.limitbyperiod + '\n' ;
-		s += this.size;
+		s += "size: " + this.size + '\n';
 		return s;
 	}
 	public Vector<Integer> getAges() {

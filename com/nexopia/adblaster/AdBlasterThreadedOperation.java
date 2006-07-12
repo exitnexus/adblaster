@@ -67,7 +67,11 @@ final class AdBlasterThreadedOperation implements Runnable {
 		if (junk){
 			createTab(chunk, tab, "Perfect");
 		}
-	
+
+		for (int i = 0; i < chunk.getViewCount(); i++){
+			chunk.getView(i).setBanner(null);
+		}
+
 		chunk.fillInstance(gd.pol);
 		
 		if (junk){
@@ -144,7 +148,7 @@ final class AdBlasterThreadedOperation implements Runnable {
 				BannerView bv = instanc.getView(j);
 				if (bv.getBanner() == null || bv.getBanner().getPayrate() < b.getPayrate()){
 					if (instanc.isValidBannerForView(bv,b)){
-						// single swapbreak;
+						// single swap
 						bv.setBanner(b);
 					}
 				}

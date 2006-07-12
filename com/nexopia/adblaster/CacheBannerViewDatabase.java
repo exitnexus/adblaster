@@ -40,4 +40,15 @@ public class CacheBannerViewDatabase {
 		return vec.get(index);
 //		return bv_db.get(index);
 	}
+
+	public Vector<BannerView> getByUser(int id) {
+		Vector<BannerView> vec = new Vector<BannerView>();
+		for (int i = 0; i < this.lastid; i++){
+			BannerView bv = this.get(i);
+			if (bv.getUserID() == id){
+				vec.add(bv);
+			}
+		}
+		return vec;
+	}
 }

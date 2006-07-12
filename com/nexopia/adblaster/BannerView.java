@@ -55,7 +55,7 @@ class BannerView{
 	}
 	
 	public String toString(){
-		return "Banner ID: " + ((b == null)?null:b.getID()) + " - Time: " + time + " User ID: " + uid; 
+		return "Banner ID: " + ((b == null)?null:b.getID()) + " - Time: " + time + " User ID: " + uid + " Size: " + size; 
 	}
 
 	public void setBannerWithoutFire(Banner b) {
@@ -76,4 +76,5 @@ class BannerView{
 	public int getPage() {
 		return this.page;
 	}
+
 }
