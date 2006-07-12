@@ -86,7 +86,7 @@ public class AdBlaster {
 				}
 			}
 		}
-
+		ac.saveCoefficients(pol.getCoefficients());
 			JFrame frame = new JFrame("AdBlaster Test Main Window");
 			JPanel panel = new JPanel(new BorderLayout());
 			

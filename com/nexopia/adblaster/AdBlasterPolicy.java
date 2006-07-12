@@ -12,6 +12,7 @@ public class AdBlasterPolicy implements I_Policy {
 	Vector<Banner> banners = null;
 	
 	public AdBlasterPolicy(AbstractAdBlasterUniverse ac) {
+		banners = new Vector<Banner>();
 		coefficients = new HashMap<Banner, Float>();
 		universe = ac;
 		for (int i = 0; i < ac.getBannerCount(); i++){
@@ -63,15 +64,16 @@ public class AdBlasterPolicy implements I_Policy {
 		}
 		
 		synchronized(banners) {
-			banners = null;
 			banners = orderBannersByScore(chunk);
 		}
 
 	}
 
 	public Banner getBestBanner(AbstractAdBlasterInstance instance, BannerView bv) {
-		if (banners == null){
-			banners = orderBannersByScore(instance);
+		synchronized (banners) {
+			if (banners.isEmpty()){
+				banners = orderBannersByScore(instance);
+			}
 		}
 		double total = 0;
 		for (int i = 0; i < banners.size(); i++){
@@ -186,6 +188,10 @@ public class AdBlasterPolicy implements I_Policy {
 		}
 		System.out.println(Arrays.toString(coefficients));
 		System.out.println(Arrays.toString(vec.toArray()));
+	}
+
+	public HashMap<Banner, Float> getCoefficients() {
+		return coefficients;
 	}
 
 }

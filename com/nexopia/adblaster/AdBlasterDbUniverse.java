@@ -1,6 +1,7 @@
 package com.nexopia.adblaster;
 
 import java.util.Collection;
+import java.util.HashMap;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -82,5 +83,9 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 	public void addUser(User u) {
 		userDB.cache.put(u.id, u);
 		
+	}
+
+	public void saveCoefficients(HashMap<Banner,Float> coefficients) {
+		bannerDB.saveCoefficients(coefficients);
 	}
 }

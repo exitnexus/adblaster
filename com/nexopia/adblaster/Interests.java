@@ -40,6 +40,11 @@ class Interests{
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
+	public Interests(Interests interests) {
+		checked = (HashMap<Integer, Boolean>) interests.checked.clone();
+	}
+
 	public void fill(String interests) {
 		String[] split = interests.split(",");
 		if (checked == null) {

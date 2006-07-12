@@ -12,7 +12,7 @@ import java.util.Vector;
 
 
 
-class Banner{
+class Banner {
 	public static final int PAYRATE_INHERIT = -1;
 	public static final int PAYTYPE_CPM = 0;
 	public static final int PAYTYPE_CPC = 1;
@@ -70,6 +70,23 @@ class Banner{
 		this.sexes = sexes;
 		this.interests = interests;
 	}
+	
+	@SuppressWarnings("unchecked") Banner(Banner b) {
+		this.index = counter();
+		this.id = b.id;
+		this.maxHits = b.maxHits;
+		this.campaign = b.campaign;
+		this.locations = (Vector<Integer>) b.locations.clone();
+		this.ages = (Vector<Integer>) b.ages.clone();
+		this.pages = (Vector<Integer>) b.pages.clone();
+		this.size = b.size;
+		this.paytype = b.paytype;
+		this.payrate = b.payrate;
+		this.viewsperuser = b.viewsperuser;
+		this.limitbyperiod = b.limitbyperiod;
+		this.interests = new Interests(b.interests);
+	}
+	
 	
 	Banner(ResultSet rs) throws SQLException {
 		this.index = counter();
@@ -197,7 +214,7 @@ class Banner{
 	 * @param interests2
 	 * @return
 	 */
-	private boolean validInterests(Interests userInterests) {
+	public boolean validInterests(Interests userInterests) {
 		return userInterests.hasAnyIn(interests);
 	}
 
@@ -205,7 +222,7 @@ class Banner{
 	 * @param sex
 	 * @return
 	 */
-	private boolean validSex(byte sex) {
+	public boolean validSex(byte sex) {
 		if (sexes.isEmpty()) {
 			return true;
 		}
@@ -220,7 +237,7 @@ class Banner{
 	 * @param location
 	 * @return
 	 */
-	private boolean validLocation(short location) {
+	public boolean validLocation(short location) {
 		Integer I = Integer.valueOf(location);
 		boolean valid;
 		if (locations.get(0).equals(Integer.NEGATE)) {
@@ -236,7 +253,7 @@ class Banner{
 	 * @param age
 	 * @return
 	 */
-	private boolean validAge(byte age) {
+	public boolean validAge(byte age) {
 		Integer I = Integer.valueOf(age);
 		boolean valid;
 		if (ages.get(0).equals(Integer.NEGATE)) {

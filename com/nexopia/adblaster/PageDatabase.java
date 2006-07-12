@@ -60,7 +60,7 @@ public class PageDatabase {
 	DatabaseEntry key = new DatabaseEntry();
 	DatabaseEntry data = new DatabaseEntry();
 
-	public int insert(String page) throws DatabaseException {
+	public synchronized int insert(String page) throws DatabaseException {
 		lastid++;
 		ib.intToEntry(lastid, data);
 		sb.objectToEntry(page, key);

@@ -6,6 +6,7 @@ package com.nexopia.adblaster;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -57,13 +58,13 @@ import java.util.Vector;
 public class BannerDatabase {
 	private HashMap<Integer, Banner> banners;
 	Vector<Integer> keyset = new Vector<Integer>();
-	
+	private Connection con; 
 	public BannerDatabase() {
 		banners = new HashMap<Integer, Banner>();
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			String url = "jdbc:mysql://192.168.0.50:3307/banner";
-			Connection con = DriverManager.getConnection(url, "nathan", "nathan");
+			con = DriverManager.getConnection(url, "nathan", "nathan");
 			String sql = "SELECT * FROM banners";
 			Statement stmt = con.createStatement();
 			ResultSet rs = stmt.executeQuery(sql);
@@ -107,6 +108,50 @@ public class BannerDatabase {
 	}
 	public static void main(String args[]){
 		new BannerDatabase();	
+	}
+
+	public void saveCoefficients(HashMap<Banner, Float> coefficients) {
+		Statement stmt;
+		try {
+			stmt = con.createStatement();
+			for (Banner banner: banners.values()) {
+				try {
+					if (coefficients.get(banner) != null) {
+						Float f = coefficients.get(banner);
+						System.out.println("Inserting banner " + banner.getID() + " with coefficient " + f);
+						stmt.executeUpdate("INSERT INTO `coefficients` SET `coefficient` = " 
+								+ f 
+								+ ", bannerid = " + banner.getID()
+								+ ", time = " + System.currentTimeMillis());
+					}
+				} catch (SQLException sqle) {
+					System.err.println("Error during coefficient insert.");
+					sqle.printStackTrace();
+				}
+			}
+		} catch (SQLException sqle) {
+			System.err.println("Unable to store coefficients in database.");
+			sqle.printStackTrace();
+		}
+	
+	}
+
+	public HashMap<Banner, Float> getCoefficientMap() {
+		HashMap<Banner,Float> coefficients = new HashMap<Banner,Float>();
+		Statement stmt;
+		try {
+			stmt = con.createStatement();
+			ResultSet rs = stmt.executeQuery("SELECT * FROM coefficients");
+			while (rs.next()) {
+				Integer bannerid = Integer.valueOf(rs.getInt("BANNERID"));
+				coefficients.put(banners.get(bannerid), new Float(rs.getFloat("COEFFICIENT")));
+				bannerid.free();
+			}
+		} catch (SQLException sqle) {
+			System.err.println("Unable to load coefficients from database.");
+			sqle.printStackTrace();
+		}
+		return coefficients;
 	}
 	
 }
