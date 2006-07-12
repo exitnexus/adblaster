@@ -6,6 +6,7 @@
  */
 package com.nexopia.adblaster;
 
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
@@ -15,15 +16,17 @@ import java.util.Vector;
 
 
 class Interests{
-	private HashMap<Integer, Boolean> checked;
+	private BitSet checked;
 	private static final Random rand = new Random();
+	private boolean negate;
 	
 	Interests(){
-	  checked = new HashMap<Integer, Boolean>();
+	  checked = new BitSet();
 	}
 	
-	Interests(String interests) {
-		this();
+	/*Interests(String interests) {
+		this(interests, false);
+		
 		StringTokenizer st = new StringTokenizer(interests, ",");
 		while (st.hasMoreTokens()) {
 			String token = st.nextToken();
@@ -38,48 +41,85 @@ class Interests{
 				//do nothing for any value that can't be parsed as an in
 			}
 		}
-	}
+	}*/
 	
-	@SuppressWarnings("unchecked")
 	public Interests(Interests interests) {
-		checked = (HashMap<Integer, Boolean>) interests.checked.clone();
+		checked = (BitSet) interests.checked.clone();
+	}
+
+	//if this constructor is used and true is passed in, then an empty
+	//string will mean all interests are true, should be true for banners/campaigns false for users
+	public Interests(String interests, boolean emptyMeansAll) {
+		checked = new BitSet();
+		if (emptyMeansAll && interests.length() == 0) {
+			negate = true;
+		} else {
+			negate = false;
+			String[] splitInterests = interests.split(",");
+			for (String interest : splitInterests) {
+				if (interest.equals("0")) {
+					negate = true;
+					continue;
+				} else {
+					try {
+						checked.set(Integer.parseInt(interest));
+					} catch (NumberFormatException e) {
+						System.err.println("Error parsing " + interest + " as an interest id.");
+						e.printStackTrace();
+					}
+				}
+			}
+		}
 	}
 
 	public void fill(String interests) {
-		String[] split = interests.split(",");
 		if (checked == null) {
-			checked = new HashMap<Integer, Boolean>();
+			checked = new BitSet();
 		}
-		if (!checked.isEmpty()) {
-			for (Integer integer : checked.keySet()) {
-				integer.free();
+		checked.clear();
+		negate = false;
+		String[] splitInterests = interests.split(",");
+		for (String interest : splitInterests) {
+			if (interest.equals("0")) {
+				negate = true;
+				continue;
+			} else {
+				try {
+					checked.set(Integer.parseInt(interest));
+				} catch (NumberFormatException e) {
+					System.err.println("Error parsing " + interest + " as an interest id.");
+					e.printStackTrace();
+				}
 			}
-			checked.clear();
-		}
-		for (int i=0; i<split.length; i++) {
-			checked.put(Integer.valueOf(Integer.parseInt(split[i])), Boolean.TRUE);
 		}
 	}
 
 	
 	
-	boolean has(Integer k) {
-		return checked.containsKey(k);
+	boolean has(int k) {
+		return checked.get(k);
 	}
 	
-	public void add(Integer i) {
-		checked.put(i, Boolean.TRUE);
+	public void add(int i) {
+		checked.set(i);
 	}
 	
-	Set getChecked() {
+	/*Set getChecked() {
 		return checked.keySet();
-	}
+	}*/
 	
 	int getCount(){
 		return checked.size();
 	}
 
-	public boolean hasAnyIn(Interests interests) {
+	public boolean matches(Interests interests) {
+		boolean matches = checked.intersects(interests.checked);
+		if (negate ^ interests.negate) {
+			return !matches;
+		} else {
+			return matches;
+		}
+		/*
 		if (interests.getChecked().size() < 1){
 			return true;
 		}
@@ -91,25 +131,29 @@ class Interests{
 			}
 		}
 		return false;
+		*/
 	}
 
-	public void putAll(Vector vector) {
-		// TODO Auto-generated method stub
-		
-	}
 	
 	public String toString() {
 		String interests = "";
+		if (negate) {
+			interests = "0,";
+		}
 		boolean first = true;
-		for (Iterator it = this.getChecked().iterator(); it.hasNext(); ){
+		for(int i=checked.nextSetBit(0); i>=0; i=checked.nextSetBit(i+1)) { 
 			if (first) {
 				first = false;
-				interests += (Integer)it.next();
+				interests += ""+i;
 			} else {
-				interests += "," + (Integer)it.next();
+				interests += "," + i;
 			}
 		}
 		return interests;
+	}
+	
+	public void clear() {
+		checked.clear();
 	}
 
 	
@@ -120,7 +164,7 @@ class Interests{
 		Interests interests = new Interests();
 		int numberOfInterests = rand.nextInt(20);
 		for (int i=0;i<numberOfInterests;i++) {
-			interests.add(new Integer(rand.nextInt(200)));
+			interests.checked.set(rand.nextInt(200));
 		}
 		return interests;
 	}

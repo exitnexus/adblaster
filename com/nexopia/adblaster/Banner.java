@@ -123,7 +123,7 @@ class Banner {
 		this.viewsperuser = rs.getInt("VIEWSPERUSER"); 
 		this.limitbyperiod = rs.getInt("LIMITBYPERIOD"); 
 
-		this.interests = new Interests(rs.getString("INTERESTS"));
+		this.interests = new Interests(rs.getString("INTERESTS"), true);
 	}
 	
 	int getID() {
@@ -215,7 +215,7 @@ class Banner {
 	 * @return
 	 */
 	public boolean validInterests(Interests userInterests) {
-		return userInterests.hasAnyIn(interests);
+		return userInterests.matches(interests);
 	}
 
 	/**

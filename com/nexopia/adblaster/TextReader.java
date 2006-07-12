@@ -46,7 +46,7 @@ public class TextReader {
 						byte age = Byte.parseByte(array[4]);
 						byte sex = Byte.parseByte(array[5]);
 						short location = Short.parseShort(array[6]);
-						Interests in = new Interests(array[7]);
+						Interests in = new Interests(array[7], false);
 						String page = array[8];
 						int passback = Integer.parseInt(array[9]);
 						int bannerid = Integer.parseInt(array[11]);

@@ -78,7 +78,7 @@ class Campaign{
 		this.sexes = Utilities.stringToVector(rs.getString("SEX"));
 		this.viewsPerUser = rs.getInt("VIEWSPERUSER"); 
 		this.limitByPeriod = rs.getInt("LIMITBYPERIOD"); 
-		this.interests = new Interests(rs.getString("INTERESTS"));
+		this.interests = new Interests(rs.getString("INTERESTS"), true);
 		this.enabled = rs.getString("ENABLED").equals("y");
 		this.paytype = rs.getByte("PAYTYPE");
 	}
@@ -138,7 +138,7 @@ class Campaign{
 	 * @return
 	 */
 	private boolean validInterests(Interests userInterests) {
-		return userInterests.hasAnyIn(interests);
+		return userInterests.matches(interests);
 	}
 
 	/**

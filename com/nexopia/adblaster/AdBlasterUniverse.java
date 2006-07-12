@@ -58,7 +58,7 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 		for(int i = 0; i < num_banners; i++){
 			Random r = new Random(System.currentTimeMillis());
 			int payrate = (1+r.nextInt(99));
-			Interests inter = new Interests("1,4");
+			Interests inter = new Interests("1,4", true);
 			//System.out.println(userid + ":" + age + ":" + sex + ":" + loc + ":" + inter);
 			
 			int campaignID=1;
@@ -118,7 +118,7 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 		for (int i = 0; i < num_users; i++){
 			for (int j = 0; j < num_interests; j++){
 				if (Math.random() > 0.5){
-					ac.getUser(i).interests.add(new Integer(j));
+					ac.getUser(i).interests.add(j);
 				}
 			}
 		}
@@ -129,13 +129,13 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 		 */
 		ac.getBannerByIndex(0).setPayrate(0);
 		ac.getBannerByIndex(0).setMaxHits(Integer.MAX_VALUE);
-		ac.getBannerByIndex(0).interests.getChecked().clear();
+		ac.getBannerByIndex(0).interests.clear();
 
 		for(int i = 1; i < num_banners; i++){
 			ac.getBannerByIndex(i).setPayrate((int)(Math.random()*10));
 			for (int j = 0; j < num_interests; j++){
 				if (Math.random() > 0.95){
-					ac.getBannerByIndex(i).interests.add(new Integer(j));
+					ac.getBannerByIndex(i).interests.add(j);
 				}
 			}
 		}

@@ -41,7 +41,7 @@ class User {
 	}
 	
 	User(int id, byte age, byte sex, short location, String interests) {
-		this(id,age,sex,location,new Interests(interests));
+		this(id,age,sex,location,new Interests(interests, false));
 	}
 
 	public void fill(int userid, int age, int sex, int location, String interests) {
@@ -50,7 +50,7 @@ class User {
 		this.sex = (byte)sex;
 		this.location = (short)location;
 		if (this.interests == null) {
-			this.interests = new Interests(interests);
+			this.interests = new Interests(interests, false);
 		} else {
 			this.interests.fill(interests);
 		}
