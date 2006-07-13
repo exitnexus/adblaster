@@ -118,11 +118,10 @@ public class BannerDatabase {
 				try {
 					if (coefficients.get(banner) != null) {
 						Float f = coefficients.get(banner);
-						System.out.println("Inserting banner " + banner.getID() + " with coefficient " + f);
 						stmt.executeUpdate("INSERT INTO `coefficients` SET `coefficient` = " 
 								+ f 
 								+ ", bannerid = " + banner.getID()
-								+ ", time = " + System.currentTimeMillis());
+								+ ", time = " + System.currentTimeMillis()/1000);
 					}
 				} catch (SQLException sqle) {
 					System.err.println("Error during coefficient insert.");
@@ -142,10 +141,12 @@ public class BannerDatabase {
 		try {
 			stmt = con.createStatement();
 			ResultSet rs = stmt.executeQuery("SELECT * FROM coefficients");
-			while (rs.next()) {
+			int i = 0;
+			while (rs.next() && i < 210) {
 				Integer bannerid = Integer.valueOf(rs.getInt("BANNERID"));
 				coefficients.put(banners.get(bannerid), new Float(rs.getFloat("COEFFICIENT")));
 				bannerid.free();
+				i++;
 			}
 		} catch (SQLException sqle) {
 			System.err.println("Unable to load coefficients from database.");
