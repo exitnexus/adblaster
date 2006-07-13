@@ -141,12 +141,10 @@ public class BannerDatabase {
 		try {
 			stmt = con.createStatement();
 			ResultSet rs = stmt.executeQuery("SELECT * FROM coefficients");
-			int i = 0;
-			while (rs.next() && i < 210) {
+			while (rs.next()) {
 				Integer bannerid = Integer.valueOf(rs.getInt("BANNERID"));
 				coefficients.put(banners.get(bannerid), new Float(rs.getFloat("COEFFICIENT")));
 				bannerid.free();
-				i++;
 			}
 		} catch (SQLException sqle) {
 			System.err.println("Unable to load coefficients from database.");
