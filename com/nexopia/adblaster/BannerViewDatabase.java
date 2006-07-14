@@ -49,6 +49,14 @@ public class BannerViewDatabase {
 		this.openDatabases();
 	}
 	
+	public BannerViewDatabase(String string) throws DatabaseException {
+		EnvironmentConfig envConf = new EnvironmentConfig();
+		envConf.setAllowCreate(true);
+		new File("BannerView.db." + string).mkdir();
+		env = new Environment(new File("BannerView.db." + string), envConf);
+		this.openDatabases();
+	}
+
 	public void insert(BannerView bv) throws DatabaseException  {
 		try {
 			lastid++;

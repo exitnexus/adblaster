@@ -16,6 +16,7 @@ class BannerView{
 	private byte size;
 	private int page;
 	private AbstractAdBlasterInstance inst;
+	public String comment = "";
 	
 	BannerView(AbstractAdBlasterInstance instance, int index, User u, Banner b, int t, byte size, int page){
 		this.uid = u.getID(); this.b = b; time = t; inst = instance;

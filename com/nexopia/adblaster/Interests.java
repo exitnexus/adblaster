@@ -16,13 +16,13 @@ import java.util.Vector;
 
 
 class Interests{
-	private BitSet checked;
+	BitSet checked;
 	private static final Random rand = new Random();
-	private boolean negate;
+	boolean negate;
 	
-	Interests(){
-	  checked = new BitSet();
-	}
+	//Interests(){
+	//  checked = new BitSet();
+	//}
 	
 	/*Interests(String interests) {
 		this(interests, false);
@@ -49,16 +49,18 @@ class Interests{
 
 	//if this constructor is used and true is passed in, then an empty
 	//string will mean all interests are true, should be true for banners/campaigns false for users
-	public Interests(String interests, boolean emptyMeansAll) {
+	public Interests(String interests, boolean isNotUser) {
 		checked = new BitSet();
-		if (emptyMeansAll && interests.length() == 0) {
+		if (isNotUser && interests.length() == 0) {
 			negate = true;
 		} else {
 			negate = false;
 			String[] splitInterests = interests.split(",");
 			for (String interest : splitInterests) {
-				if (interest.equals("0")) {
+				if (isNotUser && interest.equals("0")) {
 					negate = true;
+					continue;
+				} else if (!isNotUser && interests.equals("0")){
 					continue;
 				} else {
 					try {
@@ -161,7 +163,7 @@ class Interests{
 	 * @return
 	 */
 	public static Interests generateRandomInterests() {
-		Interests interests = new Interests();
+		Interests interests = new Interests("", false);
 		int numberOfInterests = rand.nextInt(20);
 		for (int i=0;i<numberOfInterests;i++) {
 			interests.checked.set(rand.nextInt(200));

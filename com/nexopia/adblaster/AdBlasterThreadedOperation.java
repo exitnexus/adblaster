@@ -24,14 +24,14 @@ final class AdBlasterThreadedOperation implements Runnable {
 	private final AdBlasterThreadedInstance chunk;
 	private final String name;
 	private boolean finished;
-	private boolean junk;
 	private float original_profit;
+	JTabbedPane tab;
 	
-	public AdBlasterThreadedOperation(GlobalData globalData, AdBlasterThreadedInstance chunk, String name, boolean isDisplayed) {
+	public AdBlasterThreadedOperation(GlobalData globalData, AdBlasterThreadedInstance chunk, String name, JTabbedPane tab) {
 		super();
 		this.gd = globalData;
 		this.chunk = chunk;
-		this.junk = isDisplayed;
+		this.tab = tab;
 		
 		this.name = name;
 		finished = false;
@@ -46,26 +46,17 @@ final class AdBlasterThreadedOperation implements Runnable {
 		original_profit = chunk.totalProfit();
 
 		chunk.fillInstance(gd.pol);
-
-		JFrame frame = null;
-		JPanel panel = null;
-		JTabbedPane tab = null;
 		
-		if (junk){
-			frame = new JFrame("AdBlaster Test " + name);
-			panel = new JPanel(new BorderLayout());
-			frame.setContentPane(panel);
-			tab = new JTabbedPane();
-			panel.add(tab, BorderLayout.CENTER);
-			createTab(chunk, tab, "Original");
+		if (tab != null){
+			createTab(chunk, tab, "Original", original_profit);
 		}
 
 	
 		System.out.println("Upgrading policy.");
 		gd.pol.upgradePolicy(chunk, this);
 		
-		if (junk){
-			createTab(chunk, tab, "Perfect");
+		if (tab != null){
+			createTab(chunk, tab, "Perfect", original_profit);
 		}
 
 		for (int i = 0; i < chunk.getViewCount(); i++){
@@ -74,40 +65,18 @@ final class AdBlasterThreadedOperation implements Runnable {
 
 		chunk.fillInstance(gd.pol);
 		
-		if (junk){
-			createTab(chunk, tab, "Final");
+		if (tab != null){
+			createTab(chunk, tab, "Final", original_profit);
 
 			JPanel statPanel = new JPanel();
 			statPanel.setLayout(new BoxLayout(statPanel, BoxLayout.PAGE_AXIS));
 			statPanel.add(new JScrollPane(AdBlaster.getBannerTable(AdBlaster.ac, gd.pol)));
-			panel.add(statPanel, BorderLayout.SOUTH);
-		
-			panel.setPreferredSize(new Dimension(800,600));
-			frame.setSize(800,600);
-			frame.addWindowListener(new WindowListener(){
-				public void windowOpened(WindowEvent e) {			}
-		
-				public void windowClosing(WindowEvent e) {			
-					System.exit(0);
-				}
-		
-				public void windowClosed(WindowEvent e) {		
-					System.exit(0);
-				}
-		
-				public void windowIconified(WindowEvent e) {			}
-				public void windowDeiconified(WindowEvent e) {			}
-				public void windowActivated(WindowEvent e) {			}
-				public void windowDeactivated(WindowEvent e) {			}}
-			);
-			frame.pack();
-			frame.setVisible(true);
 		}
 		this.finished = true;
 		this.notify();
 	}
 
-	private void createTab(AdBlasterThreadedInstance chunk, JTabbedPane tab, String title) {
+	public static void createTab(AdBlasterThreadedInstance chunk, JTabbedPane tab, String title, float original_profit) {
 		JPanel resultPanel = new JPanel(new BorderLayout());
 
 		{	
@@ -117,7 +86,12 @@ final class AdBlasterThreadedOperation implements Runnable {
 				DefaultTableModel model = new DefaultTableModel(chunk.getViewCount(),3);
 				JTable table = new JTable(model);
 				for (int j = 0; j < chunk.getViewCount(); j++){
-					model.setValueAt(chunk.getView(j).getUser(), j,0);
+					String s = "";
+					s += "User: " + chunk.getView(j).getUserID() + "; ";
+					s += "Page: " + chunk.getView(j).getPage() + "; ";
+					s += "Size: " + chunk.getView(j).getSize() + "; ";
+					s += chunk.getView(j).comment;
+					model.setValueAt(s, j,0);
 					model.setValueAt(chunk.getView(j).getBanner(), j,1);
 					model.setValueAt(AdBlaster.outputTime(chunk.getView(j).getTime()), j,2);
 				}
@@ -146,7 +120,7 @@ final class AdBlasterThreadedOperation implements Runnable {
 			for (int j = 0; j < instanc.getViewCount() && instanc.count(b) < b.getMaxHits(); j++){
 				// System.out.println("Trying bannerview " + j);
 				BannerView bv = instanc.getView(j);
-				if (bv.getBanner() == null || bv.getBanner().getPayrate() < b.getPayrate()){
+				if (bv.getBanner() == null || bv.getBanner().getPayrate(instanc) < b.getPayrate(instanc)){
 					if (instanc.isValidBannerForView(bv,b)){
 						// single swap
 						bv.setBanner(b);
@@ -166,7 +140,7 @@ final class AdBlasterThreadedOperation implements Runnable {
 				for (int j = 0; j < instanc.getViewCount() && instanc.count(b) < b.getMaxHits(); j++){
 					// System.out.println("Trying bannerview " + j);
 					BannerView bv = instanc.getView(j);
-					if (bv.getBanner() == null || bv.getBanner().getPayrate() < b.getPayrate()){
+					if (bv.getBanner() == null || bv.getBanner().getPayrate(instanc) < b.getPayrate(instanc)){
 						Vector swaps = null;
 						int swap_max = 0;
 						for (int l = 1; l < swap_max; l+=2){

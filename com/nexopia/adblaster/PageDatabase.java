@@ -47,6 +47,16 @@ public class PageDatabase {
 	}
 	
 	
+	public PageDatabase(String string) throws DatabaseException{
+		EnvironmentConfig envConf = new EnvironmentConfig();
+		envConf.setAllowCreate(true);
+		new File("Page.db." + string).mkdir();
+		env = new Environment(new File("Page.db." + string), envConf);
+		cache = new IntObjectHashMap();
+		openDatabases();
+	}
+
+
 	private void openDatabases() throws DatabaseException {
 		//Create primary database, keyed by page string
 		DatabaseConfig dbConf = new DatabaseConfig();

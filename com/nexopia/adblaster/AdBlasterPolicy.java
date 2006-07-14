@@ -75,62 +75,49 @@ public class AdBlasterPolicy implements I_Policy {
 				banners = orderBannersByScore(instance);
 			}
 		}
+
+		Vector<Banner> all = new Vector<Banner>();
+		all.addAll(banners);
+		while (!all.isEmpty()){
+			int banner = getRandomBanner(all, coefficients);
+			
+			if (banner == -1){
+				continue;
+			}
+
+			Banner b = (Banner) all.get(banner);
+			
+			if ( instance.count(b) < b.getMaxHits() ){
+				if (instance.isValidBannerForView(bv, b)){
+					return b;
+				}
+			}
+			
+			all.remove(b);
+			
+		}
+		return null;
+	}
+
+	private static int getRandomBanner(Vector banners, HashMap coefficients) {
 		double total = 0;
 		for (int i = 0; i < banners.size(); i++){
 			Banner b = (Banner) banners.get(i);
 			total += ((Float)coefficients.get(b)).floatValue();
 		}
 
-		int number_loops = 0;
-		User u = bv.getUser();
-		while (true){
-			double r = Math.random() * total;
-			double density = 0;
-			int banner = -1;
-			for (int i = 0; i < banners.size(); i++){
-				Banner b = (Banner) banners.get(i);
-				density += ((Float)coefficients.get(b)).floatValue();
-				if (density > r){
-					banner = i;
-					break;
-				}
-			}
-			if (number_loops > 101){
-				//JOptionPane.showConfirmDialog(null, {""});
-				return null;
-			} 
-
-			if (number_loops++ > 100){
-				banner = 0;
-			} 
-
-			
-			if (banner == -1){
-				continue;
-			}
-			
-			int bestMatch = -1;
-			float bestScore = Float.NEGATIVE_INFINITY;
-			for (int j = banner; j < banners.size(); j++){
-				Banner b = (Banner) banners.get(j);
-				float score = ((Float)coefficients.get(b)).floatValue();
-				if (score > bestScore){
-					if ( instance.count(b) < b.getMaxHits() ){
-						if (instance.isValidBannerForView(bv, b)){
-							/* If everything is working properly, this should be fine...
-							 * 
-							 */
-							if (true) return b;
-							bestScore = score;
-							bestMatch = j;
-						}
-					}
-				}
+		double r = Math.random() * total;
+		double density = 0;
+		int banner = -1;
+		for (int i = 0; i < banners.size(); i++){
+			Banner b = (Banner) banners.get(i);
+			density += ((Float)coefficients.get(b)).floatValue();
+			if (density > r){
+				banner = i;
+				break;
 			}
 		}
-
-		//Banner banner = instance.universe.getBannerByIndex(bestMatch);
-		//return banner;
+		return banner;
 	}
 	
 

@@ -20,7 +20,7 @@ import javax.swing.table.DefaultTableModel;
 
 public class AdBlaster {
 
-	private static final int THREAD_COUNT = 10;
+	private static final int THREAD_COUNT = 40;
 	static int num_serves = 10;
 	static AdBlasterDbUniverse ac;
 	static BannerViewBinding instanceBinding;
@@ -57,16 +57,58 @@ public class AdBlaster {
 		}
 		Runnable[] r = new Runnable[THREAD_COUNT];
 		Thread[] t = new Thread[THREAD_COUNT];
-		for (int i = 0; i < 5; i++){
+		
+		JFrame frame = null;
+		JPanel panel = null;
+		JTabbedPane tab = null;
+
+		frame = new JFrame("AdBlaster Test");
+		panel = new JPanel(new BorderLayout());
+		frame.setContentPane(panel);
+		tab = new JTabbedPane();
+		panel.add(tab, BorderLayout.CENTER);
+		
+		panel.setPreferredSize(new Dimension(800,600));
+		frame.setSize(800,600);
+		frame.addWindowListener(new WindowListener(){
+			public void windowOpened(WindowEvent e) {			}
+	
+			public void windowClosing(WindowEvent e) {			
+				System.exit(0);
+			}
+	
+			public void windowClosed(WindowEvent e) {		
+				System.exit(0);
+			}
+	
+			public void windowIconified(WindowEvent e) {			}
+			public void windowDeiconified(WindowEvent e) {			}
+			public void windowActivated(WindowEvent e) {			}
+			public void windowDeactivated(WindowEvent e) {			}}
+		);
+		frame.pack();
+		frame.setVisible(true);
+		
+		JTabbedPane tabs[] = new JTabbedPane[THREAD_COUNT];
+		for (int j=0; j<THREAD_COUNT; j++) {
+			tabs[j] = new JTabbedPane();
+			tab.addTab("Thread " + j, tabs[j]);
+		}
+		
+		for (int i = 0; i < 2; i++){
+			for (int j=0; j<THREAD_COUNT; j++) {
+				AdBlasterThreadedOperation.createTab(chunk[j], tabs[j], "Starting", chunk[j].totalProfit());
+			}
+			
 			for (int j = 0; j < instanc.getViewCount(); j++){
 				BannerView bv = instanc.getView(j);
 				bv.setBanner(null);
 			}
 			for (int j=0; j<THREAD_COUNT; j++) {
 				if (i == 0 || i == 4){
-					r[j] = new AdBlasterThreadedOperation(gd, chunk[j], "ThreadSet " + j, true);
+					r[j] = new AdBlasterThreadedOperation(gd, chunk[j], "ThreadSet " + j, tabs[j]);
 				} else {
-					r[j] = new AdBlasterThreadedOperation(gd, chunk[j], "ThreadSet " + j, false);
+					r[j] = new AdBlasterThreadedOperation(gd, chunk[j], "ThreadSet " + j, tabs[j]);
 				}
 				t[j] = new Thread(r[j], "operateOnChunk");
 				
@@ -78,6 +120,8 @@ public class AdBlaster {
 					if (!op.isFinished()) {
 						try {
 							r[j].wait();
+							frame.pack();
+							frame.setVisible(true);
 						} catch (Exception e1) {
 							e1.printStackTrace();
 							System.exit(0);
@@ -87,12 +131,6 @@ public class AdBlaster {
 			}
 		}
 		ac.saveCoefficients(pol.getCoefficients());
-			JFrame frame = new JFrame("AdBlaster Test Main Window");
-			JPanel panel = new JPanel(new BorderLayout());
-			
-			frame.setContentPane(panel);
-		
-			JTabbedPane tab = new JTabbedPane();
 			panel.add(tab, BorderLayout.CENTER);
 			JPanel resultPanel = new JPanel(new BorderLayout());
 			
@@ -143,24 +181,6 @@ public class AdBlaster {
 			statPanel.add(new JScrollPane(AdBlaster.getBannerTable(AdBlaster.ac, gd.pol)));
 			panel.add(statPanel, BorderLayout.SOUTH);
 		
-			panel.setPreferredSize(new Dimension(800,600));
-			frame.setSize(800,600);
-			frame.addWindowListener(new WindowListener(){
-				public void windowOpened(WindowEvent e) {			}
-		
-				public void windowClosing(WindowEvent e) {			
-					System.exit(0);
-				}
-		
-				public void windowClosed(WindowEvent e) {		
-					System.exit(0);
-				}
-		
-				public void windowIconified(WindowEvent e) {			}
-				public void windowDeiconified(WindowEvent e) {			}
-				public void windowActivated(WindowEvent e) {			}
-				public void windowDeactivated(WindowEvent e) {			}}
-			);
 			frame.pack();
 			frame.setVisible(true);
 
@@ -172,7 +192,7 @@ public class AdBlaster {
 	private static void getChunk(AdBlasterThreadedInstance chunk, AdBlasterDbInstance instance) {
 		for (int i = 0; i < ac.getUserCount()-1; i++){
 			ProgressIndicator.show(i, ac.getUserCount());
-			if (ac.getUserByIndex(i).getID() % 10000 == offset){
+			if (ac.getUserByIndex(i).getID() % 1000 == offset){
 				Vector <BannerView>vec = instance.db.getByUser(ac.getUserByIndex(i).getID());
 				for (BannerView bv : vec){
 					chunk.addView(bv);
@@ -180,7 +200,8 @@ public class AdBlaster {
 			}
 		}
 		offset++;
-		/*for (int i = 0; i < instance.getViewCount(); i++){
+		/*
+		for (int i = 0; i < instance.getViewCount(); i++){
 			BannerView bv = instance.getView(i);
 			if (bv.getUser().id % 1000 == offset){
 				chunk.addView(bv);
@@ -199,7 +220,7 @@ public class AdBlaster {
 		final JTable table = new JTable(model);
 		for (int i = 0; i < ac.getBannerCount(); i++){
 			model.setValueAt(""+ac.getBannerByIndex(i).index, i,0);
-			model.setValueAt(""+ac.getBannerByIndex(i).getPayrate(), i,1);
+			model.setValueAt(""+ac.getBannerByIndex(i).getRealPayrate(), i,1);
 			model.setValueAt(""+ac.getBannerByIndex(i).getMaxHits(), i,2);
 			model.setValueAt(pol.getCoefficient(ac.getBannerByIndex(i)), i,3);
 		}

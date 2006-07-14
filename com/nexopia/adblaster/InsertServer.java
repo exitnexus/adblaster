@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.util.Calendar;
 import java.util.MissingResourceException;
 
 import com.sleepycat.je.DatabaseException;
@@ -17,6 +18,64 @@ public class InsertServer implements Runnable {
 	private Socket client;
 	private PrintWriter out;
 	private BufferedReader in;
+	
+	private static class ThreadedDatabases{
+		private BannerViewDatabase bannerViewDb;
+		private UserDatabase userDb;
+		private PageDatabase pageDb;
+		private long start_time;
+		private static final long DAY_MS = 86400000;
+		
+		public ThreadedDatabases(){
+			start_time = System.currentTimeMillis();
+			start_time = start_time - (start_time % DAY_MS); 
+			try {
+				int min = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
+				bannerViewDb = new BannerViewDatabase(""+min);
+				userDb = new UserDatabase(""+min);
+				pageDb = new PageDatabase(""+min);
+			} catch (DatabaseException dbe) {
+				System.err.println("Unable to open databases: " + dbe);
+				dbe.printStackTrace();
+				System.exit(-1);
+			}
+		}
+		
+		public boolean isOld() {
+			//System.out.println(System.currentTimeMillis() - start_time);
+			if (System.currentTimeMillis() - start_time > DAY_MS){
+				System.out.println("Too old!");
+				return true;
+			}
+			return false;
+		}
+		
+		public void renew() {
+			try {
+				bannerViewDb.close();
+				userDb.close();
+				pageDb.close();
+			} catch (DatabaseException dbe) {
+				System.err.println("Unable to close databases: " + dbe);
+				dbe.printStackTrace();
+				System.exit(-1);
+			}
+			
+			start_time = System.currentTimeMillis();
+			start_time = start_time - (start_time % DAY_MS); 
+			try {
+				int min = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
+				bannerViewDb = new BannerViewDatabase(""+min);
+				userDb = new UserDatabase(""+min);
+				pageDb = new PageDatabase(""+min);
+			} catch (DatabaseException dbe) {
+				System.err.println("Unable to open databases: " + dbe);
+				dbe.printStackTrace();
+				System.exit(-1);
+			}
+		}
+		
+	}
 	
 	public InsertServer() {
 		try {
@@ -96,11 +155,11 @@ public class InsertServer implements Runnable {
 				try {
 					//we don't create a new user object here to save on object creation overhead, just reuse one user repeatedly
 					user.fill(userid, age, sex, location, interests);
-					userDb.insert(user);
-					int pageIndex = pageDb.insert(page);
-					bannerViewDb.insert(userid, bannerid, time, size, pageIndex);
-					if (bannerViewDb.getBannerViewCount()%1000 == 0) {
-						System.out.println("Banner Count: " + bannerViewDb.getBannerViewCount());
+					tdb.userDb.insert(user);
+					int pageIndex = tdb.pageDb.insert(page);
+					tdb.bannerViewDb.insert(userid, bannerid, time, size, pageIndex);
+					if (tdb.bannerViewDb.getBannerViewCount()%1000 == 0) {
+						System.out.println("Banner Count: " + tdb.bannerViewDb.getBannerViewCount());
 					}
 				} catch (DatabaseException e) {
 					System.err.println("Failed to insert into bannerview database: "+Integer.parseInt(words[1])+" "+Integer.parseInt(words[2])+" "+Integer.parseInt(words[3]));
@@ -113,10 +172,10 @@ public class InsertServer implements Runnable {
 				out.println("Shutting down...");
 				shutdown = true;
 				try {
-					pageDb.dump();
-					userDb.close();
-					bannerViewDb.close();
-					pageDb.close();
+					tdb.pageDb.dump();
+					tdb.userDb.close();
+					tdb.bannerViewDb.close();
+					tdb.pageDb.close();
 				} catch (DatabaseException dbe) {
 					System.err.println("Databases not closed properly at shutdown.");
 					dbe.printStackTrace();
@@ -144,29 +203,21 @@ public class InsertServer implements Runnable {
 	private static final int SERVER_PORT = 5556;
 	private static final int SOCKET_TIMEOUT = 500; //ms
 	private static boolean shutdown = false;
-	private static BannerViewDatabase bannerViewDb;
 	private static User user; //We just keep reusing this object when inserting into the user db
-	private static UserDatabase userDb;
-	private static PageDatabase pageDb;
-	
+	private static ThreadedDatabases tdb;
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		try {
-			bannerViewDb = new BannerViewDatabase();
-			userDb = new UserDatabase();
-			pageDb = new PageDatabase();
-			user = new User();
-		} catch (DatabaseException dbe) {
-			System.err.println("Unable to open databases: " + dbe);
-			dbe.printStackTrace();
-			System.exit(-1);
-		}
+		tdb = new ThreadedDatabases();
+		user = new User();
 		
 		InsertServer masterServer = new InsertServer();
 		System.out.println("Listening for connections on port " + SERVER_PORT + ".");
 		while (!shutdown) {
+			if (tdb.isOld()){
+				tdb.renew();
+			}
 			try {
 				if (masterServer.accept()) {
 					Thread t = new Thread(masterServer.spawn(), "WorkerInsertServer");

@@ -47,6 +47,18 @@ public class UserDatabase {
 		this.refreshUserCount();
 	}
 	
+	public UserDatabase(String string) throws DatabaseException{
+		EnvironmentConfig envConf = new EnvironmentConfig();
+		envConf.setAllowCreate(true);
+		new File("User.db." + string).mkdir();
+		env = new Environment(new File("User.db." + string), envConf);
+		openDatabases();
+		//cache = new HashMap<Integer, User>();
+		//keys = new Vector<Integer>();
+		cache = new IntObjectHashMap();
+		this.refreshUserCount();
+	}
+
 	private void openDatabases() throws DatabaseException {
 		//Create primary database, keyed by uid
 		DatabaseConfig dbConf = new DatabaseConfig();

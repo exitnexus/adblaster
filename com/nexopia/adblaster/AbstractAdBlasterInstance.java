@@ -26,6 +26,23 @@ public abstract class AbstractAdBlasterInstance {
 	}
 	
 	
+	public boolean isValidBannerForViewWithComments(BannerView bv, Banner b, StringBuffer buf) {
+		if (bv.getUserID() == -521590000 && b.id == 57){
+			System.out.println("ooga");
+		}
+		boolean b1 = (b == null);
+		boolean b2 = bv.getSize() == b.getSize();
+		boolean b3 = b.validUser(bv.getUser());
+		boolean b4 = b.validPage(bv.getPage());
+		boolean b5 = this.nearestWithinTimeRange(b, bv);
+		buf.append(b1 + ":"); 
+		buf.append(b2 + ":"); 
+		buf.append(b3 + ":"); 
+		buf.append(b4 + ":"); 
+		buf.append(b5 + ":"); 
+		return b1 || (b2 && b3 && b4 && b5);
+	}
+
 	public boolean isValidBannerForView(BannerView bv, Banner b) {
 		return (b == null) || (bv.getSize() == b.getSize() &&
 				b.validUser(bv.getUser()) &&
@@ -250,7 +267,7 @@ public abstract class AbstractAdBlasterInstance {
 			}
 			BannerView bv =((BannerView)getView(i)); 
 			if (bv.getBanner() != null){
-				count += bv.getBanner().getPayrate();
+				count += bv.getBanner().getRealPayrate();
 			}
 		}
 		return count;

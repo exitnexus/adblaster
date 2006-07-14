@@ -17,6 +17,7 @@ class Banner {
 	public static final int PAYTYPE_CPM = 0;
 	public static final int PAYTYPE_CPC = 1;
 	public static final int PAYTYPE_INHERIT = 2;
+	public static final int MAXRATE = 1000;
 	
 	Interests interests;
 	int id;
@@ -30,6 +31,9 @@ class Banner {
 	private int viewsperuser;
 	private int limitbyperiod;
 	Campaign campaign;
+	int index;
+	private byte size;
+	private int minviewsperday;
 	
 	static int count = 0;
 	public static int counter(){
@@ -56,8 +60,6 @@ class Banner {
 		this.campaign = campaign;
 	}
 	
-	int index;
-	private byte size;
 	
 	Banner(int id, int payrate, int maxHits, int campaignID, Vector<Integer> locations, Vector<Integer> ages, Vector<Integer> sexes, Interests interests) {
 		this.index = counter();
@@ -106,9 +108,11 @@ class Banner {
 		this.size = rs.getByte("BANNERSIZE");
 		this.paytype = rs.getByte("PAYTYPE");
 		this.payrate = rs.getInt("PAYRATE");
+		this.minviewsperday = rs.getInt("MINVIEWSPERDAY");
+		System.out.println("Views: " + this.minviewsperday);
 		if (this.getPayType() == Banner.PAYTYPE_CPC) {
 			try {
-				this.payrate = (int)(this.getPayrate()*((double)rs.getInt("CLICKS")/(double)rs.getInt("VIEWS")));
+				this.payrate = (int)(this.getRealPayrate()*((double)rs.getInt("CLICKS")/(double)rs.getInt("VIEWS")));
 			} catch (Exception e) {
 				e.printStackTrace();
 				this.payrate = rs.getInt("PAYRATE")/100; //assume 1% clickthrough if we have no data
@@ -129,9 +133,11 @@ class Banner {
 	int getID() {
 		return id;
 	}
+	
 	public String toString(){
-		String s = "" + this.index + ":" + this.id + '\n';
-		s += "Payrate:" + this.getPayrate() + '\n' ;
+		String s = "Index: " + this.index + "\n";
+		s += "ID: " + this.id + '\n';
+		s += "Payrate:" + this.getRealPayrate() + '\n' ;
 		s += "max hits:" + this.maxHits + '\n' ;
 		s += "locations:" + this.locations + '\n' ;
 		s += "ages:" + this.ages + this.ages.isEmpty() + '\n' ;
@@ -171,7 +177,25 @@ class Banner {
 	public void setSexes(Vector<Integer> sexes) {
 		this.sexes = sexes;
 	}
-	public int getPayrate() {
+	
+	/* The banner's value as it relates to a particular daily instance;
+	 * In other words, its value as related to the learning algorithm.
+	 * The value is usually the same as the payrate, unless we need to 
+	 * reach a minimum number of views.
+	 */
+	public int getPayrate(AbstractAdBlasterInstance i) {
+		if (i.count(this) < this.minviewsperday){
+			return MAXRATE;
+		}
+		if (payrate == PAYRATE_INHERIT) {
+			return campaign.getPayrate();
+		} else {
+			return payrate;
+		}
+	}
+	
+	/*The payrate that is actually assigned to the banner.*/
+	public int getRealPayrate() {
 		if (payrate == PAYRATE_INHERIT) {
 			return campaign.getPayrate();
 		} else {
@@ -295,6 +319,10 @@ class Banner {
 		}
 	}
 
+	public int getMinviewsperday() {
+		return minviewsperday;
+	}
+
 	public static boolean precheck(ResultSet rs) {
 		try {
 			boolean enabled = rs.getString("ENABLED").equals("y");
@@ -313,4 +341,5 @@ class Banner {
 			return false;
 		}
 	}
+
 }

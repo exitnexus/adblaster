@@ -18,20 +18,6 @@ class User {
 	short location;
 	static final Random rand = new Random();
 	
-	User(int id, UserDatabase db) {
-		try {
-			User u = db.getUser(id);
-			id = u.id;
-			age = u.age;
-			sex = u.sex;
-			location = u.location;
-			interests = u.interests;
-		} catch (Exception e) {
-			this.id = id;
-			this.interests = new Interests();
-		}
-	}
-	
 	User() {
 		interests = null;
 		id=0;
@@ -42,6 +28,9 @@ class User {
 	
 	User(int id, byte age, byte sex, short location, String interests) {
 		this(id,age,sex,location,new Interests(interests, false));
+		if (this.interests.negate == true){
+			throw new UnsupportedOperationException();
+		}
 	}
 
 	public void fill(int userid, int age, int sex, int location, String interests) {
@@ -54,6 +43,9 @@ class User {
 		} else {
 			this.interests.fill(interests);
 		}
+		if (this.interests.negate == true){
+			throw new UnsupportedOperationException();
+		}
 	}
 	
 	User(int id, byte age, byte sex, short location, Interests interests) {
@@ -62,6 +54,9 @@ class User {
 		this.sex = sex;
 		this.location = location;
 		this.interests = interests;
+		if (this.interests.negate == true){
+			throw new UnsupportedOperationException();
+		}
 	}
 
 	int getID() {

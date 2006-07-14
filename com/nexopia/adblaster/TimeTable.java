@@ -1,5 +1,6 @@
 package com.nexopia.adblaster;
 
+import java.util.Arrays;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,8 +33,95 @@ public class TimeTable {
 	}
 	
 	private void parseAllowedTimes() {
-		// TODO Auto-generated method stub
-		
+		boolean allowed[][] = new boolean[7][24];
+		for (int j = 0; j < validRanges.size(); j++){
+			String val = validRanges.get(j);
+
+			Pattern weekday = Pattern.compile("[MmTtWwRrFfYySs]");
+			Pattern digit = Pattern.compile("\\d+");
+			Matcher weekdayMatcher = weekday.matcher(val);
+			Matcher digitMatcher = digit.matcher(val);
+			
+			int digit1=-1;
+			int digit2=-1;
+			if (digitMatcher.find()){
+				digit1 = Integer.parseInt(val.substring(digitMatcher.start(), digitMatcher.end()));
+				if (digitMatcher.find()){
+					digit2 = Integer.parseInt(val.substring(digitMatcher.start(), digitMatcher.end()));
+				}
+			}
+			if (digit1 == -1 && digit2 == -1){
+				digit1 = 0; 
+				digit2 = 23;
+			} else if (digit2 == -1){
+				digit2 = digit1;
+			}
+			
+			String s1= "";
+			String s2= "";
+			
+			if (weekdayMatcher.find()){
+				s1 = val.substring(weekdayMatcher.start(), weekdayMatcher.end());
+				if (weekdayMatcher.find()){
+					s2 = val.substring(weekdayMatcher.start(), weekdayMatcher.end());
+				}
+			}
+			if (s1.equals("") && s2.equals("")){
+				s1 = "M";
+				s2 = "S";
+			} else if (s2 == ""){
+				s2 = s1;
+			}
+			int day1 = getDayNumber(s1.charAt(0));
+			int day2 = getDayNumber(s2.charAt(0));
+			int dayrange = day2 - day1;
+			int hourrange = digit2 - digit1;
+			for (int day = 0; day <= dayrange; day++){
+				for (int hour = 0; hour <= hourrange; hour++){
+					allowed[day1+day % 7][digit1+hour % 24] = true;
+				}
+			}
+			
+			System.out.println(digit1 + ":" + digit2);
+			System.out.println(s1 + ":" + s2);
+			/*for (int i=0; i<val.length(); i++) {
+				weekdayMatcher.region(i,i+1);
+				digitMatcher.region(i,i+1);
+				if (weekdayMatcher.matches()) {
+				
+				}
+			}*/
+		}
+		for(int i = 0; i < 7; i++)
+			System.out.println(Arrays.toString(allowed[i]));
+	}
+
+	private int getDayNumber(char c) {
+		switch (c){
+			case 'M':
+			case 'm':
+				return 0;
+			case 'T':
+			case 't':
+				return 1;
+			case 'W':
+			case 'w':
+				return 2;
+			case 'R':
+			case 'r':
+				return 3;
+			case 'F':
+			case 'f':
+				return 4;
+			case 'Y':
+			case 'y':
+				return 5;
+			case 'S':
+			case 's':
+				return 6;
+			default:
+				return -1;
+		}
 	}
 
 	private boolean validateRange(String val) {
@@ -111,7 +199,8 @@ public class TimeTable {
 	public static void main(String[] args) {
 		Pattern p = Pattern.compile("[^MmTtWwRrFfYySs\\-\\d,]+");
 		System.out.println(p);
-		TimeTable t = new TimeTable("M-22, M-F,14Jl)-2  3,,,M,J,T");
+		//TimeTable t = new TimeTable("M-22, F,14Jl)-2  3,,,M,J,T");
+		TimeTable t = new TimeTable("");
 	}
 
 }
