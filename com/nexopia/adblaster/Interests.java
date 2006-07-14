@@ -49,19 +49,34 @@ class Interests{
 
 	//if this constructor is used and true is passed in, then an empty
 	//string will mean all interests are true, should be true for banners/campaigns false for users
-	public Interests(String interests, boolean isNotUser) {
+	public Interests(String interests, boolean isBanner) {
 		checked = new BitSet();
-		if (isNotUser && interests.length() == 0) {
-			negate = true;
+		if (isBanner){
+			if (interests.length() == 0) {
+				negate = true;
+			} else {
+				negate = false;
+				String[] splitInterests = interests.split(",");
+				for (String interest : splitInterests) {
+					if (interest.equals("0")) {
+						negate = true;
+						continue;
+					} else {
+						try {
+							checked.set(Integer.parseInt(interest));
+						} catch (NumberFormatException e) {
+							System.err.println("Error parsing " + interest + " as an interest id.");
+							e.printStackTrace();
+						}
+					}
+				}
+			}
 		} else {
 			negate = false;
 			String[] splitInterests = interests.split(",");
 			for (String interest : splitInterests) {
-				if (isNotUser && interest.equals("0")) {
-					negate = true;
-					continue;
-				} else if (!isNotUser && interests.equals("0")){
-					continue;
+				if (interest.equals("0")) {
+					//intentionally skip. Anonymous user.
 				} else {
 					try {
 						checked.set(Integer.parseInt(interest));
