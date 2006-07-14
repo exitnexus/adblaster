@@ -334,7 +334,13 @@ class Banner {
 			} else if (!(enddate != 0 && enddate > System.currentTimeMillis())) {
 				validDate = false;
 			}
-			return enabled && validDate;
+			boolean validViews = true;
+			int maxviews = rs.getInt("MAXVIEWS");
+			int views = rs.getInt("VIEWS");
+			if ((maxviews != 0 && views >= maxviews)) {
+				validViews = false;
+			}
+			return enabled && validDate && validViews;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

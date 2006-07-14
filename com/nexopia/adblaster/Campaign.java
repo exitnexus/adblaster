@@ -59,7 +59,8 @@ class Campaign{
 	private boolean enabled;
 	private long startdate;
 	private long enddate;
-	
+	private int views;
+	private int maxviews;
 	
 	Vector<Integer> locations;
 	Vector<Integer> ages;
@@ -85,6 +86,8 @@ class Campaign{
 		this.paytype = rs.getByte("PAYTYPE");
 		this.startdate = rs.getLong("STARTDATE");
 		this.enddate = rs.getLong("ENDDATE");
+		this.views = rs.getInt("VIEWS");
+		this.maxviews = rs.getInt("MAXVIEWS");
 	}
 	
 	int getID() {
@@ -201,7 +204,11 @@ class Campaign{
 		} else if (!(enddate != 0 && enddate > System.currentTimeMillis())) {
 			validDate = false;
 		}
-		return enabled && validDate;
+		boolean validViews = true;
+		if ((maxviews != 0 && views >= maxviews)) {
+			validViews = false;
+		}
+		return enabled && validDate && validViews;
 	}
 
 	public byte getPayType() {
