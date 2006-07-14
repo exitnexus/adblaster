@@ -89,7 +89,7 @@ class Interests{
 		}
 	}
 
-	public void fill(String interests) {
+	public void fill(String interests, boolean isUser) {
 		if (checked == null) {
 			checked = new BitSet();
 		}
@@ -98,7 +98,9 @@ class Interests{
 		String[] splitInterests = interests.split(",");
 		for (String interest : splitInterests) {
 			if (interest.equals("0")) {
-				negate = true;
+				if (!isUser){
+					negate = true;
+				}
 				continue;
 			} else {
 				try {

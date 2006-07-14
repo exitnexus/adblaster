@@ -41,7 +41,7 @@ class User {
 		if (this.interests == null) {
 			this.interests = new Interests(interests, false);
 		} else {
-			this.interests.fill(interests);
+			this.interests.fill(interests, true);
 		}
 		if (this.interests.negate == true){
 			throw new UnsupportedOperationException();
