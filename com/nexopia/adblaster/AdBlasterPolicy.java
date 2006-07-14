@@ -41,7 +41,7 @@ public class AdBlasterPolicy implements I_Policy {
 		int sbefore[] = new int[universe.getBannerCount()];
 		for (int i = 0; i < universe.getBannerCount(); i++){
 			Banner b = universe.getBannerByIndex(i);
-			sbefore[i] = chunk.count(b);
+			sbefore[i] = chunk.bannerCount(b);
 		}
 		
 
@@ -56,7 +56,7 @@ public class AdBlasterPolicy implements I_Policy {
 		for (int i = 0; i < universe.getBannerCount(); i++){
 			Banner b = universe.getBannerByIndex(i);
 			System.out.println("Calculating banner " + i + "/" + universe.getBannerCount());
-			int after = chunk.count(b);
+			int after = chunk.bannerCount(b);
 			int before = sbefore[i];
 			System.out.println("" + after + "  :  " + before + "  :  " + (float)after/(float)before);
 			float f = ((float)((1.0f + after) / (1.0f + before)));
@@ -87,7 +87,8 @@ public class AdBlasterPolicy implements I_Policy {
 
 			Banner b = (Banner) all.get(banner);
 			
-			if ( instance.count(b) < b.getMaxHits() ){
+			if ( instance.bannerCount(b) < b.getMaxHits() && 
+					instance.campaignCount(b) < b.getCampaign().getMaxHits()){
 				if (instance.isValidBannerForView(bv, b)){
 					return b;
 				}

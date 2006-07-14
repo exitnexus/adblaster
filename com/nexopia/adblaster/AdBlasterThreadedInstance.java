@@ -42,12 +42,16 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 	}
 
 	@Override
-	int count(Banner banner) {
-		return gd.instance.count(banner);
+	int bannerCount(Banner banner) {
+		return gd.instance.bannerCount(banner);
+	}
+
+	int campaignCount(Banner banner) {
+		return gd.instance.campaignCount(banner);
 	}
 
 	@Override
-	public Vector<Tuple<Banner,Integer>> getUnserved() {
+	public Vector<Banner> getUnserved() {
 		return gd.getUnserved();
 	}
 

@@ -108,16 +108,17 @@ final class AdBlasterThreadedOperation implements Runnable {
 	}
 	
 	public void iterativeImprove(AbstractAdBlasterInstance instanc) {
-		Vector<Tuple<Banner,Integer>> unserved = gd.getUnserved();
+		Vector<Banner> unserved = gd.getUnserved();
 		
 		for (int i = 0; i < unserved.size(); i++){
 			System.out.println("Unserved: " + i +" /" + unserved.size());
 			//Progress
-			Tuple<Banner, Integer> t = unserved.get(i);
-			Banner b = (Banner)t.getFirst(0);
+			Banner b = (Banner)unserved.get(i);
 			
 			// First try simple search
-			for (int j = 0; j < instanc.getViewCount() && instanc.count(b) < b.getMaxHits(); j++){
+			for (int j = 0; j < instanc.getViewCount() && 
+				instanc.bannerCount(b) < b.getMaxHits() &&
+				instanc.campaignCount(b) < b.getCampaign().getMaxHits(); j++){
 				// System.out.println("Trying bannerview " + j);
 				BannerView bv = instanc.getView(j);
 				if (bv.getBanner() == null || bv.getBanner().getPayrate(instanc) < b.getPayrate(instanc)){
@@ -130,14 +131,18 @@ final class AdBlasterThreadedOperation implements Runnable {
 			
 			// Then try DFS
 			boolean doable = false;
-			for (int j = 0; j < instanc.getViewCount() && instanc.count(b) < b.getMaxHits(); j++){
+			for (int j = 0; j < instanc.getViewCount() && 
+				instanc.bannerCount(b) < b.getMaxHits() &&
+				instanc.campaignCount(b) < b.getCampaign().getMaxHits(); j++){
 				BannerView bv = instanc.getView(j);
 				if (instanc.isValidBannerForView(bv,b)){
 					doable = true;
 				}
 			}
 			if (doable){
-				for (int j = 0; j < instanc.getViewCount() && instanc.count(b) < b.getMaxHits(); j++){
+				for (int j = 0; j < instanc.getViewCount() && 
+					instanc.bannerCount(b) < b.getMaxHits() &&
+					instanc.campaignCount(b) < b.getCampaign().getMaxHits(); j++){
 					// System.out.println("Trying bannerview " + j);
 					BannerView bv = instanc.getView(j);
 					if (bv.getBanner() == null || bv.getBanner().getPayrate(instanc) < b.getPayrate(instanc)){

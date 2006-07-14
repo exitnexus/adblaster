@@ -184,7 +184,8 @@ class Banner {
 	 * reach a minimum number of views.
 	 */
 	public int getPayrate(AbstractAdBlasterInstance i) {
-		if (i.count(this) < this.minviewsperday){
+		if (i.bannerCount(this) < this.minviewsperday || 
+				i.bannerCount(this) < this.getCampaign().minviewsperday ){
 			return MAXRATE;
 		}
 		if (payrate == PAYRATE_INHERIT) {
@@ -329,10 +330,16 @@ class Banner {
 			long startdate = rs.getLong("STARTDATE")*1000;
 			long enddate = rs.getLong("ENDDATE")*1000;
 			boolean validDate = true;
-			if (!(startdate != 0 && startdate < System.currentTimeMillis())) {
-				validDate = false;
-			} else if (!(enddate != 0 && enddate > System.currentTimeMillis())) {
-				validDate = false;
+			if (startdate != 0){
+				if (startdate < System.currentTimeMillis()){
+					validDate = false;
+				}
+			}
+			
+			if (enddate != 0){
+				if (enddate < System.currentTimeMillis()) {
+					validDate = false;
+				}
 			}
 			boolean validViews = true;
 			int maxviews = rs.getInt("MAXVIEWS");

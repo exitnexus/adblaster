@@ -16,6 +16,7 @@ import java.util.Vector;
 
 
 class Campaign{
+
 	private static HashMap<Integer, Campaign> campaigns;
 	
 	static {
@@ -48,7 +49,15 @@ class Campaign{
 		return c;
 	}
 	
-	
+	public static Campaign getByIndex(int index) {
+		Campaign c = get(((Integer)campaigns.keySet().toArray()[index]).intValue());
+		return c;
+	}
+
+	public static int getCampaignCount() {
+		return campaigns.size();
+	}
+
 	private Interests interests;
 	private int id;
 	private int payrate;
@@ -59,8 +68,8 @@ class Campaign{
 	private boolean enabled;
 	private long startdate;
 	private long enddate;
-	private int views;
 	private int maxviews;
+	public int minviewsperday;
 	
 	Vector<Integer> locations;
 	Vector<Integer> ages;
@@ -86,8 +95,9 @@ class Campaign{
 		this.paytype = rs.getByte("PAYTYPE");
 		this.startdate = rs.getLong("STARTDATE");
 		this.enddate = rs.getLong("ENDDATE");
-		this.views = rs.getInt("VIEWS");
+		//this.views = rs.getInt("VIEWS");
 		this.maxviews = rs.getInt("MAXVIEWS");
+		this.minviewsperday = rs.getInt("MINVIEWSPERDAY");
 	}
 	
 	int getID() {
@@ -199,16 +209,19 @@ class Campaign{
 	//if it returns false then its banners will never be displayable today
 	public boolean precheck() {
 		boolean validDate = true;
-		if (!(startdate != 0 && startdate < System.currentTimeMillis())) {
-			validDate = false;
-		} else if (!(enddate != 0 && enddate > System.currentTimeMillis())) {
-			validDate = false;
+		if (startdate != 0){
+			if (startdate < System.currentTimeMillis()) {
+				validDate = false;
+			}
 		}
-		boolean validViews = true;
-		if ((maxviews != 0 && views >= maxviews)) {
-			validViews = false;
+		
+		if (enddate != 0){
+			if (enddate > System.currentTimeMillis()) {
+				validDate = false;
+			}
 		}
-		return enabled && validDate && validViews;
+		
+		return enabled && validDate;
 	}
 
 	public byte getPayType() {
@@ -222,5 +235,6 @@ class Campaign{
 	public int getViewsPerUser() {
 		return this.viewsPerUser;
 	}
+
 	
 }

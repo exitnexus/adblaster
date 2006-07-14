@@ -50,7 +50,7 @@ public class InsertServer implements Runnable {
 			return false;
 		}
 		
-		public void renew() {
+		synchronized public void renew() {
 			try {
 				bannerViewDb.close();
 				userDb.close();
@@ -154,12 +154,14 @@ public class InsertServer implements Runnable {
 				
 				try {
 					//we don't create a new user object here to save on object creation overhead, just reuse one user repeatedly
-					user.fill(userid, age, sex, location, interests);
-					tdb.userDb.insert(user);
-					int pageIndex = tdb.pageDb.insert(page);
-					tdb.bannerViewDb.insert(userid, bannerid, time, size, pageIndex);
-					if (tdb.bannerViewDb.getBannerViewCount()%1000 == 0) {
-						System.out.println("Banner Count: " + tdb.bannerViewDb.getBannerViewCount());
+					synchronized (tdb){
+						user.fill(userid, age, sex, location, interests);
+						tdb.userDb.insert(user);
+						int pageIndex = tdb.pageDb.insert(page);
+						tdb.bannerViewDb.insert(userid, bannerid, time, size, pageIndex);
+						if (tdb.bannerViewDb.getBannerViewCount()%1000 == 0) {
+							System.out.println("Banner Count: " + tdb.bannerViewDb.getBannerViewCount());
+						}
 					}
 				} catch (DatabaseException e) {
 					System.err.println("Failed to insert into bannerview database: "+Integer.parseInt(words[1])+" "+Integer.parseInt(words[2])+" "+Integer.parseInt(words[3]));

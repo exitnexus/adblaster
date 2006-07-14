@@ -9,6 +9,7 @@ public abstract class AbstractAdBlasterInstance {
 
 	AbstractAdBlasterUniverse universe;
 	private HashMap <Banner, Integer>bannerCountMap = null;
+	private HashMap <Campaign, Integer>campaignCountMap = null;
 	static Integer pool[];
 	static {
 		pool = new Integer[200];
@@ -21,6 +22,10 @@ public abstract class AbstractAdBlasterInstance {
 		bannerCountMap = new HashMap<Banner, Integer>();
 		for (int i = 0; i < ac.getBannerCount(); i++){
 			bannerCountMap.put(ac.getBannerByIndex(i), new Integer(0));
+		}
+		campaignCountMap = new HashMap<Campaign, Integer>();
+		for (int i = 0; i < ac.getCampaignCount(); i++){
+			campaignCountMap.put(ac.getCampaignByIndex(i), new Integer(0));
 		}
 		universe = ac;
 	}
@@ -224,13 +229,13 @@ public abstract class AbstractAdBlasterInstance {
 	}*/
 	
 	
-	public Vector<Tuple<Banner,Integer>> getUnserved() {
+	public Vector<Banner> getUnserved() {
 		/**Loaded bannerview
 		 * For a particular instance, get a list of all of the banners that were not served
 		 * that could have made a profit.
 		 * @return A vector of banners.
 		 */
-		Vector<Tuple<Banner,Integer>> unserved = new Vector<Tuple<Banner,Integer>>();
+		Vector<Banner> unserved = new Vector<Banner>();
 		Collection banners = this.universe.getBanners();
 		Banner b = null;
 		for (Iterator i = banners.iterator(); i.hasNext(); ){
@@ -238,23 +243,28 @@ public abstract class AbstractAdBlasterInstance {
 			if (b == null){
 				System.err.println("Error here: null banners in the list?");
 			}  else {
-				int count = count(b);
-				if (count < b.getMaxHits()){
-					unserved.add(new Tuple<Banner, Integer>(b, new Integer(b.getMaxHits() - count)));
+				if (bannerCount(b) < b.getMaxHits() && campaignCount(b) < b.getCampaign().getMaxHits()){
+					unserved.add(b);
 				}
 			}
 		}
 		return unserved;
 	}
 
-	int count(Banner banner) {
-		return ((Integer)bannerCountMap.get(banner)).intValue();
-		
+	int bannerCount(Banner banner) {
+		return bannerCountMap.get(banner).intValue();
+	}
+	int campaignCount(Banner banner) {
+		return campaignCountMap.get(banner.getCampaign()).intValue();
 	}
 	
 	synchronized protected void updateMap(BannerView bv) {
 		Integer count = this.bannerCountMap.get(bv.getBanner());
 		this.bannerCountMap.put(bv.getBanner(), Integer.valueOf(count.intValue() + 1));
+
+		count = this.campaignCountMap.get(bv.getBanner().getCampaign());
+		this.campaignCountMap.put(bv.getBanner().getCampaign(), Integer.valueOf(count.intValue() + 1));
+
 	}
 
 	public float totalProfit() {
@@ -312,7 +322,13 @@ public abstract class AbstractAdBlasterInstance {
 		BannerView second = (BannerView)it.next();
 		this.bannerCountMap.put(second.getBanner(), 
 				new Integer(((Integer)bannerCountMap.get(second.getBanner())).intValue()-1));
+		this.campaignCountMap.put(second.getBanner().getCampaign(), 
+				new Integer(((Integer)campaignCountMap.get(second.getBanner().getCampaign())).intValue()-1));
+		
 		if (bannerCountMap.get(second.getBanner()).intValue() < 0){
+			throw new UnsupportedOperationException();
+		}
+		if (campaignCountMap.get(second.getBanner().getCampaign()).intValue() < 0){
 			throw new UnsupportedOperationException();
 		}
 		for (; it.hasNext(); ){
@@ -327,7 +343,9 @@ public abstract class AbstractAdBlasterInstance {
 			
 		}
 		second.setBanner(endBanner);
-		this.bannerCountMap.put(endBanner, new Integer(((Integer)bannerCountMap.get(endBanner)).intValue()+1));
+		this.bannerCountMap.put(endBanner, new Integer((bannerCountMap.get(endBanner)).intValue()+1));
+		this.campaignCountMap.put(endBanner.getCampaign(), 
+				new Integer(campaignCountMap.get(endBanner.getCampaign()).intValue()+1));
 		
 	}
 
@@ -341,13 +359,19 @@ public abstract class AbstractAdBlasterInstance {
 			this.bannerCountMap.put(bv.getBanner(), 
 					new Integer((bannerCountMap.get(bv.getBanner())).intValue()-1));
 
-			if (bannerCountMap.get(bv.getBanner()).intValue() < 0){
+			this.campaignCountMap.put(bv.getBanner().getCampaign(), 
+					new Integer((campaignCountMap.get(bv.getBanner().getCampaign())).intValue()-1));
+
+			if (bannerCountMap.get(bv.getBanner()).intValue() < 0 ||
+					campaignCountMap.get(bv.getBanner().getCampaign()).intValue() < 0){
 				throw new UnsupportedOperationException();
 			}
 		}
 		if (b != null){
 			this.bannerCountMap.put(b, 
 					new Integer((bannerCountMap.get(b)).intValue()+1));
+			this.campaignCountMap.put(b.getCampaign(), 
+					new Integer((campaignCountMap.get(b.getCampaign())).intValue()+1));
 		}
 	}
 

@@ -23,11 +23,20 @@ public abstract class AbstractAdBlasterUniverse {
 			if (b == null){
 				System.err.println("There is an error here (null banner in the database at " + index);
 			}
-			if (b != null && instance.isValidBannerForView(bv, b) && (instance.count(b) < b.getMaxHits())){
+			if (b != null && instance.isValidBannerForView(bv, b) && 
+					(instance.bannerCount(b) < b.getMaxHits()) && 
+					(instance.campaignCount(b) < b.getCampaign().getMaxHits())){
 				match = b;
 			}
 		}
 		return match;	
+	}
+	
+	public Campaign getCampaignByIndex(int i) {
+		return Campaign.getByIndex(i);
+	}
+	public int getCampaignCount() {
+		return Campaign.getCampaignCount();
 	}
 
 }
