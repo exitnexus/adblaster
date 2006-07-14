@@ -61,6 +61,8 @@ class Interests{
 					if (interest.equals("0")) {
 						negate = true;
 						continue;
+					} else if (interest.equals("")){
+						continue;
 					} else {
 						try {
 							checked.set(Integer.parseInt(interest));
@@ -75,7 +77,7 @@ class Interests{
 			negate = false;
 			String[] splitInterests = interests.split(",");
 			for (String interest : splitInterests) {
-				if (interest.equals("0")) {
+				if (interest.equals("0") || interest.equals("")) {
 					//intentionally skip. Anonymous user.
 				} else {
 					try {
@@ -101,6 +103,8 @@ class Interests{
 				if (!isUser){
 					negate = true;
 				}
+				continue;
+			} else if (interest.equals("")){
 				continue;
 			} else {
 				try {
