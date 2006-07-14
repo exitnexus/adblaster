@@ -294,4 +294,23 @@ class Banner {
 			return false;
 		}
 	}
+
+	public static boolean precheck(ResultSet rs) {
+		try {
+			boolean enabled = rs.getString("ENABLED").equals("y");
+			long startdate = rs.getLong("STARTDATE")*1000;
+			long enddate = rs.getLong("ENDDATE")*1000;
+			boolean validDate = true;
+			if (!(startdate < System.currentTimeMillis())) {
+				validDate = false;
+			} else if (!(enddate > System.currentTimeMillis())) {
+				validDate = false;
+			}
+			return enabled && validDate;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+	}
 }

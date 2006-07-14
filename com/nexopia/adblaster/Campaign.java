@@ -57,6 +57,8 @@ class Campaign{
 	private int viewsPerUser;
 	private int limitByPeriod;
 	private boolean enabled;
+	private long startdate;
+	private long enddate;
 	
 	
 	Vector<Integer> locations;
@@ -81,6 +83,8 @@ class Campaign{
 		this.interests = new Interests(rs.getString("INTERESTS"), true);
 		this.enabled = rs.getString("ENABLED").equals("y");
 		this.paytype = rs.getByte("PAYTYPE");
+		this.startdate = rs.getLong("STARTDATE");
+		this.enddate = rs.getLong("ENDDATE");
 	}
 	
 	int getID() {
@@ -191,7 +195,13 @@ class Campaign{
 	//this does basic checks like enabled and within date range
 	//if it returns false then its banners will never be displayable today
 	public boolean precheck() {
-		return enabled;
+		boolean validDate = true;
+		if (!(startdate < System.currentTimeMillis())) {
+			validDate = false;
+		} else if (!(enddate > System.currentTimeMillis())) {
+			validDate = false;
+		}
+		return enabled && validDate;
 	}
 
 	public byte getPayType() {
