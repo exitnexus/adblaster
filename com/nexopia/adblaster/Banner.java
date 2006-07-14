@@ -329,9 +329,9 @@ class Banner {
 			long startdate = rs.getLong("STARTDATE")*1000;
 			long enddate = rs.getLong("ENDDATE")*1000;
 			boolean validDate = true;
-			if (!(startdate < System.currentTimeMillis())) {
+			if (!(startdate != 0 && startdate < System.currentTimeMillis())) {
 				validDate = false;
-			} else if (!(enddate > System.currentTimeMillis())) {
+			} else if (!(enddate != 0 && enddate > System.currentTimeMillis())) {
 				validDate = false;
 			}
 			return enabled && validDate;
