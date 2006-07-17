@@ -127,7 +127,7 @@ public abstract class PrimitiveKeyBase extends PrimitiveHashBase
 		// allocate the larger arrays
 		boolean[] flags = m_flagTable;
 		m_flagTable = new boolean[size];
-		Object keys = getKeyArray();;
+		Object keys = getKeyArray();
 		Class type = keys.getClass().getComponentType();
 		setKeyArray(Array.newInstance(type, size));
 		Object values = getValueArray();

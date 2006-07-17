@@ -86,7 +86,7 @@ public class UserDatabase {
 		ub.objectToEntry(u, data);
 		db.put(null, key, data);
 		//cache.put(Integer.valueOf(this.userCount++), u);
-		cache.put(this.userCount++, u);
+		//cache.put(this.userCount++, u);
 	}
 	
 	public User getUser(int i){
