@@ -23,17 +23,15 @@ public class InsertServer implements Runnable {
 		private BannerViewDatabase bannerViewDb;
 		private UserDatabase userDb;
 		private PageDatabase pageDb;
-		private long start_time;
+		private int day;
 		private static final long DAY_MS = 86400000;
 		
 		public ThreadedDatabases(){
-			start_time = System.currentTimeMillis();
-			start_time = start_time - (start_time % DAY_MS); 
+			day = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
 			try {
-				int min = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
-				bannerViewDb = new BannerViewDatabase(""+min);
-				userDb = new UserDatabase(""+min);
-				pageDb = new PageDatabase(""+min);
+				bannerViewDb = new BannerViewDatabase(""+day);
+				userDb = new UserDatabase(""+day);
+				pageDb = new PageDatabase(""+day);
 			} catch (DatabaseException dbe) {
 				System.err.println("Unable to open databases: " + dbe);
 				dbe.printStackTrace();
@@ -43,7 +41,7 @@ public class InsertServer implements Runnable {
 		
 		public boolean isOld() {
 			//System.out.println(System.currentTimeMillis() - start_time);
-			if (System.currentTimeMillis() - start_time > DAY_MS){
+			if (Calendar.getInstance().get(Calendar.DAY_OF_YEAR) != day){
 				System.out.println("Too old!");
 				return true;
 			}
@@ -61,13 +59,11 @@ public class InsertServer implements Runnable {
 				System.exit(-1);
 			}
 			
-			start_time = System.currentTimeMillis();
-			start_time = start_time - (start_time % DAY_MS); 
+			day = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
 			try {
-				int min = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
-				bannerViewDb = new BannerViewDatabase(""+min);
-				userDb = new UserDatabase(""+min);
-				pageDb = new PageDatabase(""+min);
+				bannerViewDb = new BannerViewDatabase(""+day);
+				userDb = new UserDatabase(""+day);
+				pageDb = new PageDatabase(""+day);
 			} catch (DatabaseException dbe) {
 				System.err.println("Unable to open databases: " + dbe);
 				dbe.printStackTrace();
