@@ -24,11 +24,8 @@ class Campaign{
 		campaigns = new HashMap<Integer, Campaign>();
 		//Database connection stuff here.
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			String url = "jdbc:mysql://192.168.0.50:3307/banner";
-			Connection con = DriverManager.getConnection(url, "nathan", "nathan");
 			String sql = "SELECT * FROM bannercampaigns";
-			Statement stmt = con.createStatement();
+			Statement stmt = JDBCConfig.createStatement();
 			ResultSet rs = stmt.executeQuery(sql);
 			int i = 0;
 			while (rs.next()) {
@@ -40,6 +37,69 @@ class Campaign{
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static Campaign add(int campaignID) {
+		try {
+			String sql = "SELECT * FROM bannercampaigns WHERE id = " + campaignID;
+			Statement stmt = JDBCConfig.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+			if (rs.next()) {
+				int id = rs.getInt("ID");
+				Campaign c = new Campaign(rs);
+				campaigns.put(Integer.valueOf(id), c);
+				return c;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public static Campaign update(int campaignID) {
+		Integer id = Integer.valueOf(campaignID);
+		Campaign c = campaigns.get(id);
+		id.free();
+		id = null;
+		if (c != null) {
+			try {
+				String sql = "SELECT * FROM bannercampaigns WHERE id = " + campaignID;
+				Statement stmt = JDBCConfig.createStatement();
+				ResultSet rs = stmt.executeQuery(sql);
+				if (rs.next()) {
+					c.update(rs);
+					return c;
+				} else {
+					campaigns.remove(c);
+					return null;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return null;
+		} else {
+			return Campaign.add(campaignID);
+		}
+	}
+	
+	public Campaign update(ResultSet rs) throws SQLException {
+		this.id = rs.getInt("ID");
+		this.payrate = rs.getInt("PAYRATE");
+		this.maxHits = rs.getInt("VIEWSPERDAY");
+		this.maxHits = (maxHits==0?Integer.MAX_VALUE:maxHits);
+		this.locations = Utilities.stringToNegationVector(rs.getString("LOC"));
+		this.ages = Utilities.stringToNegationVector(rs.getString("AGE"));
+		this.sexes = Utilities.stringToVector(rs.getString("SEX"));
+		this.viewsPerUser = rs.getInt("VIEWSPERUSER"); 
+		this.limitByPeriod = rs.getInt("LIMITBYPERIOD"); 
+		this.interests = new Interests(rs.getString("INTERESTS"), true);
+		this.enabled = rs.getString("ENABLED").equals("y");
+		this.paytype = rs.getByte("PAYTYPE");
+		this.startdate = rs.getLong("STARTDATE");
+		this.enddate = rs.getLong("ENDDATE");
+		this.maxviews = rs.getInt("MAXVIEWS");
+		this.minviewsperday = rs.getInt("MINVIEWSPERDAY");
+		return this;
 	}
 	
 	public static Campaign get(int campaignID) {
@@ -81,23 +141,7 @@ class Campaign{
 	}
 	
 	Campaign(ResultSet rs) throws SQLException {
-		this.id = rs.getInt("ID");
-		this.payrate = rs.getInt("PAYRATE");
-		this.maxHits = rs.getInt("VIEWSPERDAY");
-		this.maxHits = (maxHits==0?Integer.MAX_VALUE:maxHits);
-		this.locations = Utilities.stringToNegationVector(rs.getString("LOC"));
-		this.ages = Utilities.stringToNegationVector(rs.getString("AGE"));
-		this.sexes = Utilities.stringToVector(rs.getString("SEX"));
-		this.viewsPerUser = rs.getInt("VIEWSPERUSER"); 
-		this.limitByPeriod = rs.getInt("LIMITBYPERIOD"); 
-		this.interests = new Interests(rs.getString("INTERESTS"), true);
-		this.enabled = rs.getString("ENABLED").equals("y");
-		this.paytype = rs.getByte("PAYTYPE");
-		this.startdate = rs.getLong("STARTDATE");
-		this.enddate = rs.getLong("ENDDATE");
-		//this.views = rs.getInt("VIEWS");
-		this.maxviews = rs.getInt("MAXVIEWS");
-		this.minviewsperday = rs.getInt("MINVIEWSPERDAY");
+		this.update(rs);
 	}
 	
 	int getID() {
