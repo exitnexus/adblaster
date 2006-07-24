@@ -35,11 +35,11 @@ public class UserBannerDatabase {
 	Vector users;
 	int userCount;
 	
-	public UserBannerDatabase() throws DatabaseException {
+	public UserBannerDatabase(String s) throws DatabaseException {
 		EnvironmentConfig envConf = new EnvironmentConfig();
 		envConf.setAllowCreate(true);
 		env = new Environment(new File("UserBanner.db"), envConf);
-		UserDatabase uDb = new UserDatabase();
+		UserDatabase uDb = new UserDatabase(s);
 		BannerDatabase bDb = new BannerDatabase();
 		banners = bDb.getBanners();
 		users = uDb.getAllUsers();
@@ -80,7 +80,7 @@ public class UserBannerDatabase {
 	
 	public static void main(String args[]){
 		try {
-			UserBannerDatabase ubDb = new UserBannerDatabase();
+			UserBannerDatabase ubDb = new UserBannerDatabase("test");
 			ubDb.generate();
 		} catch (DatabaseException e) {
 			// TODO Auto-generated catch block

@@ -1,5 +1,6 @@
 package com.nexopia.adblaster;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -9,13 +10,20 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 	private BannerDatabase bannerDB;
 	UserDatabase userDB;
 	
-	public AdBlasterDbUniverse(){
+	public AdBlasterDbUniverse(String s){
 		try {
 			bannerDB = new BannerDatabase();
-			userDB = new UserDatabase();
-//			Campaign.init();
+			userDB = new UserDatabase(s);
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public AdBlasterDbUniverse(File userdb_file){
+		try {
+			bannerDB = new BannerDatabase();
+			userDB = new UserDatabase(userdb_file);
+		} catch (DatabaseException e) {
 			e.printStackTrace();
 		}
 	}

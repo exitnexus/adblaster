@@ -36,25 +36,28 @@ public class UserDatabase {
 	int keys[] = null;
 	//Vector <Integer>keys = null;
 	
-	public UserDatabase() throws DatabaseException {
+/*	public UserDatabase() throws DatabaseException {
 		EnvironmentConfig envConf = new EnvironmentConfig();
 		envConf.setAllowCreate(true);
 		env = new Environment(new File("User.db"), envConf);
 		openDatabases();
-		//cache = new HashMap<Integer, User>();
-		//keys = new Vector<Integer>();
 		cache = new IntObjectHashMap();
 		this.refreshUserCount();
-	}
+	}*/
 	
 	public UserDatabase(String string) throws DatabaseException{
+		this(new File("User.db." + string));
+	}
+
+	public UserDatabase(File f) throws DatabaseException{
+		if (!f.exists()){
+			f.mkdir();
+		}
+
 		EnvironmentConfig envConf = new EnvironmentConfig();
 		envConf.setAllowCreate(true);
-		new File("User.db." + string).mkdir();
-		env = new Environment(new File("User.db." + string), envConf);
+		env = new Environment(f, envConf);
 		openDatabases();
-		//cache = new HashMap<Integer, User>();
-		//keys = new Vector<Integer>();
 		cache = new IntObjectHashMap();
 		this.refreshUserCount();
 	}
@@ -211,7 +214,7 @@ public class UserDatabase {
 		//Environment dbEnv = null;
 		try {
 			//BannerDatabase bdb = new BannerDatabase();
-			user_db = new UserDatabase();
+			user_db = new UserDatabase("test");
 			
 			System.out.println(user_db.userCount);
 			

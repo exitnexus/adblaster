@@ -41,20 +41,26 @@ public class BannerViewDatabase {
 	private DatabaseEntry data = new DatabaseEntry();
 	private IntegerBinding ib = new IntegerBinding();
 	
-	public BannerViewDatabase() throws DatabaseException {
+	/*public BannerViewDatabase() throws DatabaseException {
 		//Create our primary database keyed by a unique ID
 		EnvironmentConfig envConf = new EnvironmentConfig();
 		envConf.setAllowCreate(true);
 		env = new Environment(new File("BannerView.db"), envConf);
 		this.openDatabases();
-	}
+	}*/
 	
-	public BannerViewDatabase(String string) throws DatabaseException {
+	public BannerViewDatabase(File f) throws DatabaseException {
+		if (!f.exists()){
+			f.mkdir();
+		}
 		EnvironmentConfig envConf = new EnvironmentConfig();
 		envConf.setAllowCreate(true);
-		new File("BannerView.db." + string).mkdir();
-		env = new Environment(new File("BannerView.db." + string), envConf);
+		env = new Environment(f, envConf);
 		this.openDatabases();
+	}
+
+	public BannerViewDatabase(String string) throws DatabaseException {
+		this(new File("BannerView.db." + string));
 	}
 
 	public void insert(BannerView bv) throws DatabaseException  {

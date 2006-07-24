@@ -20,13 +20,10 @@ class Campaign{
 	private static HashMap<Integer, Campaign> campaigns;
 	
 	static {
-		System.out.println("Initing campagins.");
+		System.out.println("Initing campaigns.");
 		campaigns = new HashMap<Integer, Campaign>();
 		//Database connection stuff here.
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			String url = "jdbc:mysql://localhost:3307/banner";
-			Connection con = DriverManager.getConnection(url, "nathan", "nathan");
 			String sql = "SELECT * FROM bannercampaigns";
 			Statement stmt = JDBCConfig.createStatement();
 			ResultSet rs = stmt.executeQuery(sql);

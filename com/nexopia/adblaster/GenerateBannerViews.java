@@ -19,7 +19,7 @@ public class GenerateBannerViews {
 	public static void main(String[] args) {
 		//UserDatabase uDb = null;
 		//BannerViewDatabase bvDb = null;
-		AdBlasterDbUniverse ac = new AdBlasterDbUniverse();
+		AdBlasterDbUniverse ac = new AdBlasterDbUniverse("test");
 		I_Policy pol = AdBlasterPolicy.randomPolicy(ac);
 
 		System.out.println("Making random instance.");

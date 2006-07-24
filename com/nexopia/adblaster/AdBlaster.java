@@ -10,6 +10,7 @@ import java.awt.event.WindowListener;
 import java.util.Vector;
 
 import javax.swing.BoxLayout;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -23,29 +24,50 @@ public class AdBlaster {
 	private static final int THREAD_COUNT = 40;
 	static int num_serves = 10;
 	static AdBlasterDbUniverse ac;
+	static AdBlasterDbInstance instanc;
 	static BannerViewBinding instanceBinding;
 	private static int offset = 0;
 	static {
-		ac = new AdBlasterDbUniverse();
-		AdBlasterDbInstance instanc = new AdBlasterDbInstance(ac);
+		
+		JFileChooser u_jfc = new JFileChooser();
+		
+		u_jfc.setDialogTitle("Choose the User directory to load");
+		u_jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		
+	    int returnVal = u_jfc.showOpenDialog(null);
+	    if(returnVal == JFileChooser.APPROVE_OPTION) {
+	       System.out.println("You chose to open this file: " +
+	            u_jfc.getSelectedFile().getName());
+	    } else {
+	    	System.exit(0);
+	    }
+	    
+		ac = new AdBlasterDbUniverse(u_jfc.getSelectedFile());
+		instanc = new AdBlasterDbInstance(ac);
 		instanceBinding = new BannerViewBinding(ac, instanc);
-		
-		
 	}
+	
 	public static void main(String args[]){
 		long start_time = System.currentTimeMillis();
 		
 		//ac = AdBlasterUniverse.generateTestData(num_banners, num_users);
 		//((AdBlasterUniverse)ac).makeMeADatabase();
 		
-		ac = new AdBlasterDbUniverse();
-		
-		
+		JFileChooser bv_jfc = new JFileChooser();
+		bv_jfc.setDialogTitle("Choose the BannerView directory to load");
+		bv_jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+	    
+		int returnVal = bv_jfc.showOpenDialog(null);
+	    if(returnVal == JFileChooser.APPROVE_OPTION) {
+	       System.out.println("You chose to open this file: " +
+	            bv_jfc.getSelectedFile().getName());
+	    } else {
+	    	System.exit(0);
+	    }
+	    
 		AdBlasterPolicy pol = AdBlasterPolicy.randomPolicy(ac);
 
-		AdBlasterDbInstance instanc = new AdBlasterDbInstance(ac);
-		instanceBinding = new BannerViewBinding(ac, instanc);
-		((AdBlasterDbInstance)instanc).load();
+		((AdBlasterDbInstance)instanc).load(bv_jfc.getSelectedFile());
 		System.out.println("Total original profit: " + instanc.totalProfit());
 		GlobalData gd = new GlobalData(instanc, pol);
 		

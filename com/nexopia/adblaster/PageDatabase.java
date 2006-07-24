@@ -10,6 +10,8 @@ import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.swing.JFileChooser;
+
 import com.sleepycat.bind.tuple.StringBinding;
 import com.sleepycat.je.CheckpointConfig;
 import com.sleepycat.je.Cursor;
@@ -32,7 +34,21 @@ public class PageDatabase {
 	public static PageDatabase pageDb;
 	static {
 		try {
-			pageDb = new PageDatabase();
+			JFileChooser p_jfc = new JFileChooser();
+			p_jfc.setDialogTitle("Choose the Page directory to load");
+
+			p_jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			p_jfc.setVisible(true);
+
+		    int returnVal = p_jfc.showOpenDialog(null);
+		    if(returnVal == JFileChooser.APPROVE_OPTION) {
+		       System.out.println("You chose to open this file: " +
+		            p_jfc.getSelectedFile().getName());
+		    } else {
+		    	System.exit(0);
+		    }
+		    
+			pageDb = new PageDatabase(p_jfc.getSelectedFile());
 		} catch (DatabaseException dbe) {
 			System.err.println("Unable to open the page database, terminating.");
 			dbe.printStackTrace();
@@ -49,22 +65,20 @@ public class PageDatabase {
 	int count;
 	//Vector <Integer>keys = null;
 	
-	public PageDatabase() throws DatabaseException {
+	public PageDatabase(File f) throws DatabaseException{
+		if (!f.exists()){
+			f.mkdir();
+		}
 		EnvironmentConfig envConf = new EnvironmentConfig();
 		envConf.setAllowCreate(true);
-		env = new Environment(new File("Page.db"), envConf);
+		env = new Environment(f, envConf);
 		cache = new IntObjectHashMap();
 		openDatabases();
 	}
-	
-	
-	public PageDatabase(String string) throws DatabaseException{
-		EnvironmentConfig envConf = new EnvironmentConfig();
-		envConf.setAllowCreate(true);
-		new File("Page.db." + string).mkdir();
-		env = new Environment(new File("Page.db." + string), envConf);
-		cache = new IntObjectHashMap();
-		openDatabases();
+
+
+	public PageDatabase(String string) throws DatabaseException {
+		this(new File("Page.db." + string));
 	}
 
 
@@ -200,7 +214,7 @@ public class PageDatabase {
 	public static void main(String[] args) {
 		PageDatabase pdb = null;
 		try {
-			pdb = new PageDatabase();
+			pdb = new PageDatabase("test");
 		} catch (DatabaseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

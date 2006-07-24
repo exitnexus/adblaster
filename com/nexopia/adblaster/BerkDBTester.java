@@ -52,7 +52,7 @@ public class BerkDBTester {
 		//userDb = null;
 		//try {
 		try {
-			db = new BannerViewDatabase(); 
+			db = new BannerViewDatabase("test"); 
 			
 			//Random r = new Random(1);
 			/*

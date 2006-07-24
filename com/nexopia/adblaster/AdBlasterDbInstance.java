@@ -1,5 +1,6 @@
 package com.nexopia.adblaster;
 
+import java.io.File;
 import java.util.HashMap;
 import com.sleepycat.je.DatabaseException;
 
@@ -10,9 +11,9 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	public AdBlasterDbInstance(AbstractAdBlasterUniverse c){
 		super(c);
 	}
-	public void load() {
+	public void load(File f) {
 		try {
-			db = new CacheBannerViewDatabase();
+			db = new CacheBannerViewDatabase(f);
 			System.out.println("Counting...");
 			for (int i = 0; i < db.vec.size(); i++){
 				BannerView bv = db.get(i);
@@ -102,7 +103,7 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 			e1.printStackTrace();
 		}*/
 
-		AdBlasterDbUniverse abu = new AdBlasterDbUniverse();
+		AdBlasterDbUniverse abu = new AdBlasterDbUniverse("test");
 		AdBlasterDbInstance abdbi = new AdBlasterDbInstance(abu);
 		I_Policy pol = AdBlasterPolicy.randomPolicy(abu);
 		abdbi.fillInstance(pol);

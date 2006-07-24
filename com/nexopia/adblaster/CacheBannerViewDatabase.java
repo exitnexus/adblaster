@@ -1,5 +1,6 @@
 package com.nexopia.adblaster;
 
+import java.io.File;
 import java.util.Vector;
 
 import com.sleepycat.je.DatabaseException;
@@ -10,8 +11,8 @@ public class CacheBannerViewDatabase {
 	Vector<BannerView> vec;
 	public int lastid;
 	
-	public CacheBannerViewDatabase() throws DatabaseException{
-		bv_db = new BannerViewDatabase();
+	public CacheBannerViewDatabase(File f) throws DatabaseException{
+		bv_db = new BannerViewDatabase(f);
 		vec = new Vector<BannerView>();
 		//BannerViewCursor cursor;
 			//cursor = bv_db.getCursor(0,0,0);

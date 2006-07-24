@@ -20,7 +20,7 @@ public class GenerateUsers {
 	public static void main(String[] args) {
 		UserDatabase uDb = null;
 		try {
-			uDb = new UserDatabase();
+			uDb = new UserDatabase("test");
 			
 			System.out.println(uDb.getUserCount());
 			

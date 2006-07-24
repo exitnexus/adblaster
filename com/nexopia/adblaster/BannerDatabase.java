@@ -58,7 +58,6 @@ import java.util.Vector;
 public class BannerDatabase {
 	private HashMap<Integer, Banner> banners;
 	Vector<Integer> keyset = new Vector<Integer>();
-	private Connection con; 
 	public BannerDatabase() {
 		banners = new HashMap<Integer, Banner>();
 		try {
@@ -110,7 +109,7 @@ public class BannerDatabase {
 	public void saveCoefficients(HashMap<Banner, Float> coefficients) {
 		Statement stmt;
 		try {
-			stmt = con.createStatement();
+			stmt = JDBCConfig.createStatement();
 			for (Banner banner: banners.values()) {
 				try {
 					if (coefficients.get(banner) != null) {
@@ -136,7 +135,7 @@ public class BannerDatabase {
 		HashMap<Banner,Float> coefficients = new HashMap<Banner,Float>();
 		Statement stmt;
 		try {
-			stmt = con.createStatement();
+			stmt = JDBCConfig.createStatement();
 			ResultSet rs = stmt.executeQuery("SELECT * FROM coefficients");
 			while (rs.next()) {
 				Integer bannerid = Integer.valueOf(rs.getInt("BANNERID"));

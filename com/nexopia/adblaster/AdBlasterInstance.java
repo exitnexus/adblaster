@@ -88,7 +88,7 @@ public class AdBlasterInstance extends AbstractAdBlasterInstance{
 	public void makeMeADatabase(){
 		try {			
 			
-			BannerViewDatabase db = new BannerViewDatabase();
+			BannerViewDatabase db = new BannerViewDatabase("test");
 
 			System.out.println("Should be inserting " + this.getViewCount() + " BannerViews.");
 			long time = System.currentTimeMillis();
