@@ -29,6 +29,17 @@ import com.sleepycat.je.OperationStatus;
  */
 
 public class PageDatabase {
+	public static PageDatabase pageDb;
+	static {
+		try {
+			pageDb = new PageDatabase();
+		} catch (DatabaseException dbe) {
+			System.err.println("Unable to open the page database, terminating.");
+			dbe.printStackTrace();
+			System.exit(-1);
+		}
+	}
+	
 	private Database db;
 	private Environment env;
 	int userCount;

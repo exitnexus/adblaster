@@ -18,16 +18,7 @@ import com.sleepycat.je.DatabaseException;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class Utilities {
-	public static PageDatabase pageDb;
-	static {
-		try {
-			pageDb = new PageDatabase();
-		} catch (DatabaseException dbe) {
-			System.err.println("Unable to open the page database, terminating.");
-			dbe.printStackTrace();
-			System.exit(-1);
-		}
-	}
+	
 	
 	public static Vector<Integer> stringToVector(String string) {
 		StringTokenizer st = new StringTokenizer(string, ",");
@@ -71,15 +62,15 @@ public class Utilities {
 					v.add(Integer.NEGATE);
 				} else {
 					v.add(Integer.IDENTITY);
-					int page = Utilities.pageDb.getPage(pages[i]);
+					int page = PageDatabase.pageDb.getPage(pages[i]);
 					if (page != 0) {
-						v.add(Integer.valueOf(Utilities.pageDb.getPage(pages[i])));
+						v.add(Integer.valueOf(PageDatabase.pageDb.getPage(pages[i])));
 					}
 				}
 			} else {
-				int page = Utilities.pageDb.getPage(pages[i]);
+				int page = PageDatabase.pageDb.getPage(pages[i]);
 				if (page != 0) {
-					v.add(Integer.valueOf(Utilities.pageDb.getPage(pages[i])));
+					v.add(Integer.valueOf(PageDatabase.pageDb.getPage(pages[i])));
 				}
 			}
 		}
