@@ -66,6 +66,10 @@ public class BannerServer {
 			return Campaign.update(id) != null;
 		}
 		
+		public void deleteCampaign(int id) {
+			Campaign.delete(id);
+			this.db.deleteCampaign(id);
+		}
 		public boolean addBanner(int id) {
 			return this.db.add(id) != null;
 		}
@@ -74,6 +78,9 @@ public class BannerServer {
 			return this.db.update(id) != null;
 		}
 		
+		public void deleteBanner(int id) {
+			this.db.delete(id);
+		}
 		/*
 		function addBanner($id){
 			$res = $this->db->prepare_query("SELECT * FROM banners WHERE id = #", $id);

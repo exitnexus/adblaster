@@ -70,7 +70,10 @@ class Campaign{
 					c.update(rs);
 					return c;
 				} else {
-					campaigns.remove(c);
+					id = Integer.valueOf(campaignID);
+					campaigns.remove(id);
+					id.free();
+					id = null;
 					return null;
 				}
 			} catch (Exception e) {
@@ -279,4 +282,12 @@ class Campaign{
 	public int getViewsPerUser() {
 		return this.viewsPerUser;
 	}
+
+	public static void delete(int campaignID) {
+		Integer id = Integer.valueOf(campaignID);
+		campaigns.remove(id);
+		id.free();
+	}
+
+	
 }

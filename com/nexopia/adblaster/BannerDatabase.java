@@ -188,8 +188,8 @@ public class BannerDatabase {
 				if (rs.next()) {
 					return b.update(rs);
 				} else {
-					banners.remove(b);
 					id = Integer.valueOf(bannerID);
+					banners.remove(id);
 					keyset.remove(id);
 					id.free();
 					id = null;
@@ -202,6 +202,29 @@ public class BannerDatabase {
 			return add(bannerID);
 		}
 		return null;
+	}
+
+	public void deleteCampaign(int campaignID) {
+		try {
+			String sql = "SELECT * FROM banners WHERE campaignid = " + campaignID;
+			Statement stmt = JDBCConfig.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+			while (rs.next()) {
+				int bannerID = rs.getInt("ID");
+				this.delete(bannerID);
+			}
+		} catch (SQLException e) {
+			System.err.println("Error deleting banners with campaign id " + campaignID + ".");
+			e.printStackTrace();
+		}
+		
+	}
+
+	public void delete(int bannerID) {
+		Integer id = Integer.valueOf(bannerID);
+		banners.remove(id);
+		keyset.remove(id);
+		id.free();
 	}
 	
 }
