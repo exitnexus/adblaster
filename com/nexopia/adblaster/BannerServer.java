@@ -70,6 +70,10 @@ public class BannerServer {
 			return this.db.add(id) != null;
 		}
 		
+		public boolean updateBanner(int id) {
+			return this.db.update(id) != null;
+		}
+		
 		/*
 		function addBanner($id){
 			$res = $this->db->prepare_query("SELECT * FROM banners WHERE id = #", $id);

@@ -92,42 +92,7 @@ class Banner {
 	
 	Banner(ResultSet rs) throws SQLException {
 		this.index = counter();
-		this.id = rs.getInt("ID");
-		this.maxHits = rs.getInt("VIEWSPERDAY");
-		maxHits = (maxHits==0?Integer.MAX_VALUE:maxHits);
-		int ci = rs.getInt("CAMPAIGNID");
-		this.campaign = Campaign.get(ci);
-		if (campaign == null){
-			System.out.println(ci + ":" + this.id);
-			throw new SQLException();
-		}
-		this.locations = Utilities.stringToNegationVector(rs.getString("LOC"));
-		this.ages = Utilities.stringToNegationVector(rs.getString("AGE"));
-		this.sexes = Utilities.stringToVector(rs.getString("SEX"));
-		this.pages = Utilities.stringToPageNegationVector(rs.getString("PAGE"));
-		this.size = rs.getByte("BANNERSIZE");
-		this.paytype = rs.getByte("PAYTYPE");
-		this.payrate = rs.getInt("PAYRATE");
-		this.minviewsperday = rs.getInt("MINVIEWSPERDAY");
-		System.out.println("Views: " + this.minviewsperday);
-		if (this.getPayType() == Banner.PAYTYPE_CPC) {
-			try {
-				this.payrate = (int)(this.getRealPayrate()*((double)rs.getInt("CLICKS")/(double)rs.getInt("VIEWS")));
-			} catch (Exception e) {
-				e.printStackTrace();
-				this.payrate = rs.getInt("PAYRATE")/100; //assume 1% clickthrough if we have no data
-			}
-		}
-		/* INTEGER viewsperday
-		 * INTEGER clicksperday
-		 * INTEGER UNSIGNED viewsperuser
-		 * CHAR limitbyhour
-		 * INTEGER UNSIGNED limitbyperiod
-		 */
-		this.viewsperuser = rs.getInt("VIEWSPERUSER"); 
-		this.limitbyperiod = rs.getInt("LIMITBYPERIOD"); 
-
-		this.interests = new Interests(rs.getString("INTERESTS"), true);
+		this.update(rs);
 	}
 	
 	int getID() {
@@ -353,6 +318,46 @@ class Banner {
 			e.printStackTrace();
 			return false;
 		}
+	}
+
+	public Banner update(ResultSet rs) throws SQLException {
+		this.id = rs.getInt("ID");
+		this.maxHits = rs.getInt("VIEWSPERDAY");
+		maxHits = (maxHits==0?Integer.MAX_VALUE:maxHits);
+		int ci = rs.getInt("CAMPAIGNID");
+		this.campaign = Campaign.get(ci);
+		if (campaign == null){
+			System.out.println(ci + ":" + this.id);
+			throw new SQLException();
+		}
+		this.locations = Utilities.stringToNegationVector(rs.getString("LOC"));
+		this.ages = Utilities.stringToNegationVector(rs.getString("AGE"));
+		this.sexes = Utilities.stringToVector(rs.getString("SEX"));
+		this.pages = Utilities.stringToPageNegationVector(rs.getString("PAGE"));
+		this.size = rs.getByte("BANNERSIZE");
+		this.paytype = rs.getByte("PAYTYPE");
+		this.payrate = rs.getInt("PAYRATE");
+		this.minviewsperday = rs.getInt("MINVIEWSPERDAY");
+		
+		if (this.getPayType() == Banner.PAYTYPE_CPC) {
+			try {
+				this.payrate = (int)(this.getRealPayrate()*((double)rs.getInt("CLICKS")/(double)rs.getInt("VIEWS")));
+			} catch (Exception e) {
+				e.printStackTrace();
+				this.payrate = rs.getInt("PAYRATE")/100; //assume 1% clickthrough if we have no data
+			}
+		}
+		/* INTEGER viewsperday
+		 * INTEGER clicksperday
+		 * INTEGER UNSIGNED viewsperuser
+		 * CHAR limitbyhour
+		 * INTEGER UNSIGNED limitbyperiod
+		 */
+		this.viewsperuser = rs.getInt("VIEWSPERUSER"); 
+		this.limitbyperiod = rs.getInt("LIMITBYPERIOD"); 
+
+		this.interests = new Interests(rs.getString("INTERESTS"), true);
+		return this;
 	}
 
 }

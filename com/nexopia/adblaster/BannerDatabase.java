@@ -175,5 +175,34 @@ public class BannerDatabase {
 		}
 		return null;
 	}
+
+	public Banner update(int bannerID) {
+		Integer id = Integer.valueOf(bannerID);
+		Banner b = banners.get(id);
+		id.free();
+		id = null;
+		if (b != null) {
+			try {
+				String sql = "SELECT * FROM banners WHERE id = " + bannerID;
+				Statement stmt = JDBCConfig.createStatement();
+				ResultSet rs = stmt.executeQuery(sql);
+				if (rs.next()) {
+					return b.update(rs);
+				} else {
+					banners.remove(b);
+					id = Integer.valueOf(bannerID);
+					keyset.remove(id);
+					id.free();
+					id = null;
+					return null;
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		} else {
+			return add(bannerID);
+		}
+		return null;
+	}
 	
 }
