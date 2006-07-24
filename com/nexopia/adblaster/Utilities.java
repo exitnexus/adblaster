@@ -76,4 +76,9 @@ public class Utilities {
 		}
 		return v;
 	}
+
+	public static Banner priorityChoose(Vector<Banner> valid) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

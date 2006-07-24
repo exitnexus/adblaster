@@ -67,6 +67,7 @@ public class BannerServer {
 		}
 		
 		public void deleteCampaign(int id) {
+			Campaign.get(id).minutely();
 			Campaign.delete(id);
 			this.db.deleteCampaign(id);
 		}
@@ -81,6 +82,24 @@ public class BannerServer {
 		public void deleteBanner(int id) {
 			this.db.delete(id);
 		}
+		
+		public int getBanner(int usertime, int size, int userid, byte age, byte sex, short location, Interests interests, int page, boolean debug){
+			//String debugLog = "";
+			//if (debug) debugLog += usertime+", "+size+", "+userid+", "+age+", "+sex+", "+loc+", "+page+", "+debug;
+			
+			Vector<Banner> valid = new Vector<Banner>();
+			for (Campaign campaign : Campaign.getCampaigns()){
+				valid.addAll(campaign.getBanners(usertime, size, userid, age, sex, location, interests, page, debug));
+			}
+			if (!valid.isEmpty()) {
+				Banner b = Utilities.priorityChoose(valid);
+				b.hit();
+				return b.getID();
+			} else {
+				return 0;
+			}
+		}
+		
 		/*
 		function addBanner($id){
 			$res = $this->db->prepare_query("SELECT * FROM banners WHERE id = #", $id);

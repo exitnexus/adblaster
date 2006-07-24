@@ -360,4 +360,9 @@ class Banner {
 		return this;
 	}
 
+	public void hit() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

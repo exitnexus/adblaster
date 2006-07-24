@@ -11,6 +11,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -105,6 +106,9 @@ class Campaign{
 		return this;
 	}
 	
+	public static Collection<Campaign> getCampaigns() {
+		return campaigns.values();
+	}
 	public static Campaign get(int campaignID) {
 		Integer I = Integer.valueOf(campaignID);
 		Campaign c = campaigns.get(I);
@@ -137,6 +141,8 @@ class Campaign{
 	Vector<Integer> locations;
 	Vector<Integer> ages;
 	Vector<Integer> sexes;
+	
+	Vector<Banner> banners;
 	
 	static int count = 0;
 	public static int counter(){
@@ -289,5 +295,21 @@ class Campaign{
 		id.free();
 	}
 
+	public void minutely() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void hourly() {
+		// TODO fill this
+	}
 	
+	public void daily() {
+		// TODO fill this
+	}
+
+	public Collection<Banner> getBanners(int usertime, int size, int userid, byte age, byte sex, short location, Interests interests2, int page, boolean debug) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
