@@ -57,14 +57,11 @@ import java.util.Vector;
 
 public class BannerDatabase {
 	private HashMap<Integer, Banner> banners;
-	//Vector<Integer> keyset = new Vector<Integer>();
+	Vector<Integer> keyset = new Vector<Integer>();
 	private Connection con; 
 	public BannerDatabase() {
 		banners = new HashMap<Integer, Banner>();
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			String url = "jdbc:mysql://localhost:3307/banner";
-			con = DriverManager.getConnection(url, "nathan", "nathan");
 			String sql = "SELECT * FROM banners";
 			Statement stmt = JDBCConfig.createStatement();
 			ResultSet rs = stmt.executeQuery(sql);
@@ -85,7 +82,7 @@ public class BannerDatabase {
 					i++;
 				}
 			}
-			//keyset.addAll(this.banners.keySet());
+			keyset.addAll(this.banners.keySet());
 			System.out.println("Total: " + i);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -95,9 +92,9 @@ public class BannerDatabase {
 	public Banner getBannerByID(int i) {
 		return (Banner)this.banners.get(new Integer(i));
 	}
-	//public Banner getBannerByIndex(int i) {
-	//	return (Banner)this.banners.get(keyset.get(i));
-	//}
+	public Banner getBannerByIndex(int i) {
+		return (Banner)this.banners.get(keyset.get(i));
+	}
 	
 	public int getBannerCount() {
 		return banners.size();
@@ -163,7 +160,9 @@ public class BannerDatabase {
 						Campaign.get(rs.getInt("CAMPAIGNID")).precheck()) {
 					try {
 						Banner b = new Banner(rs);
-						banners.put(Integer.valueOf(id), b);
+						Integer i = Integer.valueOf(id);
+						banners.put(i, b);
+						keyset.add(i);
 						return b;
 					} catch (SQLException e){
 						System.out.println("This probably indicates a bad campaign. Continue if you know what you're doing.");
