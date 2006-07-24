@@ -137,7 +137,7 @@ public class InsertServer implements Runnable {
 			if (words.length == 0) continue;
 			String command = words[0];
 			//get usertime size userid age sex location interests page passback => bannerid
-			if (command.equals("get") && words.length == 12) {
+			if (command.equals("get") && words.length == 13) {
 				int time = Integer.parseInt(words[1]);
 				byte size = Byte.parseByte(words[2]);
 				int userid = Integer.parseInt(words[3]);
@@ -146,7 +146,7 @@ public class InsertServer implements Runnable {
 				int location = Integer.parseInt(words[6]);
 				String interests = words[7];
 				String page = words[8];
-				int bannerid = Integer.parseInt(words[11]);
+				int bannerid = Integer.parseInt(words[12]);
 				
 				try {
 					//we don't create a new user object here to save on object creation overhead, just reuse one user repeatedly
@@ -162,6 +162,7 @@ public class InsertServer implements Runnable {
 				} catch (DatabaseException e) {
 					System.err.println("Failed to insert into bannerview database: "+Integer.parseInt(words[1])+" "+Integer.parseInt(words[2])+" "+Integer.parseInt(words[3]));
 					e.printStackTrace();
+					System.exit(0);
 				}
 			} else if (command.equals("quit")) {
 				out.println("Closing connection...");

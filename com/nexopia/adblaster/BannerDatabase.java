@@ -62,6 +62,9 @@ public class BannerDatabase {
 	public BannerDatabase() {
 		banners = new HashMap<Integer, Banner>();
 		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			String url = "jdbc:mysql://localhost:3307/banner";
+			con = DriverManager.getConnection(url, "nathan", "nathan");
 			String sql = "SELECT * FROM banners";
 			Statement stmt = JDBCConfig.createStatement();
 			ResultSet rs = stmt.executeQuery(sql);

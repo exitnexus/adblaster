@@ -24,6 +24,9 @@ class Campaign{
 		campaigns = new HashMap<Integer, Campaign>();
 		//Database connection stuff here.
 		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			String url = "jdbc:mysql://localhost:3307/banner";
+			Connection con = DriverManager.getConnection(url, "nathan", "nathan");
 			String sql = "SELECT * FROM bannercampaigns";
 			Statement stmt = JDBCConfig.createStatement();
 			ResultSet rs = stmt.executeQuery(sql);
@@ -279,6 +282,4 @@ class Campaign{
 	public int getViewsPerUser() {
 		return this.viewsPerUser;
 	}
-
-	
 }
