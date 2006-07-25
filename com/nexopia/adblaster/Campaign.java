@@ -13,6 +13,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Vector;
 
 
@@ -142,7 +144,7 @@ class Campaign{
 	Vector<Integer> ages;
 	Vector<Integer> sexes;
 	
-	Vector<Banner> banners;
+	Set<Banner> banners;
 	
 	static int count = 0;
 	public static int counter(){
@@ -150,6 +152,7 @@ class Campaign{
 	}
 	
 	Campaign(ResultSet rs) throws SQLException {
+		banners = new HashSet<Banner>();
 		this.update(rs);
 	}
 	
@@ -308,8 +311,30 @@ class Campaign{
 		// TODO fill this
 	}
 
-	public Collection<Banner> getBanners(int usertime, int size, int userid, byte age, byte sex, short location, Interests interests2, int page, boolean debug) {
+	public Set<Banner> getBanners(int usertime, int size, int userid, byte age, byte sex, short location, Interests interests, int page, boolean debug) {
+		HashSet<Banner> hs = new HashSet<Banner>();
+		if (this.banners.isEmpty() || !this.valid(usertime, size, userid, age, sex, location, interests, page, debug)) {
+			return hs;
+		} else {
+			for (Banner b : this.banners) {
+				if (b.valid(usertime, size, userid, age, sex, location, interests, page, debug)) {
+					hs.add(b);
+				}
+			}
+			return hs;
+		}
+	}
+
+	private boolean valid(int usertime, int size, int userid, byte age, byte sex, short location, Interests interests2, int page, boolean debug) {
 		// TODO Auto-generated method stub
-		return null;
+		return false;
+	}
+
+	public void addBanner(Banner banner) {
+		this.banners.add(banner);
+	}
+	
+	public void removeBanner(Banner banner) {
+		this.banners.remove(banner);
 	}
 }

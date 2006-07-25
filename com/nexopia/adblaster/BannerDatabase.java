@@ -4,9 +4,7 @@
  */
 package com.nexopia.adblaster;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -222,6 +220,8 @@ public class BannerDatabase {
 
 	public void delete(int bannerID) {
 		Integer id = Integer.valueOf(bannerID);
+		Banner b = this.banners.get(id);
+		b.getCampaign().removeBanner(b);
 		banners.remove(id);
 		keyset.remove(id);
 		id.free();

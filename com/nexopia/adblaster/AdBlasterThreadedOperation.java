@@ -117,7 +117,7 @@ final class AdBlasterThreadedOperation implements Runnable {
 			
 			// First try simple search
 			for (int j = 0; j < instanc.getViewCount() && 
-				instanc.bannerCount(b) < b.getMaxHits() &&
+				instanc.bannerCount(b) < b.getViewsperday() &&
 				instanc.campaignCount(b) < b.getCampaign().getMaxHits(); j++){
 				// System.out.println("Trying bannerview " + j);
 				BannerView bv = instanc.getView(j);
@@ -132,7 +132,7 @@ final class AdBlasterThreadedOperation implements Runnable {
 			// Then try DFS
 			boolean doable = false;
 			for (int j = 0; j < instanc.getViewCount() && 
-				instanc.bannerCount(b) < b.getMaxHits() &&
+				instanc.bannerCount(b) < b.getViewsperday() &&
 				instanc.campaignCount(b) < b.getCampaign().getMaxHits(); j++){
 				BannerView bv = instanc.getView(j);
 				if (instanc.isValidBannerForView(bv,b)){
@@ -141,7 +141,7 @@ final class AdBlasterThreadedOperation implements Runnable {
 			}
 			if (doable){
 				for (int j = 0; j < instanc.getViewCount() && 
-					instanc.bannerCount(b) < b.getMaxHits() &&
+					instanc.bannerCount(b) < b.getViewsperday() &&
 					instanc.campaignCount(b) < b.getCampaign().getMaxHits(); j++){
 					// System.out.println("Trying bannerview " + j);
 					BannerView bv = instanc.getView(j);

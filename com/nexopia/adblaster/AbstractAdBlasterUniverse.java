@@ -24,7 +24,7 @@ public abstract class AbstractAdBlasterUniverse {
 				System.err.println("There is an error here (null banner in the database at " + index);
 			}
 			if (b != null && instance.isValidBannerForView(bv, b) && 
-					(instance.bannerCount(b) < b.getMaxHits()) && 
+					(instance.bannerCount(b) < b.getViewsperday()) && 
 					(instance.campaignCount(b) < b.getCampaign().getMaxHits())){
 				match = b;
 			}

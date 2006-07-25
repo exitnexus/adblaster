@@ -128,7 +128,7 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 		 * 
 		 */
 		ac.getBannerByIndex(0).setPayrate(0);
-		ac.getBannerByIndex(0).setMaxHits(Integer.MAX_VALUE);
+		ac.getBannerByIndex(0).setViewsperday(Integer.MAX_VALUE);
 		ac.getBannerByIndex(0).interests.clear();
 
 		for(int i = 1; i < num_banners; i++){

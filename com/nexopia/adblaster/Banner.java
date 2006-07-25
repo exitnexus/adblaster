@@ -23,7 +23,7 @@ class Banner {
 	int id;
 	int payrate;
 	byte paytype;
-	private int maxHits;
+	private int viewsperday;
 	Vector<Integer> locations;
 	Vector<Integer> ages;
 	Vector<Integer> sexes;
@@ -34,6 +34,12 @@ class Banner {
 	int index;
 	private byte size;
 	private int minviewsperday;
+	private int startdate;
+	private int enddate;
+	private boolean enabled;
+	private int dailyviews;
+	private int dailyclicks;
+	private int clicksperday;
 	
 	static int count = 0;
 	public static int counter(){
@@ -65,7 +71,7 @@ class Banner {
 		this.index = counter();
 		this.id = id;
 		this.payrate = payrate;
-		this.maxHits = (maxHits==0?Integer.MAX_VALUE:maxHits);
+		this.viewsperday = (maxHits==0?Integer.MAX_VALUE:maxHits);
 		this.campaign = Campaign.get(campaignID);
 		this.locations = locations;
 		this.ages = ages;
@@ -76,7 +82,7 @@ class Banner {
 	@SuppressWarnings("unchecked") Banner(Banner b) {
 		this.index = counter();
 		this.id = b.id;
-		this.maxHits = b.maxHits;
+		this.viewsperday = b.viewsperday;
 		this.campaign = b.campaign;
 		this.locations = (Vector<Integer>) b.locations.clone();
 		this.ages = (Vector<Integer>) b.ages.clone();
@@ -87,11 +93,15 @@ class Banner {
 		this.viewsperuser = b.viewsperuser;
 		this.limitbyperiod = b.limitbyperiod;
 		this.interests = new Interests(b.interests);
+		this.startdate = b.startdate;
+		this.enddate = b.enddate;
+		this.enabled = b.enabled;
 	}
 	
 	
 	Banner(ResultSet rs) throws SQLException {
 		this.index = counter();
+		this.campaign = null;
 		this.update(rs);
 	}
 	
@@ -103,7 +113,7 @@ class Banner {
 		String s = "Index: " + this.index + "\n";
 		s += "ID: " + this.id + '\n';
 		s += "Payrate:" + this.getRealPayrate() + '\n' ;
-		s += "max hits:" + this.maxHits + '\n' ;
+		s += "max hits:" + this.viewsperday + '\n' ;
 		s += "locations:" + this.locations + '\n' ;
 		s += "ages:" + this.ages + this.ages.isEmpty() + '\n' ;
 		s += "sexes:" + this.sexes + this.sexes.isEmpty() + '\n' ;
@@ -130,11 +140,11 @@ class Banner {
 	public void setLocations(Vector<Integer> locations) {
 		this.locations = locations;
 	}
-	public int getMaxHits() {
-		return maxHits;
+	public int getViewsperday() {
+		return viewsperday;
 	}
-	public void setMaxHits(int maxHits) {
-		this.maxHits = maxHits;
+	public void setViewsperday(int maxHits) {
+		this.viewsperday = maxHits;
 	}
 	public Vector<Integer> getSexes() {
 		return sexes;
@@ -322,13 +332,30 @@ class Banner {
 
 	public Banner update(ResultSet rs) throws SQLException {
 		this.id = rs.getInt("ID");
-		this.maxHits = rs.getInt("VIEWSPERDAY");
-		maxHits = (maxHits==0?Integer.MAX_VALUE:maxHits);
+		this.viewsperday = rs.getInt("VIEWSPERDAY");
+		viewsperday = (viewsperday==0?Integer.MAX_VALUE:viewsperday);
 		int ci = rs.getInt("CAMPAIGNID");
-		this.campaign = Campaign.get(ci);
-		if (campaign == null){
-			System.out.println(ci + ":" + this.id);
-			throw new SQLException();
+		if (this.campaign == null) {
+			this.campaign = Campaign.get(ci);
+			if (campaign == null){
+				System.out.println(ci + ":" + this.id);
+				throw new SQLException();
+			}
+			this.campaign.addBanner(this);
+		} else if (this.campaign.getID() != rs.getInt("CAMPAIGNID")) {
+			this.campaign.removeBanner(this);
+			this.campaign = Campaign.get(ci);
+			if (campaign == null){
+				System.out.println(ci + ":" + this.id);
+				throw new SQLException();
+			}
+			this.campaign.addBanner(this);
+		} else {
+			this.campaign = Campaign.get(ci);
+			if (campaign == null){
+				System.out.println(ci + ":" + this.id);
+				throw new SQLException();
+			}
 		}
 		this.locations = Utilities.stringToNegationVector(rs.getString("LOC"));
 		this.ages = Utilities.stringToNegationVector(rs.getString("AGE"));
@@ -338,6 +365,9 @@ class Banner {
 		this.paytype = rs.getByte("PAYTYPE");
 		this.payrate = rs.getInt("PAYRATE");
 		this.minviewsperday = rs.getInt("MINVIEWSPERDAY");
+		this.startdate = rs.getInt("STARTDATE");
+		this.enddate = rs.getInt("ENDDATE");
+		this.enabled = rs.getString("ENABLED").equals("y");
 		
 		if (this.getPayType() == Banner.PAYTYPE_CPC) {
 			try {
@@ -363,6 +393,133 @@ class Banner {
 	public void hit() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public boolean valid(int time, int size, int userid, byte age, byte sex, short location, Interests interests2, int page, boolean debug) {
+		String debugLog = "";
+		if (debug) debugLog += "Checking banner this.id:";
+
+		//Utilities.bannerDebug("Testing banner: this.id");
+		if(!this.enabled) {
+			if (debug) Utilities.bannerDebug(debugLog);
+			return false;
+		}
+		if (debug) debugLog += " 1";
+		//if(!this.moded) {
+		//	return false;
+		//}
+		
+		//date
+		if(this.startdate >= time || (this.enddate != 0 && this.enddate <= time)) {
+			if (debug) Utilities.bannerDebug(debugLog);
+			return false;
+		}
+		if (debug) debugLog += " 2";
+		//Utilities.bannerDebug("testing size: this.size == size");
+		//size
+		if(this.size != size) {
+			if (debug) Utilities.bannerDebug(debugLog);
+			return false;
+		}
+		if (debug) debugLog += " 3";
+
+		//targetting
+		//age
+		//Utilities.bannerDebug("testing age");
+		if (!this.validAge(age)) {
+			if (debug) Utilities.bannerDebug(debugLog);
+			return false;
+		}
+		
+		if (debug) debugLog += " 4";
+
+		//sex
+		//Utilities.bannerDebug("testing sex");
+		if(!this.validSex(sex)) {
+			if (debug) Utilities.bannerDebug(debugLog);
+			return false;
+		}
+		if (debug) debugLog += " 5";
+		
+		//location
+		//Utilities.bannerDebug("testing location");
+		if(!this.validLocation(location)){ //default true
+			if (debug) Utilities.bannerDebug(debugLog);
+			return false;
+		}
+		
+		if (debug) debugLog += " 6";
+		//page
+		//Utilities.bannerDebug("testing page");
+		if(this.validPage(page)){ //default true
+			if (debug) Utilities.bannerDebug(debugLog);
+			return false;
+		}
+		
+		if (debug) debugLog += " 7";
+		//interests
+		//Utilities.bannerDebug("testing interests");
+		if(this.validInterests(interests2)) {
+			if (debug) Utilities.bannerDebug(debugLog);
+			return false;
+		}
+		
+		if (debug) debugLog += " 8";
+		//time
+		//Utilities.bannerDebug("testing time");
+		
+		if (!this.validTime(time)) {
+			if (debug) Utilities.bannerDebug(debugLog);
+			return false;
+		}
+		//day = gmdate("w", usertime);
+		//hour = gmdate("G", usertime);
+		//if (!this.allowedtimes.validHours[day][hour]) {
+		//	if (debug) Utilities.bannerDebug(debugLog);
+		//	return false;
+		//}
+		if (debug) debugLog += " 9";
+		//payment available
+		//if (this.campaign.clienttype == "payinadvance") {
+		//	if (this.credits + this.campaign.credits < this.payrate()) {
+		//		return false;
+		//	}
+		//}
+		
+		//frequency capping
+		//this period (day/hour)
+		//Utilities.bannerDebug("testing frequency capping");
+		if(this.viewsperday != 0 && this.dailyviews >= this.viewsperday) {
+			if (debug) Utilities.bannerDebug(debugLog);
+			return false;
+		}
+		if (debug) debugLog += " 10";
+		if(this.clicksperday != 0 && this.dailyclicks >= this.clicksperday) {
+			if (debug) Utilities.bannerDebug(debugLog);
+			return false;
+		}
+		if (debug) debugLog += " 11";
+		//views per user
+		if(!this.validUserTime(userid, time)) {
+			if (debug) Utilities.bannerDebug(debugLog);
+			return false;
+		}
+		
+		if (debug) debugLog += " 12";
+		//Utilities.bannerDebug("valid banner: this.id");
+		//all else works
+		if (debug) Utilities.bannerDebug(debugLog);
+		return true;
+	}
+
+	private boolean validTime(int time) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	private boolean validUserTime(int userid, int time) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

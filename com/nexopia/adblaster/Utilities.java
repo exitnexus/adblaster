@@ -81,4 +81,9 @@ public class Utilities {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	public static void bannerDebug(String debugLog) {
+		// TODO Auto-generated method stub
+		
+	}
 }
