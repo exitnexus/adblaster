@@ -107,6 +107,7 @@ class Campaign{
 		this.minviewsperday = rs.getInt("MINVIEWSPERDAY");
 		this.viewsperday = rs.getInt("VIEWSPERDAY");
 		this.clicksperday = rs.getInt("CLICKSPERDAY");
+		this.pages = Utilities.stringToPageNegationVector(rs.getString("PAGE"));
 		return this;
 	}
 	
@@ -148,6 +149,7 @@ class Campaign{
 	Vector<Integer> sexes;
 	
 	Set<Banner> banners;
+	Vector<Integer> pages;
 	private int viewsperday;
 	private int clicksperday;
 	
@@ -455,6 +457,20 @@ class Campaign{
 	}
 	
 	public boolean validPage(int page) {
-		return false;
+		if (pages.get(0) == Integer.NEGATE) {
+			for (int i=1; i<pages.size(); i++) {
+				if (pages.get(i).intValue() == page) {
+					return false;
+				}
+			}
+			return true;
+		} else {
+			for (int i=1; i<pages.size(); i++) {
+				if (pages.get(i).intValue() == page) {
+					return true;
+				}
+			}
+			return false;
+		}
 	}
 }
