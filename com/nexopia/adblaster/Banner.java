@@ -8,6 +8,7 @@ package com.nexopia.adblaster;
 
 import java.sql.SQLException;
 import java.sql.ResultSet;
+import java.util.HashMap;
 import java.util.Vector;
 
 
@@ -40,6 +41,7 @@ class Banner {
 	private int dailyviews;
 	private int dailyclicks;
 	private int clicksperday;
+	private HashMap<Integer, int[]> userViewTimes; //int[0] is the position of the oldest view, int[1-viewsperuser] are timestamps
 	
 	static int count = 0;
 	public static int counter(){
@@ -518,8 +520,21 @@ class Banner {
 	}
 
 	private boolean validUserTime(int userid, int time) {
-		// TODO Auto-generated method stub
-		return false;
+		if (this.viewsperuser == 0) {
+			return true;
+		} 
+		Integer uid = Integer.valueOf(userid);
+		int[] times = this.userViewTimes.get(uid);
+		uid.free();
+		if (times == null) {
+			return true;
+		} else {
+			if (times[times[0]] > time-this.limitbyperiod) {
+				return false;
+			} else {
+				return true;
+			}
+		}
 	}
 
 }
