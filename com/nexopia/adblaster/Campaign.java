@@ -146,6 +146,8 @@ class Campaign{
 	Vector<Integer> sexes;
 	
 	Set<Banner> banners;
+	private int viewsperday;
+	private int clicksperday;
 	
 	static int count = 0;
 	public static int counter(){
@@ -322,7 +324,7 @@ class Campaign{
 			return hs;
 		} else {
 			for (Banner b : this.banners) {
-				if (b.valid(usertime, size, userid, age, sex, location, interests, page, debug)) {
+				if (!b.valid(usertime, size, userid, age, sex, location, interests, page, debug)) {
 					hs.add(b);
 				}
 			}
@@ -331,6 +333,89 @@ class Campaign{
 	}
 
 	private boolean valid(int usertime, int size, int userid, byte age, byte sex, short location, Interests interests2, int page, boolean debug) {
+		String debugLog = "";
+		if (debug) debugLog += "Checking campaign: this.id";
+		if(!this.enabled)
+			return false;
+		//date
+		if(this.startdate >= usertime || (this.enddate != 0 && this.enddate <= usertime))
+			return false;
+
+		//targetting
+		//age
+		if (!this.validAge(age)) {
+			if (debug) Utilities.bannerDebug(debugLog);
+			return false;
+		}
+		
+		if (debug) debugLog += " 1";
+		//sex
+		if(!this.validSex(sex)) {
+			if (debug) Utilities.bannerDebug(debugLog);
+			return false;
+		}
+
+		//location
+		if(!this.validLocation(location)){ //default true
+			if (debug) Utilities.bannerDebug(debugLog);
+			return false;
+		}
+		
+		if (debug) debugLog += " 2";
+		//page
+		if(!this.validPage(page)){ //default true
+			if (debug) Utilities.bannerDebug(debugLog);
+			return false;
+		}
+		
+		if (debug) debugLog += " 3";
+		//interests
+		if(!this.validInterests(interests2)){
+			if (debug) Utilities.bannerDebug(debugLog);
+			return false;
+		}
+		
+		if (debug) debugLog += " 4";
+		if (!this.validTime(usertime)) {
+			if (debug) Utilities.bannerDebug(debugLog);
+			return false;
+		}
+		if (debug) debugLog += " 5";
+		//frequency capping at the campaign level
+		//this period (day/hour)
+		if(this.viewsperday != 0 && this.dailyviews() >= this.viewsperday) {
+			if (debug) Utilities.bannerDebug(debugLog);
+			return false;
+		}
+		
+		if (debug) debugLog += " 6";
+		if(this.clicksperday != 0 && this.dailyclicks() >= this.clicksperday) {
+			if (debug) Utilities.bannerDebug(debugLog);
+			return false;
+		}
+		if (debug) debugLog += " 7";
+		//views per user
+		if(!this.validUserTime(userid, usertime)) {
+			if (debug) Utilities.bannerDebug(debugLog);
+			return false;
+		}
+		if (debug) debugLog += " 8";
+		//Utilities.bannerDebug("Campaign valid: this.id");
+		if (debug) Utilities.bannerDebug(debugLog);
+		return true;
+	}
+
+	private int dailyclicks() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	private int dailyviews() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	private boolean validTime(int usertime) {
 		// TODO Auto-generated method stub
 		return false;
 	}
@@ -359,5 +444,9 @@ class Campaign{
 				return true;
 			}
 		}
+	}
+	
+	public boolean validPage(int page) {
+		return false;
 	}
 }
