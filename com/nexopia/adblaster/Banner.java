@@ -162,7 +162,7 @@ class Banner {
 	 */
 	public int getPayrate(AbstractAdBlasterInstance i) {
 		if (i.bannerCount(this) < this.minviewsperday || 
-				i.bannerCount(this) < this.getCampaign().minviewsperday ){
+				i.bannerCount(this) < this.getCampaign().getMinViewsPerDay() ){
 			return MAXRATE;
 		}
 		if (payrate == PAYRATE_INHERIT) {
