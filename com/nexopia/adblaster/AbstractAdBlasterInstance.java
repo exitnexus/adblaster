@@ -243,7 +243,7 @@ public abstract class AbstractAdBlasterInstance {
 			if (b == null){
 				System.err.println("Error here: null banners in the list?");
 			}  else {
-				if (bannerCount(b) < b.getViewsperday() && campaignCount(b) < b.getCampaign().getMaxHits()){
+				if (bannerCount(b) < b.getViewsperday() && campaignCount(b) < b.getCampaign().getViewsperuser()){
 					unserved.add(b);
 				}
 			}

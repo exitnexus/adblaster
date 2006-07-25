@@ -91,8 +91,8 @@ class Campaign{
 	public Campaign update(ResultSet rs) throws SQLException {
 		this.id = rs.getInt("ID");
 		this.payrate = rs.getInt("PAYRATE");
-		this.maxHits = rs.getInt("VIEWSPERDAY");
-		this.maxHits = (maxHits==0?Integer.MAX_VALUE:maxHits);
+		this.viewsperuser = rs.getInt("VIEWSPERDAY");
+		this.viewsperuser = (viewsperuser==0?Integer.MAX_VALUE:viewsperuser);
 		this.locations = Utilities.stringToNegationVector(rs.getString("LOC"));
 		this.ages = Utilities.stringToNegationVector(rs.getString("AGE"));
 		this.sexes = Utilities.stringToVector(rs.getString("SEX"));
@@ -131,7 +131,7 @@ class Campaign{
 	private int id;
 	private int payrate;
 	private byte paytype;
-	private int maxHits;
+	private int viewsperuser;
 	private int viewsPerUser;
 	private int limitByPeriod;
 	private boolean enabled;
@@ -180,11 +180,11 @@ class Campaign{
 	public void setLocations(Vector<Integer> locations) {
 		this.locations = locations;
 	}
-	public int getMaxHits() {
-		return maxHits;
+	public int getViewsperuser() {
+		return viewsperuser;
 	}
-	public void setMaxHits(int maxHits) {
-		this.maxHits = maxHits;
+	public void setViewsperuser(int maxHits) {
+		this.viewsperuser = maxHits;
 	}
 	public Vector getSexes() {
 		return sexes;
@@ -337,4 +337,6 @@ class Campaign{
 	public void removeBanner(Banner banner) {
 		this.banners.remove(banner);
 	}
+	
+	
 }
