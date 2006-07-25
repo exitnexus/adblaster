@@ -534,4 +534,11 @@ class Banner {
 		}
 	}
 
+	public int getDailyViews() {
+		return this.dailyviews;
+	}
+
+	public int getDailyClicks() {
+		return this.dailyclicks;
+	}
 }

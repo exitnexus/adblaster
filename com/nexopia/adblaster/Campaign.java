@@ -105,6 +105,8 @@ class Campaign{
 		this.enddate = rs.getLong("ENDDATE");
 		this.maxviews = rs.getInt("MAXVIEWS");
 		this.minviewsperday = rs.getInt("MINVIEWSPERDAY");
+		this.viewsperday = rs.getInt("VIEWSPERDAY");
+		this.clicksperday = rs.getInt("CLICKSPERDAY");
 		return this;
 	}
 	
@@ -405,14 +407,20 @@ class Campaign{
 		return true;
 	}
 
-	private int dailyclicks() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
 	private int dailyviews() {
-		// TODO Auto-generated method stub
-		return 0;
+		int views = 0;
+		for (Banner b : this.banners) {
+			views += b.getDailyViews();
+		}
+		return views;
+	}
+	
+	private int dailyclicks() {
+		int clicks = 0;
+		for (Banner b : this.banners) {
+			clicks += b.getDailyClicks();
+		}
+		return clicks;
 	}
 
 	private boolean validTime(int usertime) {
