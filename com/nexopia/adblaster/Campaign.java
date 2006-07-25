@@ -138,7 +138,8 @@ class Campaign{
 	private long startdate;
 	private long enddate;
 	private int maxviews;
-	public int minviewsperday;
+	private int minviewsperday;
+	private HashMap<Integer, int[]> userViewTimes; //int[0] is the position of the oldest view, int[1-viewsperuser] are timestamps
 	
 	Vector<Integer> locations;
 	Vector<Integer> ages;
@@ -338,5 +339,21 @@ class Campaign{
 		this.banners.remove(banner);
 	}
 	
-	
+	private boolean validUserTime(int userid, int time) {
+		if (this.viewsperuser == 0) {
+			return true;
+		} 
+		Integer uid = Integer.valueOf(userid);
+		int[] times = this.userViewTimes.get(uid);
+		uid.free();
+		if (times == null) {
+			return true;
+		} else {
+			if (times[times[0]] > time-this.limitByPeriod) {
+				return false;
+			} else {
+				return true;
+			}
+		}
+	}
 }
