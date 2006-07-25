@@ -326,7 +326,7 @@ class Campaign{
 			return hs;
 		} else {
 			for (Banner b : this.banners) {
-				if (!b.valid(usertime, size, userid, age, sex, location, interests, page, debug)) {
+				if (b.valid(usertime, size, userid, age, sex, location, interests, page, debug)) {
 					hs.add(b);
 				}
 			}
