@@ -122,8 +122,8 @@ public class AdBlaster {
 				AdBlasterThreadedOperation.createTab(chunk[j], tabs[j], "Starting", chunk[j].totalProfit());
 			}
 			
-			for (int j = 0; j < instanc.getViewCount(); j++){
-				BannerView bv = instanc.getView(j);
+			for (int j = 0; j < chunk[i].getViewCount(); j++){
+				BannerView bv = chunk[i].getView(j);
 				bv.setBanner(null);
 			}
 			for (int j=0; j<THREAD_COUNT; j++) {

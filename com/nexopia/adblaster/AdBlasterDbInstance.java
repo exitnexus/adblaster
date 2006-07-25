@@ -6,16 +6,16 @@ import com.sleepycat.je.DatabaseException;
 
 public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	HashMap swappedViews; //always look for a view here before checking the database
-	CacheBannerViewDatabase db;
+	BannerViewDatabase db;
 	
 	public AdBlasterDbInstance(AbstractAdBlasterUniverse c){
 		super(c);
 	}
 	public void load(File f) {
 		try {
-			db = new CacheBannerViewDatabase(f);
+			db = new BannerViewDatabase(f);
 			System.out.println("Counting...");
-			for (int i = 0; i < db.vec.size(); i++){
+			for (int i = 0; i < db.getBannerViewCount(); i++){
 				BannerView bv = db.get(i);
 				if (bv.getBanner() != null){
 					updateMap(bv);
@@ -123,7 +123,7 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 		super.notifyChange(view,b);
 		updateDB(view,b);
 	}
-
+	
 	private void updateDB(BannerView view, Banner b) {
 		/*try {
 			IntegerBinding ib = new IntegerBinding();
