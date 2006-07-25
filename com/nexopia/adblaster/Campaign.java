@@ -293,6 +293,10 @@ class Campaign{
 		return this.viewsPerUser;
 	}
 
+	public int getMinViewsPerDay() {
+		return this.minviewsperday;
+	}
+	
 	public static void delete(int campaignID) {
 		Integer id = Integer.valueOf(campaignID);
 		campaigns.remove(id);

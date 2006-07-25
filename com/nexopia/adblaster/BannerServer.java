@@ -93,7 +93,7 @@ public class BannerServer {
 			}
 			if (!valid.isEmpty()) {
 				Banner b = Utilities.priorityChoose(valid);
-				b.hit();
+				b.hit(userid, usertime);
 				return b.getID();
 			} else {
 				return 0;

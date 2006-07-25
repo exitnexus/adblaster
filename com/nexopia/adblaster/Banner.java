@@ -48,13 +48,6 @@ class Banner {
 		return count++;
 	}
 	
-	/*Banner() {
-		interests = new Interests();
-		id = counter(); //TODO Banners need an ID we can track them by
-		maxHits = (int) (Math.pow((Math.random()-0.5) * 2,2) * 200) + 1;
-		this.payrate = (int)(Math.random()*10);
-	}*/
-	
 	/**
 	 * @return Returns the campaignID.
 	 */
@@ -104,6 +97,8 @@ class Banner {
 	Banner(ResultSet rs) throws SQLException {
 		this.index = counter();
 		this.campaign = null;
+		this.dailyviews = 0;
+		this.dailyclicks = 0;
 		this.update(rs);
 	}
 	
@@ -326,7 +321,6 @@ class Banner {
 			}
 			return enabled && validDate && validViews;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}
@@ -392,9 +386,12 @@ class Banner {
 		return this;
 	}
 
-	public void hit() {
-		// TODO Auto-generated method stub
-		
+	public void hit(int userid, int time) {
+		Integer uid = Integer.valueOf(userid);
+		int[] times = this.userViewTimes.get(uid);
+		times[times[0]] = time;
+		times[0] = (times[0]%this.viewsperuser)+1;
+		this.dailyviews++;
 	}
 
 	public boolean valid(int time, int size, int userid, byte age, byte sex, short location, Interests interests2, int page, boolean debug) {
