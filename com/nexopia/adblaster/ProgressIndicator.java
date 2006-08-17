@@ -5,12 +5,13 @@ import javax.swing.JProgressBar;
 
 public class ProgressIndicator {
 	static JProgressBar bar;
+	static JFrame frame;
 	
 	static {
 		bar = new JProgressBar(0, 100);
 		bar.setValue(0);
 		bar.setStringPainted(true);
-		JFrame frame = new JFrame();
+		frame = new JFrame();
 		frame.setContentPane(bar);
 		frame.pack();
 		frame.setVisible(true);
@@ -27,6 +28,10 @@ public class ProgressIndicator {
 			i++;
 			show(i, 10000000);
 		}
+	}
+
+	public static void setTitle(String string) {
+		frame.setTitle(string);
 	}
 
 }

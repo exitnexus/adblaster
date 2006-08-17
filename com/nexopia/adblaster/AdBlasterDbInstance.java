@@ -14,8 +14,9 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	public void load(File f) {
 		try {
 			db = new BannerViewDatabase(f);
-			System.out.println("Counting...");
+			ProgressIndicator.setTitle("Counting bannerviews...");
 			for (int i = 0; i < db.getBannerViewCount(); i++){
+				ProgressIndicator.show(i, db.getBannerViewCount());
 				BannerView bv = db.get(i);
 				if (bv.getBanner() != null){
 					updateMap(bv);
