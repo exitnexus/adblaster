@@ -270,6 +270,7 @@ public abstract class AbstractAdBlasterInstance {
 	public float totalProfit() {
 		float count = 0;
 		long time = System.currentTimeMillis();
+		/*
 		for (int i = 0; i < getViewCount(); i++){
 			if (System.currentTimeMillis() - time > 5000){
 				System.out.println(""+ (float)i/(float)getViewCount()*100 + "% done calculating profit.");
@@ -279,6 +280,11 @@ public abstract class AbstractAdBlasterInstance {
 			if (bv.getBanner() != null){
 				count += bv.getBanner().getRealPayrate();
 			}
+		}*/
+		for (int i = 0; i < this.universe.getBannerCount(); i++){
+			Banner b = this.universe.getBannerByIndex(i);
+			float worth = this.bannerCountMap.get(b).intValue() * b.getPayrate(this);
+			count += worth;
 		}
 		return count;
 	}

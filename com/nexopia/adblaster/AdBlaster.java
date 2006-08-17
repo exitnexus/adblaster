@@ -218,7 +218,7 @@ public class AdBlaster {
 		}
 		for (int i = 0; i < ac.getUserCount()-1; i++){
 			ProgressIndicator.show(i, ac.getUserCount());
-			int hash = ac.getUserByIndex(i).getID() % modCount;
+			int hash = Math.abs(ac.getUserByIndex(i).getID() % modCount);
 			if (hash < num){
 				Vector <BannerView>vec = gd.instance.db.getByUser(ac.getUserByIndex(i).getID());
 				for (BannerView bv : vec){
