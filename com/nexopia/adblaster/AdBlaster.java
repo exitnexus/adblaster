@@ -69,14 +69,10 @@ public class AdBlaster {
 
 		((AdBlasterDbInstance)instanc).load(bv_jfc.getSelectedFile());
 		System.out.println("Total original profit: " + instanc.totalProfit());
-		GlobalData gd = new GlobalData(instanc, pol);
 		
 		System.out.println("Chunking.");
-		AdBlasterThreadedInstance[] chunk = new AdBlasterThreadedInstance[THREAD_COUNT];
-		for (int j=0; j<THREAD_COUNT; j++) {
-			chunk[j] = new AdBlasterThreadedInstance(gd);
-			getChunk(chunk[j], instanc);
-		}
+		GlobalData gd = new GlobalData(instanc, pol);
+		AdBlasterThreadedInstance[] chunk = getChunk(gd, THREAD_COUNT, 100);
 		Runnable[] r = new Runnable[THREAD_COUNT];
 		Thread[] t = new Thread[THREAD_COUNT];
 		
@@ -211,29 +207,26 @@ public class AdBlaster {
 
 	}
 
-	private static void getChunk(AdBlasterThreadedInstance chunk, AdBlasterDbInstance instance) {
+	/*
+	 * Get "num" chunks of average size "size".
+	 */
+	private static AdBlasterThreadedInstance[] getChunk(GlobalData gd, int num, int size) {
+		AdBlasterThreadedInstance r[] = new AdBlasterThreadedInstance[num];
+		int modCount = ac.getUserCount() / size;
+		for (int i = 0; i < num; i++){
+			r[i] = new AdBlasterThreadedInstance(gd);
+		}
 		for (int i = 0; i < ac.getUserCount()-1; i++){
 			ProgressIndicator.show(i, ac.getUserCount());
-			if (ac.getUserByIndex(i).getID() % 1000 == offset){
-				Vector <BannerView>vec = instance.db.getByUser(ac.getUserByIndex(i).getID());
+			int hash = ac.getUserByIndex(i).getID() % modCount;
+			if (hash < num){
+				Vector <BannerView>vec = gd.instance.db.getByUser(ac.getUserByIndex(i).getID());
 				for (BannerView bv : vec){
-					chunk.addView(bv);
+					r[hash].addView(bv);
 				}
 			}
 		}
-		offset++;
-		/*
-		for (int i = 0; i < instance.getViewCount(); i++){
-			BannerView bv = instance.getView(i);
-			if (bv.getUser().id % 1000 == offset){
-				chunk.addView(bv);
-			}
-			if (i%1000 == offset){
-				System.out.println("Loaded bannerview " + i + ": " + bv);
-			}
-		}
-		chunk.bannerCountMap = instance.bannerCountMap;
-		offset++;*/
+		return r;
 	}								
 					
 	static JTable getBannerTable(AbstractAdBlasterUniverse ac2, AdBlasterPolicy pol) {

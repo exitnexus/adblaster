@@ -6,9 +6,9 @@ public class GlobalData {
 
 	public AdBlasterPolicy pol;
 	public AbstractAdBlasterUniverse universe;
-	public AbstractAdBlasterInstance instance;
+	public AdBlasterDbInstance instance;
 
-	public GlobalData(AbstractAdBlasterInstance instance, AdBlasterPolicy pol){
+	public GlobalData(AdBlasterDbInstance instance, AdBlasterPolicy pol){
 		this.pol = pol;
 		this.instance = instance;
 		this.universe = instance.universe;
