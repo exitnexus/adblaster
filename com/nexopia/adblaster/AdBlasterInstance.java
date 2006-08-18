@@ -134,10 +134,4 @@ public class AdBlasterInstance extends AbstractAdBlasterInstance{
 		return this.views.get(i);
 	}
 
-	public void notifyChangeUser(BannerView view) {
-	}
-
-	public void notifyChangeTime(BannerView view) {
-	}
-
 }

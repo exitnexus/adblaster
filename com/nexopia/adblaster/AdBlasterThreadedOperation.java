@@ -43,6 +43,7 @@ final class AdBlasterThreadedOperation implements Runnable {
 	}
 	
 	public synchronized void operateOnChunk(AdBlasterThreadedInstance chunk) {
+		System.out.println("Operating on a chunk...");
 		original_profit = chunk.totalProfit();
 
 		chunk.fillInstance(gd.pol);

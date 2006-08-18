@@ -15,7 +15,6 @@ public class ProgressIndicator {
 		frame.setContentPane(bar);
 		frame.pack();
 		frame.setVisible(true);
-		
 	}
 	public static void show(int i, int max){
 		bar.setMaximum(max);

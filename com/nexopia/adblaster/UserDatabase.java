@@ -102,6 +102,7 @@ public class UserDatabase {
 	}
 	
 	public void refreshUserCount() {
+		System.out.println("Loading users...");
 		Cursor c = null;
 		try {
 			DatabaseEntry key = new DatabaseEntry();
@@ -130,7 +131,7 @@ public class UserDatabase {
 					keys[size++] = cache.getKeyArray()[i];
 				}
 			}
-			System.out.println(size + ":" + cache.m_entryCount);
+			System.out.println("Usermap size: " + size + ":" + cache.m_entryCount);
 		} catch (Exception dbe) {
 			this.userCount = 0;
 			System.err.println("Database Exception in refreshUserCount(): " + dbe);

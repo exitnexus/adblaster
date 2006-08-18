@@ -2,17 +2,40 @@ package com.nexopia.adblaster;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.WeakHashMap;
+
 import com.sleepycat.je.DatabaseException;
 
 public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	HashMap swappedViews; //always look for a view here before checking the database
 	BannerViewDatabase db;
+	static WeakHashMap<BannerView, Boolean> weakmap = new WeakHashMap<BannerView, Boolean>();
 	
+	static {
+		Runnable memoryMonitor = new Runnable(){
+			public void run() {
+				synchronized(this){
+					while (true){
+						try {
+							this.wait(30000);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						System.out.println("Bannerviews in memory: " + weakmap.keySet().size());
+					}
+				}
+			}
+		};
+		new Thread(memoryMonitor).start();
+	}
+
 	public AdBlasterDbInstance(AbstractAdBlasterUniverse c){
 		super(c);
 	}
 	public void load(File f) {
 		try {
+			System.out.println("Counting Bannerviews.");
 			db = new BannerViewDatabase(f);
 			ProgressIndicator.setTitle("Counting bannerviews...");
 			for (int i = 0; i < db.getBannerViewCount(); i++){
@@ -21,6 +44,7 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 				if (bv.getBanner() != null){
 					updateMap(bv);
 				}
+				weakmap.put(bv, Boolean.TRUE);
 			}
 			System.out.println("Done.");
 		} catch (DatabaseException e) {
