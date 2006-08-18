@@ -38,13 +38,44 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 			System.out.println("Counting Bannerviews.");
 			db = new BannerViewDatabase(f);
 			ProgressIndicator.setTitle("Counting bannerviews...");
-			for (int i = 0; i < db.getBannerViewCount(); i++){
-				ProgressIndicator.show(i, db.getBannerViewCount());
-				BannerView bv = db.get(i);
-				if (bv.getBanner() != null){
-					updateMap(bv);
+			/*{
+				long time = System.currentTimeMillis();
+				for (int i = 0; i < db.getBannerViewCount(); i++){
+					ProgressIndicator.show(i, db.getBannerViewCount());
+					BannerView bv = db.get(i);
+					if (bv.getBanner() != null){
+						updateMap(bv);
+					}
+					weakmap.put(bv, Boolean.TRUE);
 				}
-				weakmap.put(bv, Boolean.TRUE);
+				System.out.println(System.currentTimeMillis() - time);
+			}*/
+			
+			{
+				int i=0;
+				long time = System.currentTimeMillis();
+				BannerViewCursor c = db.getCursor();
+				BannerView bv;
+				while ((bv = c.getNext()) != null){
+					i++;
+					if (i > db.getBannerViewCount()){
+						System.out.println(bv.getIndex() + ":" + bv.getUserID());
+					}
+					ProgressIndicator.show(i, db.getBannerViewCount());
+					if (bv.getBanner() != null){
+						updateMap(bv);
+					}
+					weakmap.put(bv, Boolean.TRUE);
+				}
+				System.out.println(System.currentTimeMillis() - time);
+			}
+			for (int i = 0; i < this.universe.getBannerCount(); i++){
+				Banner b = this.universe.getBannerByID(i);
+				if (b != null){
+					System.out.print(i + ", ");
+					System.out.print(b.id + ", ");
+					System.out.println(bannerCount(b));
+				}
 			}
 			System.out.println("Done.");
 		} catch (DatabaseException e) {

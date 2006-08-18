@@ -101,6 +101,13 @@ public class BannerViewDatabase {
 		return new BannerViewCursor(c);
 	}
 	
+	public BannerViewCursor getCursor() throws DatabaseException {
+		Cursor c = db.openCursor(null, null);
+		ib.intToEntry(0, searchKey);
+		c.getSearchKeyRange(searchKey, searchData, null);
+		return new BannerViewCursor(c);
+	}
+
 	public int getBannerViewCount() {
 		return lastid;
 	}

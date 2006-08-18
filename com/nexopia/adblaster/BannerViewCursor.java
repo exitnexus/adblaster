@@ -6,8 +6,10 @@
  */
 package com.nexopia.adblaster;
 
+import com.sleepycat.je.Cursor;
 import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.DatabaseException;
+import com.sleepycat.je.OperationStatus;
 import com.sleepycat.je.SecondaryCursor;
 
 /**
@@ -17,8 +19,8 @@ import com.sleepycat.je.SecondaryCursor;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class BannerViewCursor {
-	SecondaryCursor c;
-	public BannerViewCursor(SecondaryCursor c) {
+	Cursor c;
+	public BannerViewCursor(Cursor c) {
 		this.c = c;
 	}
 	
@@ -27,7 +29,8 @@ public class BannerViewCursor {
 	IntegerBinding ib = new IntegerBinding();
 	public BannerView getNext() {
 		try {
-			c.getNext(key, data, null);
+			if (c.getNextNoDup(key, data, null) == OperationStatus.NOTFOUND)
+				return null;
 		} catch (DatabaseException e) {
 			System.out.println("DatabaseException: " + e);
 			e.printStackTrace();
