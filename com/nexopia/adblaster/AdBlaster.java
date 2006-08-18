@@ -21,8 +21,8 @@ import javax.swing.table.DefaultTableModel;
 
 public class AdBlaster {
 
-	private static final int THREAD_COUNT = 40;
-	static int num_serves = 10;
+	private static final int THREAD_COUNT = 5;
+	static int num_serves = 4;
 	static AdBlasterDbUniverse ac;
 	static AdBlasterDbInstance instanc;
 	static BannerViewBinding instanceBinding;
@@ -72,7 +72,7 @@ public class AdBlaster {
 		
 		System.out.println("Chunking.");
 		GlobalData gd = new GlobalData(instanc, pol);
-		AdBlasterThreadedInstance[] chunk = getChunk(gd, THREAD_COUNT, 100);
+		AdBlasterThreadedInstance[] chunk = getChunk(gd, THREAD_COUNT, 10);
 		Runnable[] r = new Runnable[THREAD_COUNT];
 		Thread[] t = new Thread[THREAD_COUNT];
 		
@@ -113,20 +113,20 @@ public class AdBlaster {
 			tab.addTab("Thread " + j, tabs[j]);
 		}
 		
-		for (int i = 0; i < 2; i++){
+		for (int i = 0; i < num_serves; i++){
 			for (int j=0; j<THREAD_COUNT; j++) {
 				AdBlasterThreadedOperation.createTab(chunk[j], tabs[j], "Starting", chunk[j].totalProfit());
 			}
 			
-			for (int j = 0; j < chunk[i].getViewCount(); j++){
-				BannerView bv = chunk[i].getView(j);
-				bv.setBanner(null);
-			}
 			for (int j=0; j<THREAD_COUNT; j++) {
-				if (i == 0 || i == 4){
+				for (int k = 0; k < chunk[j].getViewCount(); k++){
+					BannerView bv = chunk[j].getView(k);
+					bv.setBanner(null);
+				}
+				if (i == 0 || i == num_serves-1){
 					r[j] = new AdBlasterThreadedOperation(gd, chunk[j], "ThreadSet " + j, tabs[j]);
 				} else {
-					r[j] = new AdBlasterThreadedOperation(gd, chunk[j], "ThreadSet " + j, tabs[j]);
+					r[j] = new AdBlasterThreadedOperation(gd, chunk[j], "ThreadSet " + j, null);
 				}
 				t[j] = new Thread(r[j], "operateOnChunk");
 				

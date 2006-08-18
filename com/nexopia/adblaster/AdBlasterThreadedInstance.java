@@ -13,6 +13,22 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 		
 	}
 
+	public float totalProfit(){
+		float count = 0;
+		long time = System.currentTimeMillis();
+		for (int i = 0; i < getViewCount(); i++){
+			if (System.currentTimeMillis() - time > 5000){
+				System.out.println(""+ (float)i/(float)getViewCount()*100 + "% done calculating profit.");
+				time = System.currentTimeMillis();
+			}
+			BannerView bv =((BannerView)getView(i)); 
+			if (bv.getBanner() != null){
+				count += bv.getBanner().getRealPayrate();
+			}
+		}
+		return count;
+	}
+	
 	@Override
 	public void fillInstance(I_Policy pol) {
 		long time = System.currentTimeMillis();

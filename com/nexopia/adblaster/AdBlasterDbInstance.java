@@ -29,6 +29,17 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 		}
 	}
 	
+	public float totalProfit(){
+		float count = 0;
+		for (int i = 0; i < this.universe.getBannerCount(); i++){
+			Banner b = this.universe.getBannerByIndex(i);
+			float worth = this.bannerCount(b) * b.getRealPayrate();
+			System.out.println(":::" + this.bannerCount(b));
+			count += worth;
+		}
+		return count;
+	}
+
 	/*public void test(){
 		BannerViewCursor cursor;
 		try {
