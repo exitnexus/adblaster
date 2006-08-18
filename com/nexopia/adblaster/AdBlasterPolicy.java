@@ -37,7 +37,7 @@ public class AdBlasterPolicy implements I_Policy {
 	}
 
 	public void upgradePolicy(AbstractAdBlasterInstance chunk, AdBlasterThreadedOperation op) {
-
+		System.out.println("Upgrading.");
 		int sbefore[] = new int[universe.getBannerCount()];
 		for (int i = 0; i < universe.getBannerCount(); i++){
 			Banner b = universe.getBannerByIndex(i);
@@ -49,16 +49,17 @@ public class AdBlasterPolicy implements I_Policy {
 		float newcount = 0;
 		int iterations = 0;
 		while((newcount = chunk.totalProfit()) != count && iterations < 50){
+			System.out.println("An iteration...");
 			iterations++;
 			count = newcount;
 			op.iterativeImprove(chunk);
 		}
+		ProgressIndicator.setTitle("Calculating Banner Coefficients...");
 		for (int i = 0; i < universe.getBannerCount(); i++){
 			Banner b = universe.getBannerByIndex(i);
-			System.out.println("Calculating banner " + i + "/" + universe.getBannerCount());
+			ProgressIndicator.show(i, universe.getBannerCount());
 			int after = chunk.bannerCount(b);
 			int before = sbefore[i];
-			System.out.println("" + after + "  :  " + before + "  :  " + (float)after/(float)before);
 			float f = ((float)((1.0f + after) / (1.0f + before)));
 			this.incrementMultiply(b, (float)Math.pow(f, 1.0f)); 
 		}

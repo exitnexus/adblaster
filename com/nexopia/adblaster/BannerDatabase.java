@@ -80,7 +80,7 @@ public class BannerDatabase {
 				}
 			}
 			keyset.addAll(this.banners.keySet());
-			System.out.println("Total: " + i);
+			System.out.println("Total: " + i + " banners.");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

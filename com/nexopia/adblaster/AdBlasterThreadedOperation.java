@@ -109,10 +109,10 @@ final class AdBlasterThreadedOperation implements Runnable {
 	
 	public void iterativeImprove(AbstractAdBlasterInstance instanc) {
 		Vector<Banner> unserved = gd.getUnserved();
-		
+		System.out.println("Improving based on unserved banners.");
+		ProgressIndicator.setTitle("Using Unserved Banners...");
 		for (int i = 0; i < unserved.size(); i++){
-			System.out.println("Unserved: " + i +" /" + unserved.size());
-			//Progress
+			ProgressIndicator.show(i, unserved.size());
 			Banner b = (Banner)unserved.get(i);
 			
 			// First try simple search

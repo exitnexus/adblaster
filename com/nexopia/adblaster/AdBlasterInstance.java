@@ -21,9 +21,10 @@ public class AdBlasterInstance extends AbstractAdBlasterInstance{
 	public float totalProfit(){
 		float count = 0;
 		long time = System.currentTimeMillis();
+		System.out.println("Calculating profit.");
 		for (int i = 0; i < getViewCount(); i++){
 			if (System.currentTimeMillis() - time > 5000){
-				System.out.println(""+ (float)i/(float)getViewCount()*100 + "% done calculating profit.");
+				ProgressIndicator.show(i, getViewCount());
 				time = System.currentTimeMillis();
 			}
 			BannerView bv =((BannerView)getView(i)); 
@@ -35,18 +36,20 @@ public class AdBlasterInstance extends AbstractAdBlasterInstance{
 	}
 	
 	public void fillInstance(I_Policy pol){
+		System.out.println("Clearing.");
 		long time = System.currentTimeMillis();
 		for (int i = 0; i < getViewCount(); i++){
 			if ((System.currentTimeMillis() - time) > 5000){
-				System.out.println("..." + ((float)i/(float)getViewCount())*100 + "% complete clearing.");
+				ProgressIndicator.show(i, getViewCount());
 				time = System.currentTimeMillis();
 			}
 			getView(i).setBanner(null);
 		}
+		System.out.println("Filling.");
 		for (int i = 0; i < getViewCount(); i++){
 			BannerView bv = getView(i);
 			if ((System.currentTimeMillis() - time) > 5000){
-				System.out.println("..." + ((float)i/(float)getViewCount())*100 + "% complete filling.");
+				ProgressIndicator.show(i, getViewCount());
 				time = System.currentTimeMillis();
 			}
 			//Banner b = pol.getBestBanner(this, bv);

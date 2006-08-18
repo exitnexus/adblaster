@@ -124,7 +124,7 @@ public class UserDatabase {
 			//keys.addAll(cache.keySet());
 			int size = 0;
 			keys = new int[cache.m_entryCount];
-			System.out.println("Building map...");
+			System.out.println("Building user map...");
 			for (int i = 0; i < cache.getKeyArray().length; i++){
 				if (cache.getKeyArray()[i] != 0){
 					keys[size++] = cache.getKeyArray()[i];

@@ -32,9 +32,6 @@ public abstract class AbstractAdBlasterInstance {
 	
 	
 	public boolean isValidBannerForViewWithComments(BannerView bv, Banner b, StringBuffer buf) {
-		if (bv.getUserID() == -521590000 && b.id == 57){
-			System.out.println("ooga");
-		}
 		boolean b1 = (b == null);
 		boolean b2 = bv.getSize() == b.getSize();
 		boolean b3 = b.validUser(bv.getUser());
