@@ -7,6 +7,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
 import java.util.Vector;
 
 import javax.swing.BoxLayout;
@@ -26,48 +27,55 @@ public class AdBlaster {
 	static AdBlasterDbUniverse ac;
 	static AdBlasterDbInstance instanc;
 	static BannerViewBinding instanceBinding;
-	private static int offset = 0;
-	static {
+	
+	static File user_dir = null;
+	static File page_dir = null;
+	static File bv_dir = null;
+
+	public static File getDir(String name){
+		if (bv_dir == null){
+			JFileChooser u_jfc = new JFileChooser();
 		
-		JFileChooser u_jfc = new JFileChooser();
+			u_jfc.setDialogTitle("Choose the " + name + " directory to load");
+			u_jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			
+		    int returnVal = u_jfc.showOpenDialog(null);
+		    if(returnVal == JFileChooser.APPROVE_OPTION) {
+		       System.out.println("You chose to open this file: " +
+		            u_jfc.getSelectedFile().getName());
+		    } else {
+		    	System.exit(0);
+		    }
+		    bv_dir = u_jfc.getSelectedFile();
+		} 
 		
-		u_jfc.setDialogTitle("Choose the User directory to load");
-		u_jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		
-	    int returnVal = u_jfc.showOpenDialog(null);
-	    if(returnVal == JFileChooser.APPROVE_OPTION) {
-	       System.out.println("You chose to open this file: " +
-	            u_jfc.getSelectedFile().getName());
-	    } else {
-	    	System.exit(0);
-	    }
-	    
-		ac = new AdBlasterDbUniverse(u_jfc.getSelectedFile());
-		instanc = new AdBlasterDbInstance(ac);
-		instanceBinding = new BannerViewBinding(ac, instanc);
+		return bv_dir; 
 	}
 	
 	public static void main(String args[]){
+		if (args.length == 3){
+			System.out.println("Running with selected directories.");
+			bv_dir = new File(args[0]);
+			user_dir = new File(args[1]);
+			page_dir = new File(args[2]);
+		} else {
+			bv_dir = getDir("BannerView");
+			user_dir = getDir("User");
+			page_dir = getDir("Page");
+		}
+		
+		ac = new AdBlasterDbUniverse(user_dir);
+		instanc = new AdBlasterDbInstance(ac);
+		instanceBinding = new BannerViewBinding(ac, instanc);
+
 		long start_time = System.currentTimeMillis();
 		
 		//ac = AdBlasterUniverse.generateTestData(num_banners, num_users);
 		//((AdBlasterUniverse)ac).makeMeADatabase();
 		
-		JFileChooser bv_jfc = new JFileChooser();
-		bv_jfc.setDialogTitle("Choose the BannerView directory to load");
-		bv_jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-	    
-		int returnVal = bv_jfc.showOpenDialog(null);
-	    if(returnVal == JFileChooser.APPROVE_OPTION) {
-	       System.out.println("You chose to open this file: " +
-	            bv_jfc.getSelectedFile().getName());
-	    } else {
-	    	System.exit(0);
-	    }
-	    
 		AdBlasterPolicy pol = AdBlasterPolicy.randomPolicy(ac);
 
-		((AdBlasterDbInstance)instanc).load(bv_jfc.getSelectedFile());
+		((AdBlasterDbInstance)instanc).load(bv_dir);
 		System.out.println("Total original profit: " + instanc.totalProfit());
 		
 		System.out.println("Chunking.");

@@ -34,21 +34,7 @@ public class PageDatabase {
 	public static PageDatabase pageDb;
 	static {
 		try {
-			JFileChooser p_jfc = new JFileChooser();
-			p_jfc.setDialogTitle("Choose the Page directory to load");
-
-			p_jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			p_jfc.setVisible(true);
-
-		    int returnVal = p_jfc.showOpenDialog(null);
-		    if(returnVal == JFileChooser.APPROVE_OPTION) {
-		       System.out.println("You chose to open this file: " +
-		            p_jfc.getSelectedFile().getName());
-		    } else {
-		    	System.exit(0);
-		    }
-		    
-			pageDb = new PageDatabase(p_jfc.getSelectedFile());
+			pageDb = new PageDatabase(AdBlaster.page_dir);
 		} catch (DatabaseException dbe) {
 			System.err.println("Unable to open the page database, terminating.");
 			dbe.printStackTrace();
