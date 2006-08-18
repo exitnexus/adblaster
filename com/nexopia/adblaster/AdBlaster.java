@@ -22,7 +22,7 @@ import javax.swing.table.DefaultTableModel;
 
 public class AdBlaster {
 
-	private static final int THREAD_COUNT = 5;
+	private static final int THREAD_COUNT = 1;
 	static int num_serves = 4;
 	static AdBlasterDbUniverse ac;
 	static AdBlasterDbInstance instanc;

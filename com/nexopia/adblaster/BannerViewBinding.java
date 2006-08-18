@@ -6,6 +6,8 @@
  */
 package com.nexopia.adblaster;
 
+import java.util.WeakHashMap;
+
 import com.sleepycat.bind.tuple.TupleBinding;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -22,6 +24,26 @@ class BannerViewBinding extends TupleBinding {
 	AbstractAdBlasterInstance inst;
 	int currentIndex;
 	boolean indexFresh = false;
+	static WeakHashMap<BannerView, Boolean> weakmap = new WeakHashMap<BannerView, Boolean>();
+
+	static {
+		Runnable memoryMonitor = new Runnable(){
+			public void run() {
+				synchronized(this){
+					while (true){
+						try {
+							this.wait(30000);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						System.out.println("Bannerviews in memory: " + weakmap.keySet().size());
+					}
+				}
+			}
+		};
+		new Thread(memoryMonitor).start();
+	}
 	
 	BannerViewBinding(AbstractAdBlasterUniverse universe, AbstractAdBlasterInstance i){
 		ac = universe;
@@ -48,7 +70,10 @@ class BannerViewBinding extends TupleBinding {
 		int uid = ti.readInt();
 		byte size = ti.readByte();
 		int page = ti.readInt();
-		return new BannerView(inst, currentIndex, uid, b,time, size, page);
+		BannerView bv = new BannerView(inst, currentIndex, uid, b,time, size, page);
+		weakmap.put(bv, Boolean.TRUE);
+		return bv;
+
 	}
 
 	/* (non-Javadoc)

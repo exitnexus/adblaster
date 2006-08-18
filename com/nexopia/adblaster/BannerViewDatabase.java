@@ -10,6 +10,7 @@ import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+import java.util.WeakHashMap;
 
 import com.sleepycat.je.Cursor;
 import com.sleepycat.je.Database;
@@ -40,6 +41,7 @@ public class BannerViewDatabase {
 	private DatabaseEntry key = new DatabaseEntry();
 	private DatabaseEntry data = new DatabaseEntry();
 	private IntegerBinding ib = new IntegerBinding();
+
 	
 	/*public BannerViewDatabase() throws DatabaseException {
 		//Create our primary database keyed by a unique ID
