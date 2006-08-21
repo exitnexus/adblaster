@@ -1,6 +1,10 @@
 package com.nexopia.adblaster;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.WeakHashMap;
 
@@ -12,6 +16,31 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	
 	public AdBlasterDbInstance(AbstractAdBlasterUniverse c){
 		super(c);
+	}
+	public void loadNoCount(File dbf, File data) {
+		try {
+			db = new BannerViewDatabase(dbf);
+		} catch (DatabaseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(data));
+			br.readLine();
+			String str = "";
+			while ((str = br.readLine()) != null){
+				String r[] = str.split(", ");
+				Banner b = universe.getBannerByID(Integer.parseInt(r[1]));
+				this.bannerCountMap.put(b, new Integer(Integer.parseInt(r[2])));
+				System.out.println(r[1] + ":" + r[2]);
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	public void load(File f) {
 		try {
@@ -31,24 +60,23 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 				System.out.println(System.currentTimeMillis() - time);
 			}*/
 			
-			{
-				int i=0;
-				long time = System.currentTimeMillis();
-				BannerViewCursor c = db.getCursor();
-				BannerView bv;
-				while ((bv = c.getNext()) != null){
-					i++;
-					if (i > db.getBannerViewCount()){
-						System.out.println(bv.getIndex() + ":" + bv.getUserID());
-					}
-					ProgressIndicator.show(i, db.getBannerViewCount());
-					if (bv.getBanner() != null){
-						updateMap(bv);
-					}
+			int i=0;
+			long time = System.currentTimeMillis();
+			BannerViewCursor c = db.getCursor();
+			BannerView bv;
+			while ((bv = c.getNext()) != null){
+				i++;
+				if (i > db.getBannerViewCount()){
+					System.out.println(bv.getIndex() + ":" + bv.getUserID());
 				}
-				System.out.println(System.currentTimeMillis() - time);
+				ProgressIndicator.show(i, db.getBannerViewCount());
+				if (bv.getBanner() != null){
+					updateMap(bv);
+				}
 			}
-			for (int i = 0; i < this.universe.getBannerCount(); i++){
+			System.out.println(System.currentTimeMillis() - time);
+
+			for (i = 0; i < this.universe.getBannerCount(); i++){
 				Banner b = this.universe.getBannerByID(i);
 				if (b != null){
 					System.out.print(i + ", ");

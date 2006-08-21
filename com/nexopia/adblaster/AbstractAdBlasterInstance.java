@@ -8,7 +8,7 @@ import java.util.Vector;
 public abstract class AbstractAdBlasterInstance {
 
 	AbstractAdBlasterUniverse universe;
-	private HashMap <Banner, Integer>bannerCountMap = null;
+	protected HashMap <Banner, Integer>bannerCountMap = null;
 	private HashMap <Campaign, Integer>campaignCountMap = null;
 	static Integer pool[];
 	static {

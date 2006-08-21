@@ -53,11 +53,13 @@ public class AdBlaster {
 	}
 	
 	public static void main(String args[]){
-		if (args.length == 3){
+		File dataFile = null;
+		if (args.length == 4){
 			System.out.println("Running with selected directories.");
 			bv_dir = new File(args[0]);
 			user_dir = new File(args[1]);
 			page_dir = new File(args[2]);
+			dataFile = new File(args[3]);
 		} else {
 			bv_dir = getDir("BannerView");
 			user_dir = getDir("User");
@@ -70,12 +72,13 @@ public class AdBlaster {
 
 		long start_time = System.currentTimeMillis();
 		
-		//ac = AdBlasterUniverse.generateTestData(num_banners, num_users);
-		//((AdBlasterUniverse)ac).makeMeADatabase();
-		
 		AdBlasterPolicy pol = AdBlasterPolicy.randomPolicy(ac);
 
-		((AdBlasterDbInstance)instanc).load(bv_dir);
+		if (dataFile != null){
+			((AdBlasterDbInstance)instanc).loadNoCount(bv_dir, dataFile);
+		} else {
+			((AdBlasterDbInstance)instanc).load(bv_dir);
+		}
 		System.out.println("Total original profit: " + instanc.totalProfit());
 		
 		System.out.println("Chunking.");
