@@ -32,6 +32,10 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 				String r[] = str.split(", ");
 				Banner b = universe.getBannerByID(Integer.parseInt(r[1]));
 				this.bannerCountMap.put(b, new Integer(Integer.parseInt(r[2])));
+				if (!this.campaignCountMap.containsKey(b.campaign)){
+					this.campaignCountMap.put(b.campaign, new Integer(0));
+				}
+				this.campaignCountMap.put(b.campaign, new Integer(this.campaignCount(b) + Integer.parseInt(r[2])));
 				System.out.println(r[1] + ":" + r[2]);
 			}
 		} catch (FileNotFoundException e) {

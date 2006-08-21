@@ -9,7 +9,7 @@ public abstract class AbstractAdBlasterInstance {
 
 	AbstractAdBlasterUniverse universe;
 	protected HashMap <Banner, Integer>bannerCountMap = null;
-	private HashMap <Campaign, Integer>campaignCountMap = null;
+	protected HashMap <Campaign, Integer>campaignCountMap = null;
 	static Integer pool[];
 	static {
 		pool = new Integer[200];
