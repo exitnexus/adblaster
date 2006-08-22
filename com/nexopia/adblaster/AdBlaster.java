@@ -159,59 +159,39 @@ public class AdBlaster {
 				}
 			}
 		}
+		System.out.println("Saving Coefficients...");
 		ac.saveCoefficients(pol.getCoefficients());
-			panel.add(tab, BorderLayout.CENTER);
-			JPanel resultPanel = new JPanel(new BorderLayout());
-			
-			{
-				//Actual final results.
-				//instanc.fillInstance(gd.pol);
-				resultPanel = new JPanel(new BorderLayout());
-				JScrollPane scroll = new JScrollPane(resultPanel);
-				tab.addTab("Final", scroll);
-				DefaultTableModel model = new DefaultTableModel(instanc.getViewCount(),3);
-				JTable table = new JTable(model);
-				for (int j = 0; j < Math.min(instanc.getViewCount(),1000); j++){
-					model.setValueAt(instanc.getView(j).getUser(), j,0);
-					model.setValueAt(instanc.getView(j).getBanner(), j,1);
-					model.setValueAt(AdBlaster.outputTime(instanc.getView(j).getTime()), j,2);
-				}
-				resultPanel.add(table, BorderLayout.CENTER);
-				JPanel statsPanel = new JPanel(new FlowLayout());
-				//statsPanel.add(new JTextField(""+instanc.totalProfit()));
-				/*
-				for (int j = 0; j < instanc.getViewCount(); j++){
-					BannerView bv = instanc.getView(j);
-					bv.setBanner(null);
-				}
-				float pro = 0;
-				for (int j = 0; j < 10000; j++){
-					System.out.println((float)j/100.0f + "% calculating final profit.");
-					AdBlasterThreadedInstance f = new AdBlasterThreadedInstance(gd);
-					for (int i = 0; i < ac.getUserCount()-1; i++){
-						ProgressIndicator.show(i, ac.getUserCount());
-						if (ac.getUserByIndex(i).getID() % 10000 == j){
-							Vector <BannerView>vec = instanc.db.bv_db.getByUser(ac.getUserByIndex(i).getID());
-							for (BannerView bv : vec){
-								f.addView(bv);
-							}
-						}
-					}
-					f.fillInstance(pol);
-					pro += f.totalProfit();
-				}
-				statsPanel.add(new JTextField(""+pro));
-				*/
-				resultPanel.add(statsPanel, BorderLayout.PAGE_START);
+
+		System.out.println("Making final results...");
+		panel.add(tab, BorderLayout.CENTER);
+		JPanel resultPanel = new JPanel(new BorderLayout());
 		
+		{
+			//Actual final results.
+			//instanc.fillInstance(gd.pol);
+			resultPanel = new JPanel(new BorderLayout());
+			JScrollPane scroll = new JScrollPane(resultPanel);
+			tab.addTab("Final", scroll);
+			DefaultTableModel model = new DefaultTableModel(Math.min(instanc.getViewCount(),1000),3);
+			JTable table = new JTable(model);
+			System.out.println("Filling table...");
+			for (int j = 0; j < Math.min(instanc.getViewCount(),1000); j++){
+				model.setValueAt(instanc.getView(j).getUser(), j,0);
+				model.setValueAt(instanc.getView(j).getBanner(), j,1);
+				model.setValueAt(AdBlaster.outputTime(instanc.getView(j).getTime()), j,2);
 			}
-			JPanel statPanel = new JPanel();
-			statPanel.setLayout(new BoxLayout(statPanel, BoxLayout.PAGE_AXIS));
-			statPanel.add(new JScrollPane(AdBlaster.getBannerTable(AdBlaster.ac, gd.pol)));
-			panel.add(statPanel, BorderLayout.SOUTH);
-		
-			frame.pack();
-			frame.setVisible(true);
+			resultPanel.add(table, BorderLayout.CENTER);
+			JPanel statsPanel = new JPanel(new FlowLayout());
+			resultPanel.add(statsPanel, BorderLayout.PAGE_START);
+	
+		}
+		JPanel statPanel = new JPanel();
+		statPanel.setLayout(new BoxLayout(statPanel, BoxLayout.PAGE_AXIS));
+		statPanel.add(new JScrollPane(AdBlaster.getBannerTable(AdBlaster.ac, gd.pol)));
+		panel.add(statPanel, BorderLayout.SOUTH);
+	
+		frame.pack();
+		frame.setVisible(true);
 
 		System.out.println("Total time:" + (System.currentTimeMillis()- start_time));
 		// TODO Auto-generated method stub
