@@ -81,7 +81,7 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 			System.out.println(System.currentTimeMillis() - time);
 
 			for (i = 0; i < this.universe.getBannerCount(); i++){
-				Banner b = this.universe.getBannerByID(i);
+				Banner b = this.universe.getBannerByIndex(i);
 				if (b != null){
 					System.out.print(i + ", ");
 					System.out.print(b.id + ", ");

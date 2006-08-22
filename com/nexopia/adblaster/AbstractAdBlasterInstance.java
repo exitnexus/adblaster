@@ -345,8 +345,10 @@ public abstract class AbstractAdBlasterInstance {
 			this.campaignCountMap.put(bv.getBanner().getCampaign(), 
 					new Integer((campaignCountMap.get(bv.getBanner().getCampaign())).intValue()-1));
 
-			if (bannerCountMap.get(bv.getBanner()).intValue() < 0 ||
-					campaignCountMap.get(bv.getBanner().getCampaign()).intValue() < 0){
+			if (bannerCountMap.get(bv.getBanner()).intValue() < 0){
+				throw new UnsupportedOperationException("" + bv.getBanner());
+			}
+			if(campaignCountMap.get(bv.getBanner().getCampaign()).intValue() < 0){
 				throw new UnsupportedOperationException();
 			}
 		}

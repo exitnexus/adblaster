@@ -22,7 +22,7 @@ import javax.swing.table.DefaultTableModel;
 
 public class AdBlaster {
 
-	private static final int THREAD_COUNT = 1;
+	private static final int THREAD_COUNT = 2;
 	static int num_serves = 4;
 	static AdBlasterDbUniverse ac;
 	static AdBlasterDbInstance instanc;
@@ -83,7 +83,7 @@ public class AdBlaster {
 		
 		System.out.println("Chunking.");
 		GlobalData gd = new GlobalData(instanc, pol);
-		AdBlasterThreadedInstance[] chunk = getChunk(gd, THREAD_COUNT, 10);
+		AdBlasterThreadedInstance[] chunk = getChunk(gd, THREAD_COUNT, 1000);
 		Runnable[] r = new Runnable[THREAD_COUNT];
 		Thread[] t = new Thread[THREAD_COUNT];
 		
