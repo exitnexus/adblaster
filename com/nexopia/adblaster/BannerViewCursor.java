@@ -20,8 +20,10 @@ import com.sleepycat.je.SecondaryCursor;
  */
 public class BannerViewCursor {
 	Cursor c;
-	public BannerViewCursor(Cursor c) {
+	BannerViewBinding instanceBinding;
+	public BannerViewCursor(Cursor c, BannerViewBinding bvb) {
 		this.c = c;
+		this.instanceBinding = bvb;
 	}
 	
 	DatabaseEntry data = new DatabaseEntry();
@@ -37,7 +39,7 @@ public class BannerViewCursor {
 			return null;
 		}
 		if (data.getData() != null) {
-			BannerViewBinding bvb = AdBlaster.instanceBinding;
+			BannerViewBinding bvb = instanceBinding;
 			bvb.setIndex(ib.entryToInt(key));
 			BannerView bv = (BannerView)bvb.entryToObject(data);
 			return bv;
@@ -55,7 +57,7 @@ public class BannerViewCursor {
 			return null;
 		}
 		if (data.getData() != null) {
-			BannerViewBinding bvb = AdBlaster.instanceBinding;
+			BannerViewBinding bvb = instanceBinding;
 			bvb.setIndex(ib.entryToInt(key));
 			BannerView bv = (BannerView)bvb.entryToObject(data);
 			return bv;

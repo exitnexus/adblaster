@@ -77,7 +77,7 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 		b = new HashMap<Integer, Banner>();
 	}
 
-	public void makeMeADatabase(){
+/*	public void makeMeADatabase(){
 		try {			
 
 			EnvironmentConfig envConf = new EnvironmentConfig();
@@ -95,7 +95,7 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 			System.err.println("DatabaseException: " + e);
 			e.printStackTrace();
 		}
-	}
+	}*/
 
 	public static AdBlasterUniverse generateTestData(int num_banners, int num_users, int num_interests){
 		/*Generate ab set of test banners and parameters

@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.Vector;
 import java.util.WeakHashMap;
 
+import com.sleepycat.bind.tuple.TupleBinding;
+import com.sleepycat.bind.tuple.TupleInput;
+import com.sleepycat.bind.tuple.TupleOutput;
 import com.sleepycat.je.Cursor;
 import com.sleepycat.je.Database;
 import com.sleepycat.je.DatabaseConfig;
@@ -41,7 +44,9 @@ public class BannerViewDatabase {
 	private DatabaseEntry key = new DatabaseEntry();
 	private DatabaseEntry data = new DatabaseEntry();
 	private IntegerBinding ib = new IntegerBinding();
-
+	private BannerViewBinding instanceBinding;
+	UserBinding userKey;
+	BannerTimeKeyCreator bt;
 	
 	/*public BannerViewDatabase() throws DatabaseException {
 		//Create our primary database keyed by a unique ID
@@ -51,7 +56,8 @@ public class BannerViewDatabase {
 		this.openDatabases();
 	}*/
 	
-	public BannerViewDatabase(File f) throws DatabaseException {
+	public BannerViewDatabase(File f, BannerViewBinding bvb) throws DatabaseException {
+		this.instanceBinding = bvb;
 		if (!f.exists()){
 			f.mkdir();
 		}
@@ -59,18 +65,20 @@ public class BannerViewDatabase {
 		envConf.setAllowCreate(true);
 		env = new Environment(f, envConf);
 		this.openDatabases();
+		bt = new BannerTimeKeyCreator(this.instanceBinding);
+		userKey = new UserBinding();
 	}
 
-	public BannerViewDatabase(String string) throws DatabaseException {
-		this(new File("BannerView.db." + string));
+	public BannerViewDatabase(String string, BannerViewBinding bvb ) throws DatabaseException {
+		this(new File("BannerView.db." + string), bvb);
 	}
 
-	public void insert(BannerView bv) throws DatabaseException  {
+	public void insert(DbBannerView bv) throws DatabaseException  {
 		try {
 			lastid++;
 			//ib.intToEntry(new Integer(lastid), key);
 			ib.intToEntry(lastid, key);
-			BannerViewBinding bvb = AdBlaster.instanceBinding;
+			BannerViewBinding bvb = bv.getInstance().instanceBinding;
 			bvb.objectToEntry(bv, data);
 			db.put(null, key, data);
 		} catch (DatabaseException dbe) {
@@ -92,7 +100,6 @@ public class BannerViewDatabase {
 		}
 	}
 	
-	BannerTimeKeyCreator bt = new BannerTimeKeyCreator();
 	DatabaseEntry searchKey = new DatabaseEntry();
 	DatabaseEntry searchData = new DatabaseEntry();
 	public BannerViewCursor getCursor(int bannerID, int initialTime, int index) throws DatabaseException {
@@ -100,14 +107,14 @@ public class BannerViewDatabase {
 		int[] a = { bannerID, initialTime, index };
 		bt.objectToEntry(a, searchKey);
 		c.getSearchKeyRange(searchKey, searchData, null);
-		return new BannerViewCursor(c);
+		return new BannerViewCursor(c, this.instanceBinding);
 	}
-	
+
 	public BannerViewCursor getCursor() throws DatabaseException {
 		Cursor c = db.openCursor(null, null);
 		ib.intToEntry(0, searchKey);
 		c.getSearchKeyRange(searchKey, searchData, null);
-		return new BannerViewCursor(c);
+		return new BannerViewCursor(c, this.instanceBinding);
 	}
 
 	public int getBannerViewCount() {
@@ -143,6 +150,7 @@ public class BannerViewDatabase {
 	 * @throws DatabaseException
 	 * 
 	 */
+	static TwoIntegerBinding tib = new TwoIntegerBinding();
 	private void openDatabases() throws DatabaseException {
 		//open the primary database
 		DatabaseConfig dbConf = new DatabaseConfig();
@@ -161,7 +169,7 @@ public class BannerViewDatabase {
 		}
 		
 		//open a database keyed by BannerID, timestamp
-		BannerTimeKeyCreator bannerTimeKey = new BannerTimeKeyCreator();
+		BannerTimeKeyCreator bannerTimeKey = new BannerTimeKeyCreator(this.instanceBinding);
 		SecondaryConfig bannerTimeConf = new SecondaryConfig();
 		bannerTimeConf.setAllowCreate(true);
 		//bannerTimeConf.setSortedDuplicates(true);
@@ -169,7 +177,18 @@ public class BannerViewDatabase {
 		bannerTimeDb = env.openSecondaryDatabase(null, "BannerTimeViews", db, bannerTimeConf);
 
 		//open a database keyed by userid
-		SecondaryKeyCreator userKey = new UserBinding();
+		SecondaryKeyCreator userKey = new SecondaryKeyCreator(){
+
+			public boolean createSecondaryKey(SecondaryDatabase userKeyDB, DatabaseEntry key, DatabaseEntry data, DatabaseEntry secondaryKey) throws DatabaseException {
+				BannerViewBinding bvb = instanceBinding;
+				bvb.setIndex(ib.entryToInt(key));
+				BannerView bv = (BannerView) bvb.entryToObject(data);
+				int uid = bv.getUserID();
+				tib.intsToEntry(uid, bv.getIndex(), secondaryKey);
+				return true;
+			}
+			
+		};
 		SecondaryConfig userConf = new SecondaryConfig();
 		userConf.setAllowCreate(true);
 		//userConf.setSortedDuplicates(true);
@@ -217,16 +236,15 @@ public class BannerViewDatabase {
 			e.printStackTrace();
 		}
 
-		BannerViewBinding bvb = AdBlaster.instanceBinding;
+		BannerViewBinding bvb = instanceBinding;
 		bvb.setIndex(index);
 		BannerView bv = (BannerView)bvb.entryToObject(data);
 		return bv;
 	}
 	
-	UserBinding userKey = new UserBinding();
 	public Vector <BannerView> getByUser(int uID) {
 		Vector <BannerView>vec = new Vector<BannerView>();
-		userKey.tib.intsToEntry(uID, 0, key);
+		tib.intsToEntry(uID, 0, key);
 		Cursor cursor = null;
 		try {
 			cursor = userDb.openCursor(null, null);
@@ -234,7 +252,7 @@ public class BannerViewDatabase {
 
 			while (cursor.getNext(key, data, LockMode.DEFAULT) == OperationStatus.SUCCESS) {
 				if (data.getData() != null) {
-					BannerViewBinding bvb = AdBlaster.instanceBinding;
+					BannerViewBinding bvb = instanceBinding;
 					bvb.setIndex(ib.entryToInt(key));
 					BannerView bv = (BannerView)bvb.entryToObject(data);
 					//System.out.println(bv);
@@ -252,6 +270,47 @@ public class BannerViewDatabase {
 
 		return vec;
 	}
+	
+	public static class TwoIntegerBinding extends TupleBinding {
+
+		/* (non-Javadoc)
+		 * @see com.sleepycat.bind.tuple.TupleBinding#entryToObject(com.sleepycat.bind.tuple.TupleInput)
+		 */
+		public Object entryToObject(TupleInput ti) {
+			return new Integer(ti.readInt());
+		}
+
+		public int entryToInt(DatabaseEntry entry) {
+	        return entryToInput(entry).readInt();
+		}
+
+		/* (non-Javadoc)
+		 * @see com.sleepycat.bind.tuple.TupleBinding#objectToEntry(java.lang.Object, com.sleepycat.bind.tuple.TupleOutput)
+		 */
+		/*WARNING: This is incorrect, but its never called*/
+		public void objectToEntry(Object o, TupleOutput to) {
+			Integer i = (Integer)o;
+			to.writeInt(i.intValue());
+		}
+
+	    protected TupleOutput getTupleOutput() {
+	        int byteSize = getTupleBufferSize();
+	        if (byteSize != 0) {
+	            return new TupleOutput(new byte[byteSize]);
+	        } else {
+	            return new TupleOutput();
+	        }
+	    }
+
+		public void intsToEntry(int i, int j, DatabaseEntry entry) {
+	        TupleOutput output = getTupleOutput();
+			output.writeInt(i);
+			output.writeInt(j);
+	        outputToEntry(output, entry);
+		}
+
+	}
+
 }
 
 

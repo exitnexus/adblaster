@@ -45,6 +45,7 @@ class BannerViewBinding extends TupleBinding {
 		new Thread(memoryMonitor).start();
 	}
 	
+	/* Pass (null, null) to get a "write only" binding */
 	BannerViewBinding(AbstractAdBlasterUniverse universe, AbstractAdBlasterInstance i){
 		ac = universe;
 		inst = i;

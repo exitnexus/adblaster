@@ -28,8 +28,10 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 		}
 	}
 
-	public AdBlasterDbUniverse(File userdb_file){
+	public AdBlasterDbUniverse(File userdb_file, File pagedb_file){
 		try {
+			PageDatabase pageDb = new PageDatabase(pagedb_file);
+			campaignDB = new Campaign.CampaignDB(pageDb);
 			bannerDB = new BannerDatabase(campaignDB);
 			userDB = new UserDatabase(userdb_file);
 		} catch (DatabaseException e) {

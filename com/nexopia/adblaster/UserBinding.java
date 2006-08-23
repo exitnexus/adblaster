@@ -20,9 +20,9 @@ import com.sleepycat.je.SecondaryKeyCreator;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-class UserBinding extends TupleBinding implements SecondaryKeyCreator {
+class UserBinding extends TupleBinding {
 	IntegerBinding ib = new IntegerBinding();
-
+	
 	/* (non-Javadoc)
 	 * @see com.sleepycat.bind.tuple.TupleBinding#entryToObject(com.sleepycat.bind.tuple.TupleInput)
 	 */
@@ -63,55 +63,15 @@ class UserBinding extends TupleBinding implements SecondaryKeyCreator {
 	/* (non-Javadoc)
 	 * @see com.sleepycat.je.SecondaryKeyCreator#createSecondaryKey(com.sleepycat.je.SecondaryDatabase, com.sleepycat.je.DatabaseEntry, com.sleepycat.je.DatabaseEntry, com.sleepycat.je.DatabaseEntry)
 	 */
-	TwoIntegerBinding tib = new TwoIntegerBinding();
-	public boolean createSecondaryKey(SecondaryDatabase userKeyDB, DatabaseEntry key, DatabaseEntry data, DatabaseEntry secondaryKey) throws DatabaseException {
-		BannerViewBinding bvb = AdBlaster.instanceBinding;
+/*	public boolean createSecondaryKey(SecondaryDatabase userKeyDB, DatabaseEntry key, DatabaseEntry data, DatabaseEntry secondaryKey) throws DatabaseException {
+		BannerViewBinding bvb = instanceBinding;
 		bvb.setIndex(ib.entryToInt(key));
 		BannerView bv = (BannerView) bvb.entryToObject(data);
 		int uid = bv.getUserID();
 		tib.intsToEntry(uid, bv.getIndex(), secondaryKey);
 		return true;
-	}
+	}*/
 
-	public class TwoIntegerBinding extends TupleBinding {
-
-		/* (non-Javadoc)
-		 * @see com.sleepycat.bind.tuple.TupleBinding#entryToObject(com.sleepycat.bind.tuple.TupleInput)
-		 */
-		public Object entryToObject(TupleInput ti) {
-			return new Integer(ti.readInt());
-		}
-
-		public int entryToInt(DatabaseEntry entry) {
-	        return entryToInput(entry).readInt();
-		}
-
-		/* (non-Javadoc)
-		 * @see com.sleepycat.bind.tuple.TupleBinding#objectToEntry(java.lang.Object, com.sleepycat.bind.tuple.TupleOutput)
-		 */
-		/*WARNING: This is incorrect, but its never called*/
-		public void objectToEntry(Object o, TupleOutput to) {
-			Integer i = (Integer)o;
-			to.writeInt(i.intValue());
-		}
-
-	    protected TupleOutput getTupleOutput() {
-	        int byteSize = getTupleBufferSize();
-	        if (byteSize != 0) {
-	            return new TupleOutput(new byte[byteSize]);
-	        } else {
-	            return new TupleOutput();
-	        }
-	    }
-
-		public void intsToEntry(int i, int j, DatabaseEntry entry) {
-	        TupleOutput output = getTupleOutput();
-			output.writeInt(i);
-			output.writeInt(j);
-	        outputToEntry(output, entry);
-		}
-
-	}
 
 }
 

@@ -13,13 +13,15 @@ import com.sleepycat.je.DatabaseException;
 public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	HashMap swappedViews; //always look for a view here before checking the database
 	BannerViewDatabase db;
-	
+	public BannerViewBinding instanceBinding;
+
 	public AdBlasterDbInstance(AbstractAdBlasterUniverse c){
 		super(c);
+		instanceBinding = new BannerViewBinding(this.universe, this);
 	}
 	public void loadNoCount(File dbf, File data) {
 		try {
-			db = new BannerViewDatabase(dbf);
+			db = new BannerViewDatabase(dbf, instanceBinding);
 		} catch (DatabaseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -49,7 +51,7 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	public void load(File f) {
 		try {
 			System.out.println("Counting Bannerviews.");
-			db = new BannerViewDatabase(f);
+			db = new BannerViewDatabase(f, instanceBinding);
 			ProgressIndicator.setTitle("Counting bannerviews...");
 			/*{
 				long time = System.currentTimeMillis();

@@ -18,6 +18,7 @@ public class InsertServer implements Runnable {
 	private Socket client;
 	private PrintWriter out;
 	private BufferedReader in;
+	static BannerViewBinding bvb = new BannerViewBinding(null,null);
 	
 	private static class ThreadedDatabases{
 		private BannerViewDatabase bannerViewDb;
@@ -29,7 +30,7 @@ public class InsertServer implements Runnable {
 		public ThreadedDatabases(){
 			day = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
 			try {
-				bannerViewDb = new BannerViewDatabase(""+day);
+				bannerViewDb = new BannerViewDatabase(""+day, bvb);
 				userDb = new UserDatabase(""+day);
 				pageDb = new PageDatabase(""+day);
 			} catch (DatabaseException dbe) {
@@ -61,7 +62,7 @@ public class InsertServer implements Runnable {
 			
 			day = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
 			try {
-				bannerViewDb = new BannerViewDatabase(""+day);
+				bannerViewDb = new BannerViewDatabase(""+day, bvb);
 				userDb = new UserDatabase(""+day);
 				pageDb = new PageDatabase(""+day);
 			} catch (DatabaseException dbe) {

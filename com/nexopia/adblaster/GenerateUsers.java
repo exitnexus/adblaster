@@ -17,7 +17,7 @@ import com.sleepycat.je.DatabaseException;
 public class GenerateUsers {
 	static final int NUM_USERS = 200000;
 	
-	public static void main(String[] args) {
+/*	public static void main(String[] args) {
 		UserDatabase uDb = null;
 		try {
 			uDb = new UserDatabase("test");
@@ -44,5 +44,5 @@ public class GenerateUsers {
 				e.printStackTrace();
 			}
 		}
-	}
+	}*/
 }

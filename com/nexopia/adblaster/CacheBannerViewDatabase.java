@@ -12,8 +12,8 @@ public class CacheBannerViewDatabase {
 	IntObjectHashMap map;
 	public int lastid;
 	
-	public CacheBannerViewDatabase(File f) throws DatabaseException{
-		bv_db = new BannerViewDatabase(f);
+	public CacheBannerViewDatabase(File f, AdBlasterDbInstance inst) throws DatabaseException{
+		bv_db = new BannerViewDatabase(f,inst.instanceBinding);
 		//vec = new Vector<BannerView>();
 		map = new IntObjectHashMap();
 /*		BannerView bv = null;

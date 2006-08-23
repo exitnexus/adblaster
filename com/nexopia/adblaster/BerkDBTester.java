@@ -10,9 +10,7 @@ import java.sql.Statement;
 import java.util.HashMap;
 
 /**
- * @author wolfe
- * 
- * Window - Preferences - Java - Code Style - Code Templates
+ * DEPRECATED
  */
 
 public class BerkDBTester {
@@ -52,7 +50,7 @@ public class BerkDBTester {
 		//userDb = null;
 		//try {
 		try {
-			db = new BannerViewDatabase("test"); 
+			//db = new BannerViewDatabase("test"); 
 			
 			//Random r = new Random(1);
 			/*

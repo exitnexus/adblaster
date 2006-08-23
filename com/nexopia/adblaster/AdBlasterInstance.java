@@ -104,7 +104,7 @@ public class AdBlasterInstance extends AbstractAdBlasterInstance{
 		return this.views.size();
 	}
 
-	public void makeMeADatabase(){
+/*	public void makeMeADatabase(){
 		try {			
 			
 			BannerViewDatabase db = new BannerViewDatabase("test");
@@ -124,7 +124,7 @@ public class AdBlasterInstance extends AbstractAdBlasterInstance{
 			System.err.println("DatabaseException: " + e);
 			e.printStackTrace();
 		}
-	}
+	}*/
 	
 	public int indexOfView(BannerView bv) {
 		return views.indexOf(bv);

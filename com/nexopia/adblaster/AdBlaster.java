@@ -26,7 +26,6 @@ public class AdBlaster {
 	static int num_serves = 4;
 	static AdBlasterDbUniverse ac;
 	static AdBlasterDbInstance instanc;
-	static BannerViewBinding instanceBinding;
 	
 	static File user_dir = null;
 	static File page_dir = null;
@@ -54,21 +53,21 @@ public class AdBlaster {
 	
 	public static void main(String args[]){
 		File dataFile = null;
-		if (args.length == 4){
+		if (args.length == 3){
 			System.out.println("Running with selected directories.");
 			bv_dir = new File(args[0]);
 			user_dir = new File(args[1]);
 			page_dir = new File(args[2]);
-			dataFile = new File(args[3]);
+			//dataFile = new File(args[3]);
 		} else {
 			bv_dir = getDir("BannerView");
 			user_dir = getDir("User");
 			page_dir = getDir("Page");
 		}
 		
-		ac = new AdBlasterDbUniverse(user_dir);
+		ac = new AdBlasterDbUniverse(user_dir, page_dir);
 		instanc = new AdBlasterDbInstance(ac);
-		instanceBinding = new BannerViewBinding(ac, instanc);
+		//instanceBinding = new BannerViewBinding(ac, instanc);
 
 		long start_time = System.currentTimeMillis();
 		

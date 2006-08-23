@@ -18,14 +18,14 @@ class BannerView{
 	private AbstractAdBlasterInstance inst;
 	public String comment = "";
 	
-	BannerView(AbstractAdBlasterInstance instance, int index, User u, Banner b, int t, byte size, int page){
+	protected BannerView(AbstractAdBlasterInstance instance, int index, User u, Banner b, int t, byte size, int page){
 		this.uid = u.getID(); this.b = b; time = t; inst = instance;
 		this.size = size;
 		this.page = page;
 		this.index = index;
 	}
 	
-	BannerView(AbstractAdBlasterInstance instance, int index, int id, Banner b, int t, byte size, int page){
+	protected BannerView(AbstractAdBlasterInstance instance, int index, int id, Banner b, int t, byte size, int page){
 		this.uid = id; this.b = b; time = t; inst = instance;
 		this.size = size;
 		this.page = page;

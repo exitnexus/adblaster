@@ -155,7 +155,6 @@ public class UserDatabase {
 			c = db.openCursor(null, null);
 			if (c.getFirst(key, value, null) == OperationStatus.SUCCESS) {
 				if (value.getData() != null) {
-					UserBinding ub = new UserBinding();
 					User u = (User)ub.entryToObject(value);
 					users.add(u);
 				} else {
@@ -164,7 +163,6 @@ public class UserDatabase {
 				}
 				while (c.getNext(key, value, null) == OperationStatus.SUCCESS) {
 					if (value.getData() != null) {
-						UserBinding ub = new UserBinding();
 						User u = (User)ub.entryToObject(value);
 						users.add(u);
 					} else {
@@ -193,6 +191,7 @@ public class UserDatabase {
 		return this.userCount;
 	}
 	
+	
 	public synchronized void close() throws DatabaseException {
 		this.closeDatabases();
 		this.env.sync();
@@ -210,7 +209,7 @@ public class UserDatabase {
 	}
 	
 	
-	public static void main(String args[]){
+/*	public static void main(String args[]){
 		UserDatabase user_db = null;
 		//Environment dbEnv = null;
 		try {
@@ -219,18 +218,18 @@ public class UserDatabase {
 			
 			System.out.println(user_db.userCount);
 			
-			/*Random r = new Random ();
-			for (int i = 0; i < 100; i++){
-				
-				int userid = i;
-				byte age = (byte)(14+r.nextInt(86));
-				byte sex = (byte)(r.nextBoolean()?1:0);
-				short loc = (short)r.nextInt();
-				String interests = "1,4,6,7,8,9";
-				User u;
-				user_db.insert(u=new User(userid, age, sex, loc, interests));
-				System.out.println("Inserted " + u);
-			}*/
+			//Random r = new Random ();
+			//for (int i = 0; i < 100; i++){
+			//	
+			//	int userid = i;
+			//	byte age = (byte)(14+r.nextInt(86));
+			//	byte sex = (byte)(r.nextBoolean()?1:0);
+			//	short loc = (short)r.nextInt();
+			//	String interests = "1,4,6,7,8,9";
+			//	User u;
+			//	user_db.insert(u=new User(userid, age, sex, loc, interests));
+			//	System.out.println("Inserted " + u);
+			//}
 			user_db.refreshUserCount();
 			System.out.println(user_db.getUserCount());
 			for (int i = 0; i < 100; i++){
@@ -247,7 +246,7 @@ public class UserDatabase {
 				e.printStackTrace();
 			}
 		}
-	}
+	}*/
 
 	/**
 	 * 

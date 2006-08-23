@@ -12,8 +12,11 @@ import com.sleepycat.je.SecondaryDatabase;
 import com.sleepycat.je.SecondaryKeyCreator;
 
 public class BannerTimeKeyCreator extends TupleBinding implements SecondaryKeyCreator {
-	public BannerTimeKeyCreator() {
+	BannerViewBinding instanceBinding;
+	public BannerTimeKeyCreator(BannerViewBinding bvb) {
+		this.instanceBinding = bvb;
 	}
+	
 	IntegerBinding IBinstance = new IntegerBinding();
 	
 	/* (non-Javadoc)
@@ -22,7 +25,7 @@ public class BannerTimeKeyCreator extends TupleBinding implements SecondaryKeyCr
 	public boolean createSecondaryKey(SecondaryDatabase db,
 			DatabaseEntry key, DatabaseEntry data, DatabaseEntry secondaryKey)
 			throws DatabaseException {
-		BannerViewBinding bvb = AdBlaster.instanceBinding;
+		BannerViewBinding bvb = instanceBinding;
 		Integer i = (Integer)(IBinstance.entryToObject(key));
 		bvb.setIndex(i.intValue());
 		BannerView bv = (BannerView)bvb.entryToObject(data);

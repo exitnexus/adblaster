@@ -15,11 +15,12 @@ import com.sleepycat.je.SecondaryMultiKeyCreator;
 public class BannerKeyCreator implements SecondaryMultiKeyCreator {
 	Collection banners;
 	IntegerBinding ib = new IntegerBinding();
-	UserBinding ub = new UserBinding();
+	UserBinding ub;
 	DatabaseEntry secondaryKey = new DatabaseEntry();
 
 	public BannerKeyCreator(Collection banners) {
 		this.banners = banners;
+		ub = new UserBinding();
 	}
 	
 	/* (non-Javadoc)
