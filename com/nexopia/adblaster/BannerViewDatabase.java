@@ -73,12 +73,12 @@ public class BannerViewDatabase {
 		this(new File("BannerView.db." + string), bvb);
 	}
 
-	public void insert(DbBannerView bv) throws DatabaseException  {
+	public void insert(BannerView bv) throws DatabaseException  {
 		try {
 			lastid++;
 			//ib.intToEntry(new Integer(lastid), key);
 			ib.intToEntry(lastid, key);
-			BannerViewBinding bvb = bv.getInstance().instanceBinding;
+			BannerViewBinding bvb = instanceBinding;
 			bvb.objectToEntry(bv, data);
 			db.put(null, key, data);
 		} catch (DatabaseException dbe) {
