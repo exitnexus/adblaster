@@ -65,13 +65,12 @@ class BannerViewBinding extends TupleBinding {
 			throw new UnsupportedOperationException("You must call setIndex() first.");
 		
 		indexFresh = false;
-		int index = ti.readInt();
-		Banner b = ac.getBannerByID(index);//, BerkDBTester.bannerMap);
+		int bid = ti.readInt();
 		int time = ti.readInt();
 		int uid = ti.readInt();
 		byte size = ti.readByte();
 		int page = ti.readInt();
-		BannerView bv = new BannerView(inst, currentIndex, uid, b,time, size, page);
+		BannerView bv = new BannerView(inst, currentIndex, uid, bid ,time, size, page);
 		weakmap.put(bv, Boolean.TRUE);
 		return bv;
 
