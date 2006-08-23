@@ -68,7 +68,7 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 			Vector<Integer> loc = new Vector<Integer>();
 			Vector<Integer> ages = new Vector<Integer>();
 			
-			addBanner(new Banner(i, payrate, maxHits, campaignID, loc, sexes, ages, inter));
+			addBanner(new Banner(i, payrate, maxHits, campaignID, loc, sexes, ages, inter, null));
 		}
 	}
 	
@@ -155,5 +155,15 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 
 	public Banner getBannerByID(int i) {
 		return b.get(new Integer(i));
+	}
+	@Override
+	public Campaign getCampaignByIndex(int i) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public int getCampaignCount() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

@@ -47,7 +47,7 @@ public class Utilities {
 		return v;
 	}
 
-	public static Vector<Integer> stringToPageNegationVector(String string) {
+	public static Vector<Integer> stringToPageNegationVector(String string, PageDatabase pageDb) {
 		if (string.equals("")){
 			Vector<Integer> vec = new Vector<Integer>();
 			vec.add(Integer.NEGATE);
@@ -62,15 +62,15 @@ public class Utilities {
 					v.add(Integer.NEGATE);
 				} else {
 					v.add(Integer.IDENTITY);
-					int page = PageDatabase.pageDb.getPage(pages[i]);
+					int page = pageDb.getPage(pages[i]);
 					if (page != 0) {
-						v.add(Integer.valueOf(PageDatabase.pageDb.getPage(pages[i])));
+						v.add(Integer.valueOf(pageDb.getPage(pages[i])));
 					}
 				}
 			} else {
-				int page = PageDatabase.pageDb.getPage(pages[i]);
+				int page = pageDb.getPage(pages[i]);
 				if (page != 0) {
-					v.add(Integer.valueOf(PageDatabase.pageDb.getPage(pages[i])));
+					v.add(Integer.valueOf(pageDb.getPage(pages[i])));
 				}
 			}
 		}

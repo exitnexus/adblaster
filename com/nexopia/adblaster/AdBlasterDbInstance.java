@@ -173,22 +173,6 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 
 	}*/
 	
-	public static void main(String args[]){
-		/*EnvironmentConfig envConf = new EnvironmentConfig();
-		envConf.setAllowCreate(true);
-
-		try {
-			Environment dbEnv = new Environment(new File("BerkDBTester.db"), envConf);
-		} catch (DatabaseException e1) {
-			e1.printStackTrace();
-		}*/
-
-		AdBlasterDbUniverse abu = new AdBlasterDbUniverse("test");
-		AdBlasterDbInstance abdbi = new AdBlasterDbInstance(abu);
-		I_Policy pol = AdBlasterPolicy.randomPolicy(abu);
-		abdbi.fillInstance(pol);
-	}
-
 	protected BannerView getView(int index) {
 		BannerView bv = db.get(index);
 		return bv;

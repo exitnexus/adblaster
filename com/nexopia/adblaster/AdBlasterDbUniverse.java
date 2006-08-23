@@ -9,10 +9,19 @@ import com.sleepycat.je.DatabaseException;
 public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 	private BannerDatabase bannerDB;
 	UserDatabase userDB;
-	
-	public AdBlasterDbUniverse(String s){
+	public Campaign.CampaignDB campaignDB;
+
+	public Campaign getCampaignByIndex(int i) {
+		return campaignDB.getByIndex(i);
+	}
+	public int getCampaignCount() {
+		return campaignDB.getCampaignCount();
+	}
+
+	public AdBlasterDbUniverse(String s, PageDatabase pageDb){
 		try {
-			bannerDB = new BannerDatabase();
+			campaignDB = new Campaign.CampaignDB(pageDb);
+			bannerDB = new BannerDatabase(campaignDB);
 			userDB = new UserDatabase(s);
 		} catch (DatabaseException e) {
 			e.printStackTrace();
@@ -21,7 +30,7 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 
 	public AdBlasterDbUniverse(File userdb_file){
 		try {
-			bannerDB = new BannerDatabase();
+			bannerDB = new BannerDatabase(campaignDB);
 			userDB = new UserDatabase(userdb_file);
 		} catch (DatabaseException e) {
 			e.printStackTrace();

@@ -3,6 +3,9 @@ package com.nexopia.adblaster;
 import java.util.HashMap;
 import java.util.Vector;
 
+import com.nexopia.adblaster.Campaign.CampaignDB;
+import com.sleepycat.je.DatabaseException;
+
 public class BannerServer {
 		public static final Integer BANNER_BANNER = new Integer(1);
 		public static final Integer BANNER_LEADERBOARD = new Integer(2);
@@ -14,7 +17,7 @@ public class BannerServer {
 		public static final Integer BANNER_LINK = new Integer(8);
 	
 		public BannerDatabase db;
-
+		public CampaignDB cdb;
 		public HashMap<String,Integer> sizes;
 
 		private static int numservers;
@@ -29,8 +32,9 @@ public class BannerServer {
 
 		public int time;
 
-		public BannerServer(BannerDatabase db, int numservers) {
+		public BannerServer(BannerDatabase db, CampaignDB cdb, int numservers) {
 			this.db = db;
+			this.cdb = cdb;
 			BannerServer.numservers = numservers;
 			this.sizes = new HashMap<String, Integer>();
 			this.sizes.put("468x60", BANNER_BANNER);
@@ -54,7 +58,7 @@ public class BannerServer {
 		}
 		
 		public boolean addCampaign(int id){
-			Campaign c = Campaign.add(id);
+			Campaign c = cdb.add(id);
 			if (c != null) {
 				return true;
 			} else {
@@ -63,12 +67,12 @@ public class BannerServer {
 		}
 		
 		public boolean updateCampaign(int id) {
-			return Campaign.update(id) != null;
+			return cdb.update(id) != null;
 		}
 		
 		public void deleteCampaign(int id) {
-			Campaign.get(id).minutely();
-			Campaign.delete(id);
+			cdb.get(id).minutely();
+			cdb.delete(id);
 			this.db.deleteCampaign(id);
 		}
 		public boolean addBanner(int id) {
@@ -88,7 +92,7 @@ public class BannerServer {
 			//if (debug) debugLog += usertime+", "+size+", "+userid+", "+age+", "+sex+", "+loc+", "+page+", "+debug;
 			
 			Vector<Banner> valid = new Vector<Banner>();
-			for (Campaign campaign : Campaign.getCampaigns()){
+			for (Campaign campaign : cdb.getCampaigns()){
 				valid.addAll(campaign.getBanners(usertime, size, userid, age, sex, location, interests, page, debug));
 			}
 			if (!valid.isEmpty()) {
@@ -295,7 +299,12 @@ public class BannerServer {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		BannerDatabase bdb = new BannerDatabase();
+		try {
+			BannerDatabase bdb = new BannerDatabase(new CampaignDB(new PageDatabase("")));
+		} catch (DatabaseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

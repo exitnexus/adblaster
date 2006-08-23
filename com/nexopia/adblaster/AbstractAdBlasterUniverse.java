@@ -14,6 +14,9 @@ public abstract class AbstractAdBlasterUniverse {
 	abstract public int getUserCount();
 
 	abstract public Collection getBanners();
+	abstract public Campaign getCampaignByIndex(int i);
+	abstract public int getCampaignCount();
+
 	
 	public Banner getRandomBannerMatching(BannerView bv, AbstractAdBlasterInstance instance) {
 		Banner match = null;
@@ -32,11 +35,4 @@ public abstract class AbstractAdBlasterUniverse {
 		return match;	
 	}
 	
-	public Campaign getCampaignByIndex(int i) {
-		return Campaign.getByIndex(i);
-	}
-	public int getCampaignCount() {
-		return Campaign.getCampaignCount();
-	}
-
 }

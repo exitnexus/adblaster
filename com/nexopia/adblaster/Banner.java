@@ -11,6 +11,8 @@ import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Vector;
 
+import com.nexopia.adblaster.Campaign.CampaignDB;
+
 
 
 class Banner {
@@ -62,12 +64,12 @@ class Banner {
 	}
 	
 	
-	Banner(int id, int payrate, int maxHits, int campaignID, Vector<Integer> locations, Vector<Integer> ages, Vector<Integer> sexes, Interests interests) {
+	Banner(int id, int payrate, int maxHits, int campaignID, Vector<Integer> locations, Vector<Integer> ages, Vector<Integer> sexes, Interests interests, Campaign c) {
 		this.index = counter();
 		this.id = id;
 		this.payrate = payrate;
 		this.viewsperday = (maxHits==0?Integer.MAX_VALUE:maxHits);
-		this.campaign = Campaign.get(campaignID);
+		this.campaign = c;
 		this.locations = locations;
 		this.ages = ages;
 		this.sexes = sexes;
@@ -94,12 +96,12 @@ class Banner {
 	}
 	
 	
-	Banner(ResultSet rs) throws SQLException {
+	Banner(ResultSet rs, CampaignDB cdb) throws SQLException {
 		this.index = counter();
 		this.campaign = null;
 		this.dailyviews = 0;
 		this.dailyclicks = 0;
-		this.update(rs);
+		this.update(rs, cdb);
 	}
 	
 	int getID() {
@@ -326,13 +328,13 @@ class Banner {
 		}
 	}
 
-	public Banner update(ResultSet rs) throws SQLException {
+	public Banner update(ResultSet rs, CampaignDB cdb) throws SQLException {
 		this.id = rs.getInt("ID");
 		this.viewsperday = rs.getInt("VIEWSPERDAY");
 		viewsperday = (viewsperday==0?Integer.MAX_VALUE:viewsperday);
 		int ci = rs.getInt("CAMPAIGNID");
 		if (this.campaign == null) {
-			this.campaign = Campaign.get(ci);
+			this.campaign = cdb.get(ci);
 			if (campaign == null){
 				System.out.println(ci + ":" + this.id);
 				throw new SQLException();
@@ -340,14 +342,14 @@ class Banner {
 			this.campaign.addBanner(this);
 		} else if (this.campaign.getID() != rs.getInt("CAMPAIGNID")) {
 			this.campaign.removeBanner(this);
-			this.campaign = Campaign.get(ci);
+			this.campaign = cdb.get(ci);
 			if (campaign == null){
 				System.out.println(ci + ":" + this.id);
 				throw new SQLException();
 			}
 			this.campaign.addBanner(this);
 		} else {
-			this.campaign = Campaign.get(ci);
+			this.campaign = cdb.get(ci);
 			if (campaign == null){
 				System.out.println(ci + ":" + this.id);
 				throw new SQLException();
@@ -356,7 +358,7 @@ class Banner {
 		this.locations = Utilities.stringToNegationVector(rs.getString("LOC"));
 		this.ages = Utilities.stringToNegationVector(rs.getString("AGE"));
 		this.sexes = Utilities.stringToVector(rs.getString("SEX"));
-		this.pages = Utilities.stringToPageNegationVector(rs.getString("PAGE"));
+		this.pages = Utilities.stringToPageNegationVector(rs.getString("PAGE"), cdb.pageDb);
 		this.size = rs.getByte("BANNERSIZE");
 		this.paytype = rs.getByte("PAYTYPE");
 		this.payrate = rs.getInt("PAYRATE");

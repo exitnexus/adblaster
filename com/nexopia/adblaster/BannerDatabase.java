@@ -12,6 +12,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Vector;
 
+import com.nexopia.adblaster.Campaign.CampaignDB;
+
 /**
  * @author wolfe
  *
@@ -56,7 +58,10 @@ import java.util.Vector;
 public class BannerDatabase {
 	private HashMap<Integer, Banner> banners;
 	Vector<Integer> keyset = new Vector<Integer>();
-	public BannerDatabase() {
+	CampaignDB cdb;
+	
+	public BannerDatabase(Campaign.CampaignDB cdb) {
+		this.cdb = cdb;
 		banners = new HashMap<Integer, Banner>();
 		try {
 			String sql = "SELECT * FROM banners";
@@ -70,9 +75,9 @@ public class BannerDatabase {
 			while (rs.next()) {
 				int id = rs.getInt("ID");
 				if (Banner.precheck(rs) &&
-						Campaign.get(rs.getInt("CAMPAIGNID")).precheck()) {
+						cdb.get(rs.getInt("CAMPAIGNID")).precheck()) {
 					try {
-						banners.put(new Integer(id), new Banner(rs));
+						banners.put(new Integer(id), new Banner(rs, cdb));
 					} catch (SQLException e){
 						System.out.println("This probably indicates a bad campaign. Continue if you know what you're doing.");
 					}
@@ -99,9 +104,6 @@ public class BannerDatabase {
 	
 	public Collection getBanners() {
 		return banners.values(); 
-	}
-	public static void main(String args[]){
-		new BannerDatabase();	
 	}
 
 	public void saveCoefficients(HashMap<Banner, Float> coefficients) {
@@ -154,9 +156,9 @@ public class BannerDatabase {
 			ResultSet rs = stmt.executeQuery(sql);
 			if (rs.next()) {
 				if (Banner.precheck(rs) &&
-						Campaign.get(rs.getInt("CAMPAIGNID")).precheck()) {
+						cdb.get(rs.getInt("CAMPAIGNID")).precheck()) {
 					try {
-						Banner b = new Banner(rs);
+						Banner b = new Banner(rs, cdb);
 						Integer i = Integer.valueOf(id);
 						banners.put(i, b);
 						keyset.add(i);
@@ -184,7 +186,7 @@ public class BannerDatabase {
 				Statement stmt = JDBCConfig.createStatement();
 				ResultSet rs = stmt.executeQuery(sql);
 				if (rs.next()) {
-					return b.update(rs);
+					return b.update(rs, cdb);
 				} else {
 					id = Integer.valueOf(bannerID);
 					banners.remove(id);

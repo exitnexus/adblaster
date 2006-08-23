@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import com.nexopia.adblaster.Campaign.CampaignDB;
 import com.sleepycat.je.CheckpointConfig;
 import com.sleepycat.je.Database;
 import com.sleepycat.je.DatabaseConfig;
@@ -35,12 +36,12 @@ public class UserBannerDatabase {
 	Vector users;
 	int userCount;
 	
-	public UserBannerDatabase(String s) throws DatabaseException {
+	public UserBannerDatabase(String s, CampaignDB cdb) throws DatabaseException {
 		EnvironmentConfig envConf = new EnvironmentConfig();
 		envConf.setAllowCreate(true);
 		env = new Environment(new File("UserBanner.db"), envConf);
 		UserDatabase uDb = new UserDatabase(s);
-		BannerDatabase bDb = new BannerDatabase();
+		BannerDatabase bDb = new BannerDatabase(cdb);
 		banners = bDb.getBanners();
 		users = uDb.getAllUsers();
 		openDatabases();
@@ -78,16 +79,6 @@ public class UserBannerDatabase {
 	}
 	
 	
-	public static void main(String args[]){
-		try {
-			UserBannerDatabase ubDb = new UserBannerDatabase("test");
-			ubDb.generate();
-		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
 	/**
 	 * 
 	 */

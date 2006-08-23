@@ -20,75 +20,104 @@ import java.util.Vector;
 
 class Campaign{
 
-	private static HashMap<Integer, Campaign> campaigns;
-	
-	static {
-		System.out.println("Initing campaigns.");
-		campaigns = new HashMap<Integer, Campaign>();
-		//Database connection stuff here.
-		try {
-			String sql = "SELECT * FROM bannercampaigns";
-			Statement stmt = JDBCConfig.createStatement();
-			ResultSet rs = stmt.executeQuery(sql);
-			int i = 0;
-			while (rs.next()) {
-				int id = rs.getInt("ID");
-				campaigns.put(Integer.valueOf(id), new Campaign(rs));
-				i++;
+	static class CampaignDB{
+		private HashMap<Integer, Campaign> campaigns;
+		PageDatabase pageDb;
+		
+		public CampaignDB(PageDatabase pageDb) {
+			this.pageDb = pageDb;
+			System.out.println("Initing campaigns.");
+			campaigns = new HashMap<Integer, Campaign>();
+			//Database connection stuff here.
+			try {
+				String sql = "SELECT * FROM bannercampaigns";
+				Statement stmt = JDBCConfig.createStatement();
+				ResultSet rs = stmt.executeQuery(sql);
+				int i = 0;
+				while (rs.next()) {
+					int id = rs.getInt("ID");
+					campaigns.put(Integer.valueOf(id), new Campaign(rs, pageDb));
+					i++;
+				}
+				System.out.println("Campaigns Total: " + i);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-			System.out.println("Campaigns Total: " + i);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public static Campaign add(int campaignID) {
-		try {
-			String sql = "SELECT * FROM bannercampaigns WHERE id = " + campaignID;
-			Statement stmt = JDBCConfig.createStatement();
-			ResultSet rs = stmt.executeQuery(sql);
-			if (rs.next()) {
-				int id = rs.getInt("ID");
-				Campaign c = new Campaign(rs);
-				campaigns.put(Integer.valueOf(id), c);
-				return c;
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
-	public static Campaign update(int campaignID) {
-		Integer id = Integer.valueOf(campaignID);
-		Campaign c = campaigns.get(id);
-		id.free();
-		id = null;
-		if (c != null) {
+		}	
+		public Campaign add(int campaignID) {
 			try {
 				String sql = "SELECT * FROM bannercampaigns WHERE id = " + campaignID;
 				Statement stmt = JDBCConfig.createStatement();
 				ResultSet rs = stmt.executeQuery(sql);
 				if (rs.next()) {
-					c.update(rs);
+					int id = rs.getInt("ID");
+					Campaign c = new Campaign(rs, pageDb);
+					campaigns.put(Integer.valueOf(id), c);
 					return c;
-				} else {
-					id = Integer.valueOf(campaignID);
-					campaigns.remove(id);
-					id.free();
-					id = null;
-					return null;
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 			return null;
-		} else {
-			return Campaign.add(campaignID);
 		}
+		
+		public Campaign update(int campaignID) {
+			Integer id = Integer.valueOf(campaignID);
+			Campaign c = campaigns.get(id);
+			id.free();
+			id = null;
+			if (c != null) {
+				try {
+					String sql = "SELECT * FROM bannercampaigns WHERE id = " + campaignID;
+					Statement stmt = JDBCConfig.createStatement();
+					ResultSet rs = stmt.executeQuery(sql);
+					if (rs.next()) {
+						c.update(rs, pageDb);
+						return c;
+					} else {
+						id = Integer.valueOf(campaignID);
+						campaigns.remove(id);
+						id.free();
+						id = null;
+						return null;
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				return null;
+			} else {
+				return add(campaignID);
+			}
+		}
+		public Collection<Campaign> getCampaigns() {
+			return campaigns.values();
+		}
+		public Campaign get(int campaignID) {
+			Integer I = Integer.valueOf(campaignID);
+			Campaign c = campaigns.get(I);
+			I.free();
+			return c;
+		}
+		
+		public Campaign getByIndex(int index) {
+			Campaign c = get(((Integer)campaigns.keySet().toArray()[index]).intValue());
+			return c;
+		}
+
+		public int getCampaignCount() {
+			return campaigns.size();
+		}
+
+		public void delete(int campaignID) {
+			Integer id = Integer.valueOf(campaignID);
+			campaigns.remove(id);
+			id.free();
+		}
+
 	}
 	
-	public Campaign update(ResultSet rs) throws SQLException {
+	
+	public Campaign update(ResultSet rs, PageDatabase pageDb) throws SQLException {
 		this.id = rs.getInt("ID");
 		this.payrate = rs.getInt("PAYRATE");
 		this.viewsperuser = rs.getInt("VIEWSPERDAY");
@@ -107,29 +136,10 @@ class Campaign{
 		this.minviewsperday = rs.getInt("MINVIEWSPERDAY");
 		this.viewsperday = rs.getInt("VIEWSPERDAY");
 		this.clicksperday = rs.getInt("CLICKSPERDAY");
-		this.pages = Utilities.stringToPageNegationVector(rs.getString("PAGE"));
+		this.pages = Utilities.stringToPageNegationVector(rs.getString("PAGE"), pageDb);
 		return this;
 	}
 	
-	public static Collection<Campaign> getCampaigns() {
-		return campaigns.values();
-	}
-	public static Campaign get(int campaignID) {
-		Integer I = Integer.valueOf(campaignID);
-		Campaign c = campaigns.get(I);
-		I.free();
-		return c;
-	}
-	
-	public static Campaign getByIndex(int index) {
-		Campaign c = get(((Integer)campaigns.keySet().toArray()[index]).intValue());
-		return c;
-	}
-
-	public static int getCampaignCount() {
-		return campaigns.size();
-	}
-
 	private Interests interests;
 	private int id;
 	private int payrate;
@@ -158,9 +168,9 @@ class Campaign{
 		return count++;
 	}
 	
-	Campaign(ResultSet rs) throws SQLException {
+	Campaign(ResultSet rs, PageDatabase pageDb) throws SQLException {
 		banners = new HashSet<Banner>();
-		this.update(rs);
+		this.update(rs, pageDb);
 	}
 	
 	int getID() {
@@ -303,12 +313,6 @@ class Campaign{
 		return this.minviewsperday;
 	}
 	
-	public static void delete(int campaignID) {
-		Integer id = Integer.valueOf(campaignID);
-		campaigns.remove(id);
-		id.free();
-	}
-
 	public void minutely() {
 		// TODO Auto-generated method stub
 		
