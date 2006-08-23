@@ -74,5 +74,8 @@ class BannerView{
 	public int getPage() {
 		return this.page;
 	}
+	public int getBannerId(){
+		return this.bid;
+	}
 
 }
