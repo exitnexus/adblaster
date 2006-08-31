@@ -9,6 +9,7 @@ import com.sleepycat.je.DatabaseException;
 
 public class UDPInsertServer {
 	private static class ThreadedDatabases{
+		static BannerViewBinding bvb = new BannerViewBinding(null,null);
 		private BannerViewDatabase bannerViewDb;
 		private UserDatabase userDb;
 		private PageDatabase pageDb;
@@ -17,7 +18,7 @@ public class UDPInsertServer {
 		public ThreadedDatabases(){
 			day = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
 			try {
-				bannerViewDb = new BannerViewDatabase(""+day);
+				bannerViewDb = new BannerViewDatabase(""+day, bvb);
 				userDb = new UserDatabase(""+day);
 				pageDb = new PageDatabase(""+day);
 			} catch (DatabaseException dbe) {
@@ -49,7 +50,7 @@ public class UDPInsertServer {
 			
 			day = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
 			try {
-				bannerViewDb = new BannerViewDatabase(""+day);
+				bannerViewDb = new BannerViewDatabase(""+day, bvb);
 				userDb = new UserDatabase(""+day);
 				pageDb = new PageDatabase(""+day);
 			} catch (DatabaseException dbe) {
