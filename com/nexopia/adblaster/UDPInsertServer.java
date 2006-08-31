@@ -82,7 +82,6 @@ public class UDPInsertServer {
 	}
 	
 	private void processInput(String input) {
-		System.out.println("Received: " + input);
 		String[] words = input.split("\\s");
 		if (words.length == 0) return;
 		String command = words[0];
