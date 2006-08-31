@@ -63,7 +63,6 @@ public class UDPInsertServer {
 	}//end threadeddatabase
 	
 	private DatagramSocket socket;
-	private byte[] buf;
 	private DatagramPacket packet;
 	
 	public UDPInsertServer() {
@@ -73,16 +72,17 @@ public class UDPInsertServer {
 			System.err.println("Unable to open UDP socket.");
 			e.printStackTrace();
 		}
-		buf = new byte[1024];
-		packet = new DatagramPacket(buf, buf.length);
+		packet = new DatagramPacket(new byte[1024], 1024);
 	}
 	
 	public void handlePacket() throws IOException {
 		socket.receive(packet);
 		processInput(new String(packet.getData()));
+		packet.setData(new byte[1024]);
 	}
 	
 	private void processInput(String input) {
+		System.out.println("Received: " + input);
 		String[] words = input.split("\\s");
 		if (words.length == 0) return;
 		String command = words[0];

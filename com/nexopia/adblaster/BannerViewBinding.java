@@ -26,7 +26,7 @@ class BannerViewBinding extends TupleBinding {
 	boolean indexFresh = false;
 	static WeakHashMap<BannerView, Boolean> weakmap = new WeakHashMap<BannerView, Boolean>();
 
-	static {
+	/*static {
 		Runnable memoryMonitor = new Runnable(){
 			public void run() {
 				synchronized(this){
@@ -43,7 +43,7 @@ class BannerViewBinding extends TupleBinding {
 			}
 		};
 		new Thread(memoryMonitor).start();
-	}
+	}*/
 	
 	/* Pass (null, null) to get a "write only" binding */
 	BannerViewBinding(AbstractAdBlasterUniverse universe, AbstractAdBlasterInstance i){
