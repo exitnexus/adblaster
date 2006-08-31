@@ -86,7 +86,7 @@ public class UDPInsertServer {
 		if (words.length == 0) return;
 		String command = words[0];
 		//get usertime size userid age sex location interests page passback => bannerid
-		if (command.indexOf("get") == 0 && words.length == 13) {
+		if (command.indexOf("get") == 0 && words.length == 14) {
 			int time = Integer.parseInt(words[1]);
 			byte size = Byte.parseByte(words[2]);
 			int userid = Integer.parseInt(words[3]);
