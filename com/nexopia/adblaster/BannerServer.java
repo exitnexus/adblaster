@@ -379,6 +379,73 @@ public class BannerServer {
 	static int statstime = 0;
 	static String currentwindow = "";
 	
+	private int parseCommand(String command) {
+		int cmd;
+		if (command.toUpperCase().equals("GET")) {
+			cmd = GET;
+		} else if (command.toUpperCase().equals("PASSBACK")) {
+			cmd = PASSBACK;
+		} else if (command.toUpperCase().equals("ADD")) {
+			cmd = ADD;
+		} else if (command.toUpperCase().equals("UPDATE")) {
+			cmd = UPDATE;
+		} else if (command.toUpperCase().equals("ADDCAMPAIGN")) {
+			cmd = ADDCAMPAIGN;
+		} else if (command.toUpperCase().equals("QUIT")) {
+			cmd = QUIT;
+		} else if (command.toUpperCase().equals("DELCAMPAIGN")) {
+			cmd = DELCAMPAIGN;
+		} else if (command.toUpperCase().equals("UPDATECAMPAIGN")) {
+			cmd = UPDATECAMPAIGN;
+		} else if (command.toUpperCase().equals("DEL")) {
+			cmd = DEL;
+		} else if (command.toUpperCase().equals("CONDUMP")) {
+			cmd = CONDUMP;
+		} else if (command.toUpperCase().equals("BANNERDUMP")) {
+			cmd = BANNERDUMP;
+		} else if (command.toUpperCase().equals("STATS")) {
+			cmd = STATS;
+		} else if (command.toUpperCase().equals("UPTIME")) {
+			cmd = UPTIME;
+		} else if (command.toUpperCase().equals("SHOW")) {
+			cmd = SHOW;
+		} else if (command.toUpperCase().equals("HIDE")) {
+			cmd = HIDE;
+		} else if (command.toUpperCase().equals("SHUTDOWN")) {
+			cmd = SHUTDOWN;
+		} else if (command.toUpperCase().equals("VERSION")) {
+			cmd = VERSION;
+		} else if (command.toUpperCase().equals("RECONNECT")) {
+			cmd = RECONNECT;
+		} else if (command.toUpperCase().equals("LOGSTAT")) {
+			cmd = LOGSTAT;
+		} else if (command.toUpperCase().equals("GETFAIL")) {
+			cmd = GETFAIL;
+		} else if (command.toUpperCase().equals("GETLOG")) {
+			cmd = GETLOG;
+		} else {
+			cmd = BLANK;
+		}
+		return cmd;
+	}
+	
+	public void receive(String command){
+		String[] split = command.split(" ");
+		int cmd = BLANK;
+		String[] params = new String[split.length-1];
+		int i = 0;
+		boolean first = true;
+		for (String s : split) {
+			if (first) {
+				cmd = parseCommand(s);
+			} else {
+				params[i] = s;
+				i++;
+			}
+		}
+		receive(cmd, params);
+	}
+	
 	public void receive(int cmd, String[] params){
 		
 		switch(cmd){
