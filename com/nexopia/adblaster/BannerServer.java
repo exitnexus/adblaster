@@ -301,6 +301,7 @@ public class BannerServer {
 	public static void main(String[] args) {
 		try {
 			BannerDatabase bdb = new BannerDatabase(new CampaignDB(new PageDatabase("")));
+			bdb.loadCoefficients(new HashMap<Banner, Float>());
 		} catch (DatabaseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

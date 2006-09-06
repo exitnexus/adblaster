@@ -106,6 +106,34 @@ public class BannerDatabase {
 		return banners.values(); 
 	}
 
+	public void loadCoefficients(HashMap<Banner, Float> coefficients) {
+		Statement stmt;
+		try {
+			stmt = JDBCConfig.createStatement();
+			for (Banner banner: banners.values()) {
+				try {
+					Float f = coefficients.get(banner);
+					String st = "SELECT c.* " 
+					+ "FROM coefficients c LEFT JOIN coefficients AS c2 "
+					+ "ON c.bannerid=c2.bannerid AND c.time<c2.time "
+					+ "WHERE c2.bannerid IS NULL "
+					+ "AND c.bannerid = " + banner.getID();
+					stmt.execute(st);
+					ResultSet rs = stmt.getResultSet();
+					rs.first();
+					System.out.println(rs.getInt("bannerid") + ":" + rs.getFloat("coefficient"));
+				} catch (SQLException sqle) {
+					System.err.println("Error during coefficient retrieval.");
+					sqle.printStackTrace();
+				}
+			}
+		} catch (SQLException sqle) {
+			System.err.println("Unable to load coefficients from database.");
+			sqle.printStackTrace();
+		}
+	
+	}
+
 	public void saveCoefficients(HashMap<Banner, Float> coefficients) {
 		Statement stmt;
 		try {
