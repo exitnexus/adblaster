@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Vector;
 
 import com.nexopia.adblaster.Campaign.CampaignDB;
+import com.nexopia.adblaster.Utilities.PageValidator;
 
 
 
@@ -30,7 +31,7 @@ class Banner {
 	Vector<Integer> locations;
 	Vector<Integer> ages;
 	Vector<Integer> sexes;
-	Vector<Integer> pages;
+	PageValidator pages;
 	private int viewsperuser;
 	private int limitbyperiod;
 	Campaign campaign;
@@ -64,7 +65,7 @@ class Banner {
 	}
 	
 	
-	Banner(int id, int payrate, int maxHits, int campaignID, Vector<Integer> locations, Vector<Integer> ages, Vector<Integer> sexes, Interests interests, Campaign c) {
+	Banner(int id, int payrate, int maxHits, int campaignID, Vector<Integer> locations, Vector<Integer> ages, Vector<Integer> sexes, Interests interests, Campaign c, PageValidator pv) {
 		this.index = counter();
 		this.id = id;
 		this.payrate = payrate;
@@ -74,6 +75,7 @@ class Banner {
 		this.ages = ages;
 		this.sexes = sexes;
 		this.interests = interests;
+		this.pages = pv;
 	}
 	
 	@SuppressWarnings("unchecked") Banner(Banner b) {
@@ -83,7 +85,7 @@ class Banner {
 		this.campaign = b.campaign;
 		this.locations = (Vector<Integer>) b.locations.clone();
 		this.ages = (Vector<Integer>) b.ages.clone();
-		this.pages = (Vector<Integer>) b.pages.clone();
+		this.pages = (PageValidator) b.pages.clone();
 		this.size = b.size;
 		this.paytype = b.paytype;
 		this.payrate = b.payrate;
@@ -96,8 +98,9 @@ class Banner {
 	}
 	
 	
-	Banner(ResultSet rs, CampaignDB cdb) throws SQLException {
+	Banner(ResultSet rs, CampaignDB cdb, PageValidator pv) throws SQLException {
 		this.index = counter();
+		this.pages = pv;
 		this.campaign = null;
 		this.dailyviews = 0;
 		this.dailyclicks = 0;
@@ -276,24 +279,6 @@ class Banner {
 		return this.size;
 	}
 
-	public boolean validPage(int page) {
-		if (pages.get(0) == Integer.NEGATE) {
-			for (int i=1; i<pages.size(); i++) {
-				if (pages.get(i).intValue() == page) {
-					return false;
-				}
-			}
-			return true;
-		} else {
-			for (int i=1; i<pages.size(); i++) {
-				if (pages.get(i).intValue() == page) {
-					return true;
-				}
-			}
-			return false;
-		}
-	}
-
 	public int getMinviewsperday() {
 		return minviewsperday;
 	}
@@ -358,7 +343,7 @@ class Banner {
 		this.locations = Utilities.stringToNegationVector(rs.getString("LOC"));
 		this.ages = Utilities.stringToNegationVector(rs.getString("AGE"));
 		this.sexes = Utilities.stringToVector(rs.getString("SEX"));
-		this.pages = Utilities.stringToPageNegationVector(rs.getString("PAGE"), cdb.pageDb);
+		this.pages.make(rs.getString("PAGE"));
 		this.size = rs.getByte("BANNERSIZE");
 		this.paytype = rs.getByte("PAYTYPE");
 		this.payrate = rs.getInt("PAYRATE");
@@ -396,7 +381,7 @@ class Banner {
 		this.dailyviews++;
 	}
 
-	public boolean valid(int time, int size, int userid, byte age, byte sex, short location, Interests interests2, int page, boolean debug) {
+	public boolean valid(int time, int size, int userid, byte age, byte sex, short location, Interests interests2, String page, boolean debug) {
 		String debugLog = "";
 		if (debug) debugLog += "Checking banner this.id:";
 
@@ -452,7 +437,7 @@ class Banner {
 		if (debug) debugLog += " 6";
 		//page
 		//Utilities.bannerDebug("testing page");
-		if(this.validPage(page)){ //default true
+		if(this.pages.validate(page)){ //default true
 			if (debug) Utilities.bannerDebug(debugLog);
 			return false;
 		}

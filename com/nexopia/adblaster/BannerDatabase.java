@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Vector;
 
 import com.nexopia.adblaster.Campaign.CampaignDB;
+import com.nexopia.adblaster.Utilities.PageValidator;
 
 /**
  * @author wolfe
@@ -60,7 +61,7 @@ public class BannerDatabase {
 	Vector<Integer> keyset = new Vector<Integer>();
 	CampaignDB cdb;
 	
-	public BannerDatabase(Campaign.CampaignDB cdb) {
+	public BannerDatabase(Campaign.CampaignDB cdb, PageValidatorFactory pvfactory) {
 		this.cdb = cdb;
 		banners = new HashMap<Integer, Banner>();
 		try {
@@ -77,7 +78,7 @@ public class BannerDatabase {
 				if (Banner.precheck(rs) &&
 						cdb.get(rs.getInt("CAMPAIGNID")).precheck()) {
 					try {
-						banners.put(new Integer(id), new Banner(rs, cdb));
+						banners.put(new Integer(id), new Banner(rs, cdb, pvfactory.make()));
 					} catch (SQLException e){
 						System.out.println("This probably indicates a bad campaign. Continue if you know what you're doing.");
 					}
@@ -177,7 +178,7 @@ public class BannerDatabase {
 		return coefficients;
 	}
 
-	public Banner add(int id) {
+	public Banner add(int id, PageValidator pv) {
 		try {
 			String sql = "SELECT * FROM banners WHERE id = " + id;
 			Statement stmt = JDBCConfig.createStatement();
@@ -186,7 +187,7 @@ public class BannerDatabase {
 				if (Banner.precheck(rs) &&
 						cdb.get(rs.getInt("CAMPAIGNID")).precheck()) {
 					try {
-						Banner b = new Banner(rs, cdb);
+						Banner b = new Banner(rs, cdb, pv);
 						Integer i = Integer.valueOf(id);
 						banners.put(i, b);
 						keyset.add(i);
@@ -203,7 +204,7 @@ public class BannerDatabase {
 		return null;
 	}
 
-	public Banner update(int bannerID) {
+	public Banner update(int bannerID, PageValidator pv) {
 		Integer id = Integer.valueOf(bannerID);
 		Banner b = banners.get(id);
 		id.free();
@@ -227,7 +228,7 @@ public class BannerDatabase {
 				e.printStackTrace();
 			}
 		} else {
-			return add(bannerID);
+			return add(bannerID, pv);
 		}
 		return null;
 	}

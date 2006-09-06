@@ -35,7 +35,7 @@ public abstract class AbstractAdBlasterInstance {
 		boolean b1 = (b == null);
 		boolean b2 = bv.getSize() == b.getSize();
 		boolean b3 = b.validUser(bv.getUser());
-		boolean b4 = b.validPage(bv.getPage());
+		boolean b4 = b.pages.validate(bv);
 		boolean b5 = this.nearestWithinTimeRange(b, bv);
 		buf.append(b1 + ":"); 
 		buf.append(b2 + ":"); 
@@ -48,7 +48,7 @@ public abstract class AbstractAdBlasterInstance {
 	public boolean isValidBannerForView(BannerView bv, Banner b) {
 		return (b == null) || (bv.getSize() == b.getSize() &&
 				b.validUser(bv.getUser()) &&
-				b.validPage(bv.getPage()) &&
+				b.pages.validate(bv) &&
 				this.nearestWithinTimeRange(b, bv));
 	}
 

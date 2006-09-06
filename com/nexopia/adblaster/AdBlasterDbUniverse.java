@@ -20,8 +20,9 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 
 	public AdBlasterDbUniverse(String s, PageDatabase pageDb){
 		try {
-			campaignDB = new Campaign.CampaignDB(pageDb);
-			bannerDB = new BannerDatabase(campaignDB);
+			campaignDB = new Campaign.CampaignDB();
+			Object args[] = {pageDb};
+			bannerDB = new BannerDatabase(campaignDB, new PageValidatorFactory(Utilities.PageValidator2.class,args));
 			userDB = new UserDatabase(s);
 		} catch (DatabaseException e) {
 			e.printStackTrace();
@@ -31,8 +32,9 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 	public AdBlasterDbUniverse(File userdb_file, File pagedb_file){
 		try {
 			PageDatabase pageDb = new PageDatabase(pagedb_file);
-			campaignDB = new Campaign.CampaignDB(pageDb);
-			bannerDB = new BannerDatabase(campaignDB);
+			campaignDB = new Campaign.CampaignDB();
+			Object args[] = {pageDb};
+			bannerDB = new BannerDatabase(campaignDB, new PageValidatorFactory(Utilities.PageValidator2.class,args));
 			userDB = new UserDatabase(userdb_file);
 		} catch (DatabaseException e) {
 			e.printStackTrace();

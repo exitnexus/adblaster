@@ -17,15 +17,15 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
 
+import com.nexopia.adblaster.Utilities.PageValidator;
+
 
 class Campaign{
 
 	static class CampaignDB{
 		private HashMap<Integer, Campaign> campaigns;
-		PageDatabase pageDb;
 		
-		public CampaignDB(PageDatabase pageDb) {
-			this.pageDb = pageDb;
+		public CampaignDB() {
 			System.out.println("Initing campaigns.");
 			campaigns = new HashMap<Integer, Campaign>();
 			//Database connection stuff here.
@@ -36,7 +36,7 @@ class Campaign{
 				int i = 0;
 				while (rs.next()) {
 					int id = rs.getInt("ID");
-					campaigns.put(Integer.valueOf(id), new Campaign(rs, pageDb));
+					campaigns.put(Integer.valueOf(id), new Campaign(rs));
 					i++;
 				}
 				System.out.println("Campaigns Total: " + i);
@@ -51,7 +51,7 @@ class Campaign{
 				ResultSet rs = stmt.executeQuery(sql);
 				if (rs.next()) {
 					int id = rs.getInt("ID");
-					Campaign c = new Campaign(rs, pageDb);
+					Campaign c = new Campaign(rs);
 					campaigns.put(Integer.valueOf(id), c);
 					return c;
 				}
@@ -72,7 +72,7 @@ class Campaign{
 					Statement stmt = JDBCConfig.createStatement();
 					ResultSet rs = stmt.executeQuery(sql);
 					if (rs.next()) {
-						c.update(rs, pageDb);
+						c.update(rs);
 						return c;
 					} else {
 						id = Integer.valueOf(campaignID);
@@ -117,7 +117,7 @@ class Campaign{
 	}
 	
 	
-	public Campaign update(ResultSet rs, PageDatabase pageDb) throws SQLException {
+	public Campaign update(ResultSet rs) throws SQLException {
 		this.id = rs.getInt("ID");
 		this.payrate = rs.getInt("PAYRATE");
 		this.viewsperuser = rs.getInt("VIEWSPERDAY");
@@ -136,7 +136,7 @@ class Campaign{
 		this.minviewsperday = rs.getInt("MINVIEWSPERDAY");
 		this.viewsperday = rs.getInt("VIEWSPERDAY");
 		this.clicksperday = rs.getInt("CLICKSPERDAY");
-		this.pages = Utilities.stringToPageNegationVector(rs.getString("PAGE"), pageDb);
+		this.pages = Utilities.stringToPageValidator(rs.getString("PAGE"));
 		return this;
 	}
 	
@@ -159,7 +159,7 @@ class Campaign{
 	Vector<Integer> sexes;
 	
 	Set<Banner> banners;
-	Vector<Integer> pages;
+	PageValidator pages;
 	private int viewsperday;
 	private int clicksperday;
 	
@@ -168,9 +168,9 @@ class Campaign{
 		return count++;
 	}
 	
-	Campaign(ResultSet rs, PageDatabase pageDb) throws SQLException {
+	Campaign(ResultSet rs) throws SQLException {
 		banners = new HashSet<Banner>();
-		this.update(rs, pageDb);
+		this.update(rs);
 	}
 	
 	int getID() {
@@ -326,7 +326,7 @@ class Campaign{
 		// TODO fill this
 	}
 
-	public Set<Banner> getBanners(int usertime, int size, int userid, byte age, byte sex, short location, Interests interests, int page, boolean debug) {
+	public Set<Banner> getBanners(int usertime, int size, int userid, byte age, byte sex, short location, Interests interests, String page, boolean debug) {
 		HashSet<Banner> hs = new HashSet<Banner>();
 		if (this.banners.isEmpty() || !this.valid(usertime, size, userid, age, sex, location, interests, page, debug)) {
 			return hs;
@@ -340,7 +340,7 @@ class Campaign{
 		}
 	}
 
-	private boolean valid(int usertime, int size, int userid, byte age, byte sex, short location, Interests interests2, int page, boolean debug) {
+	private boolean valid(int usertime, int size, int userid, byte age, byte sex, short location, Interests interests2, String page, boolean debug) {
 		String debugLog = "";
 		if (debug) debugLog += "Checking campaign: this.id";
 		if(!this.enabled)
@@ -460,21 +460,7 @@ class Campaign{
 		}
 	}
 	
-	public boolean validPage(int page) {
-		if (pages.get(0) == Integer.NEGATE) {
-			for (int i=1; i<pages.size(); i++) {
-				if (pages.get(i).intValue() == page) {
-					return false;
-				}
-			}
-			return true;
-		} else {
-			for (int i=1; i<pages.size(); i++) {
-				if (pages.get(i).intValue() == page) {
-					return true;
-				}
-			}
-			return false;
-		}
+	public boolean validPage(String page) {
+		return pages.validate(page);
 	}
 }

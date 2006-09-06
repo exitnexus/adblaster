@@ -26,7 +26,8 @@ public class JDBCTester {
 			System.out.println(rs.getFetchSize());
 			HashMap<Integer, Banner> banners = new HashMap<Integer, Banner>();
 			for (int i=0; rs.next(); i++) {
-				banners.put(new Integer(rs.getInt("ID")), new Banner(rs, null));
+				if (true) throw new UnsupportedOperationException("Hasn't been updated.");
+				//banners.put(new Integer(rs.getInt("ID")), new Banner(rs, null));
 			}
 
 			for (Iterator it = banners.values().iterator(); it.hasNext(); ){

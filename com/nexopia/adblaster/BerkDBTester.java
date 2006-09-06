@@ -30,7 +30,7 @@ public class BerkDBTester {
 			System.out.println(rs.getFetchSize());
 			HashMap<Integer, Banner> banners = new HashMap<Integer, Banner>();
 			for (int i=0; rs.next(); i++) {
-				Banner b = new Banner(rs, null);
+				Banner b = new Banner(rs, null, null);
 				System.out.println(b);
 				banners.put(new Integer(rs.getInt("ID")), b);
 			}

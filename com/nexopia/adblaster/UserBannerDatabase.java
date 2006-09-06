@@ -36,12 +36,12 @@ public class UserBannerDatabase {
 	Vector users;
 	int userCount;
 	
-	public UserBannerDatabase(String s, CampaignDB cdb) throws DatabaseException {
+	public UserBannerDatabase(String s, CampaignDB cdb, PageValidatorFactory pvf) throws DatabaseException {
 		EnvironmentConfig envConf = new EnvironmentConfig();
 		envConf.setAllowCreate(true);
 		env = new Environment(new File("UserBanner.db"), envConf);
 		UserDatabase uDb = new UserDatabase(s);
-		BannerDatabase bDb = new BannerDatabase(cdb);
+		BannerDatabase bDb = new BannerDatabase(cdb, pvf);
 		banners = bDb.getBanners();
 		users = uDb.getAllUsers();
 		openDatabases();

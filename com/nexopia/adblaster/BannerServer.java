@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import com.nexopia.adblaster.Campaign.CampaignDB;
+import com.nexopia.adblaster.Utilities.PageValidator;
 import com.sleepycat.je.DatabaseException;
 
 public class BannerServer {
@@ -103,18 +104,18 @@ public class BannerServer {
 			this.db.deleteCampaign(id);
 		}
 		public boolean addBanner(int id) {
-			return this.db.add(id) != null;
+			return this.db.add(id,new Utilities.PageValidator1()) != null;
 		}
 		
 		public boolean updateBanner(int id) {
-			return this.db.update(id) != null;
+			return this.db.update(id,new Utilities.PageValidator1()) != null;
 		}
 		
 		public void deleteBanner(int id) {
 			this.db.delete(id);
 		}
 		
-		public int getBanner(int usertime, int size, int userid, byte age, byte sex, short location, Interests interests, int page, boolean debug){
+		public int getBanner(int usertime, int size, int userid, byte age, byte sex, short location, Interests interests, String page, boolean debug){
 			//String debugLog = "";
 			//if (debug) debugLog += usertime+", "+size+", "+userid+", "+age+", "+sex+", "+loc+", "+page+", "+debug;
 			
@@ -461,7 +462,7 @@ public class BannerServer {
 				byte sex=Byte.parseByte(params[4]); 
 				short loc=Short.parseShort(params[5]); 
 				String interestsStr=params[6]; 
-				int page=Integer.parseInt(params[7]); 
+				String page=params[7]; 
 				//passback=params[8]; 
 				boolean debugGet=Boolean.parseBoolean(params[9]);
 				
@@ -691,13 +692,24 @@ public class BannerServer {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		try {
-			BannerDatabase bdb = new BannerDatabase(new CampaignDB(new PageDatabase("")));
-			bdb.loadCoefficients(new HashMap<Banner, Float>());
-		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		Object args1[] = {};
+		BannerDatabase bdb = new BannerDatabase(new CampaignDB(), new PageValidatorFactory(Utilities.PageValidator1.class, args1));
+		bdb.loadCoefficients(new HashMap<Banner, Float>());
+		
+		String params[] = 
+		{"11111",//int usertime=Integer.parseInt(params[0]);
+		"640x480",//int size=Integer.parseInt(params[1]); 
+		"203",//int userid=Integer.parseInt(params[2]); 
+		"23",//byte age=Byte.parseByte(params[3]); 
+		"1",//byte sex=Byte.parseByte(params[4]); 
+		"1",//short loc=Short.parseShort(params[5]); 
+		"0",//String interestsStr=params[6]; 
+		"index",//int page=Integer.parseInt(params[7]); 
+		"???",//passback=params[8]; 
+		"false"};//boolean debugGet=Boolean.parseBoolean(params[9]);
+		BannerServer bs = new BannerServer(bdb, new CampaignDB(), 1);
+		bs.receive(GET, params);
+		
 	}
 
 }
