@@ -13,6 +13,8 @@ import java.util.Set;
 //Listen on a port for connections and write back the current time.
 public class NIOServer {
 	public  static void main (String args[]) throws IOException {
+		//BannerServer banners = new BannerServer(null, null, 1);
+		
 		//Create the server socket channel
 		ServerSocketChannel server = null;
 		Selector selector = null;
@@ -24,7 +26,7 @@ public class NIOServer {
 			server.configureBlocking(false);
 			
 			//host-port 8000
-			server.socket().bind(new java.net.InetSocketAddress("localhost",8000));
+			server.socket().bind(new java.net.InetSocketAddress("192.168.0.249",8000));
 			
 			System.out.println("Server listening on port 8000");
 			//Create the selector
@@ -40,6 +42,7 @@ public class NIOServer {
 //		Infinite server loop
 		for(int index=0; index > -1; index++) {
 			selector.select();
+		
 			// Get keys
 			Set keys = selector.selectedKeys();
 			Iterator i = keys.iterator();
@@ -61,7 +64,7 @@ public class NIOServer {
 						// Non Blocking I/O
 						client.configureBlocking(false);
 						//recording to the selector (reading)
-						client.register(selector, SelectionKey.OP_READ|SelectionKey.OP_WRITE);
+						client.register(selector, SelectionKey.OP_READ|SelectionKey.OP_WRITE|SelectionKey.OP_CONNECT);
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -69,9 +72,15 @@ public class NIOServer {
 					continue;
 				}
 				
+				if (key.isConnectable()) {
+					SocketChannel client = (SocketChannel) key.channel();
+					client.close();
+					continue;
+				}
+				
 				// if isReadable = true
 				// then the server is ready to read 
-				if (key.isReadable()) {
+				if (key.isReadable() && key.isWritable()) {
 					
 					SocketChannel client = (SocketChannel) key.channel();
 					
@@ -98,11 +107,10 @@ public class NIOServer {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					client.write(charset.encode("received "+charBuffer.toString()));
+					client.write(charset.encode("received "+charBuffer.toString()+'\n'));
 					continue;
 				}
 			}
-				
 		}
 	}
 }
