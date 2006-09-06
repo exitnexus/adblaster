@@ -55,31 +55,25 @@ public class BannerServer {
 		//public bannersizes;
 		//public HashMap<Integer, Campaign> bannercampaigns;
 		//public HashMap<Integer, Integer> campaignids; // array( bannerid => campaignid );
-		public Object[] dailyviews;
-		public Object[] dailyclicks;
+		public HashMap dailyviews;
+		public HashMap dailys;
 
 		public int time;
+		private HashMap<Banner,HashMap<User,int[]>> bannerViewMap = new HashMap<Banner, HashMap<User, int[]>>();
 
 		public BannerServer(BannerDatabase db, CampaignDB cdb, int numservers) {
 			this.db = db;
 			this.cdb = cdb;
 			BannerServer.numservers = numservers;
-			this.sizes = new HashMap<String, Integer>();
-			this.sizes.put("468x60", BANNER_BANNER);
-			this.sizes.put("728x90", BANNER_LEADERBOARD);
-			this.sizes.put("300x250", BANNER_BIGBOX);
-			this.sizes.put("120x600", BANNER_SKY120);
-			this.sizes.put("160x600", BANNER_SKY160);
-			this.sizes.put("120x60", BANNER_BUTTON60);
-			this.sizes.put("Voken", BANNER_VULCAN);
-			this.sizes.put("Link", BANNER_LINK);
-			
-			this.dailyviews = new Object[this.sizes.size()];
-			this.dailyclicks= new Object[this.sizes.size()];
-
-			for(Integer size : this.sizes.values()) {
-				this.dailyviews[size.intValue()] = new Object();
-				this.dailyclicks[size.intValue()]= new Object();
+			Integer sizes[] = {BANNER_BANNER, BANNER_LEADERBOARD,
+			BANNER_BIGBOX, BANNER_SKY120, BANNER_SKY160,
+			BANNER_BUTTON60, BANNER_VULCAN, BANNER_LINK};
+			this.dailyviews = new HashMap<Integer, Object>();
+			this.dailys = new HashMap<Integer, Object>();
+			for(int i = 0; i < sizes.length; i++) {
+				Integer size = sizes[i];
+				this.dailyviews.put(size, new Object());
+				this.dailys.put(size, new Object());
 			}
 
 			this.time = (int) (System.currentTimeMillis()/1000);
@@ -113,6 +107,19 @@ public class BannerServer {
 		
 		public void deleteBanner(int id) {
 			this.db.delete(id);
+		}
+		
+		public void markBannerUsed(User u, int time, Banner b){
+			HashMap<User, int[]> userViewMap = bannerViewMap.get(b);
+			if (userViewMap == null){
+				userViewMap = new HashMap<User,int[]>();
+				bannerViewMap.put(b, userViewMap);
+			}
+			int []views = userViewMap.get(u);
+			if (views == null){
+				views = new int[b.getViewsperuser()];
+				userViewMap.put(u, views);
+			}
 		}
 		
 		public int getBanner(int usertime, int size, int userid, byte age, byte sex, short location, Interests interests, String page, boolean debug){
