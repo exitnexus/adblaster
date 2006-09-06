@@ -90,7 +90,7 @@ public class NIOServer {
 					SocketChannel client = (SocketChannel) key.channel();
 					
 					// Read byte coming from the client
-					int BUFFER_SIZE = 32;
+					int BUFFER_SIZE = 1024;
 					ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
 					try {
 						client.read(buffer);
@@ -112,7 +112,12 @@ public class NIOServer {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					String result = banners.receive(charBuffer.toString());
+					String result = null;
+					try {
+						result = banners.receive(charBuffer.toString());
+					} catch (Exception e) {
+						//set some error indication value in result
+					}
 					client.write(charset.encode("result: "+result+'\n'));
 					continue;
 				}

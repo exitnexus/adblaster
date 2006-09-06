@@ -446,6 +446,7 @@ public class BannerServer {
 		for (String s : split) {
 			if (first) {
 				cmd = parseCommand(s);
+				first = false;
 			} else {
 				params[i] = s;
 				i++;
