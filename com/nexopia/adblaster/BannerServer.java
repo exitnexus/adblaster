@@ -56,7 +56,7 @@ public class BannerServer {
 		//public HashMap<Integer, Campaign> bannercampaigns;
 		//public HashMap<Integer, Integer> campaignids; // array( bannerid => campaignid );
 		public Object[] dailyviews;
-		public Object[] dailys;
+		public Object[] dailyclicks;
 
 		public int time;
 
@@ -75,11 +75,11 @@ public class BannerServer {
 			this.sizes.put("Link", BANNER_LINK);
 			
 			this.dailyviews = new Object[this.sizes.size()];
-			this.dailys= new Object[this.sizes.size()];
+			this.dailyclicks= new Object[this.sizes.size()];
 
 			for(Integer size : this.sizes.values()) {
 				this.dailyviews[size.intValue()] = new Object();
-				this.dailys[size.intValue()]= new Object();
+				this.dailyclicks[size.intValue()]= new Object();
 			}
 
 			this.time = (int) (System.currentTimeMillis()/1000);
@@ -430,7 +430,7 @@ public class BannerServer {
 		return cmd;
 	}
 	
-	public void receive(String command){
+	public String receive(String command){
 		String[] split = command.split(" ");
 		int cmd = BLANK;
 		String[] params = new String[split.length-1];
@@ -444,7 +444,9 @@ public class BannerServer {
 				i++;
 			}
 		}
+		
 		receive(cmd, params);
+		return command + " returned.";
 	}
 	
 	public void receive(int cmd, String[] params){

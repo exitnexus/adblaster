@@ -10,10 +10,15 @@ import java.nio.charset.CharsetEncoder;
 import java.util.Iterator;
 import java.util.Set;
 
+import com.nexopia.adblaster.Campaign.CampaignDB;
+
 //Listen on a port for connections and write back the current time.
 public class NIOServer {
 	public  static void main (String args[]) throws IOException {
-		//BannerServer banners = new BannerServer(null, null, 1);
+		Object args1[] = {};
+		CampaignDB cdb = new CampaignDB();
+		BannerDatabase bdb = new BannerDatabase(cdb, new PageValidatorFactory(Utilities.PageValidator1.class, args1));
+		BannerServer banners = new BannerServer(bdb, cdb, 1);
 		
 		//Create the server socket channel
 		ServerSocketChannel server = null;
@@ -107,7 +112,8 @@ public class NIOServer {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					client.write(charset.encode("received "+charBuffer.toString()+'\n'));
+					String result = banners.receive(charBuffer.toString());
+					client.write(charset.encode("result: "+result+'\n'));
 					continue;
 				}
 			}
