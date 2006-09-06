@@ -59,7 +59,7 @@ public class BannerServer {
 		public HashMap dailys;
 
 		public int time;
-		private HashMap<Banner,HashMap<User,int[]>> bannerViewMap = new HashMap<Banner, HashMap<User, int[]>>();
+		private HashMap<Banner,IntObjectHashMap> bannerViewMap = new HashMap<Banner, IntObjectHashMap>();
 
 		public BannerServer(BannerDatabase db, CampaignDB cdb, int numservers) {
 			this.db = db;
@@ -109,20 +109,127 @@ public class BannerServer {
 			this.db.delete(id);
 		}
 		
-		public void markBannerUsed(User u, int time, Banner b){
-			HashMap<User, int[]> userViewMap = bannerViewMap.get(b);
+		/**
+		 * Determine whether it is valid for a user to view this banner
+		 * at this time. 
+		 */
+		public boolean isBannerValidForUser(int userid, int time, Banner b){
+			
+			int[] views = getBannerViewsForUser(userid, b);
+			
+			/* Find the oldest */
+			for (int i = 0; i < views.length; i++){
+				if (views[i] != 0){
+					/* The oldest view within memory... */
+					if (time - views[i] > b.getLimitbyperiod())
+						/* If the oldest view is outside of limit period, we're golden */
+						return true;
+					else
+						return false;
+				}
+			}
+			
+			/* If we've fallen through, then there are no views.*/
+			return true;
+			
+		}
+
+		/**
+		 * Indicate that a user used a banner at a certain time. 
+		 */
+		public void markBannerUsed(int userid, int time, Banner b){
+			if (b.getViewsperuser() == 0){
+				return;
+			}
+			
+			int[] views = getBannerViewsForUser(userid, b);
+			
+			/* Throw out the oldest, insert the new view. */
+			for (int i = 0; i < views.length - 1; i++){
+				views[i] = views[i+1];
+			}
+			views[views.length - 1] = time;
+			
+		}
+
+		/**
+		 *  Return an int array of the times the user has viewed the banner. 
+		 */
+		private int[] getBannerViewsForUser(int userid, Banner b) {
+			/* Get records of all views for the banner.*/
+			IntObjectHashMap userViewMap = bannerViewMap.get(b);
 			if (userViewMap == null){
-				userViewMap = new HashMap<User,int[]>();
+				userViewMap = new IntObjectHashMap();
 				bannerViewMap.put(b, userViewMap);
 			}
-			int []views = userViewMap.get(u);
+			
+			/* From the above records, get all views for this user.*/
+			int []views = (int[])userViewMap.get(userid);
 			if (views == null){
 				views = new int[b.getViewsperuser()];
-				userViewMap.put(u, views);
+				userViewMap.put(userid, views);
 			}
+			return views;
+		}
+
+		private Vector<Banner> orderBannersByScore(Vector<Banner> old) {
+			Vector<Banner> vec = new Vector<Banner>();
+			for (int j = 0; j < old.size(); j++){
+				Banner b = old.get(j);
+				float score = b.payrate;
+				int i = -1;
+				while (true){
+					i++;
+					if (i >= vec.size()){
+						break;
+					}
+					Banner b2 = vec.get(i);
+					if (b2.payrate < score)
+						break;
+				}
+				vec.insertElementAt(b, i);
+				
+			}
+			return vec;
+		}
+
+		/**
+		 * Return a valid banner with the best score.  Currently, doesn't check
+		 * many constraints.
+		 * 
+		 * @param usertime
+		 * @param size
+		 * @param userid
+		 * @param age
+		 * @param sex
+		 * @param location
+		 * @param interests
+		 * @param page
+		 * @param debug
+		 * @return
+		 */
+		public int getBanner(int usertime, int size, int userid, byte age, byte sex, short location, Interests interests, String page, boolean debug){
+			Vector<Banner> banners = new Vector<Banner>();
+			for (int i = 0; i < db.getBannerCount(); i++){
+				Banner b = db.getBannerByIndex(i);
+				banners.add(b);
+			}
+			banners = orderBannersByScore(banners);
+			for (int i = 0; i < banners.size(); i++){
+				Banner b = banners.get(i);
+				if (isBannerValidForUser(userid, usertime, b)){
+					System.out.println(b);
+					markBannerUsed(userid, time, b);
+					return b.id;
+				}
+			}
+			return -1;
 		}
 		
-		public int getBanner(int usertime, int size, int userid, byte age, byte sex, short location, Interests interests, String page, boolean debug){
+		/** 
+		 * Not used yet
+		 */
+		public int getBannerByCoef(int usertime, int size, int userid, byte age, byte sex, short location, Interests interests, String page, boolean debug){
 			//String debugLog = "";
 			//if (debug) debugLog += usertime+", "+size+", "+userid+", "+age+", "+sex+", "+loc+", "+page+", "+debug;
 			
@@ -520,7 +627,7 @@ public class BannerServer {
 					stats[GETFAIL]++;
 					slidingstats[statstime][GETFAIL]++;
 				}
-	
+				System.out.println(ret);
 				//socket_write(sock, "ret\n");
 	
 				//unset(ret, size, userid, age, sex, loc, interests, page, passback);
@@ -705,10 +812,10 @@ public class BannerServer {
 		Object args1[] = {};
 		BannerDatabase bdb = new BannerDatabase(new CampaignDB(), new PageValidatorFactory(Utilities.PageValidator1.class, args1));
 		bdb.loadCoefficients(new HashMap<Banner, Float>());
-		
+
 		String params[] = 
 		{"11111",//int usertime=Integer.parseInt(params[0]);
-		"640x480",//int size=Integer.parseInt(params[1]); 
+		"1",//int size=Integer.parseInt(params[1]); 
 		"203",//int userid=Integer.parseInt(params[2]); 
 		"23",//byte age=Byte.parseByte(params[3]); 
 		"1",//byte sex=Byte.parseByte(params[4]); 
@@ -718,7 +825,9 @@ public class BannerServer {
 		"???",//passback=params[8]; 
 		"false"};//boolean debugGet=Boolean.parseBoolean(params[9]);
 		BannerServer bs = new BannerServer(bdb, new CampaignDB(), 1);
-		bs.receive(GET, params);
+		for (int i = 0; i < 1000; i++){
+			bs.receive(GET, params);
+		}
 		
 	}
 
