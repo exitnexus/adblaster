@@ -390,19 +390,7 @@ class Campaign{
 			if (debug) Utilities.bannerDebug(debugLog);
 			return false;
 		}
-		if (debug) debugLog += " 5";
-		//frequency capping at the campaign level
-		//this period (day/hour)
-		if(this.viewsperday != 0 && this.dailyviews() >= this.viewsperday) {
-			if (debug) Utilities.bannerDebug(debugLog);
-			return false;
-		}
 		
-		if (debug) debugLog += " 6";
-		if(this.clicksperday != 0 && this.dailyclicks() >= this.clicksperday) {
-			if (debug) Utilities.bannerDebug(debugLog);
-			return false;
-		}
 		if (debug) debugLog += " 7";
 		//Utilities.bannerDebug("Campaign valid: this.id");
 		if (debug) Utilities.bannerDebug(debugLog);
