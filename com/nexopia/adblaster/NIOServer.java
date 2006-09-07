@@ -45,7 +45,7 @@ public class NIOServer {
 		//ByteBuffer lastbuffer = null;
 		
 //		Infinite server loop
-		for(int index=0; index > -1; index++) {
+		for(int index=0; index > -1; ) {
 			selector.select();
 		
 			// Get keys
@@ -78,6 +78,7 @@ public class NIOServer {
 				}
 				
 				if (key.isConnectable()) {
+					System.err.println("Client closed");
 					SocketChannel client = (SocketChannel) key.channel();
 					client.close();
 					continue;
@@ -93,7 +94,9 @@ public class NIOServer {
 					int BUFFER_SIZE = 1024;
 					ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
 					try {
-						client.read(buffer);
+						if (client.read(buffer) == -1) {
+							System.out.println("Read closed");
+						}
 					}
 					catch (Exception e) {
 						// client is no longer active
@@ -116,9 +119,22 @@ public class NIOServer {
 					try {
 						result = banners.receive(charBuffer.toString());
 					} catch (Exception e) {
+						System.err.println("Something bad happened.");
 						//set some error indication value in result
+						System.err.println(e);
+						e.printStackTrace();
 					}
-					client.write(charset.encode("result: "+result+'\n'));
+					try {
+						ByteBuffer output = charset.encode(result+"-"+index+'\n');
+						System.out.println(output.toString());
+						client.write(output);
+						index++;
+					} catch (Exception e) {
+						//set some error indication value in result
+						System.err.println("Error writing banner result value");
+						e.printStackTrace();
+					}
+					
 					continue;
 				}
 			}
