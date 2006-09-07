@@ -1,6 +1,8 @@
 package com.nexopia.adblaster;
 
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -198,6 +200,14 @@ public class TimeTable {
 		return !invalid;
 	}
 
+	public void getValid(long time){
+		Date date = new Date(time);
+		Calendar c = Calendar.getInstance();
+		c.setTime(date);
+		int h = c.get(Calendar.HOUR_OF_DAY);
+		int d = (c.get(Calendar.DAY_OF_WEEK) - 2) % 7;
+		System.out.println(this.allowed[d][h]);
+	}
 	/**
 	 * @param args
 	 */
@@ -205,13 +215,14 @@ public class TimeTable {
 		Pattern p = Pattern.compile("[^MmTtWwRrFfYySs\\-\\d,]+");
 		System.out.println(p);
 		//TimeTable t = new TimeTable("M-22, F,14Jl)-2  3,,,M,J,T");
-		TimeTable t = new TimeTable("MF0-1,MWF3-4,W-Y6-7");
+		TimeTable t = new TimeTable("MF0-1,MWF3-4,W-Y6-18");
 		for(int i = 0; i < 7; i++){
 			for (int j = 0; j < 24; j++){
 				System.out.print(t.allowed[i][j]?1:0);
 			}
 			System.out.println();
 		}
+		t.getValid(System.currentTimeMillis());
 	}
 
 }
