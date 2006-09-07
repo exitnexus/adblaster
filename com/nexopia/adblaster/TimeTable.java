@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 public class TimeTable {
 	private Vector<String> invalidRanges;
 	private Vector<String> validRanges;
+	boolean allowed[][] = new boolean[7][24];
 	
 	public TimeTable(String times) {
 		invalidRanges = new Vector<String>(); 
@@ -33,14 +34,15 @@ public class TimeTable {
 	}
 	
 	private void parseAllowedTimes() {
-		boolean allowed[][] = new boolean[7][24];
 		for (int j = 0; j < validRanges.size(); j++){
 			String val = validRanges.get(j);
 
 			Pattern weekday = Pattern.compile("[MmTtWwRrFfYySs]");
 			Pattern digit = Pattern.compile("\\d+");
+			Pattern dash = Pattern.compile("-");
 			Matcher weekdayMatcher = weekday.matcher(val);
 			Matcher digitMatcher = digit.matcher(val);
+			Matcher dashMatcher = dash.matcher(val);
 			
 			int digit1=-1;
 			int digit2=-1;
@@ -57,33 +59,37 @@ public class TimeTable {
 				digit2 = digit1;
 			}
 			
-			String s1= "";
-			String s2= "";
 			
-			if (weekdayMatcher.find()){
+			boolean range = false;
+			while (weekdayMatcher.find()){
+				String s1= "";
+				String s2= "";
 				s1 = val.substring(weekdayMatcher.start(), weekdayMatcher.end());
-				if (weekdayMatcher.find()){
-					s2 = val.substring(weekdayMatcher.start(), weekdayMatcher.end());
+				if (val.substring(weekdayMatcher.end(),weekdayMatcher.end()+1).equals("-")){
+					range = true;
+					if (weekdayMatcher.find()){
+						s2 = val.substring(weekdayMatcher.start(), weekdayMatcher.end());
+					}
 				}
-			}
-			if (s1.equals("") && s2.equals("")){
-				s1 = "M";
-				s2 = "S";
-			} else if (s2 == ""){
-				s2 = s1;
-			}
-			int day1 = getDayNumber(s1.charAt(0));
-			int day2 = getDayNumber(s2.charAt(0));
-			int dayrange = day2 - day1;
-			int hourrange = digit2 - digit1;
-			for (int day = 0; day <= dayrange; day++){
-				for (int hour = 0; hour <= hourrange; hour++){
-					allowed[day1+day % 7][digit1+hour % 24] = true;
+				if (s1.equals("") && s2.equals("")){
+					s1 = "M";
+					s2 = "S";
+				} else if (s2 == ""){
+					s2 = s1;
 				}
+				int day1 = getDayNumber(s1.charAt(0));
+				int day2 = getDayNumber(s2.charAt(0));
+				int dayrange = day2 - day1;
+				int hourrange = digit2 - digit1;
+				for (int day = 0; day <= dayrange; day++){
+					for (int hour = 0; hour <= hourrange; hour++){
+						allowed[day1+day % 7][digit1+hour % 24] = true;
+					}
+				}
+				System.out.println(digit1 + ":" + digit2);
+				System.out.println(s1 + ":" + s2);
 			}
 			
-			System.out.println(digit1 + ":" + digit2);
-			System.out.println(s1 + ":" + s2);
 			/*for (int i=0; i<val.length(); i++) {
 				weekdayMatcher.region(i,i+1);
 				digitMatcher.region(i,i+1);
@@ -92,8 +98,7 @@ public class TimeTable {
 				}
 			}*/
 		}
-		for(int i = 0; i < 7; i++)
-			System.out.println(Arrays.toString(allowed[i]));
+		
 	}
 
 	private int getDayNumber(char c) {
@@ -200,7 +205,13 @@ public class TimeTable {
 		Pattern p = Pattern.compile("[^MmTtWwRrFfYySs\\-\\d,]+");
 		System.out.println(p);
 		//TimeTable t = new TimeTable("M-22, F,14Jl)-2  3,,,M,J,T");
-		TimeTable t = new TimeTable("");
+		TimeTable t = new TimeTable("MF0-1,MWF3-4,W-Y6-7");
+		for(int i = 0; i < 7; i++){
+			for (int j = 0; j < 24; j++){
+				System.out.print(t.allowed[i][j]?1:0);
+			}
+			System.out.println();
+		}
 	}
 
 }
