@@ -579,11 +579,10 @@ public class BannerServer {
 			}
 		}
 		
-		receive(cmd, params);
-		return command + " returned.";
+		return new Integer(receive(cmd, params)).toString();
 	}
 	
-	public void receive(int cmd, String[] params){
+	public int receive(int cmd, String[] params){
 		
 		switch(cmd){
 			case GET:
@@ -651,7 +650,7 @@ public class BannerServer {
 	
 				//unset(ret, size, userid, age, sex, loc, interests, page, passback);
 	
-				break;
+				return ret;
 			}
 			case BLANK:
 			{
@@ -823,6 +822,7 @@ public class BannerServer {
 				//myerror("unknown command: 'msg'", __LINE__);
 				break;
 		}
+		return -1;
 	}
 	/**
 	 * @param args
