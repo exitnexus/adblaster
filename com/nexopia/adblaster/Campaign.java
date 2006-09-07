@@ -391,7 +391,7 @@ class Campaign{
 			return false;
 		}
 		
-		if (debug) debugLog += " 7";
+		if (debug) debugLog += " 5";
 		//Utilities.bannerDebug("Campaign valid: this.id");
 		if (debug) Utilities.bannerDebug(debugLog);
 		return true;

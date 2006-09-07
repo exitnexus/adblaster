@@ -433,7 +433,7 @@ class Banner {
 		
 		if (debug) debugLog += " 6";
 		//page
-		if(this.pages.validate(page)){ //default true
+		if(!this.pages.validate(page)){ //default true
 			if (debug) Utilities.bannerDebug(debugLog);
 			return false;
 		}
@@ -441,7 +441,7 @@ class Banner {
 		if (debug) debugLog += " 7";
 		//interests
 		//Utilities.bannerDebug("testing interests");
-		if(this.validInterests(interests2)) {
+		if(!this.validInterests(interests2)) {
 			if (debug) Utilities.bannerDebug(debugLog);
 			return false;
 		}
@@ -456,33 +456,14 @@ class Banner {
 		}
 		if (debug) debugLog += " 9";
 		
-		
+
 		//all else works
 		if (debug) Utilities.bannerDebug(debugLog);
 		return true;
 	}
 
-	private boolean validTime(int time) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	private boolean validUserTime(int userid, int time) {
-		if (this.viewsperuser == 0) {
-			return true;
-		} 
-		Integer uid = Integer.valueOf(userid);
-		int[] times = this.userViewTimes.get(uid);
-		uid.free();
-		if (times == null) {
-			return true;
-		} else {
-			if (times[times[0]] > time-this.limitbyperiod) {
-				return false;
-			} else {
-				return true;
-			}
-		}
+	private boolean validTime(long time) {
+		return this.allowedTimes.getValid(time);
 	}
 
 	public int getDailyViews() {

@@ -242,7 +242,7 @@ public class Utilities {
 	}
 
 	public static void bannerDebug(String debugLog) {
-		// TODO Auto-generated method stub
+		System.out.println(debugLog);
 		
 	}
 }
