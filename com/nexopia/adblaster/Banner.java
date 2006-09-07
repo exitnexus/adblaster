@@ -389,15 +389,11 @@ class Banner {
 		String debugLog = "";
 		if (debug) debugLog += "Checking banner this.id:";
 
-		//Utilities.bannerDebug("Testing banner: this.id");
 		if(!this.enabled) {
 			if (debug) Utilities.bannerDebug(debugLog);
 			return false;
 		}
 		if (debug) debugLog += " 1";
-		//if(!this.moded) {
-		//	return false;
-		//}
 		
 		//date
 		if(this.startdate >= time || (this.enddate != 0 && this.enddate <= time)) {
@@ -405,7 +401,7 @@ class Banner {
 			return false;
 		}
 		if (debug) debugLog += " 2";
-		//Utilities.bannerDebug("testing size: this.size == size");
+		
 		//size
 		if(this.size != size) {
 			if (debug) Utilities.bannerDebug(debugLog);
@@ -415,7 +411,6 @@ class Banner {
 
 		//targetting
 		//age
-		//Utilities.bannerDebug("testing age");
 		if (!this.validAge(age)) {
 			if (debug) Utilities.bannerDebug(debugLog);
 			return false;
@@ -424,7 +419,6 @@ class Banner {
 		if (debug) debugLog += " 4";
 
 		//sex
-		//Utilities.bannerDebug("testing sex");
 		if(!this.validSex(sex)) {
 			if (debug) Utilities.bannerDebug(debugLog);
 			return false;
@@ -432,7 +426,6 @@ class Banner {
 		if (debug) debugLog += " 5";
 		
 		//location
-		//Utilities.bannerDebug("testing location");
 		if(!this.validLocation(location)){ //default true
 			if (debug) Utilities.bannerDebug(debugLog);
 			return false;
@@ -440,7 +433,6 @@ class Banner {
 		
 		if (debug) debugLog += " 6";
 		//page
-		//Utilities.bannerDebug("testing page");
 		if(this.pages.validate(page)){ //default true
 			if (debug) Utilities.bannerDebug(debugLog);
 			return false;
@@ -462,41 +454,9 @@ class Banner {
 			if (debug) Utilities.bannerDebug(debugLog);
 			return false;
 		}
-		//day = gmdate("w", usertime);
-		//hour = gmdate("G", usertime);
-		//if (!this.allowedtimes.validHours[day][hour]) {
-		//	if (debug) Utilities.bannerDebug(debugLog);
-		//	return false;
-		//}
 		if (debug) debugLog += " 9";
-		//payment available
-		//if (this.campaign.clienttype == "payinadvance") {
-		//	if (this.credits + this.campaign.credits < this.payrate()) {
-		//		return false;
-		//	}
-		//}
 		
-		//frequency capping
-		//this period (day/hour)
-		//Utilities.bannerDebug("testing frequency capping");
-		if(this.viewsperday != 0 && this.dailyviews >= this.viewsperday) {
-			if (debug) Utilities.bannerDebug(debugLog);
-			return false;
-		}
-		if (debug) debugLog += " 10";
-		if(this.clicksperday != 0 && this.dailyclicks >= this.clicksperday) {
-			if (debug) Utilities.bannerDebug(debugLog);
-			return false;
-		}
-		if (debug) debugLog += " 11";
-		//views per user
-		if(!this.validUserTime(userid, time)) {
-			if (debug) Utilities.bannerDebug(debugLog);
-			return false;
-		}
 		
-		if (debug) debugLog += " 12";
-		//Utilities.bannerDebug("valid banner: this.id");
 		//all else works
 		if (debug) Utilities.bannerDebug(debugLog);
 		return true;
