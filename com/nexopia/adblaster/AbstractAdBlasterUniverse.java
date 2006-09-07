@@ -28,7 +28,7 @@ public abstract class AbstractAdBlasterUniverse {
 			}
 			if (b != null && instance.isValidBannerForView(bv, b) && 
 					(instance.bannerCount(b) < b.getViewsperday()) && 
-					(instance.campaignCount(b) < b.getCampaign().getViewsperuser())){
+					(instance.campaignCount(b) < b.getCampaign().getViewsPerDay())){
 				match = b;
 			}
 		}

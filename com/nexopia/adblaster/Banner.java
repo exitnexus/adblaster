@@ -45,6 +45,7 @@ class Banner {
 	private int dailyclicks;
 	private int clicksperday;
 	private HashMap<Integer, int[]> userViewTimes; //int[0] is the position of the oldest view, int[1-viewsperuser] are timestamps
+	private TimeTable allowedTimes;
 	
 	static int count = 0;
 	public static int counter(){
@@ -65,7 +66,7 @@ class Banner {
 	}
 	
 	
-	Banner(int id, int payrate, int maxHits, int campaignID, Vector<Integer> locations, Vector<Integer> ages, Vector<Integer> sexes, Interests interests, Campaign c, PageValidator pv) {
+	Banner(int id, int payrate, int maxHits, int campaignID, Vector<Integer> locations, Vector<Integer> ages, Vector<Integer> sexes, Interests interests, Campaign c, PageValidator pv, String allowed) {
 		this.index = counter();
 		this.id = id;
 		this.payrate = payrate;
@@ -76,6 +77,7 @@ class Banner {
 		this.sexes = sexes;
 		this.interests = interests;
 		this.pages = pv;
+		this.allowedTimes = new TimeTable(allowed);
 	}
 	
 	@SuppressWarnings("unchecked") Banner(Banner b) {
@@ -94,6 +96,7 @@ class Banner {
 		this.interests = new Interests(b.interests);
 		this.startdate = b.startdate;
 		this.enddate = b.enddate;
+		this.allowedTimes = (TimeTable) b.allowedTimes.clone();
 		this.enabled = b.enabled;
 	}
 	
@@ -370,6 +373,7 @@ class Banner {
 		this.limitbyperiod = rs.getInt("LIMITBYPERIOD"); 
 
 		this.interests = new Interests(rs.getString("INTERESTS"), true);
+		this.allowedTimes = new TimeTable(rs.getString("ALLOWEDTIMES"));
 		return this;
 	}
 

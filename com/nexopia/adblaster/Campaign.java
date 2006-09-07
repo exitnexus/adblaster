@@ -115,6 +115,8 @@ class Campaign{
 		}
 
 	}
+
+	private TimeTable allowedTimes;
 	
 	
 	public Campaign update(ResultSet rs) throws SQLException {
@@ -136,6 +138,7 @@ class Campaign{
 		this.minviewsperday = rs.getInt("MINVIEWSPERDAY");
 		this.viewsperday = rs.getInt("VIEWSPERDAY");
 		this.clicksperday = rs.getInt("CLICKSPERDAY");
+		this.allowedTimes = new TimeTable(rs.getString("ALLOWEDTIMES"));
 		this.pages = Utilities.stringToPageValidator(rs.getString("PAGE"));
 		return this;
 	}
@@ -152,7 +155,6 @@ class Campaign{
 	private long enddate;
 	private int maxviews;
 	private int minviewsperday;
-	private HashMap<Integer, int[]> userViewTimes; //int[0] is the position of the oldest view, int[1-viewsperuser] are timestamps
 	
 	Vector<Integer> locations;
 	Vector<Integer> ages;
@@ -402,12 +404,6 @@ class Campaign{
 			return false;
 		}
 		if (debug) debugLog += " 7";
-		//views per user
-		if(!this.validUserTime(userid, usertime)) {
-			if (debug) Utilities.bannerDebug(debugLog);
-			return false;
-		}
-		if (debug) debugLog += " 8";
 		//Utilities.bannerDebug("Campaign valid: this.id");
 		if (debug) Utilities.bannerDebug(debugLog);
 		return true;
@@ -429,9 +425,8 @@ class Campaign{
 		return clicks;
 	}
 
-	private boolean validTime(int usertime) {
-		// TODO Auto-generated method stub
-		return false;
+	private boolean validTime(long usertime) {
+		return allowedTimes.getValid(usertime);
 	}
 
 	public void addBanner(Banner banner) {
@@ -442,25 +437,11 @@ class Campaign{
 		this.banners.remove(banner);
 	}
 	
-	private boolean validUserTime(int userid, int time) {
-		if (this.viewsperuser == 0) {
-			return true;
-		} 
-		Integer uid = Integer.valueOf(userid);
-		int[] times = this.userViewTimes.get(uid);
-		uid.free();
-		if (times == null) {
-			return true;
-		} else {
-			if (times[times[0]] > time-this.limitByPeriod) {
-				return false;
-			} else {
-				return true;
-			}
-		}
-	}
-	
 	public boolean validPage(String page) {
 		return pages.validate(page);
+	}
+
+	public int getViewsPerDay() {
+		return this.maxviews;
 	}
 }

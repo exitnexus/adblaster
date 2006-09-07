@@ -89,7 +89,7 @@ public class AdBlasterPolicy implements I_Policy {
 			Banner b = (Banner) all.get(banner);
 			
 			if ( instance.bannerCount(b) < b.getViewsperday() && 
-					instance.campaignCount(b) < b.getCampaign().getViewsperuser()){
+					instance.campaignCount(b) < b.getCampaign().getViewsPerDay()){
 				if (instance.isValidBannerForView(bv, b)){
 					return b;
 				}

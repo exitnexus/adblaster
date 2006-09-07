@@ -69,7 +69,7 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 			Vector<Integer> ages = new Vector<Integer>();
 			if (true)
 				throw new UnsupportedOperationException("This hasn't been updated for campaignDB/PageValidators");
-			addBanner(new Banner(i, payrate, maxHits, campaignID, loc, sexes, ages, inter, null, null));
+			addBanner(new Banner(i, payrate, maxHits, campaignID, loc, sexes, ages, inter, null, null, ""));
 		}
 	}
 	

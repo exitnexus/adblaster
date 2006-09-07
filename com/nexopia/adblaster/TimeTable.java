@@ -11,10 +11,14 @@ public class TimeTable {
 	private Vector<String> invalidRanges;
 	private Vector<String> validRanges;
 	boolean allowed[][] = new boolean[7][24];
+	Calendar c = Calendar.getInstance();
 	
 	public TimeTable(String times) {
 		invalidRanges = new Vector<String>(); 
 		validRanges = new Vector<String>(); 
+		if (times.equals("")){
+			validRanges.add("M-F0-23");
+		}
 		
 		Pattern p = Pattern.compile("[^MmTtWwRrFfYySs\\-\\d,]+");
 		Matcher m = p.matcher(times);
@@ -22,17 +26,23 @@ public class TimeTable {
 		p = Pattern.compile(",+");
 		m = p.matcher(times);
 		times = m.replaceAll(",");
-		System.out.println(times);
 		String[] ranges = times.split(",");
 		for (int i=0; i<ranges.length; i++) {
 			if (!this.validateRange(ranges[i])) {
 				invalidRanges.add(ranges[i]);
 				System.out.println(ranges[i] + " is invalid.");
+				throw new UnsupportedOperationException("Invalid time range.");
 			} else {
 				this.validRanges.add(ranges[i]);
 			}
 		}
 		this.parseAllowedTimes();
+	}
+	
+	public Object clone(){
+		TimeTable t = new TimeTable("");
+		t.allowed = this.allowed.clone();
+		return t;
 	}
 	
 	private void parseAllowedTimes() {
@@ -88,8 +98,6 @@ public class TimeTable {
 						allowed[day1+day % 7][digit1+hour % 24] = true;
 					}
 				}
-				System.out.println(digit1 + ":" + digit2);
-				System.out.println(s1 + ":" + s2);
 			}
 			
 			/*for (int i=0; i<val.length(); i++) {
@@ -200,13 +208,12 @@ public class TimeTable {
 		return !invalid;
 	}
 
-	public void getValid(long time){
+	public boolean getValid(long time){
 		Date date = new Date(time);
-		Calendar c = Calendar.getInstance();
 		c.setTime(date);
 		int h = c.get(Calendar.HOUR_OF_DAY);
 		int d = (c.get(Calendar.DAY_OF_WEEK) - 2) % 7;
-		System.out.println(this.allowed[d][h]);
+		return this.allowed[d][h];
 	}
 	/**
 	 * @param args

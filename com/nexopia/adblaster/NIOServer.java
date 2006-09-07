@@ -24,6 +24,9 @@ public class NIOServer {
 		ServerSocketChannel server = null;
 		Selector selector = null;
 		
+		int BUFFER_SIZE = 1024;
+		ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
+
 		try {
 			server = ServerSocketChannel.open();
 			
@@ -31,7 +34,7 @@ public class NIOServer {
 			server.configureBlocking(false);
 			
 			//host-port 8000
-			server.socket().bind(new java.net.InetSocketAddress("192.168.0.249",8000));
+			server.socket().bind(new java.net.InetSocketAddress("localhost",8000));
 			
 			System.out.println("Server listening on port 8000");
 			//Create the selector
@@ -91,8 +94,7 @@ public class NIOServer {
 					SocketChannel client = (SocketChannel) key.channel();
 					
 					// Read byte coming from the client
-					int BUFFER_SIZE = 1024;
-					ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
+					buffer.clear();
 					try {
 						if (client.read(buffer) == -1) {
 							System.out.println("Read closed");
@@ -126,7 +128,7 @@ public class NIOServer {
 					}
 					try {
 						ByteBuffer output = charset.encode(result+"-"+index+'\n');
-						System.out.println(output.toString());
+						//System.out.println(output.toString());
 						client.write(output);
 						index++;
 					} catch (Exception e) {

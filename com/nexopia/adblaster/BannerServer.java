@@ -61,8 +61,12 @@ public class BannerServer {
 		public HashMap<Banner, BannerStat> bannerviews;
 		public HashMap<Banner, BannerStat> bannerclicks;
 
+		public HashMap<Campaign, BannerStat> campaignviews;
+		public HashMap<Campaign, BannerStat> campaignclicks;
+
 		public int time;
 		private HashMap<Banner,IntObjectHashMap> bannerViewMap = new HashMap<Banner, IntObjectHashMap>();
+		Vector<Banner> banners = new Vector<Banner>();
 
 		static class BannerStat{
 			int i;
@@ -79,6 +83,8 @@ public class BannerServer {
 			this.dailyclicks = new HashMap<Integer, BannerStat>();
 			this.bannerviews = new HashMap<Banner, BannerStat>();
 			this.bannerclicks = new HashMap<Banner, BannerStat>();
+			this.campaignviews = new HashMap<Campaign, BannerStat>();
+			this.campaignclicks = new HashMap<Campaign, BannerStat>();
 			for(int i = 0; i < sizes.length; i++) {
 				Integer size = sizes[i];
 				this.dailyviews.put(size, new BannerStat());
@@ -217,23 +223,24 @@ public class BannerServer {
 		 * @param debug
 		 * @return
 		 */
+		
 		public int getBanner(int usertime, int size, int userid, byte age, byte sex, short location, Interests interests, String page, boolean debug){
 			Vector<Banner> banners = new Vector<Banner>();
-			for (int i = 0; i < db.getBannerCount(); i++){
-				Banner b = db.getBannerByIndex(i);
-				banners.add(b);
+			for (Campaign campaign : cdb.getCampaigns()){
+				banners.addAll(campaign.getBanners(usertime, size, userid, age, sex, location, interests, page, debug));
 			}
 			banners = orderBannersByScore(banners);
+			
 			for (int i = 0; i < banners.size(); i++){
 				Banner b = banners.get(i);
 				if (isBannerValidForUser(userid, usertime, b) && !hasReachedViewsPerDay(b)){
-					System.out.println(b);
+					//System.out.println(b);
 					markBannerUsed(userid, time, b);
 					this.bannerviews.get(b).i++;
 					return b.id;
 				}
 			}
-			return -1;
+			return 0;
 		}
 		
 		private boolean hasReachedViewsPerDay(Banner b) {
@@ -241,6 +248,11 @@ public class BannerServer {
 				this.bannerviews.put(b, new BannerStat());
 			}
 			if (this.bannerviews.get(b).i > b.getViewsperday())
+				return true;
+			if (this.campaignviews.get(b.campaign) == null){
+				this.campaignviews.put(b.campaign, new BannerStat());
+			}
+			if (this.campaignviews.get(b.campaign).i > b.campaign.getViewsPerDay())
 				return true;
 			return false;
 		}
@@ -559,6 +571,7 @@ public class BannerServer {
 			cmd = GETLOG;
 		} else {
 			cmd = BLANK;
+			System.out.println(command + " not found.");
 		}
 		return cmd;
 	}
@@ -578,6 +591,8 @@ public class BannerServer {
 				i++;
 			}
 		}
+
+		//System.out.println(cmd);
 		
 		return new Integer(receive(cmd, params)).toString();
 	}
@@ -599,14 +614,14 @@ public class BannerServer {
 				String interestsStr=params[6]; 
 				String page=params[7]; 
 				//passback=params[8]; 
-				boolean debugGet=Boolean.parseBoolean(params[9]);
+				//boolean debugGet=Boolean.parseBoolean(params[9]);
 				
 				Interests interests = new Interests(interestsStr, false);
 	
 				//if(passback != "")
 				//	passbackBanner(passback, userid);
 								
-				int ret = getBanner(usertime, size, userid, age, sex, loc, interests, page, debugGet);
+				int ret = getBanner(usertime, size, userid, age, sex, loc, interests, page, false);
 	
 				/*if (debug[PASSBACK]) {
 					if (passback != "") {
