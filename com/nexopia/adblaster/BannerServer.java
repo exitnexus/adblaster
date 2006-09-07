@@ -55,12 +55,19 @@ public class BannerServer {
 		//public bannersizes;
 		//public HashMap<Integer, Campaign> bannercampaigns;
 		//public HashMap<Integer, Integer> campaignids; // array( bannerid => campaignid );
-		public HashMap dailyviews;
-		public HashMap dailys;
+		public HashMap<Integer, BannerStat> dailyviews;
+		public HashMap<Integer, BannerStat> dailyclicks;
+
+		public HashMap<Banner, BannerStat> bannerviews;
+		public HashMap<Banner, BannerStat> bannerclicks;
 
 		public int time;
 		private HashMap<Banner,IntObjectHashMap> bannerViewMap = new HashMap<Banner, IntObjectHashMap>();
 
+		static class BannerStat{
+			int i;
+		}
+		
 		public BannerServer(BannerDatabase db, CampaignDB cdb, int numservers) {
 			this.db = db;
 			this.cdb = cdb;
@@ -68,12 +75,14 @@ public class BannerServer {
 			Integer sizes[] = {BANNER_BANNER, BANNER_LEADERBOARD,
 			BANNER_BIGBOX, BANNER_SKY120, BANNER_SKY160,
 			BANNER_BUTTON60, BANNER_VULCAN, BANNER_LINK};
-			this.dailyviews = new HashMap<Integer, Object>();
-			this.dailys = new HashMap<Integer, Object>();
+			this.dailyviews = new HashMap<Integer, BannerStat>();
+			this.dailyclicks = new HashMap<Integer, BannerStat>();
+			this.bannerviews = new HashMap<Banner, BannerStat>();
+			this.bannerclicks = new HashMap<Banner, BannerStat>();
 			for(int i = 0; i < sizes.length; i++) {
 				Integer size = sizes[i];
-				this.dailyviews.put(size, new Object());
-				this.dailys.put(size, new Object());
+				this.dailyviews.put(size, new BannerStat());
+				this.dailyclicks.put(size, new BannerStat());
 			}
 
 			this.time = (int) (System.currentTimeMillis()/1000);
@@ -217,15 +226,25 @@ public class BannerServer {
 			banners = orderBannersByScore(banners);
 			for (int i = 0; i < banners.size(); i++){
 				Banner b = banners.get(i);
-				if (isBannerValidForUser(userid, usertime, b)){
+				if (isBannerValidForUser(userid, usertime, b) && !hasReachedViewsPerDay(b)){
 					System.out.println(b);
 					markBannerUsed(userid, time, b);
+					this.bannerviews.get(b).i++;
 					return b.id;
 				}
 			}
 			return -1;
 		}
 		
+		private boolean hasReachedViewsPerDay(Banner b) {
+			if (this.bannerviews.get(b) == null){
+				this.bannerviews.put(b, new BannerStat());
+			}
+			if (this.bannerviews.get(b).i > b.getViewsperday())
+				return true;
+			return false;
+		}
+
 		/** 
 		 * Not used yet
 		 */
@@ -813,19 +832,24 @@ public class BannerServer {
 		BannerDatabase bdb = new BannerDatabase(new CampaignDB(), new PageValidatorFactory(Utilities.PageValidator1.class, args1));
 		bdb.loadCoefficients(new HashMap<Banner, Float>());
 
-		String params[] = 
-		{"11111",//int usertime=Integer.parseInt(params[0]);
-		"1",//int size=Integer.parseInt(params[1]); 
-		"203",//int userid=Integer.parseInt(params[2]); 
-		"23",//byte age=Byte.parseByte(params[3]); 
-		"1",//byte sex=Byte.parseByte(params[4]); 
-		"1",//short loc=Short.parseShort(params[5]); 
-		"0",//String interestsStr=params[6]; 
-		"index",//int page=Integer.parseInt(params[7]); 
-		"???",//passback=params[8]; 
-		"false"};//boolean debugGet=Boolean.parseBoolean(params[9]);
 		BannerServer bs = new BannerServer(bdb, new CampaignDB(), 1);
-		for (int i = 0; i < 1000; i++){
+		int time = 0;
+		for (int i = 0; i < 10000; i++){
+			time += (int)(Math.random()*100);
+			int size = (int) ((Math.random()*7.0) + 1);
+			int userid = (int)(Math.random()*10);
+			
+			String params[] = 
+			{String.valueOf(time),//int usertime=Integer.parseInt(params[0]);
+			String.valueOf(size),//int size=Integer.parseInt(params[1]); 
+			String.valueOf(userid),//int userid=Integer.parseInt(params[2]); 
+			"23",//byte age=Byte.parseByte(params[3]); 
+			"1",//byte sex=Byte.parseByte(params[4]); 
+			"1",//short loc=Short.parseShort(params[5]); 
+			"0",//String interestsStr=params[6]; 
+			"index",//int page=Integer.parseInt(params[7]); 
+			"???",//passback=params[8]; 
+			"false"};//boolean debugGet=Boolean.parseBoolean(params[9]);
 			bs.receive(GET, params);
 		}
 		
