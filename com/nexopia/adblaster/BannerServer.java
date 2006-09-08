@@ -1,5 +1,7 @@
 package com.nexopia.adblaster;
 
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -8,6 +10,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Vector;
 
+import com.mysql.jdbc.Connection;
 import com.nexopia.adblaster.Campaign.CampaignDB;
 import com.nexopia.adblaster.Utilities.PageValidator;
 import com.sleepycat.je.DatabaseException;
@@ -57,22 +60,28 @@ public class BannerServer {
 	//public bannersizes;
 	//public HashMap<Integer, Campaign> bannercampaigns;
 	//public HashMap<Integer, Integer> campaignids; // array( bannerid => campaignid );
-	public HashMap<Integer, BannerStat> dailyviews;
-	public HashMap<Integer, BannerStat> dailyclicks;
-	
-	public HashMap<Banner, BannerStat> bannerviews;
-	public HashMap<Banner, BannerStat> bannerclicks;
-	
-	public HashMap<Campaign, BannerStat> campaignviews;
-	public HashMap<Campaign, BannerStat> campaignclicks;
 	
 	//public int time;
 	private HashMap<Banner,IntObjectHashMap> bannerViewMap = new HashMap<Banner, IntObjectHashMap>();
 	Vector<Banner> banners = new Vector<Banner>();
+	private HashMap<Banner, BannerStat> bannerstats;
+	private HashMap<Integer, TypeStat> viewstats;
+	private HashMap<Integer, TypeStat> clickstats;
+	private HashMap<Campaign, BannerStat> campaignstats;
 	
 	static class BannerStat{
-		int views;
-		int clicks;
+		int dailyviews;
+		int dailyclicks;
+		int passbacks;
+		int current_views;
+		int current_clicks;
+		public boolean hasChanged() {
+			return (passbacks > 0 || current_views > 0 || current_clicks > 0);
+		}
+	}
+	
+	static class TypeStat {
+	
 	}
 	
 	public BannerServer(BannerDatabase db, CampaignDB cdb, int numservers) {
@@ -82,16 +91,11 @@ public class BannerServer {
 		Integer sizes[] = {BANNER_BANNER, BANNER_LEADERBOARD,
 				BANNER_BIGBOX, BANNER_SKY120, BANNER_SKY160,
 				BANNER_BUTTON60, BANNER_VULCAN, BANNER_LINK};
-		this.dailyviews = new HashMap<Integer, BannerStat>();
-		this.dailyclicks = new HashMap<Integer, BannerStat>();
-		this.bannerviews = new HashMap<Banner, BannerStat>();
-		this.bannerclicks = new HashMap<Banner, BannerStat>();
-		this.campaignviews = new HashMap<Campaign, BannerStat>();
-		this.campaignclicks = new HashMap<Campaign, BannerStat>();
+		this.bannerstats = new HashMap<Banner, BannerStat>();
 		for(int i = 0; i < sizes.length; i++) {
 			Integer size = sizes[i];
-			this.dailyviews.put(size, new BannerStat());
-			this.dailyclicks.put(size, new BannerStat());
+			this.viewstats.put(size, new TypeStat());
+			this.clickstats.put(size, new TypeStat());
 		}
 		
 		//this.time = (int) (System.currentTimeMillis()/1000);
@@ -247,10 +251,11 @@ public class BannerServer {
 				
 			}
 		}
+		
 		Banner chosen = weightedChoice(validBanners, userid, usertime);
 		if (chosen != null) {
 			markBannerUsed(userid, usertime, chosen);
-			this.bannerviews.get(chosen).views++;
+			this.bannerstats.get(chosen).dailyviews++;
 			System.out.println("PICKED:" + chosen.id);
 			return chosen.id;
 		}
@@ -313,42 +318,40 @@ public class BannerServer {
 		}
 		
 		if (viewsperday != 0) {
-			priority *= (3-this.bannerviews.get(b).views/viewsperday);
+			priority *= (3-this.bannerstats.get(b).dailyviews/viewsperday);
 		}
 		
 		if (clicksperday != 0) {
-			priority *= (3-this.bannerviews.get(b).views/clicksperday);
+			priority *= (3-this.bannerstats.get(b).dailyviews/clicksperday);
 		}
 		
 		return priority;
 	}
 
 	private boolean hasReachedViewsPerDay(Banner b) {
-		if (this.bannerviews.get(b) == null){
-			this.bannerviews.put(b, new BannerStat());
+		if (this.bannerstats.get(b) == null){
+			this.bannerstats.put(b, new BannerStat());
 		}
-		if (this.bannerviews.get(b).views > b.getViewsperday())
+		if (this.bannerstats.get(b).dailyviews > b.getViewsperday())
 			return true;
-		if (b.getCampaign().getViewsPerDay() == 0)
-			return false;
-		if (this.campaignviews.get(b.campaign) == null){
-			this.campaignviews.put(b.campaign, new BannerStat());
+		if (this.campaignstats.get(b.campaign) == null){
+			this.campaignstats.put(b.campaign, new BannerStat());
 		}
-		if (this.campaignviews.get(b.campaign).views > b.campaign.getViewsPerDay())
+		if (this.campaignstats.get(b.campaign).dailyviews > b.campaign.getViewsPerDay())
 			return true;
 		return false;
 	}
 	
 	private boolean hasReachedClicksPerDay(Banner b) {
-		if (this.bannerviews.get(b) == null){
-			this.bannerviews.put(b, new BannerStat());
+		if (this.bannerstats.get(b) == null){
+			this.bannerstats.put(b, new BannerStat());
 		}
-		if (this.bannerviews.get(b).clicks > b.getClicksperday())
+		if (this.bannerstats.get(b).dailyclicks > b.getClicksperday())
 			return true;
-		if (this.campaignviews.get(b.campaign) == null){
-			this.campaignviews.put(b.campaign, new BannerStat());
+		if (this.campaignstats.get(b.campaign) == null){
+			this.campaignstats.put(b.campaign, new BannerStat());
 		}
-		if (this.campaignviews.get(b.campaign).clicks > b.campaign.getClicksperday())
+		if (this.campaignstats.get(b.campaign).dailyclicks > b.campaign.getClicksperday())
 			return true;
 		return false;
 	}
@@ -501,6 +504,107 @@ public class BannerServer {
 		return new Integer(receive(cmd, params)).toString();
 	}
 	
+
+	private void minutely(Banner b, Connection con, int time, boolean debug) {
+		BannerStat bannerstat = this.bannerstats.get(b);
+		
+		if (debug) {
+			Utilities.bannerDebug("minutely " + b.id + " " + bannerstat.dailyviews + 
+					" " + bannerstat.dailyclicks + " " + bannerstat.passbacks);
+		}
+		
+		if(bannerstat.hasChanged()) {
+			Statement st;
+			try {
+				st = con.createStatement();
+				st.executeUpdate("UPDATE banners SET lastupdatetime = "+time+", views = views + "+bannerstat.current_views+", clicks = clicks + "+bannerstat.current_clicks+", passbacks = passbacks + "+bannerstat.passbacks+" WHERE id = " + b.id);
+				bannerstat.current_views = 0;
+				bannerstat.current_clicks = 0;
+				bannerstat.passbacks = 0;
+			} catch (SQLException e) {
+				System.err.println("Unable to update minutely banner stats.");
+				e.printStackTrace();
+			}
+			//prepare_query("UPDATE banners SET lastupdatetime = #, views = views + #, potentialviews = potentialviews + #, clicks = clicks + #, passbacks = passbacks + #, credits = credits - # WHERE id = #", $time, $this->views, $this->potentialviews, $this->clicks, $this->passbacks, $this->charge, $this->id);
+		}
+	}
+	
+	/*
+	function minutely(& $db, $time, $debug){
+		if($debug)
+			bannerDebug("minutely " . $this->id . " " . $this->views . " " . $this->clicks . " " . $this->passbacks);
+
+
+		
+		//only update banners that have new info.
+		if($this->views || $this->clicks || $this->passbacks || $this->charge) {
+			$db->prepare_query("UPDATE banners SET lastupdatetime = #, views = views + #, potentialviews = potentialviews + #, clicks = clicks + #, passbacks = passbacks + #, credits = credits - # WHERE id = #", $time, $this->views, $this->potentialviews, $this->clicks, $this->passbacks, $this->charge, $this->id);
+		}
+
+		$result = $db->prepare_query("SELECT credits FROM banners WHERE id = #", $this->id);
+		if ($line = $result->fetchrow()) {
+			$this->credits = $line['credits'];
+		}
+		unset($result);
+		
+		$this->charge = 0;
+		$this->views = 0;
+		$this->potentialviews = 0;
+		$this->clicks = 0;
+		$this->passbacks = 0;
+	}
+
+	function hourly(& $db, $time, $debug){
+		if($debug)
+			bannerDebug("hourly " . $this->id);
+
+//		$db->prepare_query("INSERT INTO bannerstats SET bannerid = ?, clientid = ?, time = ?, priority = ?, views = ?, clicks = ?", $this->id, $this->clientid, $time, $this->priority, $this->totalviews, $this->totalclicks);
+//		$db->prepare_query("INSERT IGNORE INTO bannerstats (bannerid, clientid, time, views, clicks) SELECT id, clientid, lastupdatetime, views, clicks FROM banners WHERE id = ?", $this->id);
+		$db->prepare_query("REPLACE INTO bannerstats (bannerid, time, views, potentialviews, clicks, passbacks) SELECT id, lastupdatetime, views, potentialviews, clicks, passbacks FROM banners WHERE id = #", $this->id); //bannerstats is UNIQUE on bannerid,time
+
+		if($this->paytype() == BANNER_CPC){
+			$sumviews = array_sum($this->hourlyviews);
+
+			if($sumviews){
+				$clickthrough = array_sum($this->hourlyclicks)*1000/$sumviews;
+
+				$this->priority = $this->payrate()*$clickthrough; //effective CPM rate last hour
+				$this->priority = max($this->priority, $this->payrate() * BANNER_MIN_CLICKTHROUGH); //min clickthrough
+				$this->priority = min($this->priority, $this->payrate() * BANNER_MAX_CLICKTHROUGH); //max clickthrough
+			}
+		}
+
+		$this->hour = ($this->hour + 1) % BANNER_SLIDE_SIZE;
+		$this->hourlyviews[$this->hour] = 0;
+		$this->hourlyclicks[$this->hour]= 0;
+
+		$this->pruneUserViews($time);
+
+		//if($this->limitbyhour)
+		//	$this->userviews = array();
+	}
+
+	function pruneUserViews($time) {
+		foreach ($this->userviewtimes as $uid => $userview) {
+			foreach ($userview as $id => $viewtime) {
+				if ($viewtime > $time- $this->limitbyperiod) {
+					break; //we only need to process old entries
+				} else {
+					unset($this->userviewtimes[$uid][$id]);
+					if (empty($this->userviewtimes[$uid])) {
+						unset($this->userviewtimes[$uid]);
+					}
+				}
+			}
+		}
+	}
+	function daily($debug){
+		$this->dailyviews = 0;
+		$this->dailyclicks= 0;
+
+		//$this->userviews = array();
+	}
+*/
 	public int receive(int cmd, String[] params){
 		
 		switch(cmd){
@@ -773,5 +877,6 @@ public class BannerServer {
 		}
 		
 	}
+
 	
 }
