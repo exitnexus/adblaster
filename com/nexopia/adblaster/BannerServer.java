@@ -299,7 +299,7 @@ public class BannerServer {
 		
 		if (viewsperuser != 0) {
 			int[] viewTimes = getBannerViewsForUser(uid, b);
-			if (viewTimes[viewTimes.length-1] != 0 && period != 0) {
+			if (viewTimes.length != 0 && viewTimes[viewTimes.length-1] != 0 && period != 0) {
 				priority *= 2 - Math.max(1-((time - viewTimes[viewTimes.length-1])/period)*viewsperuser, 0);
 			} else {
 				priority *= 2;
