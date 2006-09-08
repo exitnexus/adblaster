@@ -47,6 +47,7 @@ public class BannerServer {
 	static final int PASSBACK = 20;
 	static final int GETFAIL = 21;
 	static final int GETLOG = 22;
+	public static final int BANNER_SLIDE_SIZE = 8;
 	
 	
 	public BannerDatabase db;
@@ -68,6 +69,7 @@ public class BannerServer {
 	private HashMap<Integer, TypeStat> viewstats;
 	private HashMap<Integer, TypeStat> clickstats;
 	private HashMap<Campaign, BannerStat> campaignstats;
+	private HashMap<Banner, HourlyStat> hourlystats;
 	
 	static class BannerStat{
 		int dailyviews;
@@ -78,10 +80,50 @@ public class BannerServer {
 		public boolean hasChanged() {
 			return (passbacks > 0 || current_views > 0 || current_clicks > 0);
 		}
+		
+		public void view() {
+			dailyviews++;
+			current_views++;
+		}
+		
+		public void click() {
+			dailyclicks++;
+			current_clicks++;
+		}
 	}
 	
 	static class TypeStat {
 	
+	}
+	
+	static class HourlyStat {
+		private int[] views = new int[BANNER_SLIDE_SIZE];
+		private int[] clicks = new int[BANNER_SLIDE_SIZE];
+		private int current_pos = 0;
+		
+		public double getClickRate() {
+			int totalviews = 0;
+			int totalclicks = 0;
+			for (int i=0; i < views.length; i++) {
+				totalviews += views[i];
+				totalclicks += clicks[i];
+			}
+			return (double)totalviews/totalclicks;
+		}
+
+		public void shift() {
+			current_pos = (current_pos+1)%BANNER_SLIDE_SIZE;
+			views[current_pos] = 0;
+			clicks[current_pos] = 0;
+		}
+		
+		public void view() {
+			views[current_pos]++;
+		}
+		public void click() {
+			clicks[current_pos]++;
+		}
+		
 	}
 	
 	public BannerServer(BannerDatabase db, CampaignDB cdb, int numservers) {
@@ -172,7 +214,8 @@ public class BannerServer {
 			views[i] = views[i+1];
 		}
 		views[views.length - 1] = time;
-		
+		hourlystats.get(b).view();
+		bannerstats.get(b).view();
 	}
 	
 	/**
@@ -529,39 +572,26 @@ public class BannerServer {
 		}
 	}
 	
-	/*
-	function minutely(& $db, $time, $debug){
-		if($debug)
-			bannerDebug("minutely " . $this->id . " " . $this->views . " " . $this->clicks . " " . $this->passbacks);
-
-
-		
-		//only update banners that have new info.
-		if($this->views || $this->clicks || $this->passbacks || $this->charge) {
-			$db->prepare_query("UPDATE banners SET lastupdatetime = #, views = views + #, potentialviews = potentialviews + #, clicks = clicks + #, passbacks = passbacks + #, credits = credits - # WHERE id = #", $time, $this->views, $this->potentialviews, $this->clicks, $this->passbacks, $this->charge, $this->id);
+	private void hourly(Banner b, Connection con, int time, boolean debug) {
+		if (debug) {
+			Utilities.bannerDebug("hour " + b.id);
 		}
-
-		$result = $db->prepare_query("SELECT credits FROM banners WHERE id = #", $this->id);
-		if ($line = $result->fetchrow()) {
-			$this->credits = $line['credits'];
+		Statement st;
+		try {
+			st = con.createStatement();
+			st.executeUpdate("REPLACE INTO bannerstats (bannerid, time, views, potentialviews, clicks, passbacks) SELECT id, lastupdatetime, views, potentialviews, clicks, passbacks FROM banners WHERE id = " + b.id);
+		} catch (SQLException e) {
+			System.err.println("Unable to update hourly banner stats.");
+			e.printStackTrace();
 		}
-		unset($result);
-		
-		$this->charge = 0;
-		$this->views = 0;
-		$this->potentialviews = 0;
-		$this->clicks = 0;
-		$this->passbacks = 0;
+		if (b.getPayType() == Banner.PAYTYPE_CPC) {
+			HourlyStat hourlystat = hourlystats.get(b);
+			b.setCoefficient(hourlystat.getClickRate()*b.getPayRate());
+			hourlystat.shift();
+		}
 	}
-
-	function hourly(& $db, $time, $debug){
-		if($debug)
-			bannerDebug("hourly " . $this->id);
-
-//		$db->prepare_query("INSERT INTO bannerstats SET bannerid = ?, clientid = ?, time = ?, priority = ?, views = ?, clicks = ?", $this->id, $this->clientid, $time, $this->priority, $this->totalviews, $this->totalclicks);
-//		$db->prepare_query("INSERT IGNORE INTO bannerstats (bannerid, clientid, time, views, clicks) SELECT id, clientid, lastupdatetime, views, clicks FROM banners WHERE id = ?", $this->id);
-		$db->prepare_query("REPLACE INTO bannerstats (bannerid, time, views, potentialviews, clicks, passbacks) SELECT id, lastupdatetime, views, potentialviews, clicks, passbacks FROM banners WHERE id = #", $this->id); //bannerstats is UNIQUE on bannerid,time
-
+	
+	/*
 		if($this->paytype() == BANNER_CPC){
 			$sumviews = array_sum($this->hourlyviews);
 

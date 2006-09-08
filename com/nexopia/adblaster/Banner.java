@@ -36,6 +36,7 @@ class Banner {
 	private int limitbyperiod;
 	Campaign campaign;
 	int index;
+	private double coefficient;
 	private byte size;
 	private int minviewsperday;
 	private int startdate;
@@ -75,6 +76,7 @@ class Banner {
 		this.interests = interests;
 		this.pages = pv;
 		this.allowedTimes = new TimeTable(allowed);
+		this.coefficient = this.getPayRate();
 	}
 	
 	@SuppressWarnings("unchecked") Banner(Banner b) {
@@ -95,6 +97,7 @@ class Banner {
 		this.enddate = b.enddate;
 		this.allowedTimes = (TimeTable) b.allowedTimes.clone();
 		this.enabled = b.enabled;
+		this.coefficient = this.getPayRate();
 	}
 	
 	
@@ -265,7 +268,7 @@ class Banner {
 		return valid;
 	}
 	
-	private byte getPayType() {
+	public byte getPayType() {
 		if (this.paytype == Banner.PAYTYPE_INHERIT) {
 			return campaign.getPayType();
 		} else {
@@ -273,6 +276,14 @@ class Banner {
 		}
 	}
 
+	public int getPayRate() {
+		if (this.payrate == Banner.PAYRATE_INHERIT) {
+			return campaign.getPayrate();
+		} else {
+			return this.payrate;
+		}
+	}
+	
 	public byte getSize() {
 		return this.size;
 	}
@@ -369,6 +380,7 @@ class Banner {
 
 		this.interests = new Interests(rs.getString("INTERESTS"), true);
 		this.allowedTimes = new TimeTable(rs.getString("ALLOWEDTIMES"));
+		this.coefficient = this.getPayRate();
 		return this;
 	}
 
@@ -459,5 +471,10 @@ class Banner {
 
 	public int getCoefficient() {
 		return payrate;
+	}
+
+	public void setCoefficient(double coefficient) {
+		this.coefficient = coefficient;
+		
 	}
 }
