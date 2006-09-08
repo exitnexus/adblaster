@@ -236,7 +236,7 @@ public class BannerServer {
 		
 		for (int i = 0; i < banners.size(); i++){
 			Banner b = banners.get(i);
-			if (isBannerValidForUser(userid, usertime, b) && !hasReachedViewsPerDay(b)){
+			if (isBannerValidForUser(userid, usertime, b) && !hasReachedViewsPerDay(b) && !hasReachedClicksPerDay(b)){
 				validBanners.add(b);
 				//System.out.println(b);
 				
@@ -327,6 +327,20 @@ public class BannerServer {
 			this.campaignviews.put(b.campaign, new BannerStat());
 		}
 		if (this.campaignviews.get(b.campaign).views > b.campaign.getViewsPerDay())
+			return true;
+		return false;
+	}
+	
+	private boolean hasReachedClicksPerDay(Banner b) {
+		if (this.bannerviews.get(b) == null){
+			this.bannerviews.put(b, new BannerStat());
+		}
+		if (this.bannerviews.get(b).clicks > b.getClicksperday())
+			return true;
+		if (this.campaignviews.get(b.campaign) == null){
+			this.campaignviews.put(b.campaign, new BannerStat());
+		}
+		if (this.campaignviews.get(b.campaign).clicks > b.campaign.getClicksperday())
 			return true;
 		return false;
 	}
