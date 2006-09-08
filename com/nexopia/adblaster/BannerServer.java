@@ -556,7 +556,7 @@ public class BannerServer {
 				stats[GETFAIL]++;
 				slidingstats[statstime][GETFAIL]++;
 			}
-			System.out.println(ret);
+			//System.out.println(ret);
 			//socket_write(sock, "ret\n");
 			
 			//unset(ret, size, userid, age, sex, loc, interests, page, passback);
