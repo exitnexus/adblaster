@@ -576,7 +576,9 @@ public class BannerServer {
 		}
 	}
 	
-	private void hourly(Banner b, Connection con, int time, boolean debug) {
+	
+	
+	private void hourly(Banner b, Connection con, boolean debug) {
 		if (debug) {
 			Utilities.bannerDebug("hour " + b.id);
 		}
@@ -595,50 +597,11 @@ public class BannerServer {
 		}
 	}
 	
-	/*
-		if($this->paytype() == BANNER_CPC){
-			$sumviews = array_sum($this->hourlyviews);
-
-			if($sumviews){
-				$clickthrough = array_sum($this->hourlyclicks)*1000/$sumviews;
-
-				$this->priority = $this->payrate()*$clickthrough; //effective CPM rate last hour
-				$this->priority = max($this->priority, $this->payrate() * BANNER_MIN_CLICKTHROUGH); //min clickthrough
-				$this->priority = min($this->priority, $this->payrate() * BANNER_MAX_CLICKTHROUGH); //max clickthrough
-			}
-		}
-
-		$this->hour = ($this->hour + 1) % BANNER_SLIDE_SIZE;
-		$this->hourlyviews[$this->hour] = 0;
-		$this->hourlyclicks[$this->hour]= 0;
-
-		$this->pruneUserViews($time);
-
-		//if($this->limitbyhour)
-		//	$this->userviews = array();
+	private void daily(Banner b) {
+		bannerstats.get(b).dailyclicks = 0;
+		bannerstats.get(b).dailyviews = 0;
 	}
-
-	function pruneUserViews($time) {
-		foreach ($this->userviewtimes as $uid => $userview) {
-			foreach ($userview as $id => $viewtime) {
-				if ($viewtime > $time- $this->limitbyperiod) {
-					break; //we only need to process old entries
-				} else {
-					unset($this->userviewtimes[$uid][$id]);
-					if (empty($this->userviewtimes[$uid])) {
-						unset($this->userviewtimes[$uid]);
-					}
-				}
-			}
-		}
-	}
-	function daily($debug){
-		$this->dailyviews = 0;
-		$this->dailyclicks= 0;
-
-		//$this->userviews = array();
-	}
-*/
+	
 	public int receive(int cmd, String[] params){
 		
 		switch(cmd){
