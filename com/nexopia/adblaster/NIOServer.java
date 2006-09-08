@@ -176,6 +176,7 @@ public class NIOServer {
 					
 					String result = null;
 					try {
+						System.out.println(strbuf.toString());
 						result = banners.receive(strbuf.toString());
 					} catch (Exception e) {
 						System.err.println("Something bad happened.");

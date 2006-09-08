@@ -66,7 +66,7 @@ public class BannerServer {
 	public HashMap<Campaign, BannerStat> campaignviews;
 	public HashMap<Campaign, BannerStat> campaignclicks;
 	
-	public int time;
+	//public int time;
 	private HashMap<Banner,IntObjectHashMap> bannerViewMap = new HashMap<Banner, IntObjectHashMap>();
 	Vector<Banner> banners = new Vector<Banner>();
 	
@@ -94,7 +94,7 @@ public class BannerServer {
 			this.dailyclicks.put(size, new BannerStat());
 		}
 		
-		this.time = (int) (System.currentTimeMillis()/1000);
+		//this.time = (int) (System.currentTimeMillis()/1000);
 	}
 	
 	public boolean addCampaign(int id){
@@ -138,6 +138,7 @@ public class BannerServer {
 		/* Find the oldest */
 		for (int i = 0; i < views.length; i++){
 			if (views[i] != 0){
+				System.out.println(time + ":" + views[i]);
 				/* The oldest view within memory... */
 				if (time - views[i] > b.getLimitbyperiod())
 					/* If the oldest view is outside of limit period, we're golden */
@@ -236,19 +237,24 @@ public class BannerServer {
 		
 		for (int i = 0; i < banners.size(); i++){
 			Banner b = banners.get(i);
-			if (isBannerValidForUser(userid, usertime, b) && !hasReachedViewsPerDay(b) && !hasReachedClicksPerDay(b)){
+			boolean b1 = isBannerValidForUser(userid, usertime, b);
+			boolean b2 = !hasReachedViewsPerDay(b);
+			boolean b3 = !hasReachedClicksPerDay(b);
+			System.out.println("" + b.id + ":" + b1 + ":"+b2+":"+b3);
+			if ( b1 && b2 && b3){
 				validBanners.add(b);
 				//System.out.println(b);
 				
 			}
 		}
-		
-		Banner chosen = weightedChoice(validBanners, userid, time);
+		Banner chosen = weightedChoice(validBanners, userid, usertime);
 		if (chosen != null) {
-			markBannerUsed(userid, time, chosen);
+			markBannerUsed(userid, usertime, chosen);
 			this.bannerviews.get(chosen).views++;
+			System.out.println("PICKED:" + chosen.id);
 			return chosen.id;
 		}
+		System.out.println("IMPORTANT:" + validBanners.size());
 			
 		return 0;
 	}
@@ -323,6 +329,8 @@ public class BannerServer {
 		}
 		if (this.bannerviews.get(b).views > b.getViewsperday())
 			return true;
+		if (b.getCampaign().getViewsPerDay() == 0)
+			return false;
 		if (this.campaignviews.get(b.campaign) == null){
 			this.campaignviews.put(b.campaign, new BannerStat());
 		}
@@ -517,7 +525,7 @@ public class BannerServer {
 			//if(passback != "")
 			//	passbackBanner(passback, userid);
 			
-			int ret = getBanner(usertime, size, userid, age, sex, loc, interests, page, false);
+			int ret = getBanner(usertime, size, userid, age, sex, loc, interests, page, true);
 			
 			/*if (debug[PASSBACK]) {
 			 if (passback != "") {

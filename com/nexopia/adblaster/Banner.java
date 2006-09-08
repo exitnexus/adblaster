@@ -374,7 +374,7 @@ class Banner {
 
 		public boolean valid(int time, int size, int userid, byte age, byte sex, short location, Interests interests2, String page, boolean debug) {
 		String debugLog = "";
-		if (debug) debugLog += "Checking banner this.id:";
+		if (debug) debugLog += "Checking banner " + this.id + ": ";
 
 		if(!this.enabled) {
 			if (debug) Utilities.bannerDebug(debugLog);

@@ -21,7 +21,8 @@ import com.nexopia.adblaster.Utilities.PageValidator;
 
 
 class Campaign{
-
+	static String DATABASE_STR = "testbannercampaigns";
+	
 	static class CampaignDB{
 		private HashMap<Integer, Campaign> campaigns;
 		
@@ -30,7 +31,7 @@ class Campaign{
 			campaigns = new HashMap<Integer, Campaign>();
 			//Database connection stuff here.
 			try {
-				String sql = "SELECT * FROM bannercampaigns";
+				String sql = "SELECT * FROM " + DATABASE_STR;
 				Statement stmt = JDBCConfig.createStatement();
 				ResultSet rs = stmt.executeQuery(sql);
 				int i = 0;
@@ -46,7 +47,7 @@ class Campaign{
 		}	
 		public Campaign add(int campaignID) {
 			try {
-				String sql = "SELECT * FROM bannercampaigns WHERE id = " + campaignID;
+				String sql = "SELECT * FROM " + DATABASE_STR + " WHERE id = " + campaignID;
 				Statement stmt = JDBCConfig.createStatement();
 				ResultSet rs = stmt.executeQuery(sql);
 				if (rs.next()) {
@@ -68,7 +69,7 @@ class Campaign{
 			id = null;
 			if (c != null) {
 				try {
-					String sql = "SELECT * FROM bannercampaigns WHERE id = " + campaignID;
+					String sql = "SELECT * FROM " + DATABASE_STR + " WHERE id = " + campaignID;
 					Statement stmt = JDBCConfig.createStatement();
 					ResultSet rs = stmt.executeQuery(sql);
 					if (rs.next()) {
@@ -344,7 +345,7 @@ class Campaign{
 
 	private boolean valid(int usertime, int size, int userid, byte age, byte sex, short location, Interests interests2, String page, boolean debug) {
 		String debugLog = "";
-		if (debug) debugLog += "Checking campaign: this.id";
+		if (debug) debugLog += "Checking campaign " + this.id + ": ";
 		if(!this.enabled)
 			return false;
 		//date
