@@ -79,7 +79,7 @@ public class NIOServer {
 		}
 	}
 	
-	public  static void main (String args[]) throws IOException {
+	public static void main (String args[]) throws IOException {
 		socketMap = new HashMap<SocketChannel, BufferedSocketChannel>();
 		Object args1[] = {};
 		CampaignDB cdb = new CampaignDB();
@@ -112,7 +112,27 @@ public class NIOServer {
 		//ByteBuffer lastbuffer = null;
 		
 //		Infinite server loop
+		long time = System.currentTimeMillis();
+		long lastMinute = System.currentTimeMillis();
+		long lastHour = System.currentTimeMillis()+20000; //hourly is shifted by 20 seconds
+		long lastDay = System.currentTimeMillis()+40000; //daily is shifted by 40 seconds
 		for(int index=0; index > -1; ) {
+			if (System.currentTimeMillis()-time > 1000) {
+				time = System.currentTimeMillis();
+				if (time-lastMinute > 60000) {
+					lastMinute = time;
+					banners.minutely(false);
+				}
+				if (time-lastHour > 60000*60) {
+					lastHour = time;
+					banners.hourly(false);
+				}
+				if (time-lastDay > 60000*60*24) {
+					lastDay = time;
+					banners.daily(false);
+				}
+			}
+			
 			selector.select();
 		
 			// Get keys

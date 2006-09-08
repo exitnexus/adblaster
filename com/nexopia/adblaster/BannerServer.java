@@ -552,7 +552,15 @@ public class BannerServer {
 	}
 	
 
-	private void minutely(Banner b, Connection con, int time, boolean debug) {
+	@SuppressWarnings("unchecked")
+	public void minutely(boolean debug) {
+		Collection<Banner> banners = (Collection<Banner>)this.db.getBanners();
+		for (Banner b: banners) {
+			minutely(b, (int)(System.currentTimeMillis()/1000), debug);
+		}
+	}
+	
+	private void minutely(Banner b, int time, boolean debug) {
 		BannerStat bannerstat = this.bannerstats.get(b);
 		
 		if (debug) {
@@ -563,7 +571,7 @@ public class BannerServer {
 		if(bannerstat.hasChanged()) {
 			Statement st;
 			try {
-				st = con.createStatement();
+				st = JDBCConfig.createStatement();
 				st.executeUpdate("UPDATE banners SET lastupdatetime = "+time+", views = views + "+bannerstat.current_views+", clicks = clicks + "+bannerstat.current_clicks+", passbacks = passbacks + "+bannerstat.passbacks+" WHERE id = " + b.id);
 				bannerstat.current_views = 0;
 				bannerstat.current_clicks = 0;
@@ -577,14 +585,21 @@ public class BannerServer {
 	}
 	
 	
+	@SuppressWarnings("unchecked")
+	public void hourly(boolean debug) {
+		Collection<Banner> banners = (Collection<Banner>)this.db.getBanners();
+		for (Banner b: banners) {
+			hourly(b, debug);
+		}
+	}
 	
-	private void hourly(Banner b, Connection con, boolean debug) {
+	private void hourly(Banner b, boolean debug) {
 		if (debug) {
 			Utilities.bannerDebug("hour " + b.id);
 		}
 		Statement st;
 		try {
-			st = con.createStatement();
+			st = JDBCConfig.createStatement();
 			st.executeUpdate("REPLACE INTO bannerstats (bannerid, time, views, potentialviews, clicks, passbacks) SELECT id, lastupdatetime, views, potentialviews, clicks, passbacks FROM banners WHERE id = " + b.id);
 		} catch (SQLException e) {
 			System.err.println("Unable to update hourly banner stats.");
@@ -597,7 +612,14 @@ public class BannerServer {
 		}
 	}
 	
-	private void daily(Banner b) {
+	@SuppressWarnings("unchecked")
+	public void daily(boolean debug) {
+		Collection<Banner> banners = (Collection<Banner>)this.db.getBanners();
+		for (Banner b: banners) {
+			daily(b, debug);
+		}
+	}
+	public void daily(Banner b, boolean debug) {
 		bannerstats.get(b).dailyclicks = 0;
 		bannerstats.get(b).dailyviews = 0;
 	}
