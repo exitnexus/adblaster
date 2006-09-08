@@ -48,6 +48,8 @@ public class BannerServer {
 	static final int GETFAIL = 21;
 	static final int GETLOG = 22;
 	public static final int BANNER_SLIDE_SIZE = 8;
+	public static final double BANNER_MIN_CLICKRATE = 0.0002;
+	public static final double BANNER_MAX_CLICKRATE = 0.005;
 	
 	
 	public BannerDatabase db;
@@ -108,7 +110,9 @@ public class BannerServer {
 				totalviews += views[i];
 				totalclicks += clicks[i];
 			}
-			return (double)totalviews/totalclicks;
+			double clickrate = Math.max(BANNER_MIN_CLICKRATE, (double)totalviews/totalclicks);
+			clickrate = Math.min(clickrate, BANNER_MAX_CLICKRATE);
+			return clickrate;
 		}
 
 		public void shift() {
