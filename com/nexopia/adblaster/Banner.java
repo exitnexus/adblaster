@@ -41,10 +41,7 @@ class Banner {
 	private int startdate;
 	private int enddate;
 	private boolean enabled;
-	private int dailyviews;
-	private int dailyclicks;
 	private int clicksperday;
-	private HashMap<Integer, int[]> userViewTimes; //int[0] is the position of the oldest view, int[1-viewsperuser] are timestamps
 	private TimeTable allowedTimes;
 	
 	static int count = 0;
@@ -105,8 +102,6 @@ class Banner {
 		this.index = counter();
 		this.pages = pv;
 		this.campaign = null;
-		this.dailyviews = 0;
-		this.dailyclicks = 0;
 		this.update(rs, cdb);
 	}
 	
@@ -377,15 +372,7 @@ class Banner {
 		return this;
 	}
 
-	public void hit(int userid, int time) {
-		Integer uid = Integer.valueOf(userid);
-		int[] times = this.userViewTimes.get(uid);
-		times[times[0]] = time;
-		times[0] = (times[0]%this.viewsperuser)+1;
-		this.dailyviews++;
-	}
-
-	public boolean valid(int time, int size, int userid, byte age, byte sex, short location, Interests interests2, String page, boolean debug) {
+		public boolean valid(int time, int size, int userid, byte age, byte sex, short location, Interests interests2, String page, boolean debug) {
 		String debugLog = "";
 		if (debug) debugLog += "Checking banner this.id:";
 
@@ -466,11 +453,11 @@ class Banner {
 		return this.allowedTimes.getValid(time);
 	}
 
-	public int getDailyViews() {
-		return this.dailyviews;
+	public int getClicksperday() {
+		return clicksperday;
 	}
 
-	public int getDailyClicks() {
-		return this.dailyclicks;
+	public int getCoefficient() {
+		return payrate;
 	}
 }

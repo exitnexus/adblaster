@@ -397,22 +397,6 @@ class Campaign{
 		return true;
 	}
 
-	private int dailyviews() {
-		int views = 0;
-		for (Banner b : this.banners) {
-			views += b.getDailyViews();
-		}
-		return views;
-	}
-	
-	private int dailyclicks() {
-		int clicks = 0;
-		for (Banner b : this.banners) {
-			clicks += b.getDailyClicks();
-		}
-		return clicks;
-	}
-
 	private boolean validTime(long usertime) {
 		return allowedTimes.getValid(usertime);
 	}
@@ -431,5 +415,13 @@ class Campaign{
 
 	public int getViewsPerDay() {
 		return this.maxviews;
+	}
+
+	public int getClicksperday() {
+		return clicksperday;
+	}
+
+	public int getViewsperday() {
+		return viewsperday;
 	}
 }

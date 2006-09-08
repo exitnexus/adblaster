@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.Vector;
 
@@ -44,12 +45,13 @@ public class BannerServer {
 	static final int GETFAIL = 21;
 	static final int GETLOG = 22;
 	
+	
 	public BannerDatabase db;
 	public CampaignDB cdb;
 	public HashMap<String,Integer> sizes;
 	
 	private static int numservers;
-	
+	private static Random rand = new Random();
 	//public banners;
 	//public bannerids;
 	//public bannersizes;
@@ -69,7 +71,8 @@ public class BannerServer {
 	Vector<Banner> banners = new Vector<Banner>();
 	
 	static class BannerStat{
-		int i;
+		int views;
+		int clicks;
 	}
 	
 	public BannerServer(BannerDatabase db, CampaignDB cdb, int numservers) {
@@ -229,30 +232,101 @@ public class BannerServer {
 		for (Campaign campaign : cdb.getCampaigns()){
 			banners.addAll(campaign.getBanners(usertime, size, userid, age, sex, location, interests, page, debug));
 		}
-		banners = orderBannersByScore(banners);
+		Vector<Banner> validBanners = new Vector<Banner>();
 		
 		for (int i = 0; i < banners.size(); i++){
 			Banner b = banners.get(i);
 			if (isBannerValidForUser(userid, usertime, b) && !hasReachedViewsPerDay(b)){
+				validBanners.add(b);
 				//System.out.println(b);
-				markBannerUsed(userid, time, b);
-				this.bannerviews.get(b).i++;
-				return b.id;
+				
 			}
 		}
+		
+		Banner chosen = weightedChoice(validBanners, userid, time);
+		if (chosen != null) {
+			markBannerUsed(userid, time, chosen);
+			this.bannerviews.get(chosen).views++;
+			return chosen.id;
+		}
+			
 		return 0;
 	}
 	
+	private Banner weightedChoice(Vector<Banner> validBanners, int uid, int time) {
+		double total = 0;
+		double[] priorities = new double[validBanners.size()];
+		for (int i=0; i<validBanners.size(); i++) {
+			Banner b = validBanners.get(i);
+			double priority = getPriority(b, uid, time);
+			priorities[i] = priority;
+			total += priority;
+		}
+		double pick = rand.nextDouble()*total;
+		
+		double currentWeight = 0;
+		for (int i=0;i<priorities.length;i++) {
+			currentWeight += priorities[i];
+			if (currentWeight > pick) {
+				return validBanners.get(i);
+			}
+		}
+		return null;
+	}
+
+
+	/*weighting based on
+				(1 + priority) *
+				(2 - (1-(time since last view/max view rate)) *
+				(3 - ((views today)/(max views per day))) *
+				(3 - ((clicks today)/(max clicks per day)))
+	*/
+	private double getPriority(Banner b, int uid, int time) {
+		double priority = b.getCoefficient() + 1;
+		
+		double period = Math.min(b.getLimitbyperiod(), b.campaign.getLimitByPeriod());
+		if (period == 0) period = Math.max(b.getLimitbyperiod(), b.campaign.getLimitByPeriod());
+		
+		double viewsperuser = Math.min(b.getViewsperuser(), b.campaign.getViewsPerUser());
+		if (viewsperuser == 0) viewsperuser = Math.max(b.getViewsperuser(), b.campaign.getViewsperuser());
+		
+		double viewsperday = Math.min(b.getViewsperday(), b.campaign.getViewsPerDay());
+		if (viewsperday == 0) viewsperday = Math.max(b.getViewsperday(), b.campaign.getViewsPerDay());
+		
+		double clicksperday = Math.min(b.getClicksperday(), b.campaign.getClicksperday());
+		if (clicksperday == 0) clicksperday = Math.max(b.getClicksperday(), b.campaign.getClicksperday());
+		
+		
+		if (viewsperuser != 0) {
+			int[] viewTimes = getBannerViewsForUser(uid, b);
+			if (viewTimes[viewTimes.length-1] != 0 && period != 0) {
+				priority *= 2 - Math.max(1-((time - viewTimes[viewTimes.length-1])/period)*viewsperuser, 0);
+			} else {
+				priority *= 2;
+			}
+		}
+		
+		if (viewsperday != 0) {
+			priority *= (3-this.bannerviews.get(b).views/viewsperday);
+		}
+		
+		if (clicksperday != 0) {
+			priority *= (3-this.bannerviews.get(b).views/clicksperday);
+		}
+		
+		return priority;
+	}
+
 	private boolean hasReachedViewsPerDay(Banner b) {
 		if (this.bannerviews.get(b) == null){
 			this.bannerviews.put(b, new BannerStat());
 		}
-		if (this.bannerviews.get(b).i > b.getViewsperday())
+		if (this.bannerviews.get(b).views > b.getViewsperday())
 			return true;
 		if (this.campaignviews.get(b.campaign) == null){
 			this.campaignviews.put(b.campaign, new BannerStat());
 		}
-		if (this.campaignviews.get(b.campaign).i > b.campaign.getViewsPerDay())
+		if (this.campaignviews.get(b.campaign).views > b.campaign.getViewsPerDay())
 			return true;
 		return false;
 	}
@@ -270,7 +344,7 @@ public class BannerServer {
 		}
 		if (!valid.isEmpty()) {
 			Banner b = Utilities.priorityChoose(valid);
-			b.hit(userid, usertime);
+			markBannerUsed(userid, usertime, b);
 			return b.getID();
 		} else {
 			return 0;
