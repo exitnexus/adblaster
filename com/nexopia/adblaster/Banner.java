@@ -16,35 +16,19 @@ import com.nexopia.adblaster.Utilities.PageValidator;
 
 
 
-class Banner {
+class Banner extends ServablePropertyHolder{
 	public static final int PAYRATE_INHERIT = -1;
 	public static final int PAYTYPE_CPM = 0;
 	public static final int PAYTYPE_CPC = 1;
 	public static final int PAYTYPE_INHERIT = 2;
 	public static final int MAXRATE = 1000;
 	
-	Interests interests;
 	int id;
 	int payrate;
 	byte paytype;
-	private int viewsperday;
-	Vector<Integer> locations;
-	Vector<Integer> ages;
-	Vector<Integer> sexes;
-	PageValidator pages;
-	private int viewsperuser;
-	private int limitbyperiod;
 	Campaign campaign;
-	int index;
 	private double coefficient;
 	private byte size;
-	private int minviewsperday;
-	private int startdate;
-	private int enddate;
-	private boolean enabled;
-	private int clicksperday;
-	private TimeTable allowedTimes;
-	
 	static int count = 0;
 	public static int counter(){
 		return count++;
@@ -63,7 +47,7 @@ class Banner {
 		this.campaign = campaign;
 	}
 	
-	
+/*	
 	Banner(int id, int payrate, int maxHits, int campaignID, Vector<Integer> locations, Vector<Integer> ages, Vector<Integer> sexes, Interests interests, Campaign c, PageValidator pv, String allowed) {
 		this.index = counter();
 		this.id = id;
@@ -99,7 +83,7 @@ class Banner {
 		this.enabled = b.enabled;
 		this.coefficient = this.getPayRate();
 	}
-	
+*/	
 	
 	Banner(ResultSet rs, CampaignDB cdb, PageValidator pv) throws SQLException {
 		this.index = counter();
@@ -120,47 +104,30 @@ class Banner {
 		s += "locations:" + this.locations + '\n' ;
 		s += "ages:" + this.ages + this.ages.isEmpty() + '\n' ;
 		s += "sexes:" + this.sexes + this.sexes.isEmpty() + '\n' ;
-		s += "views per user:" + this.viewsperuser + '\n' ;
-		s += "views period:" + this.limitbyperiod + '\n' ;
+		s += "views per user:" + this.viewsPerUser + '\n' ;
+		s += "views period:" + this.limitByPeriod + '\n' ;
 		s += "size: " + this.size + '\n';
 		return s;
 	}
 	public Vector<Integer> getAges() {
 		return ages;
 	}
-	public void setAges(Vector<Integer> ages) {
-		this.ages = ages;
+	/*The payrate that is actually assigned to the banner.*/
+	public int getRealPayrate() {
+		if (payrate == PAYRATE_INHERIT) {
+			return campaign.getPayrate();
+		} else {
+			return payrate;
+		}
 	}
-	public Interests getInterests() {
-		return interests;
+	public byte getPayType() {
+		if (this.paytype == Banner.PAYTYPE_INHERIT) {
+			return campaign.getPayType();
+		} else {
+			return this.paytype;
+		}
 	}
-	public void setInterests(Interests interests) {
-		this.interests = interests;
-	}
-	public Vector<Integer> getLocations() {
-		return locations;
-	}
-	public void setLocations(Vector<Integer> locations) {
-		this.locations = locations;
-	}
-	public int getViewsperday() {
-		return viewsperday;
-	}
-	public void setViewsperday(int maxHits) {
-		this.viewsperday = maxHits;
-	}
-	public Vector<Integer> getSexes() {
-		return sexes;
-	}
-	public void setSexes(Vector<Integer> sexes) {
-		this.sexes = sexes;
-	}
-	
-	/* The banner's value as it relates to a particular daily instance;
-	 * In other words, its value as related to the learning algorithm.
-	 * The value is usually the same as the payrate, unless we need to 
-	 * reach a minimum number of views.
-	 */
+
 	public int getPayrate(AbstractAdBlasterInstance i) {
 		if (i.bannerCount(this) < this.minviewsperday || 
 				i.bannerCount(this) < this.getCampaign().getMinViewsPerDay() ){
@@ -172,109 +139,11 @@ class Banner {
 			return payrate;
 		}
 	}
-	
-	/*The payrate that is actually assigned to the banner.*/
-	public int getRealPayrate() {
-		if (payrate == PAYRATE_INHERIT) {
-			return campaign.getPayrate();
-		} else {
-			return payrate;
-		}
-	}
+
 	public void setPayrate(int payrate) {
 		this.payrate = payrate;
 	}
 
-	public int getLimitbyperiod() {
-		return limitbyperiod;
-	}
-
-	public void setLimitbyperiod(int limitbyperiod) {
-		this.limitbyperiod = limitbyperiod;
-	}
-
-	public int getViewsperuser() {
-		return viewsperuser;
-	}
-
-	public void setViewsperuser(int viewsperuser) {
-		this.viewsperuser = viewsperuser;
-	}
-
-	/**
-	 * @param u
-	 * @return
-	 */
-	public boolean validUser(User u) {
-		return (campaign.validUser(u) && 
-				validLocation(u.getLocation()) &&
-				validAge(u.getAge()) &&
-				validSex(u.getSex()) &&
-				validInterests(u.getInterests()));
-	}
-
-	/**
-	 * @param interests2
-	 * @return
-	 */
-	public boolean validInterests(Interests userInterests) {
-		return userInterests.matches(interests);
-	}
-
-	/**
-	 * @param sex
-	 * @return
-	 */
-	public boolean validSex(byte sex) {
-		if (sexes.isEmpty()) {
-			return true;
-		}
-		Integer I = Integer.valueOf(sex);
-		boolean valid = sexes.contains(I); 
-		I.free();
-		return valid;
-		
-	}
-
-	/**
-	 * @param location
-	 * @return
-	 */
-	public boolean validLocation(short location) {
-		Integer I = Integer.valueOf(location);
-		boolean valid;
-		if (locations.get(0).equals(Integer.NEGATE)) {
-			valid = !locations.contains(I); 
-		} else {
-			valid = locations.contains(I);
-		}
-		I.free();
-		return valid;
-	}
-
-	/**
-	 * @param age
-	 * @return
-	 */
-	public boolean validAge(byte age) {
-		Integer I = Integer.valueOf(age);
-		boolean valid;
-		if (ages.get(0).equals(Integer.NEGATE)) {
-			valid = !ages.contains(I); 
-		} else {
-			valid = ages.contains(I);
-		}
-		I.free();
-		return valid;
-	}
-	
-	public byte getPayType() {
-		if (this.paytype == Banner.PAYTYPE_INHERIT) {
-			return campaign.getPayType();
-		} else {
-			return this.paytype;
-		}
-	}
 
 	public int getPayRate() {
 		if (this.payrate == Banner.PAYRATE_INHERIT) {
@@ -286,10 +155,6 @@ class Banner {
 	
 	public byte getSize() {
 		return this.size;
-	}
-
-	public int getMinviewsperday() {
-		return minviewsperday;
 	}
 
 	public static boolean precheck(ResultSet rs) {
@@ -322,10 +187,12 @@ class Banner {
 		}
 	}
 
+
 	public Banner update(ResultSet rs, CampaignDB cdb) throws SQLException {
 		this.id = rs.getInt("ID");
-		this.viewsperday = rs.getInt("VIEWSPERDAY");
-		viewsperday = (viewsperday==0?Integer.MAX_VALUE:viewsperday);
+		if (id == 8)
+			System.out.println("poop!");
+		super.update(rs);
 		int ci = rs.getInt("CAMPAIGNID");
 		if (this.campaign == null) {
 			this.campaign = cdb.get(ci);
@@ -349,18 +216,9 @@ class Banner {
 				throw new SQLException();
 			}
 		}
-		this.locations = Utilities.stringToNegationVector(rs.getString("LOC"));
-		this.ages = Utilities.stringToNegationVector(rs.getString("AGE"));
-		this.sexes = Utilities.stringToVector(rs.getString("SEX"));
-		this.pages.make(rs.getString("PAGE"));
 		this.size = rs.getByte("BANNERSIZE");
 		this.paytype = rs.getByte("PAYTYPE");
 		this.payrate = rs.getInt("PAYRATE");
-		this.minviewsperday = rs.getInt("MINVIEWSPERDAY");
-		this.startdate = rs.getInt("STARTDATE");
-		this.enddate = rs.getInt("ENDDATE");
-		this.enabled = rs.getString("ENABLED").equals("y");
-		
 		if (this.getPayType() == Banner.PAYTYPE_CPC) {
 			try {
 				this.payrate = (int)(this.getRealPayrate()*((double)rs.getInt("CLICKS")/(double)rs.getInt("VIEWS")));
@@ -369,22 +227,11 @@ class Banner {
 				this.payrate = rs.getInt("PAYRATE")/100; //assume 1% clickthrough if we have no data
 			}
 		}
-		/* INTEGER viewsperday
-		 * INTEGER clicksperday
-		 * INTEGER UNSIGNED viewsperuser
-		 * CHAR limitbyhour
-		 * INTEGER UNSIGNED limitbyperiod
-		 */
-		this.viewsperuser = rs.getInt("VIEWSPERUSER"); 
-		this.limitbyperiod = rs.getInt("LIMITBYPERIOD"); 
-
-		this.interests = new Interests(rs.getString("INTERESTS"), true);
-		this.allowedTimes = new TimeTable(rs.getString("ALLOWEDTIMES"));
 		this.coefficient = this.getPayRate();
 		return this;
 	}
 
-		public boolean valid(int time, int size, int userid, byte age, byte sex, short location, Interests interests2, String page, boolean debug) {
+	public boolean valid(int time, int size, int userid, byte age, byte sex, short location, Interests interests2, String page, boolean debug) {
 		String debugLog = "";
 		if (debug) debugLog += "Checking banner " + this.id + ": ";
 
@@ -415,6 +262,7 @@ class Banner {
 			return false;
 		}
 		
+		System.out.println("Valid age.");
 		if (debug) debugLog += " 4";
 
 		//sex
@@ -459,14 +307,6 @@ class Banner {
 		//all else works
 		if (debug) Utilities.bannerDebug(debugLog);
 		return true;
-	}
-
-	private boolean validTime(long time) {
-		return this.allowedTimes.getValid(time);
-	}
-
-	public int getClicksperday() {
-		return clicksperday;
 	}
 
 	public int getCoefficient() {

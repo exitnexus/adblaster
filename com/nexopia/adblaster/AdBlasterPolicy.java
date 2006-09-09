@@ -40,7 +40,7 @@ public class AdBlasterPolicy implements I_Policy {
 		System.out.println("Upgrading.");
 		int sbefore[] = new int[universe.getBannerCount()];
 		for (int i = 0; i < universe.getBannerCount(); i++){
-			Banner b = universe.getBannerByIndex(i);
+			ServablePropertyHolder b = universe.getBannerByIndex(i);
 			sbefore[i] = chunk.bannerCount(b);
 		}
 		
@@ -88,8 +88,8 @@ public class AdBlasterPolicy implements I_Policy {
 
 			Banner b = (Banner) all.get(banner);
 			
-			if ( instance.bannerCount(b) < b.getViewsperday() && 
-					instance.campaignCount(b) < b.getCampaign().getViewsPerDay()){
+			if ( instance.bannerCount(b) < b.getIntegerMaxViewsPerDay() && 
+					instance.campaignCount(b) < b.getCampaign().getIntegerMaxViewsPerDay()){
 				if (instance.isValidBannerForView(bv, b)){
 					return b;
 				}
@@ -104,7 +104,7 @@ public class AdBlasterPolicy implements I_Policy {
 	private static int getRandomBanner(Vector banners, HashMap coefficients) {
 		double total = 0;
 		for (int i = 0; i < banners.size(); i++){
-			Banner b = (Banner) banners.get(i);
+			ServablePropertyHolder b = (ServablePropertyHolder) banners.get(i);
 			total += ((Float)coefficients.get(b)).floatValue();
 		}
 
@@ -112,7 +112,7 @@ public class AdBlasterPolicy implements I_Policy {
 		double density = 0;
 		int banner = -1;
 		for (int i = 0; i < banners.size(); i++){
-			Banner b = (Banner) banners.get(i);
+			ServablePropertyHolder b = (ServablePropertyHolder) banners.get(i);
 			density += ((Float)coefficients.get(b)).floatValue();
 			if (density > r){
 				banner = i;
@@ -136,7 +136,7 @@ public class AdBlasterPolicy implements I_Policy {
 				if (i >= vec.size()){
 					break;
 				}
-				Banner b2 = vec.get(i);
+				ServablePropertyHolder b2 = vec.get(i);
 				if (((Float)coefficients.get(b2)).floatValue() < score)
 					break;
 			}
@@ -147,7 +147,7 @@ public class AdBlasterPolicy implements I_Policy {
 		return vec;
 	}
 
-	public Float getCoefficient(Banner bannerByIndex) {
+	public Float getCoefficient(ServablePropertyHolder bannerByIndex) {
 		return (Float)coefficients.get(bannerByIndex);
 	}
 

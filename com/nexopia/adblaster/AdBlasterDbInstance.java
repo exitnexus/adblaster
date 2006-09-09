@@ -190,7 +190,7 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 		updateDB(view,b);
 	}
 	
-	private void updateDB(BannerView view, Banner b) {
+	private void updateDB(BannerView view, ServablePropertyHolder b) {
 		/*try {
 			IntegerBinding ib = new IntegerBinding();
 			DatabaseEntry key = new DatabaseEntry();

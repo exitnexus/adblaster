@@ -69,7 +69,7 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 			Vector<Integer> ages = new Vector<Integer>();
 			if (true)
 				throw new UnsupportedOperationException("This hasn't been updated for campaignDB/PageValidators");
-			addBanner(new Banner(i, payrate, maxHits, campaignID, loc, sexes, ages, inter, null, null, ""));
+			//addBanner(new Banner(i, payrate, maxHits, campaignID, loc, sexes, ages, inter, null, null, ""));
 		}
 	}
 	
@@ -129,7 +129,7 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 		 * 
 		 */
 		ac.getBannerByIndex(0).setPayrate(0);
-		ac.getBannerByIndex(0).setViewsperday(Integer.MAX_VALUE);
+		ac.getBannerByIndex(0).setViewsPerDay(0);
 		ac.getBannerByIndex(0).interests.clear();
 
 		for(int i = 1; i < num_banners; i++){

@@ -61,7 +61,7 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 	}
 
 	@Override
-	int bannerCount(Banner banner) {
+	int bannerCount(ServablePropertyHolder banner) {
 		return gd.instance.bannerCount(banner);
 	}
 

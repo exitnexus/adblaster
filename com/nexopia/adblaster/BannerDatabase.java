@@ -180,7 +180,7 @@ public class BannerDatabase {
 		return coefficients;
 	}
 
-	public Banner add(int id, PageValidator pv) {
+	public ServablePropertyHolder add(int id, PageValidator pv) {
 		try {
 			String sql = "SELECT * FROM banners WHERE id = " + id;
 			Statement stmt = JDBCConfig.createStatement();
@@ -206,7 +206,7 @@ public class BannerDatabase {
 		return null;
 	}
 
-	public Banner update(int bannerID, PageValidator pv) {
+	public ServablePropertyHolder update(int bannerID, PageValidator pv) {
 		Integer id = Integer.valueOf(bannerID);
 		Banner b = banners.get(id);
 		id.free();

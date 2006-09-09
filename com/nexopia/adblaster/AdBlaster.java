@@ -229,7 +229,7 @@ public class AdBlaster {
 		for (int i = 0; i < ac.getBannerCount(); i++){
 			model.setValueAt(""+ac.getBannerByIndex(i).index, i,0);
 			model.setValueAt(""+ac.getBannerByIndex(i).getRealPayrate(), i,1);
-			model.setValueAt(""+ac.getBannerByIndex(i).getViewsperday(), i,2);
+			model.setValueAt(""+ac.getBannerByIndex(i).getViewsPerDay(), i,2);
 			model.setValueAt(pol.getCoefficient(ac.getBannerByIndex(i)), i,3);
 		}
 		// TODO Auto-generated method stub

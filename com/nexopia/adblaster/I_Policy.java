@@ -8,6 +8,6 @@ public interface I_Policy {
 	public abstract Banner getBestBanner(AbstractAdBlasterInstance instance,
 			BannerView bv);
 
-	public abstract Float getCoefficient(Banner bannerByIndex);
+	public abstract Float getCoefficient(ServablePropertyHolder bannerByIndex);
 
 }

@@ -58,12 +58,12 @@ public abstract class AbstractAdBlasterInstance {
 	/*Poorly named... detects whether a bannerview satisfies time period per user*/
 	private boolean nearestWithinTimeRange(Banner b, BannerView bv) {
 		Vector<BannerView> range = null;
-		if (b.getViewsperuser() != 0){
+		if (b.getViewsPerUser() != 0){
 			range = scan(b, bv);
-			for (int i = 0; (i + b.getViewsperuser()) < range.size(); i++) {
+			for (int i = 0; (i + b.getViewsPerUser()) < range.size(); i++) {
 				BannerView first = range.get(i);
-				BannerView last = range.get(i + b.getViewsperuser());
-				if (last.getTime() - first.getTime() <= b.getLimitbyperiod()) {
+				BannerView last = range.get(i + b.getViewsPerUser());
+				if (last.getTime() - first.getTime() <= b.getLimitByPeriod()) {
 					return false;
 				}
 			}
@@ -154,7 +154,7 @@ public abstract class AbstractAdBlasterInstance {
 		User user = bv.getUser();
 		Vector<BannerView>hb = allMatching.get(user);
 		
-		Vector <BannerView> vec = (Vector<BannerView>) getAllMatching(hb, b, bv.getTime(), b.getLimitbyperiod());
+		Vector <BannerView> vec = (Vector<BannerView>) getAllMatching(hb, b, bv.getTime(), b.getLimitByPeriod());
 		
 		//put bv in the list as well
 		vec.add(bv);
@@ -240,7 +240,7 @@ public abstract class AbstractAdBlasterInstance {
 			if (b == null){
 				System.err.println("Error here: null banners in the list?");
 			}  else {
-				if (bannerCount(b) < b.getViewsperday() && campaignCount(b) < b.getCampaign().getViewsPerDay()){
+				if (bannerCount(b) < b.getIntegerMaxViewsPerDay() && campaignCount(b) < b.getCampaign().getIntegerMaxViewsPerDay()){
 					unserved.add(b);
 				}
 			}
@@ -248,7 +248,7 @@ public abstract class AbstractAdBlasterInstance {
 		return unserved;
 	}
 
-	int bannerCount(Banner banner) {
+	int bannerCount(ServablePropertyHolder banner) {
 		return bannerCountMap.get(banner).intValue();
 	}
 	int campaignCount(Banner banner) {

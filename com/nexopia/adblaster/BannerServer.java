@@ -1,19 +1,14 @@
 package com.nexopia.adblaster;
 
-import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.Vector;
 import com.thoughtworks.xstream.XStream;
 
-import com.mysql.jdbc.Connection;
 import com.nexopia.adblaster.Campaign.CampaignDB;
-import com.nexopia.adblaster.Utilities.PageValidator;
-import com.sleepycat.je.DatabaseException;
 
 public class BannerServer {
 	public static final Integer BANNER_BANNER = new Integer(1);
@@ -65,13 +60,13 @@ public class BannerServer {
 	//public HashMap<Integer, Integer> campaignids; // array( bannerid => campaignid );
 	
 	//public int time;
-	private HashMap<Banner,IntObjectHashMap> bannerViewMap = new HashMap<Banner, IntObjectHashMap>();
+	private HashMap<ServablePropertyHolder,IntObjectHashMap> viewMap = new HashMap<ServablePropertyHolder, IntObjectHashMap>();
 	Vector<Banner> banners = new Vector<Banner>();
-	private HashMap<Banner, BannerStat> bannerstats;
-	private HashMap<Integer, TypeStat> viewstats;
-	private HashMap<Integer, TypeStat> clickstats;
-	private HashMap<Campaign, BannerStat> campaignstats;
-	private HashMap<Banner, HourlyStat> hourlystats;
+	private FastMap<Banner, BannerStat> bannerstats;
+	private HashMap<Integer, TypeStat> viewstats = new HashMap<Integer,TypeStat>();
+	private HashMap<Integer, TypeStat> clickstats = new HashMap<Integer,TypeStat>();
+	private FastMap<Campaign, BannerStat> campaignstats = new FastMap<Campaign,BannerStat>();
+	private FastMap<Banner, HourlyStat> hourlystats = new FastMap<Banner,HourlyStat>();
 	
 	static class BannerStat{
 		int dailyviews;
@@ -140,7 +135,7 @@ public class BannerServer {
 		Integer sizes[] = {BANNER_BANNER, BANNER_LEADERBOARD,
 				BANNER_BIGBOX, BANNER_SKY120, BANNER_SKY160,
 				BANNER_BUTTON60, BANNER_VULCAN, BANNER_LINK};
-		this.bannerstats = new HashMap<Banner, BannerStat>();
+		this.bannerstats = new FastMap<Banner, BannerStat>();
 		for(int i = 0; i < sizes.length; i++) {
 			Integer size = sizes[i];
 			this.viewstats.put(size, new TypeStat());
@@ -151,7 +146,7 @@ public class BannerServer {
 	}
 	
 	public boolean addCampaign(int id){
-		Campaign c = cdb.add(id);
+		ServablePropertyHolder c = cdb.add(id);
 		if (c != null) {
 			return true;
 		} else {
@@ -184,21 +179,20 @@ public class BannerServer {
 	 * Determine whether it is valid for a user to view this banner
 	 * at this time. 
 	 */
-	public boolean isBannerValidForUser(int userid, int time, Banner b){
+	public boolean isValidForUser(int userid, int time, ServablePropertyHolder b){
+		if (b.getViewsPerUser() <= 0)
+			return true;
 		
-		int[] views = getBannerViewsForUser(userid, b);
-		
-		/* Find the oldest */
-		for (int i = 0; i < views.length; i++){
-			if (views[i] != 0){
-				System.out.println(time + ":" + views[i]);
-				/* The oldest view within memory... */
-				if (time - views[i] > b.getLimitbyperiod())
-					/* If the oldest view is outside of limit period, we're golden */
-					return true;
-				else
-					return false;
-			}
+		/* Find the oldest view*/
+		int[] views = getViewsForUser(userid, b);
+
+		if (views[0] != 0){
+			System.out.println(time + ":" + views[0] + " > " + b.getLimitByPeriod());
+			if (time - views[0] > b.getLimitByPeriod())
+				/* If the oldest view is outside of limit period, we're golden */
+				return true;
+			else
+				return false;
 		}
 		
 		/* If we've fallen through, then there are no views.*/
@@ -210,36 +204,46 @@ public class BannerServer {
 	 * Indicate that a user used a banner at a certain time. 
 	 */
 	public void markBannerUsed(int userid, int time, Banner b){
-		if (b.getViewsperuser() == 0){
-			return;
+		if (b.getViewsPerUser() != 0){
+			int[] views = getViewsForUser(userid, b);
+			
+			/* Throw out the oldest, insert the new view. */
+			for (int i = 0; i < views.length - 1; i++){
+				views[i] = views[i+1];
+			}
+			views[views.length - 1] = time;
+			System.out.println(Arrays.toString(views));
 		}
 		
-		int[] views = getBannerViewsForUser(userid, b);
-		
-		/* Throw out the oldest, insert the new view. */
-		for (int i = 0; i < views.length - 1; i++){
-			views[i] = views[i+1];
+		if (b.getCampaign().getViewsPerUser() != 0){
+			int[] cviews = getViewsForUser(userid, b.getCampaign());
+			
+			/* Throw out the oldest, insert the new view. */
+			for (int i = 0; i < cviews.length - 1; i++){
+				cviews[i] = cviews[i+1];
+			}
+			cviews[cviews.length - 1] = time;
 		}
-		views[views.length - 1] = time;
-		hourlystats.get(b).view();
-		bannerstats.get(b).view();
+
+		hourlystats.getOrCreate(b, HourlyStat.class).view();
+		bannerstats.getOrCreate(b, BannerStat.class).view();
 	}
 	
 	/**
 	 *  Return an int array of the times the user has viewed the banner. 
 	 */
-	private int[] getBannerViewsForUser(int userid, Banner b) {
+	private int[] getViewsForUser(int userid, ServablePropertyHolder b) {
 		/* Get records of all views for the banner.*/
-		IntObjectHashMap userViewMap = bannerViewMap.get(b);
+		IntObjectHashMap userViewMap = viewMap.get(b);
 		if (userViewMap == null){
 			userViewMap = new IntObjectHashMap();
-			bannerViewMap.put(b, userViewMap);
+			viewMap.put(b, userViewMap);
 		}
 		
 		/* From the above records, get all views for this user.*/
 		int []views = (int[])userViewMap.get(userid);
 		if (views == null){
-			views = new int[b.getViewsperuser()];
+			views = new int[b.getViewsPerUser()];
 			userViewMap.put(userid, views);
 		}
 		return views;
@@ -291,7 +295,7 @@ public class BannerServer {
 		
 		for (int i = 0; i < banners.size(); i++){
 			Banner b = banners.get(i);
-			boolean b1 = isBannerValidForUser(userid, usertime, b);
+			boolean b1 = isValidForUser(userid, usertime, b);
 			boolean b2 = !hasReachedViewsPerDay(b);
 			boolean b3 = !hasReachedClicksPerDay(b);
 			System.out.println("" + b.id + ":" + b1 + ":"+b2+":"+b3);
@@ -345,21 +349,21 @@ public class BannerServer {
 	private double getPriority(Banner b, int uid, int time) {
 		double priority = b.getCoefficient() + 1;
 		
-		double period = Math.min(b.getLimitbyperiod(), b.campaign.getLimitByPeriod());
-		if (period == 0) period = Math.max(b.getLimitbyperiod(), b.campaign.getLimitByPeriod());
+		double period = Math.min(b.getLimitByPeriod(), b.campaign.getLimitByPeriod());
+		if (period == 0) period = Math.max(b.getLimitByPeriod(), b.campaign.getLimitByPeriod());
 		
-		double viewsperuser = Math.min(b.getViewsperuser(), b.campaign.getViewsPerUser());
-		if (viewsperuser == 0) viewsperuser = Math.max(b.getViewsperuser(), b.campaign.getViewsperuser());
+		double viewsperuser = Math.min(b.getViewsPerUser(), b.campaign.getViewsPerUser());
+		if (viewsperuser == 0) viewsperuser = Math.max(b.getViewsPerUser(), b.campaign.getViewsPerUser());
 		
-		double viewsperday = Math.min(b.getViewsperday(), b.campaign.getViewsPerDay());
-		if (viewsperday == 0) viewsperday = Math.max(b.getViewsperday(), b.campaign.getViewsPerDay());
+		double viewsperday = Math.min(b.getViewsPerDay(), b.campaign.getViewsPerDay());
+		if (viewsperday == 0) viewsperday = Math.max(b.getViewsPerDay(), b.campaign.getViewsPerDay());
 		
 		double clicksperday = Math.min(b.getClicksperday(), b.campaign.getClicksperday());
 		if (clicksperday == 0) clicksperday = Math.max(b.getClicksperday(), b.campaign.getClicksperday());
 		
 		
 		if (viewsperuser != 0) {
-			int[] viewTimes = getBannerViewsForUser(uid, b);
+			int[] viewTimes = getViewsForUser(uid, b);
 			if (viewTimes.length != 0 && viewTimes[viewTimes.length-1] != 0 && period != 0) {
 				priority *= 2 - Math.max(1-((time - viewTimes[viewTimes.length-1])/period)*viewsperuser, 0);
 			} else {
@@ -382,12 +386,12 @@ public class BannerServer {
 		if (this.bannerstats.get(b) == null){
 			this.bannerstats.put(b, new BannerStat());
 		}
-		if (this.bannerstats.get(b).dailyviews > b.getViewsperday())
+		if (this.bannerstats.get(b).dailyviews > b.getIntegerMaxViewsPerDay())
 			return true;
 		if (this.campaignstats.get(b.campaign) == null){
 			this.campaignstats.put(b.campaign, new BannerStat());
 		}
-		if (this.campaignstats.get(b.campaign).dailyviews > b.campaign.getViewsPerDay())
+		if (this.campaignstats.get(b.campaign).dailyviews > b.campaign.getIntegerMaxViewsPerDay())
 			return true;
 		return false;
 	}
@@ -396,12 +400,12 @@ public class BannerServer {
 		if (this.bannerstats.get(b) == null){
 			this.bannerstats.put(b, new BannerStat());
 		}
-		if (this.bannerstats.get(b).dailyclicks > b.getClicksperday())
+		if (this.bannerstats.get(b).dailyclicks > b.getIntegerMaxClicksperday())
 			return true;
 		if (this.campaignstats.get(b.campaign) == null){
 			this.campaignstats.put(b.campaign, new BannerStat());
 		}
-		if (this.campaignstats.get(b.campaign).dailyclicks > b.campaign.getClicksperday())
+		if (this.campaignstats.get(b.campaign).dailyclicks > b.campaign.getIntegerMaxClicksperday())
 			return true;
 		return false;
 	}
@@ -439,9 +443,33 @@ public class BannerServer {
 	
 	static class FastMap <K, V> {
 		HashMap <K,V>map;
+		
+		FastMap(){
+			map = new HashMap<K,V>();
+		}
+		
 		FastMap(K key, V val){
 			map = new HashMap<K,V>();
 			map.put(key, val);
+		}
+		
+		public V getOrCreate(K k, Class defaultValue) {
+			V elem = this.get(k);
+			if(elem == null){
+				try {
+					elem = (V) defaultValue.newInstance();
+				} catch (SecurityException e) {
+					e.printStackTrace();
+				} catch (InstantiationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				this.put(k,elem);
+			}
+			return elem;
 		}
 		HashMap getMap(){
 			return map;
