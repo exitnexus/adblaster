@@ -16,7 +16,7 @@ public class SQLQueue
 		queue = new LinkedList<String>();
 		threads = new SQLWorker[nThreads];
 		
-		for (int i=0; i<nThreads; i++) {
+		for (int i=0; i<this.nThreads; i++) {
 			threads[i] = new SQLWorker();
 			threads[i].start();
 		}
