@@ -1,7 +1,6 @@
 package com.nexopia.adblaster;
 
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -569,18 +568,10 @@ public class BannerServer {
 		}
 		
 		if(bannerstat.hasChanged()) {
-			Statement st;
-			try {
-				st = JDBCConfig.createStatement();
-				st.executeUpdate("UPDATE banners SET lastupdatetime = "+time+", views = views + "+bannerstat.current_views+", clicks = clicks + "+bannerstat.current_clicks+", passbacks = passbacks + "+bannerstat.passbacks+" WHERE id = " + b.id);
-				bannerstat.current_views = 0;
-				bannerstat.current_clicks = 0;
-				bannerstat.passbacks = 0;
-			} catch (SQLException e) {
-				System.err.println("Unable to update minutely banner stats.");
-				e.printStackTrace();
-			}
-			//prepare_query("UPDATE banners SET lastupdatetime = #, views = views + #, potentialviews = potentialviews + #, clicks = clicks + #, passbacks = passbacks + #, credits = credits - # WHERE id = #", $time, $this->views, $this->potentialviews, $this->clicks, $this->passbacks, $this->charge, $this->id);
+			JDBCConfig.queueQuery("UPDATE banners SET lastupdatetime = "+time+", views = views + "+bannerstat.current_views+", clicks = clicks + "+bannerstat.current_clicks+", passbacks = passbacks + "+bannerstat.passbacks+" WHERE id = " + b.id);
+			bannerstat.current_views = 0;
+			bannerstat.current_clicks = 0;
+			bannerstat.passbacks = 0;
 		}
 	}
 	
@@ -597,14 +588,7 @@ public class BannerServer {
 		if (debug) {
 			Utilities.bannerDebug("hour " + b.id);
 		}
-		Statement st;
-		try {
-			st = JDBCConfig.createStatement();
-			st.executeUpdate("REPLACE INTO bannerstats (bannerid, time, views, potentialviews, clicks, passbacks) SELECT id, lastupdatetime, views, potentialviews, clicks, passbacks FROM banners WHERE id = " + b.id);
-		} catch (SQLException e) {
-			System.err.println("Unable to update hourly banner stats.");
-			e.printStackTrace();
-		}
+		JDBCConfig.queueQuery("REPLACE INTO bannerstats (bannerid, time, views, potentialviews, clicks, passbacks) SELECT id, lastupdatetime, views, potentialviews, clicks, passbacks FROM banners WHERE id = " + b.id);
 		if (b.getPayType() == Banner.PAYTYPE_CPC) {
 			HourlyStat hourlystat = hourlystats.get(b);
 			b.setCoefficient(hourlystat.getClickRate()*b.getPayRate());

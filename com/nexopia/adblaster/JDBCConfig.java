@@ -7,11 +7,13 @@ import java.sql.Statement;
 
 public class JDBCConfig {
 	private static Connection con; 
+	private static SQLQueue sqlQueue;
 	static {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			String url = "jdbc:mysql://192.168.0.50:3307/banner";
 			con = DriverManager.getConnection(url, "nathan", "nathan");
+			sqlQueue = new SQLQueue(1);
 		} catch (ClassNotFoundException e) {
 			System.err.println("Unable to load JDBC driver.");
 			e.printStackTrace();
@@ -25,5 +27,9 @@ public class JDBCConfig {
 	
 	public static Statement createStatement() throws SQLException {
 		return con.createStatement();
+	}
+	
+	public static void queueQuery(String query) {
+		sqlQueue.execute(query);
 	}
 }
