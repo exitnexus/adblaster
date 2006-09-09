@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.Vector;
+import com.thoughtworks.xstream.XStream;
 
 import com.mysql.jdbc.Connection;
 import com.nexopia.adblaster.Campaign.CampaignDB;
@@ -94,7 +95,10 @@ public class BannerServer {
 	}
 	
 	static class TypeStat {
-	
+		private static XStream xstream = new XStream();
+		public String toXML() {
+			return xstream.toXML(this);
+		}
 	}
 	
 	static class HourlyStat {
