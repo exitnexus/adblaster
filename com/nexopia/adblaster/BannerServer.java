@@ -1,5 +1,7 @@
 package com.nexopia.adblaster;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -8,6 +10,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.Vector;
+import java.util.zip.GZIPOutputStream;
+
 import com.thoughtworks.xstream.XStream;
 
 import com.nexopia.adblaster.Campaign.CampaignDB;
@@ -96,9 +100,21 @@ public class BannerServer {
 	
 	static class TypeStat {
 		private static XStream xstream = new XStream();
+		private static final boolean COMPRESS = true; 
 		
 		public String toXML() {
-			return xstream.toXML(this);
+			if (!COMPRESS) {
+				return xstream.toXML(this);
+			} else {
+				GZIPOutputStream gz = null;
+				try {
+					gz = new GZIPOutputStream(new ByteArrayOutputStream());
+					gz.write(xstream.toXML(this).getBytes());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				return gz.toString();
+			}
 		}
 		
 		public static int INITIAL_ARRAY_SIZE = 100;
