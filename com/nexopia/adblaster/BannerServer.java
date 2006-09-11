@@ -52,6 +52,9 @@ public class BannerServer {
 	public BannerDatabase db;
 	public CampaignDB cdb;
 	public HashMap<String,Integer> sizes;
+	Integer sizes_array[] = {BANNER_BANNER, BANNER_LEADERBOARD,
+			BANNER_BIGBOX, BANNER_SKY120, BANNER_SKY160,
+			BANNER_BUTTON60, BANNER_VULCAN, BANNER_LINK};
 	
 	private static int numservers;
 	private static Random rand = new Random();
@@ -697,7 +700,14 @@ public class BannerServer {
 		for (Banner b: banners) {
 			daily(b, debug);
 		}
+		long time = System.currentTimeMillis()/1000;
+		for (Integer size: sizes_array) {
+			TypeStat views = viewstats.get(size);
+			TypeStat clicks = clickstats.get(size);
+			JDBCConfig.queueQuery("INSERT INTO bannertypestats SET size = "+size+", time = "+time+", views = "+views.total+", clicks = "+clicks.total+", viewsdump = '"+views.toXML()+"', clicksdump = '"+clicks.toXML()+"'");
+		}
 	}
+	
 	public void daily(Banner b, boolean debug) {
 		bannerstats.get(b).dailyclicks = 0;
 		bannerstats.get(b).dailyviews = 0;
