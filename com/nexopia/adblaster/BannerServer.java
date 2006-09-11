@@ -1,7 +1,10 @@
 package com.nexopia.adblaster;
 
+import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
@@ -91,8 +94,67 @@ public class BannerServer {
 	
 	static class TypeStat {
 		private static XStream xstream = new XStream();
+		
 		public String toXML() {
 			return xstream.toXML(this);
+		}
+		
+		public static int INITIAL_ARRAY_SIZE = 100;
+		public int starttime;
+		private int total;
+		private int[][] agesex;
+		private int[] loc;
+		private int[] interests;
+		private int[][] hittimes;
+		private HashMap<String, Integer> pages;
+		
+		public TypeStat() {
+			total = 0;
+			starttime = (int)(System.currentTimeMillis()/1000);
+			loc = new int[INITIAL_ARRAY_SIZE];
+			agesex = new int[INITIAL_ARRAY_SIZE][3];
+			hittimes = new int[7][24];
+			pages = new HashMap<String, Integer>();
+		}
+		
+		public void hit(int age, int sex, int loc, int[] interests, String page, int time) {
+			total++;
+			Calendar c = Calendar.getInstance();
+			c.setTime(new Timestamp((long)time*1000));
+			hittimes[c.get(Calendar.DAY_OF_WEEK)][c.get(Calendar.HOUR_OF_DAY)]++;
+			if (age < 100 && age >= 0) {
+				agesex[age][sex]++;
+			}
+			this.loc = expandArray(this.loc, loc);
+			this.loc[loc]++;
+			for (int interest: interests) {
+				this.interests = expandArray(this.interests, interest);
+				this.interests[interest]++;
+			}
+			Integer pageviews = pages.get(page);
+			if (pageviews == null) {
+				pageviews = Integer.valueOf(1);
+			} else {
+				int i = pageviews.intValue();
+				i++;
+				pageviews.free();
+				pageviews = Integer.valueOf(i);
+			}
+			pages.put(page, pageviews);
+				
+		}
+
+		private int[] expandArray(int[] array, int new_val) {
+			if (array.length > new_val) {
+				return array;
+			} else {
+				int new_size = Math.max(array.length*2, new_val);
+				int[] new_array = new int[new_size];
+				for (int i=0; i<array.length; i++) {
+					new_array[i] = array[i];
+				}
+				return new_array;
+			}
 		}
 	}
 	
