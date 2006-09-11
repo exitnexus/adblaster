@@ -4,7 +4,6 @@ import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
@@ -117,7 +116,7 @@ public class BannerServer {
 			pages = new HashMap<String, Integer>();
 		}
 		
-		public void hit(int age, int sex, int loc, int[] interests, String page, int time) {
+		public void hit(int age, int sex, int loc, Interests interests, String page, int time) {
 			total++;
 			Calendar c = Calendar.getInstance();
 			c.setTime(new Timestamp((long)time*1000));
@@ -127,9 +126,9 @@ public class BannerServer {
 			}
 			this.loc = expandArray(this.loc, loc);
 			this.loc[loc]++;
-			for (int interest: interests) {
-				this.interests = expandArray(this.interests, interest);
-				this.interests[interest]++;
+			for(int i=interests.checked.nextSetBit(0); i>=0; i=interests.checked.nextSetBit(i+1)) { 
+				this.interests = expandArray(this.interests, i);
+				this.interests[i]++;
 			}
 			Integer pageviews = pages.get(page);
 			if (pageviews == null) {
@@ -265,7 +264,7 @@ public class BannerServer {
 	/**
 	 * Indicate that a user used a banner at a certain time. 
 	 */
-	public void markBannerUsed(int userid, int time, Banner b){
+	public void markBannerUsed(int age, int sex, int loc, Interests interests, String page, int time, int userid, Banner b){
 		if (b.getViewsPerUser() != 0){
 			int[] views = getViewsForUser(userid, b);
 			
@@ -289,6 +288,8 @@ public class BannerServer {
 
 		hourlystats.getOrCreate(b, HourlyStat.class).view();
 		bannerstats.getOrCreate(b, BannerStat.class).view();
+		viewstats.get(b.getSize()).hit(age, sex, loc, interests, page, time);
+		clickstats.get(b.getSize()).hit(age, sex, loc, interests, page, time);
 	}
 	
 	/**
@@ -370,7 +371,7 @@ public class BannerServer {
 		
 		Banner chosen = weightedChoice(validBanners, userid, usertime);
 		if (chosen != null) {
-			markBannerUsed(userid, usertime, chosen);
+			markBannerUsed(age, sex, location, interests, page, usertime, userid, chosen);
 			this.bannerstats.get(chosen).dailyviews++;
 			System.out.println("PICKED:" + chosen.id);
 			return chosen.id;
@@ -485,7 +486,7 @@ public class BannerServer {
 		}
 		if (!valid.isEmpty()) {
 			Banner b = Utilities.priorityChoose(valid);
-			markBannerUsed(userid, usertime, b);
+			markBannerUsed(age, sex, location, interests, page, usertime, userid, b);
 			return b.getID();
 		} else {
 			return 0;
