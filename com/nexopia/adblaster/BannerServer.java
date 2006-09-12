@@ -2,6 +2,7 @@ package com.nexopia.adblaster;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -108,19 +109,27 @@ public class BannerServer {
 	static class TypeStat {
 		private static XStream xstream = new XStream();
 		private static final boolean COMPRESS = true; 
+		private static final String GZIP_ENCODING = "ISO8859_1";
 		
 		public String toXML() {
 			if (!COMPRESS) {
 				return xstream.toXML(this);
 			} else {
 				GZIPOutputStream gz = null;
+				ByteArrayOutputStream bytes = null;
 				try {
-					gz = new GZIPOutputStream(new ByteArrayOutputStream());
+					bytes = new ByteArrayOutputStream(); 
+					gz = new GZIPOutputStream(bytes);
 					gz.write(xstream.toXML(this).getBytes());
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				return gz.toString();
+				try {
+					return bytes.toString(GZIP_ENCODING);
+				} catch (UnsupportedEncodingException e) {
+					e.printStackTrace();
+					return null;
+				}
 			}
 		}
 		
