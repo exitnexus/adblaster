@@ -112,6 +112,8 @@ public class BannerServer {
 		private static final String GZIP_ENCODING = "ISO8859_1";
 		
 		public String toXML() {
+			xstream.alias("typestat", TypeStat.class);
+			xstream.alias("integer", Integer.class);
 			if (!COMPRESS) {
 				return xstream.toXML(this);
 			} else {
