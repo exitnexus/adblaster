@@ -3,6 +3,9 @@ package com.nexopia.adblaster;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -740,6 +743,7 @@ public class BannerServer {
 	}
 	
 	public int receive(int cmd, String[] params){
+		int id;
 		
 		switch(cmd){
 		case GET:
@@ -818,7 +822,7 @@ public class BannerServer {
 			slidingstats[statstime][0]++;
 			
 			//(id, age, sex, loc, interests, page, time) = explode(' ', params);
-			String id="", 
+			String sid="", 
 			age="", 
 			sex="", 
 			loc="", 
@@ -835,41 +839,69 @@ public class BannerServer {
 			break;
 		}
 		case ADD: // "add id"
-		{
-			//addBannerD(params);
+			id = Integer.parseInt(params[0]);
+			db.add(id, new Utilities.PageValidator1()); //addBannerD(params);
 			bannerDebug("add params");
 			break;
-		}
 		case UPDATE: // "update id"
 			//updateBannerD(params);
+			id = Integer.parseInt(params[0]);
+			db.add(id, new Utilities.PageValidator1()); 
 			bannerDebug("update params");
 			break;
 			
 		case DEL: // "del id"
 			//deleteBannerD(params);
+			id = Integer.parseInt(params[0]);
+			db.delete(id);
 			bannerDebug("delete params");
 			break;
 			
 		case ADDCAMPAIGN: // "addcampaign id"
-			//addCampaignD(params);
+			id = Integer.parseInt(params[0]);
+			cdb.add(id);
+			try {
+				Statement st = JDBCConfig.createStatement();
+				ResultSet rs = st.executeQuery("SELECT id FROM banners WHERE campaignid = " + id);
+				while (rs.next()) {
+					int bannerid = rs.getInt("id");
+					db.add(bannerid, new Utilities.PageValidator1());
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			bannerDebug("addcampaign params");
 			break;
 			
 		case UPDATECAMPAIGN: // "updatecampaign id"
-			//updateCampaignD(params);
+			id = Integer.parseInt(params[0]);
+			cdb.add(id);
+			try {
+				Statement st = JDBCConfig.createStatement();
+				ResultSet rs = st.executeQuery("SELECT id FROM banners WHERE campaignid = " + id);
+				while (rs.next()) {
+					int bannerid = rs.getInt("id");
+					db.add(bannerid, new Utilities.PageValidator1());
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			bannerDebug("updatecampaign params");
 			break;
 			
 		case DELCAMPAIGN: // "delcampaign id"
-			//deleteCampaignD(params);
+			id = Integer.parseInt(params[0]);
+			for (Banner b: cdb.get(id).banners) {
+				db.delete(b.id);
+			}
+			cdb.delete(id);
 			bannerDebug("deletecampaign params");
 			break;
 			
-		case QUIT: //disconnects this connection
-			//			@socket_shutdown(clients[sock]);
-			//socket_close(clients[(int)sock]);
-			//unset(clients[(int)sock]); 	// remove client from arrays
-			//unset(clientdata[(int)sock]);
+		case QUIT: 
+			//Nothing needs to be done to cleanup a given connection right now, the client simply needs to drop connection.
 			break;
 			
 		case CONDUMP:
