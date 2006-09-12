@@ -130,6 +130,7 @@ public class BannerServer {
 			total = 0;
 			starttime = (int)(System.currentTimeMillis()/1000);
 			loc = new int[INITIAL_ARRAY_SIZE];
+			interests = new int[INITIAL_ARRAY_SIZE];
 			agesex = new int[INITIAL_ARRAY_SIZE][3];
 			hittimes = new int[7][24];
 			pages = new HashMap<String, Integer>();
@@ -166,7 +167,7 @@ public class BannerServer {
 			if (array.length > new_val) {
 				return array;
 			} else {
-				int new_size = Math.max(array.length*2, new_val);
+				int new_size = Math.max(array.length*2, new_val+1);
 				int[] new_array = new int[new_size];
 				for (int i=0; i<array.length; i++) {
 					new_array[i] = array[i];
@@ -999,7 +1000,6 @@ public class BannerServer {
 			"false"};//boolean debugGet=Boolean.parseBoolean(params[9]);
 			bs.receive(GET, params);
 		}
-		
 	}
 
 	
