@@ -51,7 +51,14 @@ public class BannerServer {
 	public static final int BANNER_SLIDE_SIZE = 8;
 	public static final double BANNER_MIN_CLICKRATE = 0.0002;
 	public static final double BANNER_MAX_CLICKRATE = 0.005;
+	public static final boolean debug = true;	
+	static boolean debugFields[] = new boolean[1000];//should be map?
+	static int stats[] = new int[1000];//should be map?
 	
+	static StringBuffer logsock = new StringBuffer();
+	static int slidingstats[][] = new int[1000][1000];
+	static int statstime = 0;
+	static String currentwindow = "";
 	
 	public BannerDatabase db;
 	public CampaignDB cdb;
@@ -72,8 +79,8 @@ public class BannerServer {
 	private HashMap<ServablePropertyHolder,IntObjectHashMap> viewMap = new HashMap<ServablePropertyHolder, IntObjectHashMap>();
 	Vector<Banner> banners = new Vector<Banner>();
 	private FastMap<Banner, BannerStat> bannerstats;
-	private HashMap<Integer, TypeStat> viewstats = new HashMap<Integer,TypeStat>();
-	private HashMap<Integer, TypeStat> clickstats = new HashMap<Integer,TypeStat>();
+	private FastMap<Integer, TypeStat> viewstats = new FastMap<Integer,TypeStat>();
+	private FastMap<Integer, TypeStat> clickstats = new FastMap<Integer,TypeStat>();
 	private FastMap<Campaign, BannerStat> campaignstats = new FastMap<Campaign,BannerStat>();
 	private FastMap<Banner, HourlyStat> hourlystats = new FastMap<Banner,HourlyStat>();
 	
@@ -308,8 +315,9 @@ public class BannerServer {
 
 		hourlystats.getOrCreate(b, HourlyStat.class).view();
 		bannerstats.getOrCreate(b, BannerStat.class).view();
-		viewstats.get(b.getSize()).hit(age, sex, loc, interests, page, time);
-		clickstats.get(b.getSize()).hit(age, sex, loc, interests, page, time);
+		campaignstats.getOrCreate(b.campaign, BannerStat.class).view();
+		viewstats.getOrCreate(Integer.valueOf(b.getSize()), TypeStat.class).hit(age, sex, loc, interests, page, time);
+		clickstats.getOrCreate(Integer.valueOf(b.getSize()), TypeStat.class).hit(age, sex, loc, interests, page, time);
 	}
 	
 	/**
@@ -379,9 +387,10 @@ public class BannerServer {
 		for (int i = 0; i < banners.size(); i++){
 			Banner b = banners.get(i);
 			boolean b1 = isValidForUser(userid, usertime, b);
-			boolean b2 = !hasReachedViewsPerDay(b);
-			boolean b3 = !hasReachedClicksPerDay(b);
-			System.out.println("" + b.id + ":" + b1 + ":"+b2+":"+b3);
+			boolean b2 = isValidForUser(userid, usertime, b.campaign);
+			boolean b3 = !hasReachedViewsPerDay(b);
+			boolean b4 = !hasReachedClicksPerDay(b);
+			if (debug) System.out.println("" + b.id + ":" + b1 + ":"+b2+":"+b3+":"+b4);
 			if ( b1 && b2 && b3){
 				validBanners.add(b);
 				//System.out.println(b);
@@ -392,7 +401,6 @@ public class BannerServer {
 		Banner chosen = weightedChoice(validBanners, userid, usertime);
 		if (chosen != null) {
 			markBannerUsed(age, sex, location, interests, page, usertime, userid, chosen);
-			this.bannerstats.get(chosen).dailyviews++;
 			System.out.println("PICKED:" + chosen.id);
 			return chosen.id;
 		}
@@ -466,16 +474,13 @@ public class BannerServer {
 	}
 
 	private boolean hasReachedViewsPerDay(Banner b) {
-		if (this.bannerstats.get(b) == null){
-			this.bannerstats.put(b, new BannerStat());
-		}
-		if (this.bannerstats.get(b).dailyviews > b.getIntegerMaxViewsPerDay())
+
+		if (this.bannerstats.getOrCreate(b, BannerStat.class).dailyviews >= b.getIntegerMaxViewsPerDay())
 			return true;
-		if (this.campaignstats.get(b.campaign) == null){
-			this.campaignstats.put(b.campaign, new BannerStat());
-		}
-		if (this.campaignstats.get(b.campaign).dailyviews > b.campaign.getIntegerMaxViewsPerDay())
+		if (this.campaignstats.getOrCreate(b.campaign, BannerStat.class).dailyviews >= b.campaign.getIntegerMaxViewsPerDay())
 			return true;
+		if (debug) System.out.println("Banner Views: " + this.bannerstats.getOrCreate(b, BannerStat.class).dailyviews + ":" + b.getIntegerMaxViewsPerDay());
+		if (debug) System.out.println("Campaign Views: " + this.campaignstats.getOrCreate(b.campaign, BannerStat.class).dailyviews + ":" + b.campaign.getIntegerMaxViewsPerDay());
 		return false;
 	}
 	
@@ -585,13 +590,6 @@ public class BannerServer {
 		
 	}
 	
-	static boolean debug[] = new boolean[1000];//should be map?
-	static int stats[] = new int[1000];//should be map?
-	
-	static StringBuffer logsock = new StringBuffer();
-	static int slidingstats[][] = new int[1000][1000];
-	static int statstime = 0;
-	static String currentwindow = "";
 	
 	private int parseCommand(String command) {
 		int cmd;
@@ -675,7 +673,7 @@ public class BannerServer {
 	}
 	
 	private void minutely(Banner b, int time, boolean debug) {
-		BannerStat bannerstat = this.bannerstats.get(b);
+		BannerStat bannerstat = this.bannerstats.getOrCreate(b, BannerStat.class);
 		
 		if (debug) {
 			Utilities.bannerDebug("minutely " + b.id + " " + bannerstat.dailyviews + 
@@ -778,10 +776,10 @@ public class BannerServer {
 			  //currentwindow
 			   recentviews.add(new FastMap<String, FastVec>(userid, new FastVec(ret)));
 			   }*/
-			if(debug[GET] || (debug[GETFAIL] && (ret == -1)))
+			if(debugFields[GET] || (debugFields[GETFAIL] && (ret == -1)))
 				bannerDebug("get params => ret");
 			
-			if(debug[GETLOG] && (logsock != null)){
+			if(debugFields[GETLOG] && (logsock != null)){
 				if(logsock.append("get params => ret\n") == null){
 					bannerDebug("log server connection error: errstr (errno)<br />");
 					//CLOSE Logsock// logsock.close();
@@ -802,7 +800,7 @@ public class BannerServer {
 		}
 		case BLANK:
 		{
-			if(debug[0])
+			if(debugFields[0])
 				bannerDebug(" params");
 			
 			stats[0]++;

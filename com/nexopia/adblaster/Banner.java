@@ -190,8 +190,6 @@ class Banner extends ServablePropertyHolder{
 
 	public Banner update(ResultSet rs, CampaignDB cdb) throws SQLException {
 		this.id = rs.getInt("ID");
-		if (id == 8)
-			System.out.println("poop!");
 		super.update(rs);
 		int ci = rs.getInt("CAMPAIGNID");
 		if (this.campaign == null) {
@@ -262,7 +260,6 @@ class Banner extends ServablePropertyHolder{
 			return false;
 		}
 		
-		System.out.println("Valid age.");
 		if (debug) debugLog += " 4";
 
 		//sex

@@ -142,7 +142,7 @@ class Campaign extends ServablePropertyHolder{
 		return id;
 	}
 	public String toString(){
-		return "" + this.id + "," + this.getPayrate();
+		return "" + this.id + " at " + this.getPayrate() + "cpm";
 	}
 	public int getPayrate() {
 		return payrate;
