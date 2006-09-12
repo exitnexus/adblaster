@@ -21,6 +21,7 @@ import com.thoughtworks.xstream.XStream;
 import com.nexopia.adblaster.Campaign.CampaignDB;
 
 public class BannerServer {
+	public static final String CURRENT_VERSION = "0.0";
 	public static final Integer BANNER_BANNER = new Integer(1);
 	public static final Integer BANNER_LEADERBOARD = new Integer(2);
 	public static final Integer BANNER_BIGBOX = new Integer(3);
@@ -683,7 +684,7 @@ public class BannerServer {
 		
 		//System.out.println(cmd);
 		
-		return new Integer(receive(cmd, params)).toString();
+		return receive(cmd, params);
 	}
 	
 
@@ -751,7 +752,7 @@ public class BannerServer {
 		bannerstats.get(b).dailyviews = 0;
 	}
 	
-	public int receive(int cmd, String[] params){
+	public String receive(int cmd, String[] params){
 		int id;
 		
 		switch(cmd){
@@ -819,8 +820,10 @@ public class BannerServer {
 			//socket_write(sock, "ret\n");
 			
 			//unset(ret, size, userid, age, sex, loc, interests, page, passback);
-			
-			return ret;
+			Integer retInt = Integer.valueOf(ret);
+			String retString = retInt.toString();
+			retInt.free();
+			return retString;
 		}
 		case BLANK:
 		{
@@ -913,18 +916,6 @@ public class BannerServer {
 			//Nothing needs to be done to cleanup a given connection right now, the client simply needs to drop connection.
 			break;
 			
-		case CONDUMP:
-			//socket_write(sock, print_r(clients, true) + "\n");
-			break;
-			
-		case BUFFDUMP:
-			//socket_write(sock, print_r(clientdata, true) + "\n");
-			break;
-			
-		case BANNERDUMP:
-			//socket_write(sock, print_r(bannerserver, true) + "\n");
-			break;
-			
 		case STATS:
 			int total[] = new int[109000];
 			int k=0;
@@ -984,12 +975,12 @@ public class BannerServer {
 			//socket_write(sock, "shutting down\n");
 			bannerDebug("shutting down");
 			final int TIMEUPDATES = 12;
+			daily(true);
 			//daily(debug[TIMEUPDATES]);
 			System.exit(0);
 			
 		case VERSION:
-			//socket_write(sock, "version\n");
-			break;
+			return CURRENT_VERSION;
 			
 		case RECONNECT:
 			/*if(logsock)
@@ -1028,7 +1019,7 @@ public class BannerServer {
 			//myerror("unknown command: 'msg'", __LINE__);
 			break;
 		}
-		return -1;
+		return null;
 	}
 	/**
 	 * @param args
