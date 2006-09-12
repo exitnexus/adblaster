@@ -52,6 +52,9 @@ public class BannerServer {
 	static final int PASSBACK = 20;
 	static final int GETFAIL = 21;
 	static final int GETLOG = 22;
+	static final int MINUTELY = 23;
+	static final int HOURLY = 24;
+	static final int DAILY = 25;
 	public static final int BANNER_SLIDE_SIZE = 8;
 	public static final double BANNER_MIN_CLICKRATE = 0.0002;
 	public static final double BANNER_MAX_CLICKRATE = 0.005;
@@ -649,6 +652,12 @@ public class BannerServer {
 			cmd = GETFAIL;
 		} else if (command.toUpperCase().equals("GETLOG")) {
 			cmd = GETLOG;
+		} else if (command.toUpperCase().equals("MINUTELY")) {
+			cmd = MINUTELY;
+		} else if (command.toUpperCase().equals("HOURLY")) {
+			cmd = HOURLY;
+		} else if (command.toUpperCase().equals("DAILY")) {
+			cmd = DAILY;
 		} else {
 			cmd = BLANK;
 			System.out.println(command + " not found.");
@@ -1006,7 +1015,15 @@ public class BannerServer {
 		case LOGSTAT:
 			//socket_write(sock, (logsock ? "connected" : "not") + ": logserver, logserver_port\n");
 			break;
-			
+		case MINUTELY:
+			minutely(true);
+			break;
+		case HOURLY:
+			hourly(true);
+			break;
+		case DAILY:
+			daily(true);
+			break;
 		default:
 			//myerror("unknown command: 'msg'", __LINE__);
 			break;
