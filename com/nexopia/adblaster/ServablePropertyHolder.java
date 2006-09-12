@@ -187,6 +187,7 @@ public class ServablePropertyHolder {
 		if(this.startdate >= usertime || (this.enddate != 0 && this.enddate <= usertime))
 			return false;
 	
+		if (debug) debugLog += " 0";
 		//targetting
 		//age
 		if (!this.validAge(age)) {
@@ -245,5 +246,12 @@ public class ServablePropertyHolder {
 			return Integer.MAX_VALUE;
 		else
 			return this.viewsPerUser;
+	}
+	
+	public int getIntegerMaxViews(){
+		if (this.maxviews == 0)
+			return Integer.MAX_VALUE;
+		else
+			return this.maxviews;
 	}
 }

@@ -59,7 +59,7 @@ public class BannerServer {
 	public static final int BANNER_SLIDE_SIZE = 8;
 	public static final double BANNER_MIN_CLICKRATE = 0.0002;
 	public static final double BANNER_MAX_CLICKRATE = 0.005;
-	public static final boolean debug = true;	
+	public static final boolean debug = true;
 	static boolean debugFields[] = new boolean[1000];//should be map?
 	static int stats[] = new int[1000];//should be map?
 	
@@ -408,8 +408,10 @@ public class BannerServer {
 			boolean b2 = isValidForUser(userid, usertime, b.campaign);
 			boolean b3 = !hasReachedViewsPerDay(b);
 			boolean b4 = !hasReachedClicksPerDay(b);
+			boolean b5 = !hasReachedMaxViews(b);
+			
 			if (debug) System.out.println("" + b.id + ":" + b1 + ":"+b2+":"+b3+":"+b4);
-			if ( b1 && b2 && b3){
+			if ( b1 && b2 && b3 && b4 && b5){
 				validBanners.add(b);
 				//System.out.println(b);
 				
@@ -422,11 +424,20 @@ public class BannerServer {
 			System.out.println("PICKED:" + chosen.id);
 			return chosen.id;
 		}
-		System.out.println("IMPORTANT:" + validBanners.size());
+		System.out.println("Number of valid banners:" + validBanners.size());
 			
 		return 0;
 	}
 	
+	private boolean hasReachedMaxViews(Banner b) {
+		if ((b.getViews() + this.bannerstats.getOrCreate(b, BannerStat.class).dailyviews) > b.getIntegerMaxViews())
+			return true;
+		if ((b.getCampaign().getViews() + this.campaignstats.getOrCreate(b.campaign, BannerStat.class).dailyviews) > b.getIntegerMaxViews())
+			return true;
+		return false;
+			
+	}
+
 	private Banner weightedChoice(Vector<Banner> validBanners, int uid, int time) {
 		double total = 0;
 		double[] priorities = new double[validBanners.size()];
@@ -441,7 +452,7 @@ public class BannerServer {
 		double currentWeight = 0;
 		for (int i=0;i<priorities.length;i++) {
 			currentWeight += priorities[i];
-			if (currentWeight > pick) {
+			if (currentWeight >= pick) {
 				return validBanners.get(i);
 			}
 		}
@@ -705,7 +716,7 @@ public class BannerServer {
 		}
 		
 		if(bannerstat.hasChanged()) {
-			JDBCConfig.queueQuery("UPDATE banners SET lastupdatetime = "+time+", views = views + "+bannerstat.current_views+", clicks = clicks + "+bannerstat.current_clicks+", passbacks = passbacks + "+bannerstat.passbacks+" WHERE id = " + b.id);
+			JDBCConfig.queueQuery("UPDATE " + JDBCConfig.BANNER_TABLE + " SET lastupdatetime = "+time+", views = views + "+bannerstat.current_views+", clicks = clicks + "+bannerstat.current_clicks+", passbacks = passbacks + "+bannerstat.passbacks+" WHERE id = " + b.id);
 			bannerstat.current_views = 0;
 			bannerstat.current_clicks = 0;
 			bannerstat.passbacks = 0;
@@ -725,7 +736,7 @@ public class BannerServer {
 		if (debug) {
 			Utilities.bannerDebug("hour " + b.id);
 		}
-		JDBCConfig.queueQuery("REPLACE INTO bannerstats (bannerid, time, views, potentialviews, clicks, passbacks) SELECT id, lastupdatetime, views, potentialviews, clicks, passbacks FROM banners WHERE id = " + b.id);
+		JDBCConfig.queueQuery("REPLACE INTO " + JDBCConfig.BANNERSTAT_TABLE + " (bannerid, time, views, potentialviews, clicks, passbacks) SELECT id, lastupdatetime, views, potentialviews, clicks, passbacks FROM banners WHERE id = " + b.id);
 		if (b.getPayType() == Banner.PAYTYPE_CPC) {
 			HourlyStat hourlystat = hourlystats.get(b);
 			b.setCoefficient(hourlystat.getClickRate()*b.getPayRate());
@@ -743,7 +754,7 @@ public class BannerServer {
 		for (Integer size: sizes_array) {
 			TypeStat views = viewstats.get(size);
 			TypeStat clicks = clickstats.get(size);
-			JDBCConfig.queueQuery("INSERT INTO bannertypestats SET size = "+size+", time = "+time+", views = "+views.total+", clicks = "+clicks.total+", viewsdump = '"+views.toXML()+"', clicksdump = '"+clicks.toXML()+"'");
+			JDBCConfig.queueQuery("INSERT INTO " + JDBCConfig.BANNERTYPESTAT_TABLE + " SET size = "+size+", time = "+time+", views = "+views.total+", clicks = "+clicks.total+", viewsdump = '"+views.toXML()+"', clicksdump = '"+clicks.toXML()+"'");
 		}
 	}
 	

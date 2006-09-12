@@ -30,6 +30,9 @@ class Banner extends ServablePropertyHolder{
 	private double coefficient;
 	private byte size;
 	static int count = 0;
+	private int views;
+	private int clicks;
+	
 	public static int counter(){
 		return count++;
 	}
@@ -90,6 +93,15 @@ class Banner extends ServablePropertyHolder{
 		this.pages = pv;
 		this.campaign = null;
 		this.update(rs, cdb);
+		java.sql.Statement s = JDBCConfig.createStatement();
+		s.execute("SELECT views FROM " + JDBCConfig.BANNERSTAT_TABLE + " WHERE id = " + this.id);
+		ResultSet rs2 = s.getResultSet();
+		views = rs2.getInt("views");
+
+		s.execute("SELECT clicks FROM " + JDBCConfig.BANNERSTAT_TABLE + " WHERE id = " + this.id);
+		ResultSet rs3 = s.getResultSet();
+		clicks = rs3.getInt("clicks");
+		
 	}
 	
 	int getID() {
@@ -313,5 +325,21 @@ class Banner extends ServablePropertyHolder{
 	public void setCoefficient(double coefficient) {
 		this.coefficient = coefficient;
 		
+	}
+
+	public int getClicks() {
+		return clicks;
+	}
+
+	public void setClicks(int clicks) {
+		this.clicks = clicks;
+	}
+
+	public int getViews() {
+		return views;
+	}
+
+	public void setViews(int views) {
+		this.views = views;
 	}
 }

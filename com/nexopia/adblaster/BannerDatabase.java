@@ -57,7 +57,6 @@ import com.nexopia.adblaster.Utilities.PageValidator;
  */
 
 public class BannerDatabase {
-	private static final String DATABASE_STR = "testbanners";
 	
 	private HashMap<Integer, Banner> banners;
 	Vector<Integer> keyset = new Vector<Integer>();
@@ -67,7 +66,7 @@ public class BannerDatabase {
 		this.cdb = cdb;
 		banners = new HashMap<Integer, Banner>();
 		try {
-			String sql = "SELECT * FROM " + DATABASE_STR;
+			String sql = "SELECT * FROM " + JDBCConfig.BANNER_TABLE;
 			Statement stmt = JDBCConfig.createStatement();
 			ResultSet rs = stmt.executeQuery(sql);
 			/*for (int i = 0; i < rs.getMetaData().getColumnCount(); i++){

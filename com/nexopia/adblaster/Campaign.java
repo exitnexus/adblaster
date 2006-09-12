@@ -21,7 +21,6 @@ import com.nexopia.adblaster.Utilities.PageValidator;
 
 
 class Campaign extends ServablePropertyHolder{
-	static String DATABASE_STR = "testbannercampaigns";
 	
 	static class CampaignDB{
 		private HashMap<Integer, Campaign> campaigns;
@@ -31,7 +30,7 @@ class Campaign extends ServablePropertyHolder{
 			campaigns = new HashMap<Integer, Campaign>();
 			//Database connection stuff here.
 			try {
-				String sql = "SELECT * FROM " + DATABASE_STR;
+				String sql = "SELECT * FROM " + JDBCConfig.CAMPAIGN_TABLE;
 				Statement stmt = JDBCConfig.createStatement();
 				ResultSet rs = stmt.executeQuery(sql);
 				int i = 0;
@@ -47,7 +46,7 @@ class Campaign extends ServablePropertyHolder{
 		}	
 		public ServablePropertyHolder add(int campaignID) {
 			try {
-				String sql = "SELECT * FROM " + DATABASE_STR + " WHERE id = " + campaignID;
+				String sql = "SELECT * FROM " + JDBCConfig.CAMPAIGN_TABLE + " WHERE id = " + campaignID;
 				Statement stmt = JDBCConfig.createStatement();
 				ResultSet rs = stmt.executeQuery(sql);
 				if (rs.next()) {
@@ -69,7 +68,7 @@ class Campaign extends ServablePropertyHolder{
 			id = null;
 			if (c != null) {
 				try {
-					String sql = "SELECT * FROM " + DATABASE_STR + " WHERE id = " + campaignID;
+					String sql = "SELECT * FROM " + JDBCConfig.CAMPAIGN_TABLE + " WHERE id = " + campaignID;
 					Statement stmt = JDBCConfig.createStatement();
 					ResultSet rs = stmt.executeQuery(sql);
 					if (rs.next()) {
@@ -121,14 +120,45 @@ class Campaign extends ServablePropertyHolder{
 	int payrate;
 	byte paytype;
 	Set<Banner> banners;
+	private int views;
+	private int clicks;
 	static int count = 0;
 	public static int counter(){
 		return count++;
 	}
 	
+	public static int []loadViewsAndClicks(int campaignID){
+		int totalViews = 0;
+		int totalClicks = 0;
+		try {
+			Statement s = JDBCConfig.createStatement();
+			ResultSet rs = s.executeQuery("SELECT id FROM " + JDBCConfig.BANNER_TABLE + " WHERE campaignid = " + campaignID);
+			int i = 0;
+			while (rs.next()) {
+				int id = rs.getInt("ID");
+				Statement s2 = JDBCConfig.createStatement();
+				ResultSet rs2 = s2.executeQuery("SELECT views, clicks FROM " + JDBCConfig.BANNERSTAT_TABLE + " WHERE id = " + id);
+				while (rs2.next()) {
+					totalViews += rs2.getInt("VIEWS");
+					totalClicks += rs2.getInt("CLICKS");
+				}
+				
+				i++;
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		int ret[] = {totalViews,totalClicks};
+		return ret;
+	}
+	
 	Campaign(ResultSet rs) throws SQLException {
 		banners = new HashSet<Banner>();
 		this.update(rs);
+		int viewsAndClicks[] = loadViewsAndClicks(this.id);
+		this.views = viewsAndClicks[0];
+		this.clicks = viewsAndClicks[0];
 	}
 	
 	public void update(ResultSet rs) throws SQLException{
@@ -309,6 +339,22 @@ class Campaign extends ServablePropertyHolder{
 	
 	public void removeBanner(Banner banner) {
 		this.banners.remove(banner);
+	}
+
+	public int getClicks() {
+		return clicks;
+	}
+
+	public void setClicks(int clicks) {
+		this.clicks = clicks;
+	}
+
+	public int getViews() {
+		return views;
+	}
+
+	public void setViews(int views) {
+		this.views = views;
 	}
 	
 
