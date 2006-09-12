@@ -457,11 +457,11 @@ public class BannerServer {
 		double viewsperuser = Math.min(b.getViewsPerUser(), b.campaign.getViewsPerUser());
 		if (viewsperuser == 0) viewsperuser = Math.max(b.getViewsPerUser(), b.campaign.getViewsPerUser());
 		
-		double viewsperday = Math.min(b.getViewsPerDay(), b.campaign.getViewsPerDay());
-		if (viewsperday == 0) viewsperday = Math.max(b.getViewsPerDay(), b.campaign.getViewsPerDay());
+		double viewsperday = Math.min(b.getViewsPerDay(), b.campaign.getViewsPerDay())/numservers;
+		if (viewsperday == 0) viewsperday = Math.max(b.getViewsPerDay(), b.campaign.getViewsPerDay())/numservers;
 		
-		double clicksperday = Math.min(b.getClicksperday(), b.campaign.getClicksperday());
-		if (clicksperday == 0) clicksperday = Math.max(b.getClicksperday(), b.campaign.getClicksperday());
+		double clicksperday = Math.min(b.getClicksperday(), b.campaign.getClicksperday())/numservers;
+		if (clicksperday == 0) clicksperday = Math.max(b.getClicksperday(), b.campaign.getClicksperday())/numservers;
 		
 		
 		if (viewsperuser != 0) {
@@ -486,12 +486,12 @@ public class BannerServer {
 
 	private boolean hasReachedViewsPerDay(Banner b) {
 
-		if (this.bannerstats.getOrCreate(b, BannerStat.class).dailyviews >= b.getIntegerMaxViewsPerDay())
+		if (this.bannerstats.getOrCreate(b, BannerStat.class).dailyviews >= b.getIntegerMaxViewsPerDay()/numservers)
 			return true;
-		if (this.campaignstats.getOrCreate(b.campaign, BannerStat.class).dailyviews >= b.campaign.getIntegerMaxViewsPerDay())
+		if (this.campaignstats.getOrCreate(b.campaign, BannerStat.class).dailyviews >= b.campaign.getIntegerMaxViewsPerDay()/numservers)
 			return true;
-		if (debug) System.out.println("Banner Views: " + this.bannerstats.getOrCreate(b, BannerStat.class).dailyviews + ":" + b.getIntegerMaxViewsPerDay());
-		if (debug) System.out.println("Campaign Views: " + this.campaignstats.getOrCreate(b.campaign, BannerStat.class).dailyviews + ":" + b.campaign.getIntegerMaxViewsPerDay());
+		if (debug) System.out.println("Banner Views: " + this.bannerstats.getOrCreate(b, BannerStat.class).dailyviews + ":" + b.getIntegerMaxViewsPerDay()/numservers);
+		if (debug) System.out.println("Campaign Views: " + this.campaignstats.getOrCreate(b.campaign, BannerStat.class).dailyviews + ":" + b.campaign.getIntegerMaxViewsPerDay()/numservers);
 		return false;
 	}
 	
@@ -499,12 +499,12 @@ public class BannerServer {
 		if (this.bannerstats.get(b) == null){
 			this.bannerstats.put(b, new BannerStat());
 		}
-		if (this.bannerstats.get(b).dailyclicks > b.getIntegerMaxClicksperday())
+		if (this.bannerstats.get(b).dailyclicks > b.getIntegerMaxClicksperday()/numservers)
 			return true;
 		if (this.campaignstats.get(b.campaign) == null){
 			this.campaignstats.put(b.campaign, new BannerStat());
 		}
-		if (this.campaignstats.get(b.campaign).dailyclicks > b.campaign.getIntegerMaxClicksperday())
+		if (this.campaignstats.get(b.campaign).dailyclicks > b.campaign.getIntegerMaxClicksperday()/numservers)
 			return true;
 		return false;
 	}
