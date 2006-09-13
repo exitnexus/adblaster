@@ -59,8 +59,10 @@ public class BannerServer {
 	public static final double BANNER_MIN_CLICKRATE = 0.0002;
 	public static final double BANNER_MAX_CLICKRATE = 0.005;
 	public static final int STATS_WINDOW = 60;
+	private static final int NO_BANNER = 0;
+	private static final int VIEW_WINDOWS = 5;
 	
-	static boolean debugFields[] = new boolean[1000];//should be map?
+	//static boolean debugFields[] = new boolean[1000];//should be map?
 	
 	static HashMap<String, Boolean> debug;
 	{
@@ -84,7 +86,7 @@ public class BannerServer {
 	}
 	
 	static StringBuffer logsock = new StringBuffer();
-	static String currentwindow = "";
+	static int currentwindow = 0;
 	
 	public BannerDatabase db;
 	public CampaignDB cdb;
@@ -588,7 +590,7 @@ public class BannerServer {
 		return "" + s;
 	}
 	
-	static FastVec <FastMap<String, FastVec>>recentviews;
+	static Vector<HashMap<Integer, Vector<Integer>>> recentviews = new Vector<HashMap<Integer, Vector<Integer>>>();
 	
 	static class FastMap <K, V> {
 		HashMap <K,V>map;
@@ -610,10 +612,8 @@ public class BannerServer {
 				} catch (SecurityException e) {
 					e.printStackTrace();
 				} catch (InstantiationException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				this.put(k,elem);
@@ -728,6 +728,10 @@ public class BannerServer {
 		return receive(cmd, params);
 	}
 	
+	public void secondly() {
+		currentwindow = (currentwindow+1)%VIEW_WINDOWS;
+		recentviews.set(currentwindow, new HashMap<Integer, Vector<Integer>>());
+	}
 
 	@SuppressWarnings("unchecked")
 	public void minutely(boolean debug) {
@@ -822,32 +826,36 @@ public class BannerServer {
 			
 			int ret = getBanner(usertime, size, userid, age, sex, loc, interests, page, true);
 			
-			/*if (debug[PASSBACK]) {
-			 if (passback != "") {
-			 boolean hasSeen = false;
-			 String viewsstring = "";
-			 for (Object vi : recentviews ) { //reference
-			 FastMap<String, FastVec>viewswindow = (FastMap<String, FastVec>)vi;
-			 if (viewswindow.get(userid) != null && !viewswindow.get(userid).isEmpty()) {
-			 for (Object view : viewswindow.get(userid) ) {
-			 viewsstring += "view ";
-			 if (passback == view) {
-			 hasSeen = true;
-			 }
-			 }
-			 }
-			 }
-			 if (!hasSeen) {
-			 //bannerDebug("Invalid Passback: passback, Recently Viewed: viewsstring");
-			  }
-			  }
-			  //currentwindow
-			   recentviews.add(new FastMap<String, FastVec>(userid, new FastVec(ret)));
-			   }*/
-			if(debugFields[GET] || (debugFields[GETFAIL] && (ret == -1)))
-				bannerDebug("get params => ret");
+			if (debug.get("passback").booleanValue()) {
+				if (passback != 0) {
+					boolean hasSeen = false;
+					String viewsstring = "";
+					Integer uid = Integer.valueOf(userid);
+					for (HashMap<Integer, Vector<Integer>> uidtoviews : recentviews) {
+						if (uidtoviews.get(uid) != null && !uidtoviews.get(uid).isEmpty()) {
+							for (Integer view : uidtoviews.get(userid)) {
+								viewsstring += " " + view;
+								if (passback == view.intValue()) {
+									hasSeen = true;
+								}
+							}
+						}
+					}
+					if (!hasSeen) {
+						bannerDebug("Invalid Passback: " + passback + ", Recently Vied: " + viewsstring);
+					}
+					Vector<Integer> currentUserWindow = recentviews.get(currentwindow).get(uid);
+					if (currentUserWindow == null) {
+						currentUserWindow = new Vector<Integer>();
+					}
+					currentUserWindow.add(Integer.valueOf(passback));
+				}
+			}
 			
-			if(debugFields[GETLOG] && (logsock != null)){
+			if(debug.get("get").booleanValue() || (debug.get("getfail").booleanValue() && (ret == NO_BANNER)))
+				bannerDebug("get params => ret");
+
+			if(debug.get("getlog").booleanValue() && (logsock != null)){
 				if(logsock.append("get params => ret\n") == null){
 					bannerDebug("log server connection error: errstr (errno)<br />");
 					//CLOSE Logsock// logsock.close();
@@ -898,7 +906,6 @@ public class BannerServer {
 					db.add(bannerid, new Utilities.PageValidator1());
 				}
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			bannerDebug("addcampaign params");
@@ -915,7 +922,6 @@ public class BannerServer {
 					db.add(bannerid, new Utilities.PageValidator1());
 				}
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			bannerDebug("updatecampaign params");
