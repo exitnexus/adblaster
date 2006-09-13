@@ -431,16 +431,16 @@ public class BannerServer {
 		Vector<Banner> validBanners = new Vector<Banner>();
 		
 		for (int i = 0; i < banners.size(); i++){
-			Banner b = banners.get(i);
-			boolean b1 = isValidForUser(userid, usertime, b);
-			boolean b2 = isValidForUser(userid, usertime, b.campaign);
-			boolean b3 = !hasReachedViewsPerDay(b);
-			boolean b4 = !hasReachedClicksPerDay(b);
-			boolean b5 = !hasReachedMaxViews(b);
+			Banner banner_i = banners.get(i);
+			boolean b1 = isValidForUser(userid, usertime, banner_i);
+			boolean b2 = isValidForUser(userid, usertime, banner_i.campaign);
+			boolean b3 = !hasReachedViewsPerDay(banner_i);
+			boolean b4 = !hasReachedClicksPerDay(banner_i);
+			boolean b5 = !hasReachedMaxViews(banner_i);
 			
-			if (debug) System.out.println("" + b.id + ":" + b1 + ":"+b2+":"+b3+":"+b4);
+			if (debug) System.out.println("" + banner_i.id + ":" + b1 + ":"+b2+":"+b3+":"+b4);
 			if ( b1 && b2 && b3 && b4 && b5){
-				validBanners.add(b);
+				validBanners.add(banner_i);
 				//System.out.println(b);
 				
 			}
