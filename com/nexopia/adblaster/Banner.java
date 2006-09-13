@@ -96,11 +96,13 @@ class Banner extends ServablePropertyHolder{
 		java.sql.Statement s = JDBCConfig.createStatement();
 		s.execute("SELECT views FROM " + JDBCConfig.BANNERSTAT_TABLE + " WHERE id = " + this.id);
 		ResultSet rs2 = s.getResultSet();
-		views = rs2.getInt("views");
+		if (rs2.first())
+			views = rs2.getInt("VIEWS");
 
 		s.execute("SELECT clicks FROM " + JDBCConfig.BANNERSTAT_TABLE + " WHERE id = " + this.id);
 		ResultSet rs3 = s.getResultSet();
-		clicks = rs3.getInt("clicks");
+		if (rs3.first())
+			clicks = rs3.getInt("clicks");
 		
 	}
 	

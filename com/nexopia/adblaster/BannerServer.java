@@ -430,10 +430,11 @@ public class BannerServer {
 	}
 	
 	private boolean hasReachedMaxViews(Banner b) {
-		if ((b.getViews() + this.bannerstats.getOrCreate(b, BannerStat.class).dailyviews) > b.getIntegerMaxViews())
+		if ((b.getViews() + this.bannerstats.getOrCreate(b, BannerStat.class).dailyviews) >= b.getIntegerMaxViews())
 			return true;
-		if ((b.getCampaign().getViews() + this.campaignstats.getOrCreate(b.campaign, BannerStat.class).dailyviews) > b.getIntegerMaxViews())
+		if ((b.getCampaign().getViews() + this.campaignstats.getOrCreate(b.campaign, BannerStat.class).dailyviews) >= b.campaign.getIntegerMaxViews())
 			return true;
+		if (debug) System.out.println("" + b.getCampaign().getViews() + " + " + this.campaignstats.getOrCreate(b.campaign, BannerStat.class).dailyviews + " < " + b.campaign.getIntegerMaxViews()); 
 		return false;
 			
 	}

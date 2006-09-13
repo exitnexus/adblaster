@@ -82,6 +82,7 @@ public class BannerDatabase {
 						banners.put(new Integer(id), new Banner(rs, cdb, pvfactory.make()));
 					} catch (SQLException e){
 						System.out.println("This probably indicates a bad campaign. Continue if you know what you're doing.");
+						e.printStackTrace();
 					}
 					i++;
 				}

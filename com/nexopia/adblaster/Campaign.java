@@ -139,8 +139,10 @@ class Campaign extends ServablePropertyHolder{
 				Statement s2 = JDBCConfig.createStatement();
 				ResultSet rs2 = s2.executeQuery("SELECT views, clicks FROM " + JDBCConfig.BANNERSTAT_TABLE + " WHERE id = " + id);
 				while (rs2.next()) {
-					totalViews += rs2.getInt("VIEWS");
-					totalClicks += rs2.getInt("CLICKS");
+					if (rs2.first()){
+						totalViews += rs2.getInt("VIEWS");
+						totalClicks += rs2.getInt("CLICKS");
+					}
 				}
 				
 				i++;
@@ -321,7 +323,10 @@ class Campaign extends ServablePropertyHolder{
 
 	public Set<Banner> getBanners(int usertime, int size, int userid, byte age, byte sex, short location, Interests interests, String page, boolean debug) {
 		HashSet<Banner> hs = new HashSet<Banner>();
-		if (this.banners.isEmpty() || !this.valid(usertime, size, userid, age, sex, location, interests, page, debug)) {
+		boolean b1 = this.banners.isEmpty();
+		boolean b2 = !this.valid(usertime, size, userid, age, sex, location, interests, page, debug);		
+		if (b1 || b2) {
+			System.out.println("Campaign " + this.toString() + " is: " + b1 + ":" + b2);
 			return hs;
 		} else {
 			for (Banner b : this.banners) {
