@@ -100,7 +100,7 @@ public class NIOServer {
 			//host-port 8000
 			server.socket().bind(new java.net.InetSocketAddress("localhost",8000));
 			
-			System.out.println("Server listening on port 8000");
+			BannerServer.bannerDebug("Server listening on port 8000");
 			//Create the selector
 			selector = Selector.open();
 			
@@ -178,7 +178,7 @@ public class NIOServer {
 				}
 				
 				if (key.isConnectable()) {
-					System.err.println("Client closed");
+					BannerServer.bannerDebug("Client closed");
 					BufferedSocketChannel client = socketMap.get( key.channel() );
 					client.close();
 					continue;
@@ -200,19 +200,17 @@ public class NIOServer {
 					} else if (len == -1){
 						//nothing readable
 						if (strbuf.length() > 0)
-							System.out.println("Error! " + strbuf.toString());
+							BannerServer.bannerDebug("Error! " + strbuf.toString());
 						client.close();
 						continue;
 					}
 					
 					String result = null;
 					try {
-						System.out.println(strbuf.toString());
+						BannerServer.bannerDebug(strbuf.toString());
 						result = banners.receive(strbuf.toString());
 					} catch (Exception e) {
-						System.err.println("Something bad happened.");
-						//set some error indication value in result
-						System.err.println(e);
+						BannerServer.bannerDebug("Unexpected exception when attempting to handle input '" + strbuf.toString() + "'");
 						e.printStackTrace();
 					}
 					try {
@@ -222,7 +220,7 @@ public class NIOServer {
 						index++;
 					} catch (Exception e) {
 						//set some error indication value in result
-						System.err.println("Error writing banner result value");
+						BannerServer.bannerDebug("Error writing banner result value");
 						e.printStackTrace();
 					}
 					
