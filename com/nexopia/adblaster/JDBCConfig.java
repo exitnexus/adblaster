@@ -16,7 +16,7 @@ public class JDBCConfig {
 	static {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
-			String url = "jdbc:mysql://192.168.0.150:3307/testbanner";
+			String url = "jdbc:mysql://192.168.0.50:3306/testbanner";
 			con = DriverManager.getConnection(url, "root", "Hawaii");
 			sqlQueue = new SQLQueue(1);
 		} catch (ClassNotFoundException e) {
