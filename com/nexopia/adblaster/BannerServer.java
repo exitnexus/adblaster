@@ -580,7 +580,6 @@ public class BannerServer {
 	}
 	
 	
-	public static int debugGet(){return 1;}
 	public static void bannerDebug(String str) {
 		Date now = new Date();
 		System.out.println("[ " + now + " ] " + str);

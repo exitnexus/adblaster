@@ -126,15 +126,15 @@ public class NIOServer {
 				banners.secondly();
 				if (time-lastMinute > 60000) {
 					lastMinute = time;
-					banners.minutely(false);
+					banners.minutely(BannerServer.debug.get("timeupdates").booleanValue());
 				}
 				if (time-lastHour > 60000*60) {
 					lastHour = time;
-					banners.hourly(false);
+					banners.hourly(BannerServer.debug.get("timeupdates").booleanValue());
 				}
 				if (time-lastDay > 60000*60*24) {
 					lastDay = time;
-					banners.daily(false);
+					banners.daily(BannerServer.debug.get("timeupdates").booleanValue());
 				}
 			}
 			
