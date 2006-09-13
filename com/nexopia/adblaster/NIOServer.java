@@ -135,6 +135,9 @@ public class NIOServer {
 				if (time-lastDay > 60000*60*24) {
 					lastDay = time;
 					banners.daily(BannerServer.debug.get("timeupdates").booleanValue());
+					if (BannerServer.debug.get("dailyrestart").booleanValue()) {
+						System.exit(0);
+					}
 				}
 			}
 			

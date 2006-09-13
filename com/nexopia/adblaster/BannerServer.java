@@ -878,20 +878,20 @@ public class BannerServer {
 		case ADD: // "add id"
 			id = Integer.parseInt(params[0]);
 			db.add(id, new Utilities.PageValidator1()); //addBannerD(params);
-			bannerDebug("add params");
+			bannerDebug("add " + Arrays.toString(params));
 			break;
 		case UPDATE: // "update id"
 			//updateBannerD(params);
 			id = Integer.parseInt(params[0]);
 			db.add(id, new Utilities.PageValidator1()); 
-			bannerDebug("update params");
+			bannerDebug("update " + Arrays.toString(params));
 			break;
 			
 		case DEL: // "del id"
 			//deleteBannerD(params);
 			id = Integer.parseInt(params[0]);
 			db.delete(id);
-			bannerDebug("delete params");
+			bannerDebug("delete " + Arrays.toString(params));
 			break;
 			
 		case ADDCAMPAIGN: // "addcampaign id"
@@ -907,7 +907,7 @@ public class BannerServer {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			bannerDebug("addcampaign params");
+			bannerDebug("addcampaign " + Arrays.toString(params));
 			break;
 			
 		case UPDATECAMPAIGN: // "updatecampaign id"
@@ -923,7 +923,7 @@ public class BannerServer {
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			bannerDebug("updatecampaign params");
+			bannerDebug("updatecampaign " + Arrays.toString(params));
 			break;
 			
 		case DELCAMPAIGN: // "delcampaign id"
@@ -932,7 +932,7 @@ public class BannerServer {
 				db.delete(b.id);
 			}
 			cdb.delete(id);
-			bannerDebug("deletecampaign params");
+			bannerDebug("deletecampaign "+ Arrays.toString(params));
 			break;
 			
 		case QUIT: 
@@ -1025,15 +1025,19 @@ public class BannerServer {
 			//socket_write(sock, (logsock ? "connected" : "not") + ": logserver, logserver_port\n");
 			break;
 		case MINUTELY:
-			minutely(true);
+			minutely(BannerServer.debug.get("timeupdates").booleanValue());
 			break;
 		case HOURLY:
-			hourly(true);
+			hourly(BannerServer.debug.get("timeupdates").booleanValue());
 			break;
 		case DAILY:
-			daily(true);
+			daily(BannerServer.debug.get("timeupdates").booleanValue());
 			break;
 		case CLICK:
+			if (debug.get("click").booleanValue()) {
+				bannerDebug("click " + Arrays.toString(params));
+			}
+			
 			int bannerid=Integer.parseInt(params[0]); 
 			Banner b = db.getBannerByID(bannerid);
 			
