@@ -66,6 +66,11 @@ public class BannerServer {
 	static boolean debugFields[] = new boolean[1000];//should be map?
 	static ServerStat stats = new ServerStat();
 	static ServerStat slidingstats[] = new ServerStat[STATS_WINDOW];
+	{
+		for (int i = 0; i < slidingstats.length; i++){
+			slidingstats[i] = new ServerStat();
+		}
+	}
 	
 	static StringBuffer logsock = new StringBuffer();
 	static String currentwindow = "";
@@ -781,7 +786,7 @@ public class BannerServer {
 	
 	public String receive(int cmd, String[] params){
 		int id;
-		int t_sec = (int)System.currentTimeMillis() / 1000;
+		int t_sec = (int)(System.currentTimeMillis() / 1000);
 		int statstime = (t_sec % STATS_WINDOW);
 		
 		switch(cmd){
