@@ -56,6 +56,7 @@ public class BannerServer {
 	static final int MINUTELY = 23;
 	static final int HOURLY = 24;
 	static final int DAILY = 25;
+	static final int CLICK = 26;
 	public static final int BANNER_SLIDE_SIZE = 8;
 	public static final double BANNER_MIN_CLICKRATE = 0.0002;
 	public static final double BANNER_MAX_CLICKRATE = 0.005;
@@ -67,7 +68,6 @@ public class BannerServer {
 	static ServerStat slidingstats[] = new ServerStat[STATS_WINDOW];
 	
 	static StringBuffer logsock = new StringBuffer();
-	static int statstime = 0;
 	static String currentwindow = "";
 	
 	public BannerDatabase db;
@@ -684,6 +684,8 @@ public class BannerServer {
 			cmd = HOURLY;
 		} else if (command.toUpperCase().equals("DAILY")) {
 			cmd = DAILY;
+		} else if (command.toUpperCase().equals("CLICK")) {
+			cmd = CLICK;
 		} else {
 			cmd = BLANK;
 			System.out.println(command + " not found.");
@@ -779,6 +781,8 @@ public class BannerServer {
 	
 	public String receive(int cmd, String[] params){
 		int id;
+		int t_sec = (int)System.currentTimeMillis() / 1000;
+		int statstime = (t_sec % STATS_WINDOW);
 		
 		switch(cmd){
 		case GET:
@@ -1010,40 +1014,22 @@ public class BannerServer {
 		case DAILY:
 			daily(true);
 			break;
+		case CLICK:
+			int bannerid=Integer.parseInt(params[0]); 
+			Banner b = db.getBannerByID(bannerid);
+			
+			this.bannerstats.getOrCreate(b, BannerStat.class).click();
+			this.campaignstats.getOrCreate(b.getCampaign(), BannerStat.class).click();
+			
+			stats.click++;
+			slidingstats[statstime%STATS_WINDOW].click++;
+			
+			break;
 		default:
 			//myerror("unknown command: 'msg'", __LINE__);
 			break;
 		}
 		return null;
-	}
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		Object args1[] = {};
-		BannerDatabase bdb = new BannerDatabase(new CampaignDB(), new PageValidatorFactory(Utilities.PageValidator1.class, args1));
-		bdb.loadCoefficients(new HashMap<Banner, Float>());
-		
-		BannerServer bs = new BannerServer(bdb, new CampaignDB(), 1);
-		int time = 0;
-		for (int i = 0; i < 10000; i++){
-			time += (int)(Math.random()*100);
-			int size = (int) ((Math.random()*7.0) + 1);
-			int userid = (int)(Math.random()*10);
-			
-			String params[] = 
-			{String.valueOf(time),//int usertime=Integer.parseInt(params[0]);
-					String.valueOf(size),//int size=Integer.parseInt(params[1]); 
-					String.valueOf(userid),//int userid=Integer.parseInt(params[2]); 
-					"23",//byte age=Byte.parseByte(params[3]); 
-					"1",//byte sex=Byte.parseByte(params[4]); 
-					"1",//short loc=Short.parseShort(params[5]); 
-					"0",//String interestsStr=params[6]; 
-					"index",//int page=Integer.parseInt(params[7]); 
-					"???",//passback=params[8]; 
-			"false"};//boolean debugGet=Boolean.parseBoolean(params[9]);
-			bs.receive(GET, params);
-		}
 	}
 
 	
