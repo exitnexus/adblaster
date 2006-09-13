@@ -3,6 +3,10 @@ package com.nexopia.adblaster;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
+import java.net.SocketException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -22,6 +26,8 @@ import com.thoughtworks.xstream.XStream;
 import com.nexopia.adblaster.Campaign.CampaignDB;
 
 public class BannerServer {
+	private static final int LOG_PORT = 5556;
+	private static final String LOG_HOST = "localhost";
 	public static final String CURRENT_VERSION = "0.0";
 	public static final Integer BANNER_BANNER = new Integer(1);
 	public static final Integer BANNER_LEADERBOARD = new Integer(2);
@@ -62,8 +68,6 @@ public class BannerServer {
 	private static final int NO_BANNER = 0;
 	private static final int VIEW_WINDOWS = 5;
 	
-	//static boolean debugFields[] = new boolean[1000];//should be map?
-	
 	static HashMap<String, Boolean> debug;
 	{
 		debug.put("tick", Boolean.FALSE);
@@ -79,13 +83,12 @@ public class BannerServer {
 	
 	static ServerStat stats = new ServerStat();
 	static ServerStat slidingstats[] = new ServerStat[STATS_WINDOW];
-	{
+	static {
 		for (int i = 0; i < slidingstats.length; i++){
 			slidingstats[i] = new ServerStat();
 		}
 	}
 	
-	static StringBuffer logsock = new StringBuffer();
 	static int currentwindow = 0;
 	
 	public BannerDatabase db;
@@ -111,7 +114,22 @@ public class BannerServer {
 	private FastMap<Integer, TypeStat> clickstats = new FastMap<Integer,TypeStat>();
 	private FastMap<Campaign, BannerStat> campaignstats = new FastMap<Campaign,BannerStat>();
 	private FastMap<Banner, HourlyStat> hourlystats = new FastMap<Banner,HourlyStat>();
-	
+
+	private EasyDatagramSocket logsock;
+	private int logserver_port;
+	private String logserver;
+
+	private final class EasyDatagramSocket extends DatagramSocket {
+		public EasyDatagramSocket() throws SocketException {
+			super();
+		}
+
+		public void send(String s) throws IOException{
+			byte[] b = s.getBytes();
+			this.send(new DatagramPacket(b,b.length,this.getRemoteSocketAddress()));
+		}
+	}
+
 	static class ServerStat {
 		int starttime;
 		public ServerStat() {
@@ -266,6 +284,7 @@ public class BannerServer {
 	}
 	
 	public BannerServer(BannerDatabase db, CampaignDB cdb, int numservers) {
+		
 		this.db = db;
 		this.cdb = cdb;
 		BannerServer.numservers = numservers;
@@ -279,7 +298,17 @@ public class BannerServer {
 			this.clickstats.put(size, new TypeStat());
 		}
 		
-		//this.time = (int) (System.currentTimeMillis()/1000);
+		 try {
+			logsock = new EasyDatagramSocket();
+			logserver = LOG_HOST;
+			logserver_port = LOG_PORT;
+			logsock.connect(new InetSocketAddress(logserver, logserver_port));
+			logsock.setSoTimeout(20);
+		} catch (SocketException e) {
+			e.printStackTrace();
+		}
+		 
+		 //this.time = (int) (System.currentTimeMillis()/1000);
 	}
 	
 	public boolean addCampaign(int id){
@@ -324,7 +353,7 @@ public class BannerServer {
 		int[] views = getViewsForUser(userid, b);
 
 		if (views[0] != 0){
-			System.out.println(time + ":" + views[0] + " > " + b.getLimitByPeriod());
+			if (debug.get("development").booleanValue()) System.out.println(time + ":" + views[0] + " > " + b.getLimitByPeriod());
 			if (time - views[0] > b.getLimitByPeriod())
 				/* If the oldest view is outside of limit period, we're golden */
 				return true;
@@ -349,7 +378,7 @@ public class BannerServer {
 				views[i] = views[i+1];
 			}
 			views[views.length - 1] = time;
-			System.out.println(Arrays.toString(views));
+			if (debug.get("development").booleanValue()) System.out.println(Arrays.toString(views));
 		}
 		
 		if (b.getCampaign().getViewsPerUser() != 0){
@@ -444,18 +473,16 @@ public class BannerServer {
 			if (debug) System.out.println("" + banner_i.id + ":" + b1 + ":"+b2+":"+b3+":"+b4);
 			if ( b1 && b2 && b3 && b4 && b5){
 				validBanners.add(banner_i);
-				//System.out.println(b);
-				
 			}
 		}
 		
 		Banner chosen = weightedChoice(validBanners, userid, usertime);
 		if (chosen != null) {
 			markBannerUsed(age, sex, location, interests, page, usertime, userid, chosen);
-			System.out.println("PICKED:" + chosen.id);
+			if (debug) System.out.println("PICKED:" + chosen.id);
 			return chosen.id;
 		}
-		System.out.println("Number of valid banners:" + validBanners.size());
+		if (debug) System.out.println("Number of valid banners:" + validBanners.size());
 			
 		return 0;
 	}
@@ -701,25 +728,31 @@ public class BannerServer {
 			cmd = CLICK;
 		} else {
 			cmd = BLANK;
-			System.out.println(command + " not found.");
+			System.out.println("'" + command + "'" + " not found.");
 		}
 		return cmd;
 	}
 	
-	public String receive(String command){
+	public String receive(String command) throws IOException{
 		String[] split = command.split(" ");
 		int cmd = BLANK;
-		String[] params = new String[split.length-1];
-		int i = 0;
-		boolean first = true;
-		for (String s : split) {
-			if (first) {
-				cmd = parseCommand(s);
-				first = false;
-			} else {
-				params[i] = s;
-				i++;
+		String[] params;
+		if (split.length > 0){
+			params = new String[split.length-1];
+			int i = 0;
+			boolean first = true;
+			for (String s : split) {
+				if (first) {
+					cmd = parseCommand(s);
+					first = false;
+				} else {
+					params[i] = s;
+					i++;
+				}
 			}
+		} else {
+			params = new String[0];
+			cmd = parseCommand(command);
 		}
 		
 		//System.out.println(cmd);
@@ -796,7 +829,7 @@ public class BannerServer {
 		bannerstats.get(b).dailyviews = 0;
 	}
 	
-	public String receive(int cmd, String[] params){
+	public String receive(int cmd, String[] params) throws IOException{
 		int id;
 		int t_sec = (int)(System.currentTimeMillis() / 1000);
 		int statstime = (t_sec % STATS_WINDOW);
@@ -852,13 +885,14 @@ public class BannerServer {
 			}
 			
 			if(debug.get("get").booleanValue() || (debug.get("getfail").booleanValue() && (ret == NO_BANNER)))
-				bannerDebug("get params => ret");
-
+				bannerDebug("get " + format(params) + " => " + ret);
+			
 			if(debug.get("getlog").booleanValue() && (logsock != null)){
-				if(logsock.append("get params => ret\n") == null){
-					bannerDebug("log server connection error: errstr (errno)<br />");
-					//CLOSE Logsock// logsock.close();
-					logsock = null;
+				try {
+					logsock.send("get " + format(params) + " => " + ret + "\n");
+				} catch (IOException e) {
+					logsock.disconnect();
+					throw(e);
 				}
 			}
 			
@@ -866,10 +900,7 @@ public class BannerServer {
 				stats.getfail++;
 				slidingstats[statstime].getfail++;
 			}
-			//System.out.println(ret);
-			//socket_write(sock, "ret\n");
 			
-			//unset(ret, size, userid, age, sex, loc, interests, page, passback);
 			Integer retInt = Integer.valueOf(ret);
 			String retString = retInt.toString();
 			retInt.free();
@@ -1001,29 +1032,16 @@ public class BannerServer {
 			return CURRENT_VERSION;
 			
 		case RECONNECT:
-			/*if(logsock)
-			 fclose(logsock);
-			 
-			 if(params)
-			 list(logserver, logserver_port) = explode(':', params);
-			 
-			 if(logserver && logserver_port){
-			 if(logsock = fsockopen(logserver, logserver_port, errno, errstr, 0.05)){
-			 stream_set_timeout(logsock, 0.02);
-			 //					stream_set_blocking(logsock, 0); //non blocking
-			  socket_write(sock, "success: logserver, logserver_port\n");
-			  }else{
-			  socket_write(sock, "failed: logserver, logserver_port\n");
-			  logsock = null;
-			  }
-			  }else{
-			  socket_write(sock, "no logserver defined\n");
-			  }
-			  
-			  break;*/
+			if(params != null){
+				logserver = params[0];
+				logserver_port = Integer.parseInt(params[1]);
+			}
+			
+			logsock.connect(new InetSocketAddress(logserver, logserver_port));
+			logsock.setSoTimeout(20);
+			return "success: " + logserver + "," + logserver_port + "\n";
 		case LOGSTAT:
-			//socket_write(sock, (logsock ? "connected" : "not") + ": logserver, logserver_port\n");
-			break;
+			return (logsock.isConnected() ? "connected" : "not") + ": " + logserver + "," + logserver_port + "\n";
 		case MINUTELY:
 			minutely(BannerServer.debug.get("timeupdates").booleanValue());
 			break;
@@ -1055,6 +1073,17 @@ public class BannerServer {
 		return null;
 	}
 
+	private String format(String[] params) {
+		StringBuffer str = new StringBuffer("");
+		for (int i = 0; i < params.length; i++){
+			str.append(params[i]);
+			if (i < params.length-1){
+				str.append(" ");
+			}
+		}
+		return str.toString();
+	}
+
 	private void passbackBanner(int passback, int userid) {
 		Banner b = db.getBannerByID(passback);
 		bannerstats.get(b).passbacks++;
@@ -1064,6 +1093,4 @@ public class BannerServer {
 		}
 	}
 
-	
-	
 }
