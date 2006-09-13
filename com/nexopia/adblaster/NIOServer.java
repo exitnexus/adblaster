@@ -117,6 +117,9 @@ public class NIOServer {
 		long lastHour = System.currentTimeMillis()+20000; //hourly is shifted by 20 seconds
 		long lastDay = System.currentTimeMillis()+40000; //daily is shifted by 40 seconds
 		for(int index=0; index > -1; ) {
+			if (BannerServer.debug.get("tick").booleanValue()) {
+				BannerServer.bannerDebug("Tick");
+			}
 			if (System.currentTimeMillis()-time > 1000) {
 				time = System.currentTimeMillis();
 				if (time-lastMinute > 60000) {
@@ -154,6 +157,9 @@ public class NIOServer {
 					try {
 						SocketChannel original = server.accept();
 						client = new BufferedSocketChannel(original);
+						if (BannerServer.debug.get("tick").booleanValue()) {
+							BannerServer.bannerDebug("[connection]: " + original.socket().getInetAddress());
+						}
 						socketMap.put(original, client);
 						// Non Blocking I/O
 						client.configureBlocking(false);

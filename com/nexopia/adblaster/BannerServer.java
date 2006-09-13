@@ -10,6 +10,7 @@ import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
@@ -578,7 +579,11 @@ public class BannerServer {
 	
 	
 	public static int debugGet(){return 1;}
-	public static void bannerDebug(String str){}
+	public static void bannerDebug(String str) {
+		Date now = new Date();
+		System.out.println("[ " + now + " ] " + str);
+	}
+	
 	public static String str_pad(int s, int i){
 		return "" + s;
 	}
