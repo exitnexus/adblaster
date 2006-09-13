@@ -60,11 +60,13 @@ public class BannerServer {
 	public static final double BANNER_MIN_CLICKRATE = 0.0002;
 	public static final double BANNER_MAX_CLICKRATE = 0.005;
 	public static final boolean debug = true;
+	public static final int STATS_WINDOW = 60;
+	
 	static boolean debugFields[] = new boolean[1000];//should be map?
-	static int stats[] = new int[1000];//should be map?
+	static ServerStat stats = new ServerStat();
+	static ServerStat slidingstats[] = new ServerStat[STATS_WINDOW];
 	
 	static StringBuffer logsock = new StringBuffer();
-	static int slidingstats[][] = new int[1000][1000];
 	static int statstime = 0;
 	static String currentwindow = "";
 	
@@ -91,6 +93,17 @@ public class BannerServer {
 	private FastMap<Integer, TypeStat> clickstats = new FastMap<Integer,TypeStat>();
 	private FastMap<Campaign, BannerStat> campaignstats = new FastMap<Campaign,BannerStat>();
 	private FastMap<Banner, HourlyStat> hourlystats = new FastMap<Banner,HourlyStat>();
+	
+	static class ServerStat {
+		int starttime;
+		public ServerStat() {
+			starttime = (int)(System.currentTimeMillis()/1000);
+		}
+		int connect = 0; 
+		int get = 0;
+		int getfail = 0; 
+		int click = 0;
+	}
 	
 	static class BannerStat{
 		int dailyviews;
@@ -770,8 +783,8 @@ public class BannerServer {
 		switch(cmd){
 		case GET:
 		{
-			stats[GET]++;
-			slidingstats[statstime][GET]++;
+			stats.get++;
+			slidingstats[statstime].get++;
 			
 			int usertime=Integer.parseInt(params[0]);
 			int size=Integer.parseInt(params[1]); 
@@ -824,9 +837,9 @@ public class BannerServer {
 				}
 			}
 			
-			if(ret == -1){
-				stats[GETFAIL]++;
-				slidingstats[statstime][GETFAIL]++;
+			if(ret == 0){
+				stats.getfail++;
+				slidingstats[statstime].getfail++;
 			}
 			//System.out.println(ret);
 			//socket_write(sock, "ret\n");
@@ -836,31 +849,6 @@ public class BannerServer {
 			String retString = retInt.toString();
 			retInt.free();
 			return retString;
-		}
-		case BLANK:
-		{
-			if(debugFields[0])
-				bannerDebug(" params");
-			
-			stats[0]++;
-			slidingstats[statstime][0]++;
-			
-			//(id, age, sex, loc, interests, page, time) = explode(' ', params);
-			String sid="", 
-			age="", 
-			sex="", 
-			loc="", 
-			interestsStr="", 
-			page="", 
-			time="";
-			Interests interests = new Interests(interestsStr, false);
-			
-			
-			//new Banner(id, age, sex, loc, interests, page, time);
-			
-			//unset(id, age, sex, loc, interests, page);
-			
-			break;
 		}
 		case ADD: // "add id"
 			id = Integer.parseInt(params[0]);
@@ -929,35 +917,30 @@ public class BannerServer {
 			break;
 			
 		case STATS:
-			int total[] = new int[109000];
-			int k=0;
-			for(int i=0; i<slidingstats.length; i++){
-				int[] stat = slidingstats[i];
-				for(int j=0; j<stat.length; j++){
-					int v = stat[j]; 
-					if(total[k] != 0)
-						total[k] = v;
+			/*
+			$total = array();
+			foreach($slidingstats as $i => $stat)
+				foreach($stat as $k => $v)
+					if(!isset($total[$k]))
+						$total[$k] = $v;
 					else
-						total[k] += v;
-				}
-				k++;
+						$total[$k] += $v;
+			*/
+			ServerStat totalstat = new ServerStat();
+			for (ServerStat slidingstat: slidingstats) {
+				totalstat.get += slidingstat.get;
+				totalstat.getfail += slidingstat.getfail;
+				totalstat.connect += slidingstat.connect;
+				totalstat.click += slidingstat.click;
 			}
-			final int STARTTIME = 0;
-			final int CONNECT = 1;
-			int window = 1;
 			
-			String out  = "Uptime: " + (System.currentTimeMillis() - stats[STARTTIME]) + "\n";
-			out += "Connect:  " + str_pad(stats[CONNECT], 9) + str_pad(total[CONNECT], 7) + (slidingstats[(statstime+window-1)%window][CONNECT]) + "\n";
-			out += "Get:      " + str_pad(stats[GET], 9) +     str_pad(total[GET], 7) +     (slidingstats[(statstime+window-1)%window][GET]) + "\n";
-			out += "Get Fail: " + str_pad(stats[GETFAIL], 9) + str_pad(total[GETFAIL], 7) + (slidingstats[(statstime+window-1)%window][GETFAIL]) + "\n";
-			out += ":    " + str_pad(stats[0], 9) +   str_pad(total[0], 7) +   (slidingstats[(statstime+window-1)%window][0]) + "\n";
-			//out += "Connections: " + clientdata.size() + "\n";
+			String out  = "Uptime: " + (System.currentTimeMillis()/1000 - stats.starttime) + "\n";
+			out += "Connect:  " + str_pad(stats.connect, 9) + str_pad(totalstat.connect, 7) + (slidingstats[(statstime+STATS_WINDOW-1)%STATS_WINDOW].connect) + "\n";
+			out += "Get:  " + str_pad(stats.get, 9) + str_pad(totalstat.get, 7) + (slidingstats[(statstime+STATS_WINDOW-1)%STATS_WINDOW].get) + "\n";
+			out += "Get Fail:  " + str_pad(stats.getfail, 9) + str_pad(totalstat.getfail, 7) + (slidingstats[(statstime+STATS_WINDOW-1)%STATS_WINDOW].getfail) + "\n";
+			out += "Click:  " + str_pad(stats.click, 9) + str_pad(totalstat.click, 7) + (slidingstats[(statstime+STATS_WINDOW-1)%STATS_WINDOW].click) + "\n";
 			
-			//socket_write(sock, out + "\n");
-			
-			//unset(out, total, stat, i, k, v);
-			
-			break;
+			return out;
 			
 		case UPTIME:
 			//socket_write(sock,  "Uptime: " . (time - stats[STARTTIME]) + "\n");
