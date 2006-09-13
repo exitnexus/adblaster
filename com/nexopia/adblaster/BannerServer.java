@@ -38,9 +38,6 @@ public class BannerServer {
 	private static final int DELCAMPAIGN = 5;
 	private static final int UPDATECAMPAIGN = 6;
 	private static final int DEL = 7;
-	private static final int CONDUMP = 8;
-	private static final int BUFFDUMP = 9;
-	private static final int BANNERDUMP = 10;
 	private static final int STATS = 11;
 	private static final int UPTIME = 12;
 	private static final int SHOW = 13;
@@ -60,10 +57,23 @@ public class BannerServer {
 	public static final int BANNER_SLIDE_SIZE = 8;
 	public static final double BANNER_MIN_CLICKRATE = 0.0002;
 	public static final double BANNER_MAX_CLICKRATE = 0.005;
-	public static final boolean debug = true;
 	public static final int STATS_WINDOW = 60;
 	
 	static boolean debugFields[] = new boolean[1000];//should be map?
+	
+	static HashMap<String, Boolean> debug;
+	{
+		debug.put("tick", Boolean.FALSE);
+		debug.put("connect", Boolean.FALSE);
+		debug.put("get", Boolean.FALSE);
+		debug.put("getlog", Boolean.TRUE);
+		debug.put("click", Boolean.TRUE);
+		debug.put("timeupdates", Boolean.FALSE);
+		debug.put("dailyrestart", Boolean.TRUE);
+		debug.put("passback", Boolean.TRUE);
+		debug.put("development", Boolean.TRUE);
+	}
+	
 	static ServerStat stats = new ServerStat();
 	static ServerStat slidingstats[] = new ServerStat[STATS_WINDOW];
 	{
@@ -452,7 +462,7 @@ public class BannerServer {
 			return true;
 		if ((b.getCampaign().getViews() + this.campaignstats.getOrCreate(b.campaign, BannerStat.class).dailyviews) >= b.campaign.getIntegerMaxViews())
 			return true;
-		if (debug) System.out.println("" + b.getCampaign().getViews() + " + " + this.campaignstats.getOrCreate(b.campaign, BannerStat.class).dailyviews + " < " + b.campaign.getIntegerMaxViews()); 
+		if (debug.get("development").booleanValue()) System.out.println("" + b.getCampaign().getViews() + " + " + this.campaignstats.getOrCreate(b.campaign, BannerStat.class).dailyviews + " < " + b.campaign.getIntegerMaxViews()); 
 		return false;
 			
 	}
@@ -527,8 +537,8 @@ public class BannerServer {
 			return true;
 		if (this.campaignstats.getOrCreate(b.campaign, BannerStat.class).dailyviews >= b.campaign.getIntegerMaxViewsPerDay()/numservers)
 			return true;
-		if (debug) System.out.println("Banner Views: " + this.bannerstats.getOrCreate(b, BannerStat.class).dailyviews + ":" + b.getIntegerMaxViewsPerDay()/numservers);
-		if (debug) System.out.println("Campaign Views: " + this.campaignstats.getOrCreate(b.campaign, BannerStat.class).dailyviews + ":" + b.campaign.getIntegerMaxViewsPerDay()/numservers);
+		if (debug.get("development").booleanValue()) System.out.println("Banner Views: " + this.bannerstats.getOrCreate(b, BannerStat.class).dailyviews + ":" + b.getIntegerMaxViewsPerDay()/numservers);
+		if (debug.get("development").booleanValue()) System.out.println("Campaign Views: " + this.campaignstats.getOrCreate(b.campaign, BannerStat.class).dailyviews + ":" + b.campaign.getIntegerMaxViewsPerDay()/numservers);
 		return false;
 	}
 	
@@ -657,10 +667,6 @@ public class BannerServer {
 			cmd = UPDATECAMPAIGN;
 		} else if (command.toUpperCase().equals("DEL")) {
 			cmd = DEL;
-		} else if (command.toUpperCase().equals("CONDUMP")) {
-			cmd = CONDUMP;
-		} else if (command.toUpperCase().equals("BANNERDUMP")) {
-			cmd = BANNERDUMP;
 		} else if (command.toUpperCase().equals("STATS")) {
 			cmd = STATS;
 		} else if (command.toUpperCase().equals("UPTIME")) {
