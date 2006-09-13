@@ -68,7 +68,7 @@ public class BannerServer {
 	private static final int NO_BANNER = 0;
 	private static final int VIEW_WINDOWS = 5;
 	
-	static HashMap<String, Boolean> debug;
+	static HashMap<String, Boolean> debug=new HashMap<String,Boolean>();
 	{
 		debug.put("tick", Boolean.FALSE);
 		debug.put("connect", Boolean.FALSE);
