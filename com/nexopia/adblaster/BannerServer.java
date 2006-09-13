@@ -567,9 +567,7 @@ public class BannerServer {
 	}
 	
 	
-	public static void passbackBanner(String s, String y){}
 	public static int debugGet(){return 1;}
-	public static void addBanner(){};
 	public static void bannerDebug(String str){}
 	public static String str_pad(int s, int i){
 		return "" + s;
@@ -803,13 +801,13 @@ public class BannerServer {
 			short loc=Short.parseShort(params[5]); 
 			String interestsStr=params[6]; 
 			String page=params[7]; 
-			//passback=params[8]; 
+			int passback=Integer.parseInt(params[8]); 
 			//boolean debugGet=Boolean.parseBoolean(params[9]);
 			
 			Interests interests = new Interests(interestsStr, false);
 			
-			//if(passback != "")
-			//	passbackBanner(passback, userid);
+			if(passback != 0)
+				passbackBanner(passback, userid);
 			
 			int ret = getBanner(usertime, size, userid, age, sex, loc, interests, page, true);
 			
@@ -1037,5 +1035,15 @@ public class BannerServer {
 		return null;
 	}
 
+	private void passbackBanner(int passback, int userid) {
+		Banner b = db.getBannerByID(passback);
+		bannerstats.get(b).passbacks++;
+		int[] userviews = getViewsForUser(userid, b);
+		for (int i=0; i<userviews.length; i++) {
+			userviews[i] = (int)(System.currentTimeMillis()/1000);
+		}
+	}
+
+	
 	
 }
