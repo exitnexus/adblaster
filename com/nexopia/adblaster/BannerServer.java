@@ -396,7 +396,6 @@ public class BannerServer {
 		bannerstats.getOrCreate(b, BannerStat.class).view();
 		campaignstats.getOrCreate(b.campaign, BannerStat.class).view();
 		viewstats.getOrCreate(Integer.valueOf(b.getSize()), TypeStat.class).hit(age, sex, loc, interests, page, time);
-		clickstats.getOrCreate(Integer.valueOf(b.getSize()), TypeStat.class).hit(age, sex, loc, interests, page, time);
 	}
 	
 	/**
