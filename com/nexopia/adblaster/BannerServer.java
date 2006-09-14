@@ -74,6 +74,7 @@ public class BannerServer {
 		debug.put("connect", Boolean.FALSE);
 		debug.put("get", Boolean.FALSE);
 		debug.put("getlog", Boolean.TRUE);
+		debug.put("getfail", Boolean.FALSE);
 		debug.put("click", Boolean.TRUE);
 		debug.put("timeupdates", Boolean.FALSE);
 		debug.put("dailyrestart", Boolean.TRUE);
@@ -616,8 +617,12 @@ public class BannerServer {
 		return "" + s;
 	}
 	
-	static Vector<HashMap<Integer, Vector<Integer>>> recentviews = new Vector<HashMap<Integer, Vector<Integer>>>();
-	
+	static Vector<HashMap<Integer, Vector<Integer>>> recentviews = new Vector<HashMap<Integer, Vector<Integer>>>(VIEW_WINDOWS);
+	{
+		for (int i=0; i<VIEW_WINDOWS; i++) {
+			recentviews.add(new HashMap<Integer, Vector<Integer>>());
+		}
+	}
 	static class FastMap <K, V> {
 		HashMap <K,V>map;
 		
@@ -762,7 +767,11 @@ public class BannerServer {
 	
 	public void secondly() {
 		currentwindow = (currentwindow+1)%VIEW_WINDOWS;
-		recentviews.set(currentwindow, new HashMap<Integer, Vector<Integer>>());
+		if (recentviews.size() < currentwindow+1) {
+			recentviews.add(new HashMap<Integer, Vector<Integer>>());
+		} else {
+			recentviews.set(currentwindow, new HashMap<Integer, Vector<Integer>>());
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -1086,10 +1095,16 @@ public class BannerServer {
 
 	private void passbackBanner(int passback, int userid) {
 		Banner b = db.getBannerByID(passback);
-		bannerstats.get(b).passbacks++;
-		int[] userviews = getViewsForUser(userid, b);
-		for (int i=0; i<userviews.length; i++) {
-			userviews[i] = (int)(System.currentTimeMillis()/1000);
+		if (b != null) {
+			bannerstats.getOrCreate(b, BannerStat.class).passbacks++;
+			int[] userviews = getViewsForUser(userid, b);
+			for (int i=0; i<userviews.length; i++) {
+				userviews[i] = (int)(System.currentTimeMillis()/1000);
+			}
+		} else {
+			if (debug.get("passback").booleanValue()) {
+				bannerDebug("Attempted to passback banner " +passback+ ", which doesn't exist.");
+			}
 		}
 	}
 
