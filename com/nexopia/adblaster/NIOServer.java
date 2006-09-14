@@ -189,48 +189,46 @@ public class NIOServer {
 					client.sc = (SocketChannel)key.channel();
 					
 					StringBuffer strbuf = new StringBuffer("");
-					int len = getString(client, strbuf);
-					if (len == 0){
-						//no EOL terminator found
-						//System.out.println("Skipping..." + strbuf.toString());
-						continue;
-					} else if (len == -1){
+					int len = 0;
+					while ((len = getString(client, strbuf)) == 1) {
+						String result = null;
+						try {
+							if (BannerServer.debug.get("development").booleanValue()) {
+								BannerServer.bannerDebug(strbuf.toString());
+							}
+							if (strbuf.toString().equals("reset")) {
+								cdb = new CampaignDB();
+								bdb = new BannerDatabase(cdb, new PageValidatorFactory(Utilities.PageValidator1.class, args1));
+								banners = new BannerServer(bdb, cdb, 1);
+								if (BannerServer.debug.get("development").booleanValue()) {
+									BannerServer.bannerDebug("Reinitialized the banner server.");
+								}
+							} else {
+								//The banner server deals with any commands except a server reset.
+								result = banners.receive(strbuf.toString());
+							}
+						} catch (Exception e) {
+							BannerServer.bannerDebug("Unexpected exception when attempting to handle input '" + strbuf.toString() + "'");
+							e.printStackTrace();
+						}
+						try {
+							ByteBuffer output = charset.encode(result+"-"+index+'\n');
+							//System.out.println(output.toString());
+							client.write(output);
+							index++;
+						} catch (Exception e) {
+							//set some error indication value in result
+							BannerServer.bannerDebug("Error writing banner result value");
+							e.printStackTrace();
+						}
+						strbuf.setLength(0);
+					}
+					if (len == -1){
 						//nothing readable
 						if (strbuf.length() > 0)
 							BannerServer.bannerDebug("Error! " + strbuf.toString());
 						client.close();
 						continue;
-					}
-					
-					String result = null;
-					try {
-						if (BannerServer.debug.get("development").booleanValue()) {
-							BannerServer.bannerDebug(strbuf.toString());
-						}
-						if (strbuf.toString().equals("reset")) {
-							cdb = new CampaignDB();
-							bdb = new BannerDatabase(cdb, new PageValidatorFactory(Utilities.PageValidator1.class, args1));
-							banners = new BannerServer(bdb, cdb, 1);
-							if (BannerServer.debug.get("development").booleanValue()) {
-								BannerServer.bannerDebug("Reinitialized the banner server.");
-							}
-						} else {
-							//The banner server deals with any commands except a server reset.
-							result = banners.receive(strbuf.toString());
-						}
-					} catch (Exception e) {
-						BannerServer.bannerDebug("Unexpected exception when attempting to handle input '" + strbuf.toString() + "'");
-						e.printStackTrace();
-					}
-					try {
-						ByteBuffer output = charset.encode(result+"-"+index+'\n');
-						//System.out.println(output.toString());
-						client.write(output);
-						index++;
-					} catch (Exception e) {
-						//set some error indication value in result
-						BannerServer.bannerDebug("Error writing banner result value");
-						e.printStackTrace();
 					}
 					
 					continue;
@@ -248,7 +246,9 @@ public class NIOServer {
 	 */
 	public static int getString(BufferedSocketChannel client, StringBuffer s) throws IOException{
 		// Read byte coming from the client
+		System.err.println("Buffer before read: " +s);
 		int i = client.read(s);
+		System.err.println("Buffer after read: " +s);
 		if (i == -1){
 			return -1;
 		}
