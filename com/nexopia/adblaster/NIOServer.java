@@ -246,9 +246,7 @@ public class NIOServer {
 	 */
 	public static int getString(BufferedSocketChannel client, StringBuffer s) throws IOException{
 		// Read byte coming from the client
-		System.err.println("Buffer before read: " +s);
 		int i = client.read(s);
-		System.err.println("Buffer after read: " +s);
 		if (i == -1){
 			return -1;
 		}
