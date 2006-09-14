@@ -76,7 +76,7 @@ public class BannerServer {
 		debug.put("getlog", Boolean.TRUE);
 		debug.put("getfail", Boolean.FALSE);
 		debug.put("click", Boolean.TRUE);
-		debug.put("timeupdates", Boolean.FALSE);
+		debug.put("timeupdates", Boolean.TRUE);
 		debug.put("dailyrestart", Boolean.TRUE);
 		debug.put("passback", Boolean.TRUE);
 		debug.put("development", Boolean.TRUE);

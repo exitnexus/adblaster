@@ -1,13 +1,10 @@
 package com.nexopia.adblaster;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.*;
 import java.nio.channels.*;
-import java.nio.channels.spi.*;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
-import java.nio.charset.CharsetEncoder;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
@@ -207,8 +204,20 @@ public class NIOServer {
 					
 					String result = null;
 					try {
-						BannerServer.bannerDebug(strbuf.toString());
-						result = banners.receive(strbuf.toString());
+						if (BannerServer.debug.get("development").booleanValue()) {
+							BannerServer.bannerDebug(strbuf.toString());
+						}
+						if (strbuf.toString().equals("reset")) {
+							cdb = new CampaignDB();
+							bdb = new BannerDatabase(cdb, new PageValidatorFactory(Utilities.PageValidator1.class, args1));
+							banners = new BannerServer(bdb, cdb, 1);
+							if (BannerServer.debug.get("development").booleanValue()) {
+								BannerServer.bannerDebug("Reinitialized the banner server.");
+							}
+						} else {
+							//The banner server deals with any commands except a server reset.
+							result = banners.receive(strbuf.toString());
+						}
 					} catch (Exception e) {
 						BannerServer.bannerDebug("Unexpected exception when attempting to handle input '" + strbuf.toString() + "'");
 						e.printStackTrace();
