@@ -217,9 +217,9 @@ public class NIOServer {
 							client.write(output);
 							index++;
 						} catch (Exception e) {
-							//set some error indication value in result
-							BannerServer.bannerDebug("Error writing banner result value");
-							e.printStackTrace();
+							//This happens often, it's not a problem condition.  It just means that the client
+							//didn't care about the result, for example they triggered a command for which there
+							//is no result.
 						}
 						strbuf.setLength(0);
 					}
