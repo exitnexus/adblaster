@@ -867,13 +867,14 @@ public class BannerServer {
 			int ret = getBanner(usertime, size, userid, age, sex, loc, interests, page, true);
 			
 			if (debug.get("passback").booleanValue()) {
+				Integer uid = Integer.valueOf(userid);
 				if (passback != 0) {
 					boolean hasSeen = false;
 					String viewsstring = "";
-					Integer uid = Integer.valueOf(userid);
 					for (HashMap<Integer, Vector<Integer>> uidtoviews : recentviews) {
 						if (uidtoviews.get(uid) != null && !uidtoviews.get(uid).isEmpty()) {
-							for (Integer view : uidtoviews.get(userid)) {
+							Vector<Integer> userviews = uidtoviews.get(uid);
+							for (Integer view : userviews) {
 								viewsstring += " " + view;
 								if (passback == view.intValue()) {
 									hasSeen = true;
@@ -882,14 +883,17 @@ public class BannerServer {
 						}
 					}
 					if (!hasSeen) {
-						bannerDebug("Invalid Passback: " + passback + ", Recently Vied: " + viewsstring);
+						bannerDebug("Invalid Passback: " + passback + ", Recently Viewed: " + viewsstring);
 					}
-					Vector<Integer> currentUserWindow = recentviews.get(currentwindow).get(uid);
-					if (currentUserWindow == null) {
-						currentUserWindow = new Vector<Integer>();
-					}
-					currentUserWindow.add(Integer.valueOf(passback));
 				}
+				Vector<Integer> currentUserWindow = recentviews.get(currentwindow).get(uid);
+				if (currentUserWindow == null) {
+					currentUserWindow = new Vector<Integer>();
+					recentviews.get(currentwindow).put(uid, currentUserWindow);
+				}
+				currentUserWindow.add(Integer.valueOf(ret));
+				uid.free();
+				uid=null;
 			}
 			
 			if(debug.get("get").booleanValue() || (debug.get("getfail").booleanValue() && (ret == NO_BANNER)))
