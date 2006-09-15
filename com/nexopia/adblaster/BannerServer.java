@@ -72,14 +72,14 @@ public class BannerServer {
 	{
 		debug.put("tick", Boolean.FALSE);
 		debug.put("connect", Boolean.FALSE);
-		debug.put("get", Boolean.FALSE);
+		debug.put("get", Boolean.TRUE);
 		debug.put("getlog", Boolean.TRUE);
 		debug.put("getfail", Boolean.FALSE);
 		debug.put("click", Boolean.TRUE);
 		debug.put("timeupdates", Boolean.TRUE);
 		debug.put("dailyrestart", Boolean.TRUE);
 		debug.put("passback", Boolean.TRUE);
-		debug.put("development", Boolean.FALSE);
+		debug.put("development", Boolean.TRUE);
 	}
 	
 	static ServerStat stats = new ServerStat();
@@ -576,13 +576,18 @@ public class BannerServer {
 		if (this.bannerstats.get(b) == null){
 			this.bannerstats.put(b, new BannerStat());
 		}
-		if (this.bannerstats.get(b).dailyclicks > b.getIntegerMaxClicksperday()/numservers)
+		if (this.bannerstats.get(b).dailyclicks >= b.getIntegerMaxClicksperday()/numservers) {
 			return true;
+		}
+		
+		
 		if (this.campaignstats.get(b.campaign) == null){
 			this.campaignstats.put(b.campaign, new BannerStat());
 		}
-		if (this.campaignstats.get(b.campaign).dailyclicks > b.campaign.getIntegerMaxClicksperday()/numservers)
+		if (this.campaignstats.get(b.campaign).dailyclicks >= b.campaign.getIntegerMaxClicksperday()/numservers) {
 			return true;
+		}
+		
 		return false;
 	}
 	
