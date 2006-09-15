@@ -290,13 +290,13 @@ class Campaign extends ServablePropertyHolder{
 	public boolean precheck() {
 		boolean validDate = true;
 		if (startdate != 0){
-			if (startdate < System.currentTimeMillis()) {
+			if (startdate > System.currentTimeMillis() + 86400*1000) {
 				validDate = false;
 			}
 		}
 		
 		if (enddate != 0){
-			if (enddate > System.currentTimeMillis()) {
+			if (enddate < System.currentTimeMillis() + 86400*1000) {
 				validDate = false;
 			}
 		}

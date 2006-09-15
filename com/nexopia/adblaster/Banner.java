@@ -178,7 +178,7 @@ class Banner extends ServablePropertyHolder{
 			long enddate = rs.getLong("ENDDATE")*1000;
 			boolean validDate = true;
 			if (startdate != 0){
-				if (startdate < System.currentTimeMillis()){
+				if (startdate > System.currentTimeMillis() + 86400*1000){
 					validDate = false;
 				}
 			}
