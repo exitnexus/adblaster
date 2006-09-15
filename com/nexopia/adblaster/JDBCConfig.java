@@ -2,6 +2,7 @@ package com.nexopia.adblaster;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -36,5 +37,13 @@ public class JDBCConfig {
 	
 	public static void queueQuery(String query) {
 		sqlQueue.execute(query);
+	}
+
+	public static void queueQuery(String query, byte[] a, byte[] b) {
+		sqlQueue.execute(query, a, b);
+	}
+
+	public static PreparedStatement prepareStatement(String sql) throws SQLException {
+		return con.prepareStatement(sql);
 	}
 }
