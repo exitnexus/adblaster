@@ -1,5 +1,6 @@
 package com.nexopia.adblaster;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -19,6 +20,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.Vector;
+import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import com.thoughtworks.xstream.XStream;
@@ -168,28 +170,31 @@ public class BannerServer {
 		private static final boolean COMPRESS = true; 
 		private static final String GZIP_ENCODING = "ISO8859_1";
 		
-		public String toXML() {
+		public byte[] toXML() {
 			xstream.alias("typestat", TypeStat.class);
 			xstream.alias("integer", Integer.class);
 			if (!COMPRESS) {
-				return xstream.toXML(this);
-			} else {
-				GZIPOutputStream gz = null;
-				ByteArrayOutputStream bytes = null;
 				try {
-					bytes = new ByteArrayOutputStream(); 
-					gz = new GZIPOutputStream(bytes);
-					gz.write(xstream.toXML(this).getBytes());
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				try {
-					return bytes.toString(GZIP_ENCODING);
+					return xstream.toXML(this).getBytes(GZIP_ENCODING);
 				} catch (UnsupportedEncodingException e) {
 					e.printStackTrace();
 					return null;
 				}
+			} else {
+				GZIPOutputStream gz = null;
+				ByteArrayOutputStream bytes = null;
+				try {
+					bytes = new ByteArrayOutputStream(30000); 
+					gz = new GZIPOutputStream(bytes);
+					gz.write(xstream.toXML(this).getBytes());
+					gz.finish();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				//System.out.println(bytes.toString());
+				return bytes.toByteArray();
 			}
+			
 		}
 		
 		public static int INITIAL_ARRAY_SIZE = 100;
@@ -833,7 +838,8 @@ public class BannerServer {
 		for (Integer size: sizes_array) {
 			TypeStat views = viewstats.get(size);
 			TypeStat clicks = clickstats.get(size);
-			JDBCConfig.queueQuery("INSERT INTO " + JDBCConfig.BANNERTYPESTAT_TABLE + " SET size = "+size+", time = "+time+", views = "+views.total+", clicks = "+clicks.total+", viewsdump = '"+views.toXML()+"', clicksdump = '"+clicks.toXML()+"'");
+			JDBCConfig.queueQuery("INSERT INTO " + JDBCConfig.BANNERTYPESTAT_TABLE + " SET size = "+size+", time = "+time+", views = "+views.total+", clicks = "+clicks.total+", viewsdump = ?, clicksdump = ?", views.toXML(), clicks.toXML());
+			//System.err.println("****" + "INSERT INTO " + JDBCConfig.BANNERTYPESTAT_TABLE + " SET size = "+size+", time = "+time+", views = "+views.total+", clicks = "+clicks.total+", viewsdump = '"+views.toXML()+"', clicksdump = '"+clicks.toXML()+"'" + "****");
 		}
 	}
 	
