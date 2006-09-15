@@ -79,7 +79,7 @@ public class BannerServer {
 		debug.put("timeupdates", Boolean.TRUE);
 		debug.put("dailyrestart", Boolean.TRUE);
 		debug.put("passback", Boolean.TRUE);
-		debug.put("development", Boolean.TRUE);
+		debug.put("development", Boolean.FALSE);
 	}
 	
 	static ServerStat stats = new ServerStat();
@@ -857,14 +857,14 @@ public class BannerServer {
 			String interestsStr=params[6]; 
 			String page=params[7]; 
 			int passback=Integer.parseInt(params[8]); 
-			//boolean debugGet=Boolean.parseBoolean(params[9]);
+			boolean debugGet=Boolean.parseBoolean(params[9]);
 			
 			Interests interests = new Interests(interestsStr, false);
 			
 			if(passback != 0)
 				passbackBanner(passback, userid);
 			
-			int ret = getBanner(usertime, size, userid, age, sex, loc, interests, page, true);
+			int ret = getBanner(usertime, size, userid, age, sex, loc, interests, page, debugGet);
 			
 			if (debug.get("passback").booleanValue()) {
 				Integer uid = Integer.valueOf(userid);
