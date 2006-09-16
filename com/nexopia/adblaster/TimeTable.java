@@ -73,14 +73,22 @@ public class TimeTable {
 			
 			
 			boolean range = false;
-			while (weekdayMatcher.find()){
+			if (range) {
+				System.err.println("huh?");
+			}
+			boolean firstTime = true;
+			boolean match;
+			while ((match = weekdayMatcher.find()) || firstTime){
+				firstTime = false;
 				String s1= "";
 				String s2= "";
-				s1 = val.substring(weekdayMatcher.start(), weekdayMatcher.end());
-				if (val.substring(weekdayMatcher.end(),weekdayMatcher.end()+1).equals("-")){
-					range = true;
-					if (weekdayMatcher.find()){
-						s2 = val.substring(weekdayMatcher.start(), weekdayMatcher.end());
+				if (match) {
+					s1 = val.substring(weekdayMatcher.start(), weekdayMatcher.end());
+					if (val.length() > weekdayMatcher.end() && val.substring(weekdayMatcher.end(),weekdayMatcher.end()+1).equals("-")){
+						range = true;
+						if (weekdayMatcher.find()){
+							s2 = val.substring(weekdayMatcher.start(), weekdayMatcher.end());
+						}
 					}
 				}
 				if (s1.equals("") && s2.equals("")){
@@ -209,10 +217,12 @@ public class TimeTable {
 	}
 
 	public boolean getValid(long time){
+		//System.err.println(time);
 		Date date = new Date(time);
 		c.setTime(date);
 		int h = c.get(Calendar.HOUR_OF_DAY);
-		int d = (c.get(Calendar.DAY_OF_WEEK) - 2) % 7;
+		int d = (c.get(Calendar.DAY_OF_WEEK)-2) % 7;
+		//System.err.println("Checking time for day " + d + " and hour " + h + ". - " + this.allowed[d][(h-1)%24] + " " + this.allowed[d][h] + " " + this.allowed[d][(h+1%24)]);
 		return this.allowed[d][h];
 	}
 	/**

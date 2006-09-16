@@ -308,7 +308,7 @@ class Banner extends ServablePropertyHolder{
 		//time
 		//Utilities.bannerDebug("testing time");
 		
-		if (!this.validTime(time)) {
+		if (!this.validTime((long)time * 1000)) {
 			if (debug) Utilities.bannerDebug(debugLog);
 			return false;
 		}

@@ -223,7 +223,7 @@ public class ServablePropertyHolder {
 		}
 		
 		if (debug) debugLog += " 4";
-		if (!this.validTime(usertime)) {
+		if (!this.validTime((long)usertime*1000)) {
 			if (debug) Utilities.bannerDebug(debugLog);
 			return false;
 		}

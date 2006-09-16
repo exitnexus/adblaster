@@ -220,7 +220,7 @@ public class BannerServer {
 			total++;
 			Calendar c = Calendar.getInstance();
 			c.setTime(new Timestamp((long)time*1000));
-			hittimes[c.get(Calendar.DAY_OF_WEEK)][c.get(Calendar.HOUR_OF_DAY)]++;
+			hittimes[c.get(Calendar.DAY_OF_WEEK)-1][c.get(Calendar.HOUR_OF_DAY)]++;
 			if (age < 100 && age >= 0) {
 				agesex[age][sex]++;
 			}
