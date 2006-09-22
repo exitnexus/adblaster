@@ -20,7 +20,8 @@
  * SOFTWARE.
  */
 
-package com.nexopia.adblaster;
+package com.nexopia.adblaster.util;
+
 
 
 /**
@@ -95,7 +96,7 @@ public class IntObjectHashMap extends PrimitiveKeyBase {
 	 * @return backing key array object
 	 */
 
-	protected final int[] getKeyArray() {
+	public final int[] getKeyArray() {
 		return m_keyTable;
 	}
 

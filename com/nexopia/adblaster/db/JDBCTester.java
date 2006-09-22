@@ -4,7 +4,7 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-package com.nexopia.adblaster;
+package com.nexopia.adblaster.db;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -12,6 +12,9 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Iterator;
+
+import com.nexopia.adblaster.struct.Banner;
+import com.nexopia.adblaster.util.Integer;
 
 public class JDBCTester {
 

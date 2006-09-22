@@ -2,6 +2,11 @@ package com.nexopia.adblaster;
 
 import java.util.Collection;
 
+import com.nexopia.adblaster.struct.Banner;
+import com.nexopia.adblaster.struct.BannerView;
+import com.nexopia.adblaster.struct.Campaign;
+import com.nexopia.adblaster.struct.User;
+
 public abstract class AbstractAdBlasterUniverse {
 	
 	abstract public Banner getBannerByIndex(int i);

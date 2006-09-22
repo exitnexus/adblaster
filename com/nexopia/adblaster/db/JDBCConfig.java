@@ -1,10 +1,12 @@
-package com.nexopia.adblaster;
+package com.nexopia.adblaster.db;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+
+import com.nexopia.adblaster.SQLQueue;
 
 public class JDBCConfig {
 	public static final String BANNERSTAT_TABLE = "bannerstats";	

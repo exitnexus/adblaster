@@ -2,6 +2,10 @@ package com.nexopia.adblaster;
 
 import java.util.Vector;
 
+import com.nexopia.adblaster.struct.Banner;
+import com.nexopia.adblaster.struct.BannerView;
+import com.nexopia.adblaster.struct.I_Policy;
+import com.nexopia.adblaster.util.ProgressIndicator;
 import com.sleepycat.je.DatabaseException;
 
 
@@ -83,7 +87,7 @@ public class AdBlasterInstance extends AbstractAdBlasterInstance{
 		int randomPick = (int) (Math.random()*(universe.getUserCount()-1.0));
 		int time = (int) (Math.random()*60*60*24);
 		byte size = (byte) (Math.random()*8);
-		return new BannerView(instance, index++, ac.getUserByIndex(randomPick).id, -1, time, size, 0);
+		return new BannerView(instance, index++, ac.getUserByIndex(randomPick).getID(), -1, time, size, 0);
 	}
 
 	public static AdBlasterInstance randomInstance(int num, AdBlasterDbUniverse ac) {

@@ -1,8 +1,7 @@
-package com.nexopia.adblaster;
+package com.nexopia.adblaster.util;
 
 import java.lang.reflect.InvocationTargetException;
 
-import com.nexopia.adblaster.Utilities.PageValidator;
 
 public class PageValidatorFactory {
 	Class klass;

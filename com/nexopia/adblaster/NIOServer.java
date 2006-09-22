@@ -9,7 +9,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
-import com.nexopia.adblaster.Campaign.CampaignDB;
+import com.nexopia.adblaster.db.BannerDatabase;
+import com.nexopia.adblaster.struct.Campaign.CampaignDB;
+import com.nexopia.adblaster.util.PageValidator1;
+import com.nexopia.adblaster.util.PageValidatorFactory;
 
 //Listen on a port for connections and write back the current time.
 public class NIOServer {
@@ -80,7 +83,7 @@ public class NIOServer {
 		socketMap = new HashMap<SocketChannel, BufferedSocketChannel>();
 		Object args1[] = {};
 		CampaignDB cdb = new CampaignDB();
-		BannerDatabase bdb = new BannerDatabase(cdb, new PageValidatorFactory(Utilities.PageValidator1.class, args1));
+		BannerDatabase bdb = new BannerDatabase(cdb, new PageValidatorFactory(PageValidator1.class, args1));
 		BannerServer banners = new BannerServer(bdb, cdb, 1);
 		
 		//Create the server socket channel
@@ -198,7 +201,7 @@ public class NIOServer {
 							}
 							if (strbuf.toString().equals("reset")) {
 								cdb = new CampaignDB();
-								bdb = new BannerDatabase(cdb, new PageValidatorFactory(Utilities.PageValidator1.class, args1));
+								bdb = new BannerDatabase(cdb, new PageValidatorFactory(PageValidator1.class, args1));
 								banners = new BannerServer(bdb, cdb, 1);
 								if (BannerServer.debug.get("development").booleanValue()) {
 									BannerServer.bannerDebug("Reinitialized the banner server.");

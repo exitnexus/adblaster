@@ -20,6 +20,9 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
+import com.nexopia.adblaster.struct.BannerView;
+import com.nexopia.adblaster.util.ProgressIndicator;
+
 public class AdBlaster {
 
 	private static final int THREAD_COUNT = 2;
@@ -227,7 +230,7 @@ public class AdBlaster {
 		DefaultTableModel model = new DefaultTableModel(ac.getBannerCount(),4);
 		final JTable table = new JTable(model);
 		for (int i = 0; i < ac.getBannerCount(); i++){
-			model.setValueAt(""+ac.getBannerByIndex(i).index, i,0);
+			model.setValueAt(""+ac.getBannerByIndex(i).getID(), i,0);
 			model.setValueAt(""+ac.getBannerByIndex(i).getRealPayrate(), i,1);
 			model.setValueAt(""+ac.getBannerByIndex(i).getViewsPerDay(), i,2);
 			model.setValueAt(pol.getCoefficient(ac.getBannerByIndex(i)), i,3);

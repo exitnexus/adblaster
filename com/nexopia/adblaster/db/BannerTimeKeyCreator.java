@@ -1,8 +1,11 @@
 /*
  * Created on Jun 19, 2006
  */
-package com.nexopia.adblaster;
+package com.nexopia.adblaster.db;
 
+import com.nexopia.adblaster.IntegerBinding;
+import com.nexopia.adblaster.struct.BannerView;
+import com.nexopia.adblaster.util.Integer;
 import com.sleepycat.bind.tuple.TupleBinding;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;

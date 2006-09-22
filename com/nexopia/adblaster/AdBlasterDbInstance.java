@@ -8,6 +8,13 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.WeakHashMap;
 
+import com.nexopia.adblaster.db.BannerViewBinding;
+import com.nexopia.adblaster.struct.Banner;
+import com.nexopia.adblaster.struct.BannerView;
+import com.nexopia.adblaster.struct.I_Policy;
+import com.nexopia.adblaster.struct.ServablePropertyHolder;
+import com.nexopia.adblaster.util.Integer;
+import com.nexopia.adblaster.util.ProgressIndicator;
 import com.sleepycat.je.DatabaseException;
 
 public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
@@ -34,10 +41,10 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 				String r[] = str.split(", ");
 				Banner b = universe.getBannerByID(Integer.parseInt(r[1]));
 				this.bannerCountMap.put(b, new Integer(Integer.parseInt(r[2])));
-				if (!this.campaignCountMap.containsKey(b.campaign)){
-					this.campaignCountMap.put(b.campaign, new Integer(0));
+				if (!this.campaignCountMap.containsKey(b.getCampaign())){
+					this.campaignCountMap.put(b.getCampaign(), new Integer(0));
 				}
-				this.campaignCountMap.put(b.campaign, new Integer(this.campaignCount(b) + Integer.parseInt(r[2])));
+				this.campaignCountMap.put(b.getCampaign(), new Integer(this.campaignCount(b) + Integer.parseInt(r[2])));
 				System.out.println(r[1] + ":" + r[2]);
 			}
 		} catch (FileNotFoundException e) {
@@ -86,7 +93,7 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 				Banner b = this.universe.getBannerByIndex(i);
 				if (b != null){
 					System.out.print(i + ", ");
-					System.out.print(b.id + ", ");
+					System.out.print(b.getID() + ", ");
 					System.out.println(bannerCount(b));
 				}
 			}

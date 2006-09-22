@@ -4,7 +4,7 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-package com.nexopia.adblaster;
+package com.nexopia.adblaster.db;
 
 import java.io.File;
 import java.util.Iterator;
@@ -12,6 +12,8 @@ import java.util.List;
 
 import javax.swing.JFileChooser;
 
+import com.nexopia.adblaster.IntegerBinding;
+import com.nexopia.adblaster.util.IntObjectHashMap;
 import com.sleepycat.bind.tuple.StringBinding;
 import com.sleepycat.je.CheckpointConfig;
 import com.sleepycat.je.Cursor;

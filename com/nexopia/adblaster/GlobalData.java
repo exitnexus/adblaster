@@ -2,6 +2,8 @@ package com.nexopia.adblaster;
 
 import java.util.Vector;
 
+import com.nexopia.adblaster.struct.Banner;
+
 public class GlobalData {
 
 	public AdBlasterPolicy pol;

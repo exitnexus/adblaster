@@ -2,7 +2,11 @@ package com.nexopia.adblaster;
 
 import java.util.Vector;
 
-import com.nexopia.adblaster.Campaign.CampaignDB;
+import com.nexopia.adblaster.struct.Banner;
+import com.nexopia.adblaster.struct.BannerView;
+import com.nexopia.adblaster.struct.I_Policy;
+import com.nexopia.adblaster.struct.ServablePropertyHolder;
+import com.nexopia.adblaster.struct.Campaign.CampaignDB;
 
 public class OldPolicy implements I_Policy {
 
@@ -35,31 +39,31 @@ public class OldPolicy implements I_Policy {
 	public double getPriority(Banner b, int uid, int time, BannerServer server) {
 		double priority = b.getCoefficient() + 1;
 
-		double period = Math.min(b.getLimitByPeriod(), b.campaign
+		double period = Math.min(b.getLimitByPeriod(), b.getCampaign()
 				.getLimitByPeriod());
 		if (period == 0)
-			period = Math.max(b.getLimitByPeriod(), b.campaign
+			period = Math.max(b.getLimitByPeriod(), b.getCampaign()
 					.getLimitByPeriod());
 
-		double viewsperuser = Math.min(b.getViewsPerUser(), b.campaign
+		double viewsperuser = Math.min(b.getViewsPerUser(), b.getCampaign()
 				.getViewsPerUser());
 		if (viewsperuser == 0)
-			viewsperuser = Math.max(b.getViewsPerUser(), b.campaign
+			viewsperuser = Math.max(b.getViewsPerUser(), b.getCampaign()
 					.getViewsPerUser());
 
-		double viewsperday = Math.min(b.getViewsPerDay(), b.campaign
+		double viewsperday = Math.min(b.getViewsPerDay(), b.getCampaign()
 				.getViewsPerDay())
 				/ server.numservers;
 		if (viewsperday == 0)
-			viewsperday = Math.max(b.getViewsPerDay(), b.campaign
+			viewsperday = Math.max(b.getViewsPerDay(), b.getCampaign()
 					.getViewsPerDay())
 					/ server.numservers;
 
-		double clicksperday = Math.min(b.getClicksperday(), b.campaign
+		double clicksperday = Math.min(b.getClicksperday(), b.getCampaign()
 				.getClicksperday())
 				/ server.numservers;
 		if (clicksperday == 0)
-			clicksperday = Math.max(b.getClicksperday(), b.campaign
+			clicksperday = Math.max(b.getClicksperday(), b.getCampaign()
 					.getClicksperday())
 					/ server.numservers;
 

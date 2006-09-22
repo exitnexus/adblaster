@@ -1,4 +1,4 @@
-package com.nexopia.adblaster;
+package com.nexopia.adblaster.util;
 
 import javax.swing.JFrame;
 import javax.swing.JProgressBar;

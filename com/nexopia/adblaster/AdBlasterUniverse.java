@@ -9,6 +9,11 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.Vector;
 
+import com.nexopia.adblaster.struct.Banner;
+import com.nexopia.adblaster.struct.Campaign;
+import com.nexopia.adblaster.struct.User;
+import com.nexopia.adblaster.util.Integer;
+import com.nexopia.adblaster.util.Interests;
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.EnvironmentConfig;
 
@@ -24,7 +29,7 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 		return b.size();
 	}
 	protected void addBanner(Banner banner) {
-		b.put(new Integer(banner.id), banner);
+		b.put(new Integer(banner.getID()), banner);
 	}
 
 	public User getUser(int i) {
@@ -36,7 +41,7 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 	}
 	
 	protected void addUser(User user) {
-		u.put(new Integer(user.id), user);
+		u.put(new Integer(user.getID()), user);
 	}
 
 	public AdBlasterUniverse(int interests, int num_banners, int num_users){
@@ -119,7 +124,7 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 		for (int i = 0; i < num_users; i++){
 			for (int j = 0; j < num_interests; j++){
 				if (Math.random() > 0.5){
-					ac.getUser(i).interests.add(j);
+					ac.getUser(i).getInterests().add(j);
 				}
 			}
 		}
@@ -130,13 +135,13 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 		 */
 		ac.getBannerByIndex(0).setPayrate(0);
 		ac.getBannerByIndex(0).setViewsPerDay(0);
-		ac.getBannerByIndex(0).interests.clear();
+		ac.getBannerByIndex(0).getInterests().clear();
 
 		for(int i = 1; i < num_banners; i++){
 			ac.getBannerByIndex(i).setPayrate((int)(Math.random()*10));
 			for (int j = 0; j < num_interests; j++){
 				if (Math.random() > 0.95){
-					ac.getBannerByIndex(i).interests.add(j);
+					ac.getBannerByIndex(i).getInterests().add(j);
 				}
 			}
 		}

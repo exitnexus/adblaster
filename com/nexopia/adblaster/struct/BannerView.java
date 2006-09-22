@@ -1,14 +1,16 @@
 /**
  * 
  */
-package com.nexopia.adblaster;
+package com.nexopia.adblaster.struct;
+
+import com.nexopia.adblaster.AbstractAdBlasterInstance;
 
 
 /**
  * BannerView objects should know their instance, and inform their instances when they
  * change.
  */
-class BannerView{
+public class BannerView{
 	private int uid;
 	private int bid;
 	private int time;
@@ -18,7 +20,7 @@ class BannerView{
 	private AbstractAdBlasterInstance inst;
 	public String comment = "";
 	
-	protected BannerView(AbstractAdBlasterInstance instance, int index, int uid, int bid, int t, byte size, int page){
+	public BannerView(AbstractAdBlasterInstance instance, int index, int uid, int bid, int t, byte size, int page){
 		this.uid = uid; this.bid = bid; time = t; inst = instance;
 		this.size = size;
 		this.page = page;
@@ -26,7 +28,7 @@ class BannerView{
 	}
 	
 	
-	Banner getBanner() {
+	public Banner getBanner() {
 		if (bid == -1){
 			return null;
 		}
@@ -39,11 +41,11 @@ class BannerView{
 		this.bid = b.id;
 	}
 
-	User getUser() {
+	public User getUser() {
 		return inst.universe.getUser(this.uid);
 	}
 
-	int getTime() {
+	public int getTime() {
 		return time;
 	}
 

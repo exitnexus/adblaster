@@ -1,4 +1,4 @@
-package com.nexopia.adblaster;
+package com.nexopia.adblaster.util;
 
 import java.util.*;
 /**

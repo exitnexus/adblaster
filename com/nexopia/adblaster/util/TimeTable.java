@@ -1,4 +1,4 @@
-package com.nexopia.adblaster;
+package com.nexopia.adblaster.util;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 
 public class TimeTable {
 	private Vector<String> invalidRanges;

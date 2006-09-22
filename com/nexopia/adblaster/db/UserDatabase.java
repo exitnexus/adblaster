@@ -4,13 +4,16 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-package com.nexopia.adblaster;
+package com.nexopia.adblaster.db;
 
 import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import com.nexopia.adblaster.IntegerBinding;
+import com.nexopia.adblaster.struct.User;
+import com.nexopia.adblaster.util.IntObjectHashMap;
 import com.sleepycat.je.CheckpointConfig;
 import com.sleepycat.je.Cursor;
 import com.sleepycat.je.Database;
@@ -32,7 +35,7 @@ public class UserDatabase {
 	private Database db;
 	private Environment env;
 	int userCount;
-	IntObjectHashMap cache;
+	public IntObjectHashMap cache;
 	int keys[] = null;
 	//Vector <Integer>keys = null;
 	
@@ -114,7 +117,7 @@ public class UserDatabase {
 					i++;
 					if (value.getData() != null) {
 						User u = (User)ub.entryToObject(value);
-						cache.put(u.id, u);
+						cache.put(u.getID(), u);
 					}
 				}
 				this.userCount = i;
@@ -124,14 +127,14 @@ public class UserDatabase {
 			//keys.clear();
 			//keys.addAll(cache.keySet());
 			int size = 0;
-			keys = new int[cache.m_entryCount];
+			keys = new int[cache.getEntryCount()];
 			System.out.println("Building user map...");
 			for (int i = 0; i < cache.getKeyArray().length; i++){
 				if (cache.getKeyArray()[i] != 0){
 					keys[size++] = cache.getKeyArray()[i];
 				}
 			}
-			System.out.println("Usermap size: " + size + ":" + cache.m_entryCount);
+			System.out.println("Usermap size: " + size + ":" + cache.getEntryCount());
 		} catch (Exception dbe) {
 			this.userCount = 0;
 			System.err.println("Database Exception in refreshUserCount(): " + dbe);

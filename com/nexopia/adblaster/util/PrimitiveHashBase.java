@@ -20,7 +20,7 @@
  * IN THE SOFTWARE.
  */
 
-package com.nexopia.adblaster;
+package com.nexopia.adblaster.util;
 
 import java.lang.reflect.Array;
 
@@ -259,5 +259,9 @@ public abstract class PrimitiveHashBase
 			slot = stepSlot(slot);
 		}
 		return slot;
+	}
+
+	public int getEntryCount() {
+		return m_entryCount;
 	}
 }

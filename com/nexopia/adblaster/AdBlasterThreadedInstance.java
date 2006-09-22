@@ -2,6 +2,12 @@ package com.nexopia.adblaster;
 
 import java.util.Vector;
 
+import com.nexopia.adblaster.struct.Banner;
+import com.nexopia.adblaster.struct.BannerView;
+import com.nexopia.adblaster.struct.I_Policy;
+import com.nexopia.adblaster.struct.ServablePropertyHolder;
+import com.nexopia.adblaster.util.ProgressIndicator;
+
 public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 	private Vector<BannerView> views;
 	private GlobalData gd;
@@ -61,7 +67,7 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 	}
 
 	@Override
-	int bannerCount(ServablePropertyHolder banner) {
+	public int bannerCount(ServablePropertyHolder banner) {
 		return gd.instance.bannerCount(banner);
 	}
 

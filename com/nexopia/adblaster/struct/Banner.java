@@ -4,19 +4,24 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-package com.nexopia.adblaster;
+package com.nexopia.adblaster.struct;
 
 import java.sql.SQLException;
 import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Vector;
 
-import com.nexopia.adblaster.Campaign.CampaignDB;
-import com.nexopia.adblaster.Utilities.PageValidator;
+import com.nexopia.adblaster.AbstractAdBlasterInstance;
+import com.nexopia.adblaster.db.JDBCConfig;
+import com.nexopia.adblaster.struct.Campaign.CampaignDB;
+import com.nexopia.adblaster.util.Integer;
+import com.nexopia.adblaster.util.Interests;
+import com.nexopia.adblaster.util.PageValidator;
+import com.nexopia.adblaster.util.Utilities;
 
 
 
-class Banner extends ServablePropertyHolder{
+public class Banner extends ServablePropertyHolder{
 	public static final int PAYRATE_INHERIT = -1;
 	public static final int PAYTYPE_CPM = 0;
 	public static final int PAYTYPE_CPC = 1;
@@ -88,7 +93,7 @@ class Banner extends ServablePropertyHolder{
 	}
 */	
 	
-	Banner(ResultSet rs, CampaignDB cdb, PageValidator pv) throws SQLException {
+	public Banner(ResultSet rs, CampaignDB cdb, PageValidator pv) throws SQLException {
 		this.index = counter();
 		this.pages = pv;
 		this.campaign = null;
@@ -106,7 +111,7 @@ class Banner extends ServablePropertyHolder{
 		
 	}
 	
-	int getID() {
+	public int getID() {
 		return id;
 	}
 	
@@ -343,5 +348,9 @@ class Banner extends ServablePropertyHolder{
 
 	public void setViews(int views) {
 		this.views = views;
+	}
+
+	public PageValidator getPageValidator() {
+		return this.pages;
 	}
 }

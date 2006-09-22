@@ -6,6 +6,13 @@ import java.util.Arrays;
 
 import javax.swing.JOptionPane;
 
+import com.nexopia.adblaster.struct.Banner;
+import com.nexopia.adblaster.struct.BannerView;
+import com.nexopia.adblaster.struct.I_Policy;
+import com.nexopia.adblaster.struct.ServablePropertyHolder;
+import com.nexopia.adblaster.util.Integer;
+import com.nexopia.adblaster.util.ProgressIndicator;
+
 public class AdBlasterPolicy implements I_Policy {
 	private HashMap<Banner, Float> coefficients;
 	AbstractAdBlasterUniverse universe;

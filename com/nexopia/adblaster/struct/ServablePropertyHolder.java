@@ -1,10 +1,15 @@
-package com.nexopia.adblaster;
+package com.nexopia.adblaster.struct;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Vector;
 
-import com.nexopia.adblaster.Utilities.PageValidator;
+import com.nexopia.adblaster.BannerServer;
+import com.nexopia.adblaster.util.Integer;
+import com.nexopia.adblaster.util.Interests;
+import com.nexopia.adblaster.util.PageValidator;
+import com.nexopia.adblaster.util.TimeTable;
+import com.nexopia.adblaster.util.Utilities;
 
 public class ServablePropertyHolder {
 

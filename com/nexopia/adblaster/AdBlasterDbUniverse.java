@@ -4,6 +4,14 @@ import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 
+import com.nexopia.adblaster.db.BannerDatabase;
+import com.nexopia.adblaster.db.PageDatabase;
+import com.nexopia.adblaster.db.UserDatabase;
+import com.nexopia.adblaster.struct.Banner;
+import com.nexopia.adblaster.struct.Campaign;
+import com.nexopia.adblaster.struct.User;
+import com.nexopia.adblaster.util.PageValidator2;
+import com.nexopia.adblaster.util.PageValidatorFactory;
 import com.sleepycat.je.DatabaseException;
 
 public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
@@ -22,7 +30,7 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 		try {
 			campaignDB = new Campaign.CampaignDB();
 			Object args[] = {pageDb};
-			bannerDB = new BannerDatabase(campaignDB, new PageValidatorFactory(Utilities.PageValidator2.class,args));
+			bannerDB = new BannerDatabase(campaignDB, new PageValidatorFactory(PageValidator2.class,args));
 			userDB = new UserDatabase(s);
 		} catch (DatabaseException e) {
 			e.printStackTrace();
@@ -34,7 +42,7 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 			PageDatabase pageDb = new PageDatabase(pagedb_file);
 			campaignDB = new Campaign.CampaignDB();
 			Object args[] = {pageDb};
-			bannerDB = new BannerDatabase(campaignDB, new PageValidatorFactory(Utilities.PageValidator2.class,args));
+			bannerDB = new BannerDatabase(campaignDB, new PageValidatorFactory(PageValidator2.class,args));
 			userDB = new UserDatabase(userdb_file);
 		} catch (DatabaseException e) {
 			e.printStackTrace();
@@ -94,7 +102,7 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 	}
 
 	public User getRandomUser() {
-		return userDB.getUserByIndex((int)(Math.random()*(userDB.userCount-1)));
+		return userDB.getUserByIndex((int)(Math.random()*(userDB.getUserCount()-1)));
 	}
 
 	public User getUserByIndex(int randomPick) {
@@ -102,7 +110,7 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 	}
 
 	public void addUser(User u) {
-		userDB.cache.put(u.id, u);
+		userDB.cache.put(u.getID(), u);
 		
 	}
 

@@ -25,7 +25,18 @@ import java.util.zip.GZIPOutputStream;
 
 import com.thoughtworks.xstream.XStream;
 
-import com.nexopia.adblaster.Campaign.CampaignDB;
+import com.nexopia.adblaster.db.BannerDatabase;
+import com.nexopia.adblaster.db.JDBCConfig;
+import com.nexopia.adblaster.struct.Banner;
+import com.nexopia.adblaster.struct.Campaign;
+import com.nexopia.adblaster.struct.I_Policy;
+import com.nexopia.adblaster.struct.ServablePropertyHolder;
+import com.nexopia.adblaster.struct.Campaign.CampaignDB;
+import com.nexopia.adblaster.util.IntObjectHashMap;
+import com.nexopia.adblaster.util.Integer;
+import com.nexopia.adblaster.util.Interests;
+import com.nexopia.adblaster.util.PageValidator1;
+import com.nexopia.adblaster.util.Utilities;
 
 public class BannerServer {
 	private static final int LOG_PORT = 5556;
@@ -71,7 +82,7 @@ public class BannerServer {
 	private static final int VIEW_WINDOWS = 5;
 	private final I_Policy policy;
 	
-	static HashMap<String, Boolean> debug=new HashMap<String,Boolean>();
+	public static HashMap<String, Boolean> debug=new HashMap<String,Boolean>();
 	{
 		debug.put("tick", Boolean.FALSE);
 		debug.put("connect", Boolean.FALSE);
@@ -227,7 +238,7 @@ public class BannerServer {
 			}
 			this.loc = expandArray(this.loc, loc);
 			this.loc[loc]++;
-			for(int i=interests.checked.nextSetBit(0); i>=0; i=interests.checked.nextSetBit(i+1)) { 
+			for(int i=interests.getChecked().nextSetBit(0); i>=0; i=interests.getChecked().nextSetBit(i+1)) { 
 				this.interests = expandArray(this.interests, i);
 				this.interests[i]++;
 			}
@@ -337,11 +348,11 @@ public class BannerServer {
 		this.db.deleteCampaign(id);
 	}
 	public boolean addBanner(int id) {
-		return this.db.add(id,new Utilities.PageValidator1()) != null;
+		return this.db.add(id,new PageValidator1()) != null;
 	}
 	
 	public boolean updateBanner(int id) {
-		return this.db.update(id,new Utilities.PageValidator1()) != null;
+		return this.db.update(id,new PageValidator1()) != null;
 	}
 	
 	public void deleteBanner(int id) {
@@ -375,14 +386,14 @@ public class BannerServer {
 
 		hourlystats.getOrCreate(b, HourlyStat.class).view();
 		bannerstats.getOrCreate(b, BannerStat.class).view();
-		campaignstats.getOrCreate(b.campaign, BannerStat.class).view();
+		campaignstats.getOrCreate(b.getCampaign(), BannerStat.class).view();
 		viewstats.getOrCreate(Integer.valueOf(b.getSize()), TypeStat.class).hit(age, sex, loc, interests, page, time);
 	}
 	
 	/**
 	 *  Return an int array of the times the user has viewed the banner. 
 	 */
-	int[] getViewsForUser(int userid, ServablePropertyHolder b) {
+	public int[] getViewsForUser(int userid, ServablePropertyHolder b) {
 		/* Get records of all views for the banner.*/
 		IntObjectHashMap userViewMap = viewMap.get(b);
 		if (userViewMap == null){
@@ -403,7 +414,7 @@ public class BannerServer {
 		Vector<Banner> vec = new Vector<Banner>();
 		for (int j = 0; j < old.size(); j++){
 			Banner b = old.get(j);
-			float score = b.payrate;
+			float score = b.getPayRate();
 			int i = -1;
 			while (true){
 				i++;
@@ -411,7 +422,7 @@ public class BannerServer {
 					break;
 				}
 				Banner b2 = vec.get(i);
-				if (b2.payrate < score)
+				if (b2.getPayRate() < score)
 					break;
 			}
 			vec.insertElementAt(b, i);
@@ -439,9 +450,9 @@ public class BannerServer {
 	boolean hasReachedMaxViews(Banner b) {
 		if ((b.getViews() + this.bannerstats.getOrCreate(b, BannerStat.class).dailyviews) >= b.getIntegerMaxViews())
 			return true;
-		if ((b.getCampaign().getViews() + this.campaignstats.getOrCreate(b.campaign, BannerStat.class).dailyviews) >= b.campaign.getIntegerMaxViews())
+		if ((b.getCampaign().getViews() + this.campaignstats.getOrCreate(b.getCampaign(), BannerStat.class).dailyviews) >= b.getCampaign().getIntegerMaxViews())
 			return true;
-		if (debug.get("development").booleanValue()) System.out.println("" + b.getCampaign().getViews() + " + " + this.campaignstats.getOrCreate(b.campaign, BannerStat.class).dailyviews + " < " + b.campaign.getIntegerMaxViews()); 
+		if (debug.get("development").booleanValue()) System.out.println("" + b.getCampaign().getViews() + " + " + this.campaignstats.getOrCreate(b.getCampaign(), BannerStat.class).dailyviews + " < " + b.getCampaign().getIntegerMaxViews()); 
 		return false;
 			
 	}
@@ -480,14 +491,14 @@ public class BannerServer {
 		for (int i = 0; i < banners.size(); i++) {
 			Banner banner_i = banners.get(i);
 			boolean b1 = banner_i.isValidForUser(userid, usertime, debug, this);
-			boolean b2 = banner_i.campaign.isValidForUser(userid, usertime,
+			boolean b2 = banner_i.getCampaign().isValidForUser(userid, usertime,
 					debug, this);
 			boolean b3 = !hasReachedViewsPerDay(banner_i);
 			boolean b4 = !hasReachedClicksPerDay(banner_i);
 			boolean b5 = !hasReachedMaxViews(banner_i);
 
 			if (debug)
-				System.out.println("" + banner_i.id + ":" + b1 + ":" + b2 + ":"
+				System.out.println("" + banner_i.getID() + ":" + b1 + ":" + b2 + ":"
 						+ b3 + ":" + b4);
 			if (b1 && b2 && b3 && b4 && b5) {
 				validBanners.add(banner_i);
@@ -499,8 +510,8 @@ public class BannerServer {
 			markBannerUsed(age, sex, location, interests, page,
 					usertime, userid, chosen);
 			if (debug)
-				System.out.println("PICKED:" + chosen.id);
-			return chosen.id;
+				System.out.println("PICKED:" + chosen.getID());
+			return chosen.getID();
 		}
 		if (debug)
 			System.out.println("Number of valid banners:" + validBanners.size());
@@ -514,10 +525,10 @@ public class BannerServer {
 
 		if (this.bannerstats.getOrCreate(b, BannerStat.class).dailyviews >= b.getIntegerMaxViewsPerDay()/numservers)
 			return true;
-		if (this.campaignstats.getOrCreate(b.campaign, BannerStat.class).dailyviews >= b.campaign.getIntegerMaxViewsPerDay()/numservers)
+		if (this.campaignstats.getOrCreate(b.getCampaign(), BannerStat.class).dailyviews >= b.getCampaign().getIntegerMaxViewsPerDay()/numservers)
 			return true;
 		if (debug.get("development").booleanValue()) System.out.println("Banner Views: " + this.bannerstats.getOrCreate(b, BannerStat.class).dailyviews + ":" + b.getIntegerMaxViewsPerDay()/numservers);
-		if (debug.get("development").booleanValue()) System.out.println("Campaign Views: " + this.campaignstats.getOrCreate(b.campaign, BannerStat.class).dailyviews + ":" + b.campaign.getIntegerMaxViewsPerDay()/numservers);
+		if (debug.get("development").booleanValue()) System.out.println("Campaign Views: " + this.campaignstats.getOrCreate(b.getCampaign(), BannerStat.class).dailyviews + ":" + b.getCampaign().getIntegerMaxViewsPerDay()/numservers);
 		return false;
 	}
 	
@@ -530,10 +541,10 @@ public class BannerServer {
 		}
 		
 		
-		if (this.campaignstats.get(b.campaign) == null){
-			this.campaignstats.put(b.campaign, new BannerStat());
+		if (this.campaignstats.get(b.getCampaign()) == null){
+			this.campaignstats.put(b.getCampaign(), new BannerStat());
 		}
-		if (this.campaignstats.get(b.campaign).dailyclicks >= b.campaign.getIntegerMaxClicksperday()/numservers) {
+		if (this.campaignstats.get(b.getCampaign()).dailyclicks >= b.getCampaign().getIntegerMaxClicksperday()/numservers) {
 			return true;
 		}
 		
@@ -739,12 +750,12 @@ public class BannerServer {
 		BannerStat bannerstat = this.bannerstats.getOrCreate(b, BannerStat.class);
 		
 		if (debug) {
-			Utilities.bannerDebug("minutely " + b.id + " " + bannerstat.dailyviews + 
+			Utilities.bannerDebug("minutely " + b.getID() + " " + bannerstat.dailyviews + 
 					" " + bannerstat.dailyclicks + " " + bannerstat.passbacks);
 		}
 		
 		if(bannerstat.hasChanged()) {
-			JDBCConfig.queueQuery("UPDATE " + JDBCConfig.BANNER_TABLE + " SET lastupdatetime = "+time+", views = views + "+bannerstat.current_views+", clicks = clicks + "+bannerstat.current_clicks+", passbacks = passbacks + "+bannerstat.passbacks+" WHERE id = " + b.id);
+			JDBCConfig.queueQuery("UPDATE " + JDBCConfig.BANNER_TABLE + " SET lastupdatetime = "+time+", views = views + "+bannerstat.current_views+", clicks = clicks + "+bannerstat.current_clicks+", passbacks = passbacks + "+bannerstat.passbacks+" WHERE id = " + b.getID());
 			bannerstat.current_views = 0;
 			bannerstat.current_clicks = 0;
 			bannerstat.passbacks = 0;
@@ -762,9 +773,9 @@ public class BannerServer {
 	
 	private void hourly(Banner b, boolean debug) {
 		if (debug) {
-			Utilities.bannerDebug("hour " + b.id);
+			Utilities.bannerDebug("hour " + b.getID());
 		}
-		JDBCConfig.queueQuery("REPLACE INTO " + JDBCConfig.BANNERSTAT_TABLE + " (bannerid, time, views, potentialviews, clicks, passbacks) SELECT id, lastupdatetime, views, potentialviews, clicks, passbacks FROM banners WHERE id = " + b.id);
+		JDBCConfig.queueQuery("REPLACE INTO " + JDBCConfig.BANNERSTAT_TABLE + " (bannerid, time, views, potentialviews, clicks, passbacks) SELECT id, lastupdatetime, views, potentialviews, clicks, passbacks FROM banners WHERE id = " + b.getID());
 		if (b.getPayType() == Banner.PAYTYPE_CPC) {
 			HourlyStat hourlystat = hourlystats.get(b);
 			b.setCoefficient(hourlystat.getClickRate()*b.getPayRate());
@@ -875,13 +886,13 @@ public class BannerServer {
 		}
 		case ADD: // "add id"
 			id = Integer.parseInt(params[0]);
-			db.add(id, new Utilities.PageValidator1()); //addBannerD(params);
+			db.add(id, new PageValidator1()); //addBannerD(params);
 			bannerDebug("add " + Arrays.toString(params));
 			break;
 		case UPDATE: // "update id"
 			//updateBannerD(params);
 			id = Integer.parseInt(params[0]);
-			db.add(id, new Utilities.PageValidator1()); 
+			db.add(id, new PageValidator1()); 
 			bannerDebug("update " + Arrays.toString(params));
 			break;
 			
@@ -900,7 +911,7 @@ public class BannerServer {
 				ResultSet rs = st.executeQuery("SELECT id FROM banners WHERE campaignid = " + id);
 				while (rs.next()) {
 					int bannerid = rs.getInt("id");
-					db.add(bannerid, new Utilities.PageValidator1());
+					db.add(bannerid, new PageValidator1());
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -916,7 +927,7 @@ public class BannerServer {
 				ResultSet rs = st.executeQuery("SELECT id FROM banners WHERE campaignid = " + id);
 				while (rs.next()) {
 					int bannerid = rs.getInt("id");
-					db.add(bannerid, new Utilities.PageValidator1());
+					db.add(bannerid, new PageValidator1());
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -927,7 +938,7 @@ public class BannerServer {
 		case DELCAMPAIGN: // "delcampaign id"
 			id = Integer.parseInt(params[0]);
 			for (Banner b: cdb.get(id).banners) {
-				db.delete(b.id);
+				db.delete(b.getID());
 			}
 			cdb.delete(id);
 			bannerDebug("deletecampaign "+ Arrays.toString(params));

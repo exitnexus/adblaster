@@ -4,7 +4,7 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-package com.nexopia.adblaster;
+package com.nexopia.adblaster.struct;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -17,12 +17,16 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
 
-import com.nexopia.adblaster.Utilities.PageValidator;
+import com.nexopia.adblaster.BannerServer;
+import com.nexopia.adblaster.db.JDBCConfig;
+import com.nexopia.adblaster.util.Integer;
+import com.nexopia.adblaster.util.Interests;
 
 
-class Campaign extends ServablePropertyHolder{
+
+public class Campaign extends ServablePropertyHolder{
 	
-	static class CampaignDB{
+	public static class CampaignDB{
 		private HashMap<Integer, Campaign> campaigns;
 		
 		public CampaignDB() {
@@ -119,7 +123,7 @@ class Campaign extends ServablePropertyHolder{
 	int id;
 	int payrate;
 	byte paytype;
-	Set<Banner> banners;
+	public Set<Banner> banners;
 	private int views;
 	private int clicks;
 	static int count = 0;

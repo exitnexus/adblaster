@@ -20,9 +20,10 @@
  * IN THE SOFTWARE.
  */
 
-package com.nexopia.adblaster;
+package com.nexopia.adblaster.util;
 
 import java.lang.reflect.Array;
+
 
 /**
  * Base class for type-specific hash map classes with primitive keys. This

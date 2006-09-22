@@ -2,7 +2,7 @@
  * Created on Jun 19, 2006
  *
  */
-package com.nexopia.adblaster;
+package com.nexopia.adblaster.db;
 
 
 import java.sql.ResultSet;
@@ -12,8 +12,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Vector;
 
-import com.nexopia.adblaster.Campaign.CampaignDB;
-import com.nexopia.adblaster.Utilities.PageValidator;
+import com.nexopia.adblaster.struct.Banner;
+import com.nexopia.adblaster.struct.Campaign;
+import com.nexopia.adblaster.struct.ServablePropertyHolder;
+import com.nexopia.adblaster.struct.Campaign.CampaignDB;
+import com.nexopia.adblaster.util.Integer;
+import com.nexopia.adblaster.util.PageValidator;
+import com.nexopia.adblaster.util.PageValidatorFactory;
 
 /**
  * @author wolfe

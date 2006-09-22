@@ -5,9 +5,17 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
 
+import com.nexopia.adblaster.struct.Banner;
+import com.nexopia.adblaster.struct.BannerView;
+import com.nexopia.adblaster.struct.Campaign;
+import com.nexopia.adblaster.struct.I_Policy;
+import com.nexopia.adblaster.struct.ServablePropertyHolder;
+import com.nexopia.adblaster.struct.User;
+import com.nexopia.adblaster.util.Integer;
+
 public abstract class AbstractAdBlasterInstance {
 
-	AbstractAdBlasterUniverse universe;
+	public AbstractAdBlasterUniverse universe;
 	protected HashMap <Banner, Integer>bannerCountMap = null;
 	protected HashMap <Campaign, Integer>campaignCountMap = null;
 	static Integer pool[];
@@ -35,7 +43,7 @@ public abstract class AbstractAdBlasterInstance {
 		boolean b1 = (b == null);
 		boolean b2 = bv.getSize() == b.getSize();
 		boolean b3 = b.validUser(bv.getUser());
-		boolean b4 = b.pages.validate(bv);
+		boolean b4 = b.getPageValidator().validate(bv);
 		boolean b5 = this.nearestWithinTimeRange(b, bv);
 		buf.append(b1 + ":"); 
 		buf.append(b2 + ":"); 
@@ -48,7 +56,7 @@ public abstract class AbstractAdBlasterInstance {
 	public boolean isValidBannerForView(BannerView bv, Banner b) {
 		return (b == null) || (bv.getSize() == b.getSize() &&
 				b.validUser(bv.getUser()) &&
-				b.pages.validate(bv) &&
+				b.getPageValidator().validate(bv) &&
 				this.nearestWithinTimeRange(b, bv));
 	}
 
@@ -68,7 +76,7 @@ public abstract class AbstractAdBlasterInstance {
 				}
 			}
 		}
-		if (b.campaign.getViewsPerUser() != 0) {
+		if (b.getCampaign().getViewsPerUser() != 0) {
 			Campaign c = b.getCampaign();
 			if (range == null){
 				range = scan(c, bv);
@@ -248,7 +256,7 @@ public abstract class AbstractAdBlasterInstance {
 		return unserved;
 	}
 
-	int bannerCount(ServablePropertyHolder banner) {
+	public int bannerCount(ServablePropertyHolder banner) {
 		return bannerCountMap.get(banner).intValue();
 	}
 	int campaignCount(Banner banner) {
@@ -337,7 +345,7 @@ public abstract class AbstractAdBlasterInstance {
 	 * @param bv
 	 * @param b
 	 */
-	synchronized protected void notifyChange(BannerView bv, Banner b){
+	public synchronized void notifyChange(BannerView bv, Banner b){
 		if (bv.getBanner() != null){
 			this.bannerCountMap.put(bv.getBanner(), 
 					new Integer((bannerCountMap.get(bv.getBanner())).intValue()-1));

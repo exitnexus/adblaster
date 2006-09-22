@@ -4,8 +4,10 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-package com.nexopia.adblaster;
+package com.nexopia.adblaster.db;
 
+import com.nexopia.adblaster.IntegerBinding;
+import com.nexopia.adblaster.struct.User;
 import com.sleepycat.bind.tuple.TupleBinding;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -20,7 +22,7 @@ import com.sleepycat.je.SecondaryKeyCreator;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-class UserBinding extends TupleBinding {
+public class UserBinding extends TupleBinding {
 	IntegerBinding ib = new IntegerBinding();
 	
 	/* (non-Javadoc)

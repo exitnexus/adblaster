@@ -3,6 +3,8 @@ package com.nexopia.adblaster;
 import java.io.File;
 import java.util.Vector;
 
+import com.nexopia.adblaster.struct.BannerView;
+import com.nexopia.adblaster.util.IntObjectHashMap;
 import com.sleepycat.je.DatabaseException;
 
 public class CacheBannerViewDatabase {

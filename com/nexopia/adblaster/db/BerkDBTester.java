@@ -1,13 +1,19 @@
 /*
  * Created on Jun 16, 2006
  */
-package com.nexopia.adblaster;
+package com.nexopia.adblaster.db;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.HashMap;
+
+import com.nexopia.adblaster.BannerViewCursor;
+import com.nexopia.adblaster.BannerViewDatabase;
+import com.nexopia.adblaster.struct.Banner;
+import com.nexopia.adblaster.struct.BannerView;
+import com.nexopia.adblaster.util.Integer;
 
 /**
  * DEPRECATED

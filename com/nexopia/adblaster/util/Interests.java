@@ -4,7 +4,7 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-package com.nexopia.adblaster;
+package com.nexopia.adblaster.util;
 
 import java.util.BitSet;
 import java.util.HashMap;
@@ -15,10 +15,11 @@ import java.util.StringTokenizer;
 import java.util.Vector;
 
 
-class Interests{
+
+public class Interests{
 	BitSet checked;
 	private static final Random rand = new Random();
-	boolean negate;
+	public boolean negate;
 	
 	//Interests(){
 	//  checked = new BitSet();
@@ -190,6 +191,10 @@ class Interests{
 			interests.checked.set(rand.nextInt(200));
 		}
 		return interests;
+	}
+
+	public BitSet getChecked() {
+		return this.checked;
 	}
 
 	

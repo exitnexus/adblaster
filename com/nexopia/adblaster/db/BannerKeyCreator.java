@@ -1,12 +1,16 @@
 /*
  * Created on Jun 19, 2006
  */
-package com.nexopia.adblaster;
+package com.nexopia.adblaster.db;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 
+import com.nexopia.adblaster.IntegerBinding;
+import com.nexopia.adblaster.struct.Banner;
+import com.nexopia.adblaster.struct.User;
+import com.nexopia.adblaster.util.Integer;
 import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.SecondaryDatabase;

@@ -4,10 +4,13 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-package com.nexopia.adblaster;
+package com.nexopia.adblaster.db;
 
 import java.util.WeakHashMap;
 
+import com.nexopia.adblaster.AbstractAdBlasterInstance;
+import com.nexopia.adblaster.AbstractAdBlasterUniverse;
+import com.nexopia.adblaster.struct.BannerView;
 import com.sleepycat.bind.tuple.TupleBinding;
 import com.sleepycat.bind.tuple.TupleInput;
 import com.sleepycat.bind.tuple.TupleOutput;
@@ -18,7 +21,7 @@ import com.sleepycat.bind.tuple.TupleOutput;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-class BannerViewBinding extends TupleBinding {
+public class BannerViewBinding extends TupleBinding {
 	
 	AbstractAdBlasterUniverse ac;
 	AbstractAdBlasterInstance inst;
@@ -46,13 +49,13 @@ class BannerViewBinding extends TupleBinding {
 	}*/
 	
 	/* Pass (null, null) to get a "write only" binding */
-	BannerViewBinding(AbstractAdBlasterUniverse universe, AbstractAdBlasterInstance i){
+	public BannerViewBinding(AbstractAdBlasterUniverse universe, AbstractAdBlasterInstance i){
 		ac = universe;
 		inst = i;
 	}
 
 	/*Must be called before entryToObject is called.*/
-	void setIndex(int i){
+	public void setIndex(int i){
 		currentIndex = i;
 		indexFresh = true;
 	}

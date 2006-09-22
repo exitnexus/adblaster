@@ -19,7 +19,11 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
-final class AdBlasterThreadedOperation implements Runnable {
+import com.nexopia.adblaster.struct.Banner;
+import com.nexopia.adblaster.struct.BannerView;
+import com.nexopia.adblaster.util.ProgressIndicator;
+
+public final class AdBlasterThreadedOperation implements Runnable {
 	private final GlobalData gd;
 	private final AdBlasterThreadedInstance chunk;
 	private final String name;

@@ -1,4 +1,8 @@
-package com.nexopia.adblaster;
+package com.nexopia.adblaster.struct;
+
+import com.nexopia.adblaster.AbstractAdBlasterInstance;
+import com.nexopia.adblaster.AdBlasterThreadedOperation;
+import com.nexopia.adblaster.BannerServer;
 
 public interface I_Policy {
 

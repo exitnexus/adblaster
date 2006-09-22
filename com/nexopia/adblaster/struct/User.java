@@ -4,13 +4,16 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-package com.nexopia.adblaster;
+package com.nexopia.adblaster.struct;
 
 import java.util.Random;
 
+import com.nexopia.adblaster.util.Integer;
+import com.nexopia.adblaster.util.Interests;
 
 
-class User {
+
+public class User {
 	Interests interests;
 	int id;
 	byte age;
@@ -18,7 +21,7 @@ class User {
 	short location;
 	static final Random rand = new Random();
 	
-	User() {
+	public User() {
 		interests = null;
 		id=0;
 		age=0;
@@ -26,7 +29,7 @@ class User {
 		location=0;
 	}
 	
-	User(int id, byte age, byte sex, short location, String interests) {
+	public User(int id, byte age, byte sex, short location, String interests) {
 		this(id,age,sex,location,new Interests(interests, false));
 		if (this.interests.negate == true){
 			throw new UnsupportedOperationException();
@@ -59,7 +62,7 @@ class User {
 		}
 	}
 
-	int getID() {
+	public int getID() {
 		return id;
 	}
 	static String sexes[] = {"u","m","f"};
@@ -67,25 +70,25 @@ class User {
 	public String toString(){
 		return new Integer(id).toString() + ":" + age + ":" + sexes[sex];
 	}
-	byte getAge() {
+	public byte getAge() {
 		return age;
 	}
 	void setAge(byte age) {
 		this.age = age;
 	}
-	Interests getInterests() {
+	public Interests getInterests() {
 		return interests;
 	}
 	void setInterests(Interests interests) {
 		this.interests = interests;
 	}
-	short getLocation() {
+	public short getLocation() {
 		return location;
 	}
 	void setLocation(short location) {
 		this.location = location;
 	}
-	byte getSex() {
+	public byte getSex() {
 		return sex;
 	}
 	void setSex(byte sex) {

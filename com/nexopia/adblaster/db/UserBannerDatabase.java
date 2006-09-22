@@ -4,7 +4,7 @@
  * TODO To change the template for this generated file go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-package com.nexopia.adblaster;
+package com.nexopia.adblaster.db;
 
 import java.io.File;
 import java.util.Collection;
@@ -12,7 +12,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-import com.nexopia.adblaster.Campaign.CampaignDB;
+import com.nexopia.adblaster.struct.Banner;
+import com.nexopia.adblaster.struct.Campaign;
+import com.nexopia.adblaster.struct.User;
+import com.nexopia.adblaster.struct.Campaign.CampaignDB;
+import com.nexopia.adblaster.util.PageValidatorFactory;
 import com.sleepycat.je.CheckpointConfig;
 import com.sleepycat.je.Database;
 import com.sleepycat.je.DatabaseConfig;
