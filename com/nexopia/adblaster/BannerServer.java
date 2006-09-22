@@ -69,6 +69,7 @@ public class BannerServer {
 	public static final int STATS_WINDOW = 60;
 	private static final int NO_BANNER = 0;
 	private static final int VIEW_WINDOWS = 5;
+	private final I_Policy policy;
 	
 	static HashMap<String, Boolean> debug=new HashMap<String,Boolean>();
 	{
@@ -101,7 +102,7 @@ public class BannerServer {
 			BANNER_BIGBOX, BANNER_SKY120, BANNER_SKY160,
 			BANNER_BUTTON60, BANNER_VULCAN, BANNER_LINK};
 	
-	private static int numservers;
+	static int numservers;
 	private static Random rand = new Random();
 	//public banners;
 	//public bannerids;
@@ -112,7 +113,7 @@ public class BannerServer {
 	//public int time;
 	private HashMap<ServablePropertyHolder,IntObjectHashMap> viewMap = new HashMap<ServablePropertyHolder, IntObjectHashMap>();
 	Vector<Banner> banners = new Vector<Banner>();
-	private FastMap<Banner, BannerStat> bannerstats;
+	FastMap<Banner, BannerStat> bannerstats;
 	private FastMap<Integer, TypeStat> viewstats = new FastMap<Integer,TypeStat>();
 	private FastMap<Integer, TypeStat> clickstats = new FastMap<Integer,TypeStat>();
 	private FastMap<Campaign, BannerStat> campaignstats = new FastMap<Campaign,BannerStat>();
@@ -290,7 +291,7 @@ public class BannerServer {
 	}
 	
 	public BannerServer(BannerDatabase db, CampaignDB cdb, int numservers) {
-		
+		this.policy = new OldPolicy(cdb);
 		this.db = db;
 		this.cdb = cdb;
 		BannerServer.numservers = numservers;
@@ -348,31 +349,6 @@ public class BannerServer {
 	}
 	
 	/**
-	 * Determine whether it is valid for a user to view this banner
-	 * at this time. 
-	 */
-	public boolean isValidForUser(int userid, int time, ServablePropertyHolder b){
-		if (b.getViewsPerUser() <= 0)
-			return true;
-		
-		/* Find the oldest view*/
-		int[] views = getViewsForUser(userid, b);
-
-		if (views[0] != 0){
-			if (debug.get("development").booleanValue()) System.out.println(time + ":" + views[0] + " > " + b.getLimitByPeriod());
-			if (time - views[0] > b.getLimitByPeriod())
-				/* If the oldest view is outside of limit period, we're golden */
-				return true;
-			else
-				return false;
-		}
-		
-		/* If we've fallen through, then there are no views.*/
-		return true;
-		
-	}
-	
-	/**
 	 * Indicate that a user used a banner at a certain time. 
 	 */
 	public void markBannerUsed(int age, int sex, int loc, Interests interests, String page, int time, int userid, Banner b){
@@ -406,7 +382,7 @@ public class BannerServer {
 	/**
 	 *  Return an int array of the times the user has viewed the banner. 
 	 */
-	private int[] getViewsForUser(int userid, ServablePropertyHolder b) {
+	int[] getViewsForUser(int userid, ServablePropertyHolder b) {
 		/* Get records of all views for the banner.*/
 		IntObjectHashMap userViewMap = viewMap.get(b);
 		if (userViewMap == null){
@@ -460,39 +436,7 @@ public class BannerServer {
 	 * @return
 	 */
 	
-	public int getBanner(int usertime, int size, int userid, byte age, byte sex, short location, Interests interests, String page, boolean debug){
-		Vector<Banner> banners = new Vector<Banner>();
-		for (Campaign campaign : cdb.getCampaigns()){
-			banners.addAll(campaign.getBanners(usertime, size, userid, age, sex, location, interests, page, debug));
-		}
-		Vector<Banner> validBanners = new Vector<Banner>();
-		
-		for (int i = 0; i < banners.size(); i++){
-			Banner banner_i = banners.get(i);
-			boolean b1 = isValidForUser(userid, usertime, banner_i);
-			boolean b2 = isValidForUser(userid, usertime, banner_i.campaign);
-			boolean b3 = !hasReachedViewsPerDay(banner_i);
-			boolean b4 = !hasReachedClicksPerDay(banner_i);
-			boolean b5 = !hasReachedMaxViews(banner_i);
-			
-			if (debug) System.out.println("" + banner_i.id + ":" + b1 + ":"+b2+":"+b3+":"+b4);
-			if ( b1 && b2 && b3 && b4 && b5){
-				validBanners.add(banner_i);
-			}
-		}
-		
-		Banner chosen = weightedChoice(validBanners, userid, usertime);
-		if (chosen != null) {
-			markBannerUsed(age, sex, location, interests, page, usertime, userid, chosen);
-			if (debug) System.out.println("PICKED:" + chosen.id);
-			return chosen.id;
-		}
-		if (debug) System.out.println("Number of valid banners:" + validBanners.size());
-			
-		return 0;
-	}
-	
-	private boolean hasReachedMaxViews(Banner b) {
+	boolean hasReachedMaxViews(Banner b) {
 		if ((b.getViews() + this.bannerstats.getOrCreate(b, BannerStat.class).dailyviews) >= b.getIntegerMaxViews())
 			return true;
 		if ((b.getCampaign().getViews() + this.campaignstats.getOrCreate(b.campaign, BannerStat.class).dailyviews) >= b.campaign.getIntegerMaxViews())
@@ -507,7 +451,7 @@ public class BannerServer {
 		double[] priorities = new double[validBanners.size()];
 		for (int i=0; i<validBanners.size(); i++) {
 			Banner b = validBanners.get(i);
-			double priority = getPriority(b, uid, time);
+			double priority = policy.getPriority(b, uid, time, this);
 			priorities[i] = priority;
 			total += priority;
 		}
@@ -523,50 +467,50 @@ public class BannerServer {
 		return null;
 	}
 
+	public int getBestBanner(int usertime, int size, int userid, byte age,
+			byte sex, short location, Interests interests, String page,
+			boolean debug) {
+		Vector<Banner> banners = new Vector<Banner>();
+		for (Campaign campaign : cdb.getCampaigns()) {
+			banners.addAll(campaign.getBanners(usertime, size, userid, age,
+					sex, location, interests, page, debug));
+		}
+		Vector<Banner> validBanners = new Vector<Banner>();
 
-	/*weighting based on
-				(1 + priority) *
-				(2 - (1-(time since last view/max view rate)) *
-				(3 - ((views today)/(max views per day))) *
-				(3 - ((clicks today)/(max clicks per day)))
-	*/
-	private double getPriority(Banner b, int uid, int time) {
-		double priority = b.getCoefficient() + 1;
-		
-		double period = Math.min(b.getLimitByPeriod(), b.campaign.getLimitByPeriod());
-		if (period == 0) period = Math.max(b.getLimitByPeriod(), b.campaign.getLimitByPeriod());
-		
-		double viewsperuser = Math.min(b.getViewsPerUser(), b.campaign.getViewsPerUser());
-		if (viewsperuser == 0) viewsperuser = Math.max(b.getViewsPerUser(), b.campaign.getViewsPerUser());
-		
-		double viewsperday = Math.min(b.getViewsPerDay(), b.campaign.getViewsPerDay())/numservers;
-		if (viewsperday == 0) viewsperday = Math.max(b.getViewsPerDay(), b.campaign.getViewsPerDay())/numservers;
-		
-		double clicksperday = Math.min(b.getClicksperday(), b.campaign.getClicksperday())/numservers;
-		if (clicksperday == 0) clicksperday = Math.max(b.getClicksperday(), b.campaign.getClicksperday())/numservers;
-		
-		
-		if (viewsperuser != 0) {
-			int[] viewTimes = getViewsForUser(uid, b);
-			if (viewTimes.length != 0 && viewTimes[viewTimes.length-1] != 0 && period != 0) {
-				priority *= 2 - Math.max(1-((time - viewTimes[viewTimes.length-1])/period)*viewsperuser, 0);
-			} else {
-				priority *= 2;
+		for (int i = 0; i < banners.size(); i++) {
+			Banner banner_i = banners.get(i);
+			boolean b1 = banner_i.isValidForUser(userid, usertime, debug, this);
+			boolean b2 = banner_i.campaign.isValidForUser(userid, usertime,
+					debug, this);
+			boolean b3 = !hasReachedViewsPerDay(banner_i);
+			boolean b4 = !hasReachedClicksPerDay(banner_i);
+			boolean b5 = !hasReachedMaxViews(banner_i);
+
+			if (debug)
+				System.out.println("" + banner_i.id + ":" + b1 + ":" + b2 + ":"
+						+ b3 + ":" + b4);
+			if (b1 && b2 && b3 && b4 && b5) {
+				validBanners.add(banner_i);
 			}
 		}
-		
-		if (viewsperday != 0) {
-			priority *= (3-this.bannerstats.get(b).dailyviews/viewsperday);
+
+		Banner chosen = weightedChoice(validBanners, userid, usertime);
+		if (chosen != null) {
+			markBannerUsed(age, sex, location, interests, page,
+					usertime, userid, chosen);
+			if (debug)
+				System.out.println("PICKED:" + chosen.id);
+			return chosen.id;
 		}
-		
-		if (clicksperday != 0) {
-			priority *= (3-this.bannerstats.get(b).dailyviews/clicksperday);
-		}
-		
-		return priority;
+		if (debug)
+			System.out.println("Number of valid banners:" + validBanners.size());
+
+		return 0;
+
 	}
 
-	private boolean hasReachedViewsPerDay(Banner b) {
+
+	boolean hasReachedViewsPerDay(Banner b) {
 
 		if (this.bannerstats.getOrCreate(b, BannerStat.class).dailyviews >= b.getIntegerMaxViewsPerDay()/numservers)
 			return true;
@@ -577,7 +521,7 @@ public class BannerServer {
 		return false;
 	}
 	
-	private boolean hasReachedClicksPerDay(Banner b) {
+	boolean hasReachedClicksPerDay(Banner b) {
 		if (this.bannerstats.get(b) == null){
 			this.bannerstats.put(b, new BannerStat());
 		}
@@ -875,7 +819,7 @@ public class BannerServer {
 			if(passback != 0)
 				passbackBanner(passback, userid);
 			
-			int ret = getBanner(usertime, size, userid, age, sex, loc, interests, page, debugGet);
+			int ret = getBestBanner(usertime, size, userid, age, sex, loc, interests, page, debugGet);
 			
 			if (debug.get("passback").booleanValue()) {
 				Integer uid = Integer.valueOf(userid);

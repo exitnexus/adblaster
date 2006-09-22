@@ -183,4 +183,9 @@ public class AdBlasterPolicy implements I_Policy {
 		return coefficients;
 	}
 
+	public double getPriority(Banner b, int uid, int time, BannerServer server) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 }

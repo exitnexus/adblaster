@@ -254,4 +254,30 @@ public class ServablePropertyHolder {
 		else
 			return this.maxviews;
 	}
+	
+	
+	/**
+	 * Determine whether it is valid for a user to view this banner
+	 * at this time. 
+	 */
+	public boolean isValidForUser(int userid, int time, boolean debug, BannerServer server){
+		if (getViewsPerUser() <= 0)
+			return true;
+		
+		/* Find the oldest view*/
+		int[] views = server.getViewsForUser(userid, this);
+
+		if (views[0] != 0){
+			if (debug) System.out.println(time + ":" + views[0] + " > " + getLimitByPeriod());
+			if (time - views[0] > getLimitByPeriod())
+				/* If the oldest view is outside of limit period, we're golden */
+				return true;
+			else
+				return false;
+		}
+		
+		/* If we've fallen through, then there are no views.*/
+		return true;
+		
+	}
 }

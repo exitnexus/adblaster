@@ -10,4 +10,7 @@ public interface I_Policy {
 
 	public abstract Float getCoefficient(ServablePropertyHolder bannerByIndex);
 
+	public abstract double getPriority(Banner b, int uid, int time, BannerServer server);
+
+
 }
