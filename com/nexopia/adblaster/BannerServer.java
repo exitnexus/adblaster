@@ -1,29 +1,20 @@
 package com.nexopia.adblaster;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Random;
 import java.util.Vector;
 import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
-import com.thoughtworks.xstream.XStream;
 
 import com.nexopia.adblaster.db.BannerDatabase;
 import com.nexopia.adblaster.db.JDBCConfig;
@@ -31,7 +22,10 @@ import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.Campaign;
 import com.nexopia.adblaster.struct.I_Policy;
 import com.nexopia.adblaster.struct.ServablePropertyHolder;
+import com.nexopia.adblaster.struct.TypeStat;
 import com.nexopia.adblaster.struct.Campaign.CampaignDB;
+import com.nexopia.adblaster.util.EasyDatagramSocket;
+import com.nexopia.adblaster.util.FastMap;
 import com.nexopia.adblaster.util.IntObjectHashMap;
 import com.nexopia.adblaster.util.Integer;
 import com.nexopia.adblaster.util.Interests;
@@ -134,17 +128,6 @@ public class BannerServer {
 	private int logserver_port;
 	private String logserver;
 
-	private final class EasyDatagramSocket extends DatagramSocket {
-		public EasyDatagramSocket() throws SocketException {
-			super();
-		}
-
-		public void send(String s) throws IOException{
-			byte[] b = s.getBytes();
-			this.send(new DatagramPacket(b,b.length,this.getRemoteSocketAddress()));
-		}
-	}
-
 	static class ServerStat {
 		int starttime;
 		public ServerStat() {
@@ -174,98 +157,6 @@ public class BannerServer {
 		public void click() {
 			dailyclicks++;
 			current_clicks++;
-		}
-	}
-	
-	static class TypeStat {
-		private static XStream xstream = new XStream();
-		private static final boolean COMPRESS = true; 
-		private static final String GZIP_ENCODING = "ISO8859_1";
-		
-		public byte[] toXML() {
-			xstream.alias("typestat", TypeStat.class);
-			xstream.alias("integer", Integer.class);
-			if (!COMPRESS) {
-				try {
-					return xstream.toXML(this).getBytes(GZIP_ENCODING);
-				} catch (UnsupportedEncodingException e) {
-					e.printStackTrace();
-					return null;
-				}
-			} else {
-				GZIPOutputStream gz = null;
-				ByteArrayOutputStream bytes = null;
-				try {
-					bytes = new ByteArrayOutputStream(30000); 
-					gz = new GZIPOutputStream(bytes);
-					gz.write(xstream.toXML(this).getBytes());
-					gz.finish();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				//System.out.println(bytes.toString());
-				return bytes.toByteArray();
-			}
-			
-		}
-		
-		public static int INITIAL_ARRAY_SIZE = 100;
-		public int starttime;
-		private int total;
-		private int[][] agesex;
-		private int[] loc;
-		private int[] interests;
-		private int[][] hittimes;
-		private HashMap<String, Integer> pages;
-		
-		public TypeStat() {
-			total = 0;
-			starttime = (int)(System.currentTimeMillis()/1000);
-			loc = new int[INITIAL_ARRAY_SIZE];
-			interests = new int[INITIAL_ARRAY_SIZE];
-			agesex = new int[INITIAL_ARRAY_SIZE][3];
-			hittimes = new int[7][24];
-			pages = new HashMap<String, Integer>();
-		}
-		
-		public void hit(int age, int sex, int loc, Interests interests, String page, int time) {
-			total++;
-			Calendar c = Calendar.getInstance();
-			c.setTime(new Timestamp((long)time*1000));
-			hittimes[c.get(Calendar.DAY_OF_WEEK)-1][c.get(Calendar.HOUR_OF_DAY)]++;
-			if (age < 100 && age >= 0) {
-				agesex[age][sex]++;
-			}
-			this.loc = expandArray(this.loc, loc);
-			this.loc[loc]++;
-			for(int i=interests.getChecked().nextSetBit(0); i>=0; i=interests.getChecked().nextSetBit(i+1)) { 
-				this.interests = expandArray(this.interests, i);
-				this.interests[i]++;
-			}
-			Integer pageviews = pages.get(page);
-			if (pageviews == null) {
-				pageviews = Integer.valueOf(1);
-			} else {
-				int i = pageviews.intValue();
-				i++;
-				pageviews.free();
-				pageviews = Integer.valueOf(i);
-			}
-			pages.put(page, pageviews);
-				
-		}
-
-		private int[] expandArray(int[] array, int new_val) {
-			if (array.length > new_val) {
-				return array;
-			} else {
-				int new_size = Math.max(array.length*2, new_val+1);
-				int[] new_array = new int[new_size];
-				for (int i=0; i<array.length; i++) {
-					new_array[i] = array[i];
-				}
-				return new_array;
-			}
 		}
 	}
 	
@@ -408,27 +299,6 @@ public class BannerServer {
 			userViewMap.put(userid, views);
 		}
 		return views;
-	}
-	
-	private Vector<Banner> orderBannersByScore(Vector<Banner> old) {
-		Vector<Banner> vec = new Vector<Banner>();
-		for (int j = 0; j < old.size(); j++){
-			Banner b = old.get(j);
-			float score = b.getPayRate();
-			int i = -1;
-			while (true){
-				i++;
-				if (i >= vec.size()){
-					break;
-				}
-				Banner b2 = vec.get(i);
-				if (b2.getPayRate() < score)
-					break;
-			}
-			vec.insertElementAt(b, i);
-			
-		}
-		return vec;
 	}
 	
 	/**
@@ -587,66 +457,6 @@ public class BannerServer {
 			recentviews.add(new HashMap<Integer, Vector<Integer>>());
 		}
 	}
-	static class FastMap <K, V> {
-		HashMap <K,V>map;
-		
-		FastMap(){
-			map = new HashMap<K,V>();
-		}
-		
-		FastMap(K key, V val){
-			map = new HashMap<K,V>();
-			map.put(key, val);
-		}
-		
-		public V getOrCreate(K k, Class defaultValue) {
-			V elem = this.get(k);
-			if(elem == null){
-				try {
-					elem = (V) defaultValue.newInstance();
-				} catch (SecurityException e) {
-					e.printStackTrace();
-				} catch (InstantiationException e) {
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					e.printStackTrace();
-				}
-				this.put(k,elem);
-			}
-			return elem;
-		}
-		HashMap getMap(){
-			return map;
-		}
-		void put(K k, V v){
-			map.put(k,v);
-		}
-		V get(K k){
-			return map.get(k);
-		}
-		
-	}
-	
-	static class FastVec <T> implements Iterable{
-		Vector <T>v;
-		public FastVec(T obj){
-			v = new Vector<T>();
-			v.add(obj);
-		}
-		public FastVec add(T obj){
-			v.add(obj);
-			return this;
-		}
-		public Iterator iterator() {
-			return v.iterator();
-		}
-		public boolean isEmpty(){
-			return v.isEmpty();
-		}
-		
-	}
-	
-	
 	private int parseCommand(String command) {
 		int cmd;
 		if (command.toUpperCase().equals("GET")) {
