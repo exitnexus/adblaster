@@ -320,8 +320,8 @@ class Banner extends ServablePropertyHolder{
 		return true;
 	}
 
-	public int getCoefficient() {
-		return payrate;
+	public double getCoefficient() {
+		return coefficient;
 	}
 
 	public void setCoefficient(double coefficient) {

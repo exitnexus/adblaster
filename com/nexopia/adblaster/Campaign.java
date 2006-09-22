@@ -329,7 +329,7 @@ class Campaign extends ServablePropertyHolder{
 		boolean b2 = !this.valid(usertime, size, userid, age, sex, location, interests, page, debug);		
 		if (b1 || b2) {
 			if (BannerServer.debug.get("development").booleanValue())
-				System.out.println("Campaign " + this.toString() + " is: " + b1 + ":" + b2);
+				System.out.println("Campaign " + this.toString() + " is: " + (b1?"empty":"non-empty") + ":" + (b2?"invalid":"valid"));
 			return hs;
 		} else {
 			for (Banner b : this.banners) {

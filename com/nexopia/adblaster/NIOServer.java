@@ -230,7 +230,25 @@ public class NIOServer {
 						client.close();
 						continue;
 					}
-					
+					String result = null;
+					try {
+						BannerServer.bannerDebug(strbuf.toString());
+						result = banners.receive(strbuf.toString().trim());
+					} catch (Exception e) {
+						BannerServer.bannerDebug("Unexpected exception when attempting to handle input '" + strbuf.toString() + "'");
+						e.printStackTrace();
+					}
+					try {
+						ByteBuffer output = charset.encode(result+"-"+index+'\n');
+						//System.out.println(output.toString());
+						client.write(output);
+						index++;
+					} catch (Exception e) {
+						//set some error indication value in result
+						BannerServer.bannerDebug("Error writing banner result value");
+						e.printStackTrace();
+					}
+
 					continue;
 				}
 			}
