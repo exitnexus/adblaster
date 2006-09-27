@@ -1,0 +1,4 @@
+#Note to Travis: revision 4798 is the one you're going to need.  The libraries you'll need that aren't in the trunk are bdbje and mysql-connector, a google for either will get you right to them.
+javac -classpath /home/baxter/share/berkeleyje/je-3.0.12/lib/je.jar:/home/baxter/share/mysql-connector/mysql-connector-java-3.1.13/mysql-connector-java-3.1.13-bin.jar:/home/baxter/src/adblaster.4905/:/home/baxter/src/adblaster.4905/xstream-1.2.jar:/home/baxter/src/adblaster.4905/xpp3_min-1.1.3.4.0.jar com/nexopia/adblaster/*.java
+
+java -Xmx1024M -classpath /home/baxter/share/berkeleyje/je-3.0.12/lib/je.jar:/home/baxter/share/mysql-connector/mysql-connector-java-3.1.13/mysql-connector-java-3.1.13-bin.jar:/home/baxter/src/adblaster.4905/:/home/baxter/src/adblaster.4905/xstream-1.2.jar:/home/baxter/src/adblaster.4905/xpp3_min-1.1.3.4.0.jar com/nexopia/adblaster/NIOServer
