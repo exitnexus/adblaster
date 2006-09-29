@@ -12,7 +12,6 @@ import java.util.List;
 
 import javax.swing.JFileChooser;
 
-import com.nexopia.adblaster.IntegerBinding;
 import com.nexopia.adblaster.util.IntObjectHashMap;
 import com.sleepycat.bind.tuple.StringBinding;
 import com.sleepycat.je.CheckpointConfig;

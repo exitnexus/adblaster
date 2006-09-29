@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 
-import com.nexopia.adblaster.IntegerBinding;
 import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.User;
 import com.nexopia.adblaster.util.Integer;

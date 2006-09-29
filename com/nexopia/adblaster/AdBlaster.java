@@ -22,6 +22,7 @@ import javax.swing.table.DefaultTableModel;
 
 import com.nexopia.adblaster.struct.BannerView;
 import com.nexopia.adblaster.util.ProgressIndicator;
+import com.nexopia.adblaster.util.Utilities;
 
 public class AdBlaster {
 
@@ -30,29 +31,10 @@ public class AdBlaster {
 	static AdBlasterDbUniverse ac;
 	static AdBlasterDbInstance instanc;
 	
-	static File user_dir = null;
-	static File page_dir = null;
-	static File bv_dir = null;
+	private static File user_dir = null;
+	private static File page_dir = null;
+	private static File bv_dir = null;
 
-	public static File getDir(String name){
-		if (bv_dir == null){
-			JFileChooser u_jfc = new JFileChooser();
-		
-			u_jfc.setDialogTitle("Choose the " + name + " directory to load");
-			u_jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			
-		    int returnVal = u_jfc.showOpenDialog(null);
-		    if(returnVal == JFileChooser.APPROVE_OPTION) {
-		       System.out.println("You chose to open this file: " +
-		            u_jfc.getSelectedFile().getName());
-		    } else {
-		    	System.exit(0);
-		    }
-		    bv_dir = u_jfc.getSelectedFile();
-		} 
-		
-		return bv_dir; 
-	}
 	
 	public static void main(String args[]){
 		File dataFile = null;
@@ -62,9 +44,9 @@ public class AdBlaster {
 			user_dir = new File(args[1]);
 			page_dir = new File(args[2]);
 		} else {
-			bv_dir = getDir("BannerView");
-			user_dir = getDir("User");
-			page_dir = getDir("Page");
+			bv_dir = Utilities.getDir("BannerView");
+			user_dir = Utilities.getDir("User");
+			page_dir = Utilities.getDir("Page");
 		}
 		
 		if (args.length == 4){

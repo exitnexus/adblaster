@@ -3,7 +3,6 @@
  */
 package com.nexopia.adblaster.db;
 
-import com.nexopia.adblaster.IntegerBinding;
 import com.nexopia.adblaster.struct.BannerView;
 import com.nexopia.adblaster.util.Integer;
 import com.sleepycat.bind.tuple.TupleBinding;

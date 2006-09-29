@@ -11,7 +11,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-import com.nexopia.adblaster.IntegerBinding;
 import com.nexopia.adblaster.struct.User;
 import com.nexopia.adblaster.util.IntObjectHashMap;
 import com.sleepycat.je.CheckpointConfig;

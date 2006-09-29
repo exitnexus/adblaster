@@ -16,7 +16,8 @@ import com.sleepycat.je.DatabaseException;
 
 public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 	private BannerDatabase bannerDB;
-	UserDatabase userDB;
+	private UserDatabase userDB;
+	private PageDatabase pageDb;
 	public Campaign.CampaignDB campaignDB;
 
 	public Campaign getCampaignByIndex(int i) {
@@ -28,6 +29,7 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 
 	public AdBlasterDbUniverse(String s, PageDatabase pageDb){
 		try {
+			this.pageDb = pageDb;
 			campaignDB = new Campaign.CampaignDB();
 			Object args[] = {pageDb};
 			bannerDB = new BannerDatabase(campaignDB, new PageValidatorFactory(PageValidator2.class,args));
@@ -40,6 +42,7 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 	public AdBlasterDbUniverse(File userdb_file, File pagedb_file){
 		try {
 			PageDatabase pageDb = new PageDatabase(pagedb_file);
+			this.pageDb = pageDb;
 			campaignDB = new Campaign.CampaignDB();
 			Object args[] = {pageDb};
 			bannerDB = new BannerDatabase(campaignDB, new PageValidatorFactory(PageValidator2.class,args));
@@ -116,5 +119,9 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 
 	public void saveCoefficients(HashMap<Banner,Float> coefficients) {
 		bannerDB.saveCoefficients(coefficients);
+	}
+
+	public PageDatabase getPageDatabase() {
+		return this.pageDb;
 	}
 }

@@ -7,6 +7,7 @@
 package com.nexopia.adblaster;
 
 import com.nexopia.adblaster.db.BannerViewBinding;
+import com.nexopia.adblaster.db.IntegerBinding;
 import com.nexopia.adblaster.struct.BannerView;
 import com.sleepycat.je.Cursor;
 import com.sleepycat.je.DatabaseEntry;

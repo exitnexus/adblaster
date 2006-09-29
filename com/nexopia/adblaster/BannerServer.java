@@ -19,9 +19,12 @@ import java.util.zip.GZIPInputStream;
 import com.nexopia.adblaster.db.BannerDatabase;
 import com.nexopia.adblaster.db.JDBCConfig;
 import com.nexopia.adblaster.struct.Banner;
+import com.nexopia.adblaster.struct.BannerStat;
 import com.nexopia.adblaster.struct.Campaign;
+import com.nexopia.adblaster.struct.HourlyStat;
 import com.nexopia.adblaster.struct.I_Policy;
 import com.nexopia.adblaster.struct.ServablePropertyHolder;
+import com.nexopia.adblaster.struct.ServerStat;
 import com.nexopia.adblaster.struct.TypeStat;
 import com.nexopia.adblaster.struct.Campaign.CampaignDB;
 import com.nexopia.adblaster.util.EasyDatagramSocket;
@@ -82,7 +85,7 @@ public class BannerServer {
 		debug.put("connect", Boolean.FALSE);
 		debug.put("get", Boolean.TRUE);
 		debug.put("getlog", Boolean.TRUE);
-		debug.put("getfail", Boolean.FALSE);
+		debug.put("getfail", Boolean.TRUE);
 		debug.put("click", Boolean.TRUE);
 		debug.put("timeupdates", Boolean.TRUE);
 		debug.put("dailyrestart", Boolean.TRUE);
@@ -128,70 +131,6 @@ public class BannerServer {
 	private int logserver_port;
 	private String logserver;
 
-	static class ServerStat {
-		int starttime;
-		public ServerStat() {
-			starttime = (int)(System.currentTimeMillis()/1000);
-		}
-		int connect = 0; 
-		int get = 0;
-		int getfail = 0; 
-		int click = 0;
-	}
-	
-	static class BannerStat{
-		int dailyviews;
-		int dailyclicks;
-		int passbacks;
-		int current_views;
-		int current_clicks;
-		public boolean hasChanged() {
-			return (passbacks > 0 || current_views > 0 || current_clicks > 0);
-		}
-		
-		public void view() {
-			dailyviews++;
-			current_views++;
-		}
-		
-		public void click() {
-			dailyclicks++;
-			current_clicks++;
-		}
-	}
-	
-	static class HourlyStat {
-		private int[] views = new int[BANNER_SLIDE_SIZE];
-		private int[] clicks = new int[BANNER_SLIDE_SIZE];
-		private int current_pos = 0;
-		
-		public double getClickRate() {
-			int totalviews = 0;
-			int totalclicks = 0;
-			for (int i=0; i < views.length; i++) {
-				totalviews += views[i];
-				totalclicks += clicks[i];
-			}
-			double clickrate = Math.max(BANNER_MIN_CLICKRATE, (double)totalviews/totalclicks);
-			clickrate = Math.min(clickrate, BANNER_MAX_CLICKRATE);
-			return clickrate;
-		}
-
-		public void shift() {
-			current_pos = (current_pos+1)%BANNER_SLIDE_SIZE;
-			views[current_pos] = 0;
-			clicks[current_pos] = 0;
-		}
-		
-		public void view() {
-			views[current_pos]++;
-		}
-		public void click() {
-			clicks[current_pos]++;
-		}
-		
-	}
-	
 	public BannerServer(BannerDatabase db, CampaignDB cdb, int numservers) {
 		this.policy = new OldPolicy(cdb);
 		this.db = db;
@@ -352,6 +291,7 @@ public class BannerServer {
 			byte sex, short location, Interests interests, String page,
 			boolean debug) {
 		Vector<Banner> banners = new Vector<Banner>();
+		System.out.println("Testing " + cdb.getCampaigns().size() + " campaigns.");
 		for (Campaign campaign : cdb.getCampaigns()) {
 			banners.addAll(campaign.getBanners(usertime, size, userid, age,
 					sex, location, interests, page, debug));
@@ -406,7 +346,7 @@ public class BannerServer {
 		if (this.bannerstats.get(b) == null){
 			this.bannerstats.put(b, new BannerStat());
 		}
-		if (this.bannerstats.get(b).dailyclicks >= b.getIntegerMaxClicksperday()/numservers) {
+		if (this.bannerstats.get(b).getDailyClicks() >= b.getIntegerMaxClicksperday()/numservers) {
 			return true;
 		}
 		
@@ -414,7 +354,7 @@ public class BannerServer {
 		if (this.campaignstats.get(b.getCampaign()) == null){
 			this.campaignstats.put(b.getCampaign(), new BannerStat());
 		}
-		if (this.campaignstats.get(b.getCampaign()).dailyclicks >= b.getCampaign().getIntegerMaxClicksperday()/numservers) {
+		if (this.campaignstats.get(b.getCampaign()).getDailyClicks() >= b.getCampaign().getIntegerMaxClicksperday()/numservers) {
 			return true;
 		}
 		
@@ -561,13 +501,13 @@ public class BannerServer {
 		
 		if (debug) {
 			Utilities.bannerDebug("minutely " + b.getID() + " " + bannerstat.dailyviews + 
-					" " + bannerstat.dailyclicks + " " + bannerstat.passbacks);
+					" " + bannerstat.getDailyClicks() + " " + bannerstat.passbacks);
 		}
 		
 		if(bannerstat.hasChanged()) {
-			JDBCConfig.queueQuery("UPDATE " + JDBCConfig.BANNER_TABLE + " SET lastupdatetime = "+time+", views = views + "+bannerstat.current_views+", clicks = clicks + "+bannerstat.current_clicks+", passbacks = passbacks + "+bannerstat.passbacks+" WHERE id = " + b.getID());
-			bannerstat.current_views = 0;
-			bannerstat.current_clicks = 0;
+			JDBCConfig.queueQuery("UPDATE " + JDBCConfig.BANNER_TABLE + " SET lastupdatetime = "+time+", views = views + "+bannerstat.getCurrentViews()+", clicks = clicks + "+bannerstat.getCurrentClicks()+", passbacks = passbacks + "+bannerstat.passbacks+" WHERE id = " + b.getID());
+			bannerstat.SetCurrentViews(0);
+			bannerstat.setCurrentClicks(0);
 			bannerstat.passbacks = 0;
 		}
 	}
@@ -634,7 +574,7 @@ public class BannerServer {
 			String page=params[7]; 
 			int passback=Integer.parseInt(params[8]); 
 			boolean debugGet=Boolean.parseBoolean(params[9]);
-			
+			debugGet = true;
 			Interests interests = new Interests(interestsStr, false);
 			
 			if(passback != 0)
@@ -856,7 +796,7 @@ public class BannerServer {
 			break;
 		default:
 			//myerror("unknown command: 'msg'", __LINE__);
-			break;
+			throw new UnsupportedOperationException("Command:" + cmd + " : Params: " + Arrays.toString(params));			
 		}
 		return null;
 	}

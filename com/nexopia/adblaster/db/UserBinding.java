@@ -6,7 +6,6 @@
  */
 package com.nexopia.adblaster.db;
 
-import com.nexopia.adblaster.IntegerBinding;
 import com.nexopia.adblaster.struct.User;
 import com.sleepycat.bind.tuple.TupleBinding;
 import com.sleepycat.bind.tuple.TupleInput;

@@ -14,6 +14,7 @@ import java.util.WeakHashMap;
 
 import com.nexopia.adblaster.db.BannerTimeKeyCreator;
 import com.nexopia.adblaster.db.BannerViewBinding;
+import com.nexopia.adblaster.db.IntegerBinding;
 import com.nexopia.adblaster.db.UserBinding;
 import com.nexopia.adblaster.struct.BannerView;
 import com.nexopia.adblaster.util.Integer;

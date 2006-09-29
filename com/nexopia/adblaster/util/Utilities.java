@@ -6,8 +6,11 @@
  */
 package com.nexopia.adblaster.util;
 
+import java.io.File;
 import java.util.StringTokenizer;
 import java.util.Vector;
+
+import javax.swing.JFileChooser;
 
 import com.nexopia.adblaster.db.PageDatabase;
 import com.nexopia.adblaster.struct.Banner;
@@ -21,6 +24,23 @@ import com.sleepycat.je.DatabaseException;
  */
 public class Utilities {
 	
+	static File bv_dir;
+	
+	public static File getDir(String name){
+		JFileChooser u_jfc = new JFileChooser();
+	
+		u_jfc.setDialogTitle("Choose the " + name + " directory to load");
+		u_jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		
+	    int returnVal = u_jfc.showOpenDialog(null);
+	    if(returnVal == JFileChooser.APPROVE_OPTION) {
+	       System.out.println("You chose to open this file: " +
+	            u_jfc.getSelectedFile().getName());
+	    } else {
+	    	System.exit(0);
+	    }
+		return u_jfc.getSelectedFile();
+	}
 	
 	public static Vector<Integer> stringToVector(String string) {
 		StringTokenizer st = new StringTokenizer(string, ",");
