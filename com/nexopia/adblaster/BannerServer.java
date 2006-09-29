@@ -83,14 +83,14 @@ public class BannerServer {
 	{
 		debug.put("tick", Boolean.FALSE);
 		debug.put("connect", Boolean.FALSE);
-		debug.put("get", Boolean.TRUE);
-		debug.put("getlog", Boolean.TRUE);
-		debug.put("getfail", Boolean.TRUE);
+		debug.put("get", Boolean.FALSE);
+		debug.put("getlog", Boolean.FALSE);
+		debug.put("getfail", Boolean.FALSE);
 		debug.put("click", Boolean.TRUE);
 		debug.put("timeupdates", Boolean.TRUE);
 		debug.put("dailyrestart", Boolean.TRUE);
 		debug.put("passback", Boolean.TRUE);
-		debug.put("development", Boolean.TRUE);
+		debug.put("development", Boolean.FALSE);
 	}
 	
 	static ServerStat stats = new ServerStat();
@@ -291,7 +291,6 @@ public class BannerServer {
 			byte sex, short location, Interests interests, String page,
 			boolean debug) {
 		Vector<Banner> banners = new Vector<Banner>();
-		System.out.println("Testing " + cdb.getCampaigns().size() + " campaigns.");
 		for (Campaign campaign : cdb.getCampaigns()) {
 			banners.addAll(campaign.getBanners(usertime, size, userid, age,
 					sex, location, interests, page, debug));
@@ -574,7 +573,7 @@ public class BannerServer {
 			String page=params[7]; 
 			int passback=Integer.parseInt(params[8]); 
 			boolean debugGet=Boolean.parseBoolean(params[9]);
-			debugGet = true;
+
 			Interests interests = new Interests(interestsStr, false);
 			
 			if(passback != 0)

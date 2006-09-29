@@ -46,22 +46,25 @@ public class SimulationServer {
 		ac = new AdBlasterDbUniverse(user_dir, page_dir);
 		instanc = new AdBlasterDbInstance(ac);
 
-		if (dataFile != null){
-			((AdBlasterDbInstance)instanc).loadNoCount(bv_dir, dataFile);
-		} else {
-			((AdBlasterDbInstance)instanc).load(bv_dir);
-		}
-		
+		try {
+			((AdBlasterDbInstance)instanc).loadNoCount(bv_dir, null);
+		} catch (Exception ignored)	{}
+		System.out.println("Running...");
+		ProgressIndicator.setTitle("Running...");
+		ProgressIndicator.show(0, 1);
 		for (int i = 0; i < instanc.getViewCount(); i++){
 			BannerView bv = instanc.getView(i);
 			try {
 				String s = banners.receive("get " + bv.getTime() + " " + 
 						bv.getSize() + " " + 
 						bv.getUserID() + " " + 
-						bv.getUser().getAge() + " " + 
-						bv.getUser().getSex() + " " + 
-						bv.getUser().getLocation() + " " + 
-						bv.getUser().getInterests().toString() + " " + 
+						(bv.getUser() != null?
+							bv.getUser().getAge() + " " + 
+							bv.getUser().getSex() + " " + 
+							bv.getUser().getLocation() + " " + 
+							bv.getUser().getInterests().toString() + " "
+						:
+							"0 0 0 0 ") +
 						ac.getPageDatabase().getPage(bv.getPage()) +
 						" 0 0");
 				if (i % 1000 == 0){

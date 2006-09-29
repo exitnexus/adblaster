@@ -11,14 +11,17 @@ import com.nexopia.adblaster.struct.BannerView;
 public class PageValidator2 implements PageValidator{
 	Vector<Integer> pages;
 	PageDatabase pdb;
-	PageValidator2(PageDatabase pdb){
+	
+	public PageValidator2(PageDatabase pdb){
 		this.pdb = pdb;
 	}
+	
 	public PageValidator clone(){
 		PageValidator2 pv = new PageValidator2(pdb);
 		pv.pages = (Vector<Integer>) this.pages.clone();
 		return pv;
 	}
+	
 	public boolean validate(int page){
 		if (pages.get(0) == Integer.NEGATE) {
 			for (int i=1; i<pages.size(); i++) {
