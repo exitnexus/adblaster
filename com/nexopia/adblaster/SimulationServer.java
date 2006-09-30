@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import com.nexopia.adblaster.db.BannerDatabase;
+import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.BannerView;
 import com.nexopia.adblaster.struct.Campaign.CampaignDB;
 import com.nexopia.adblaster.util.Integer;
@@ -55,6 +56,7 @@ public class SimulationServer {
 		System.out.println("Running...");
 		ProgressIndicator.setTitle("Running...");
 		ProgressIndicator.show(0, 1);
+		float profit = 0;
 		for (int i = 0; i < instanc.getViewCount(); i++){
 			BannerView bv = instanc.getView(i);
 			try {
@@ -73,12 +75,17 @@ public class SimulationServer {
 				if (i % 1000 == 0){
 					ProgressIndicator.show(i, instanc.getViewCount());
 				}
-				System.out.println(s);
+				//System.out.println(s);
+				int b = Integer.parseInt(s);
+				Banner banner = ac.getBannerByID(b);
+				if (banner != null)
+					profit += banner.getPayRate();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} 
+		System.out.println("Final profit: " + profit);
 
 	}
 }
