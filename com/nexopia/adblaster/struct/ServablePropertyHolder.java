@@ -8,6 +8,7 @@ import com.nexopia.adblaster.BannerServer;
 import com.nexopia.adblaster.util.Integer;
 import com.nexopia.adblaster.util.Interests;
 import com.nexopia.adblaster.util.PageValidator;
+import com.nexopia.adblaster.util.PageValidatorFactory;
 import com.nexopia.adblaster.util.TimeTable;
 import com.nexopia.adblaster.util.Utilities;
 
@@ -157,7 +158,7 @@ public class ServablePropertyHolder {
 		return pages.validate(page);
 	}
 
-	public void update(ResultSet rs) throws SQLException {
+	public void update(ResultSet rs, PageValidatorFactory pvf) throws SQLException {
 		this.locations = Utilities.stringToNegationVector(rs.getString("LOC"));
 		this.ages = Utilities.stringToNegationVector(rs.getString("AGE"));
 		this.sexes = Utilities.stringToVector(rs.getString("SEX"));
@@ -172,7 +173,8 @@ public class ServablePropertyHolder {
 		this.viewsperday = rs.getInt("VIEWSPERDAY");
 		this.clicksperday = rs.getInt("CLICKSPERDAY");
 		this.allowedTimes = new TimeTable(rs.getString("ALLOWEDTIMES"));
-		this.pages = Utilities.stringToPageValidator(rs.getString("PAGE"));
+		this.pages = pvf.make();
+		this.pages.make(rs.getString("PAGE"));
 	}
 
 	public boolean validUser(User u) {

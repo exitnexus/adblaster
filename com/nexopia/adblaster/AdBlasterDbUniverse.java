@@ -17,7 +17,7 @@ import com.sleepycat.je.DatabaseException;
 public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 	private BannerDatabase bannerDB;
 	private UserDatabase userDB;
-	private PageDatabase pageDb;
+	PageDatabase pageDb;
 	public Campaign.CampaignDB campaignDB;
 
 	public Campaign getCampaignByIndex(int i) {
@@ -30,9 +30,11 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 	public AdBlasterDbUniverse(String s, PageDatabase pageDb){
 		try {
 			this.pageDb = pageDb;
-			campaignDB = new Campaign.CampaignDB();
 			Object args[] = {pageDb};
-			bannerDB = new BannerDatabase(campaignDB, new PageValidatorFactory(PageValidator2.class,args));
+			PageValidatorFactory factory = 
+				new PageValidatorFactory(PageValidator2.class,args);
+			campaignDB = new Campaign.CampaignDB(factory);
+			bannerDB = new BannerDatabase(campaignDB, factory);
 			userDB = new UserDatabase(s);
 		} catch (DatabaseException e) {
 			e.printStackTrace();
@@ -43,9 +45,11 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 		try {
 			PageDatabase pageDb = new PageDatabase(pagedb_file);
 			this.pageDb = pageDb;
-			campaignDB = new Campaign.CampaignDB();
 			Object args[] = {pageDb};
-			bannerDB = new BannerDatabase(campaignDB, new PageValidatorFactory(PageValidator2.class,args));
+			PageValidatorFactory factory = 
+				new PageValidatorFactory(PageValidator2.class,args);
+			campaignDB = new Campaign.CampaignDB(factory);
+			bannerDB = new BannerDatabase(campaignDB, factory);
 			userDB = new UserDatabase(userdb_file);
 		} catch (DatabaseException e) {
 			e.printStackTrace();

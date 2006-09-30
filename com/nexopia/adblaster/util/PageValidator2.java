@@ -14,6 +14,7 @@ public class PageValidator2 implements PageValidator{
 	
 	public PageValidator2(PageDatabase pdb){
 		this.pdb = pdb;
+		pages = new Vector<Integer>();
 	}
 	
 	public PageValidator clone(){

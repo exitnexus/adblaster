@@ -38,7 +38,10 @@ public class BannerView{
 	
 	public void setBanner(Banner b) {
 		this.inst.notifyChange(this, b);
-		this.bid = b.id;
+		if (b == null)
+			this.bid = -1;
+		else 
+			this.bid = b.id;
 	}
 
 	public User getUser() {

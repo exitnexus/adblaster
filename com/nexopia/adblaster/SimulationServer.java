@@ -8,6 +8,7 @@ import com.nexopia.adblaster.struct.BannerView;
 import com.nexopia.adblaster.struct.Campaign.CampaignDB;
 import com.nexopia.adblaster.util.Integer;
 import com.nexopia.adblaster.util.PageValidator1;
+import com.nexopia.adblaster.util.PageValidator2;
 import com.nexopia.adblaster.util.PageValidatorFactory;
 import com.nexopia.adblaster.util.ProgressIndicator;
 import com.nexopia.adblaster.util.Utilities;
@@ -22,11 +23,6 @@ public class SimulationServer {
 
 
 	public static void main(String args[]){
-		Object args1[] = {};
-		CampaignDB cdb = new CampaignDB();
-		BannerDatabase bdb = new BannerDatabase(cdb, new PageValidatorFactory(PageValidator1.class, args1));
-		BannerServer banners = new BannerServer(bdb, cdb, 1);
-		
 		File dataFile = null;
 		if (args.length >= 3){
 			System.out.println("Running with selected directories.");
@@ -46,6 +42,13 @@ public class SimulationServer {
 		ac = new AdBlasterDbUniverse(user_dir, page_dir);
 		instanc = new AdBlasterDbInstance(ac);
 
+		Object args1[] = {ac.pageDb};
+		PageValidatorFactory factory = 
+			new PageValidatorFactory(PageValidator2.class, args1);
+		CampaignDB cdb = new CampaignDB(factory);
+		BannerDatabase bdb = new BannerDatabase(cdb, factory);
+		BannerServer banners = new BannerServer(bdb, cdb, 1);
+		
 		try {
 			((AdBlasterDbInstance)instanc).loadNoCount(bv_dir, null);
 		} catch (Exception ignored)	{}
@@ -70,6 +73,7 @@ public class SimulationServer {
 				if (i % 1000 == 0){
 					ProgressIndicator.show(i, instanc.getViewCount());
 				}
+				System.out.println(s);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

@@ -209,7 +209,7 @@ public class Banner extends ServablePropertyHolder{
 
 	public Banner update(ResultSet rs, CampaignDB cdb) throws SQLException {
 		this.id = rs.getInt("ID");
-		super.update(rs);
+		super.update(rs, cdb.pvf);
 		int ci = rs.getInt("CAMPAIGNID");
 		if (this.campaign == null) {
 			this.campaign = cdb.get(ci);

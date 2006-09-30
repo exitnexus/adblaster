@@ -21,6 +21,7 @@ import com.nexopia.adblaster.BannerServer;
 import com.nexopia.adblaster.db.JDBCConfig;
 import com.nexopia.adblaster.util.Integer;
 import com.nexopia.adblaster.util.Interests;
+import com.nexopia.adblaster.util.PageValidatorFactory;
 
 
 
@@ -28,8 +29,10 @@ public class Campaign extends ServablePropertyHolder{
 	
 	public static class CampaignDB{
 		private HashMap<Integer, Campaign> campaigns;
+		PageValidatorFactory pvf;
 		
-		public CampaignDB() {
+		public CampaignDB(PageValidatorFactory pvf) {
+			this.pvf = pvf;
 			System.out.println("Initing campaigns.");
 			campaigns = new HashMap<Integer, Campaign>();
 			//Database connection stuff here.
@@ -40,7 +43,7 @@ public class Campaign extends ServablePropertyHolder{
 				int i = 0;
 				while (rs.next()) {
 					int id = rs.getInt("ID");
-					campaigns.put(Integer.valueOf(id), new Campaign(rs));
+					campaigns.put(Integer.valueOf(id), new Campaign(rs, pvf));
 					i++;
 				}
 				System.out.println("Campaigns Total: " + i);
@@ -55,7 +58,7 @@ public class Campaign extends ServablePropertyHolder{
 				ResultSet rs = stmt.executeQuery(sql);
 				if (rs.next()) {
 					int id = rs.getInt("ID");
-					Campaign c = new Campaign(rs);
+					Campaign c = new Campaign(rs, pvf);
 					campaigns.put(Integer.valueOf(id), c);
 					return c;
 				}
@@ -76,7 +79,7 @@ public class Campaign extends ServablePropertyHolder{
 					Statement stmt = JDBCConfig.createStatement();
 					ResultSet rs = stmt.executeQuery(sql);
 					if (rs.next()) {
-						c.update(rs);
+						c.update(rs, pvf);
 						return c;
 					} else {
 						id = Integer.valueOf(campaignID);
@@ -159,16 +162,16 @@ public class Campaign extends ServablePropertyHolder{
 		return ret;
 	}
 	
-	Campaign(ResultSet rs) throws SQLException {
+	Campaign(ResultSet rs, PageValidatorFactory pvf) throws SQLException {
 		banners = new HashSet<Banner>();
-		this.update(rs);
+		this.update(rs, pvf);
 		int viewsAndClicks[] = loadViewsAndClicks(this.id);
 		this.views = viewsAndClicks[0];
 		this.clicks = viewsAndClicks[0];
 	}
 	
-	public void update(ResultSet rs) throws SQLException{
-		super.update(rs);
+	public void update(ResultSet rs, PageValidatorFactory pvf) throws SQLException{
+		super.update(rs, pvf);
 		this.id = rs.getInt("ID");
 		this.payrate = rs.getInt("PAYRATE");
 		this.paytype = rs.getByte("PAYTYPE");
