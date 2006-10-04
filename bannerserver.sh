@@ -1,4 +1,17 @@
-#Note to Travis: revision 4798 is the one you're going to need.  The libraries you'll need that aren't in the trunk are bdbje and mysql-connector, a google for either will get you right to them.
-javac -classpath /home/baxter/share/berkeleyje/je-3.0.12/lib/je.jar:/home/baxter/share/mysql-connector/mysql-connector-java-3.1.13/mysql-connector-java-3.1.13-bin.jar:/home/baxter/src/adblaster.4905/:/home/baxter/src/adblaster.4905/xstream-1.2.jar:/home/baxter/src/adblaster.4905/xpp3_min-1.1.3.4.0.jar com/nexopia/adblaster/*.java
+#!/bin/sh
 
-java -Xmx1024M -classpath /home/baxter/share/berkeleyje/je-3.0.12/lib/je.jar:/home/baxter/share/mysql-connector/mysql-connector-java-3.1.13/mysql-connector-java-3.1.13-bin.jar:/home/baxter/src/adblaster.4905/:/home/baxter/src/adblaster.4905/xstream-1.2.jar:/home/baxter/src/adblaster.4905/xpp3_min-1.1.3.4.0.jar com/nexopia/adblaster/NIOServer
+# Base Class Paths
+CLASS_PATHS=".:je-3.1.0.jar:xstream-1.2.jar:xpp3_min-1.1.3.4.0.jar"
+
+# Ubuntu has a package for MySQL Connector
+EXTRA_PATHS="/usr/share/java/mysql.jar"
+
+# Mysical Magic Java Flags
+MAGIC_JAVA_EXECUTION_FLAGS="-Xmx1024M"
+
+# Compile
+javac -classpath ${CLASS_PATHS}:${EXTRA_PATHS} com/nexopia/adblaster/*.java
+
+# Execute
+java ${MAGIC_JAVA_EXECUTION_FLAGS} -classpath ${CLASS_PATHS}:${EXTRA_PATHS} com/nexopia/adblaster/NIOServer 
+
