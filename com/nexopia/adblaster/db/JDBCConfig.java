@@ -1,5 +1,8 @@
 package com.nexopia.adblaster.db;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -16,6 +19,19 @@ public class JDBCConfig {
 
 	private static Connection con; 
 	private static SQLQueue sqlQueue;
+	
+	public static String inputString(String s) {
+		BufferedReader input = new BufferedReader(new InputStreamReader(
+				System.in));
+		System.out.print(s);
+		try {
+			return input.readLine();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return "";
+	}
+	
 	static {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
@@ -28,7 +44,10 @@ public class JDBCConfig {
 			System.exit(-1);
 		} catch (SQLException e) {
 			System.err.println("Unable to establish connection to banner database.");
-			e.printStackTrace();
+			if (inputString("Display stack trace? (y)").equals("y"))
+				e.printStackTrace();
+			System.err.println("Run the following command (or something similar): ");
+			System.err.println("ssh -nNT -R 3306:192.168.0.50:3306 root@192.168.0.50 -p 3022.");
 			System.exit(-1);
 		}
 	}

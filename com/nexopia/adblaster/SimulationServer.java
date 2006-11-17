@@ -74,8 +74,8 @@ public class SimulationServer {
 						" 0 0");
 				if (i % 1000 == 0){
 					ProgressIndicator.show(i, instanc.getViewCount());
+					System.out.println("Result " + i + " : " + s);
 				}
-				//System.out.println(s);
 				int b = Integer.parseInt(s);
 				Banner banner = ac.getBannerByID(b);
 				if (banner != null)
