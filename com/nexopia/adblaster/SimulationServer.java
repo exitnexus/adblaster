@@ -54,8 +54,8 @@ public class SimulationServer {
 			((AdBlasterDbInstance)instanc).loadNoCount(bv_dir, null);
 		} catch (Exception ignored)	{}
 		System.out.println("Running...");
-		ProgressIndicator.setTitle("Running...");
-		ProgressIndicator.show(0, 1);
+		//ProgressIndicator.setTitle("Running...");
+		//ProgressIndicator.show(0, 1);
 		float profit = 0;
 		for (int i = 0; i < instanc.getViewCount(); i++){
 			BannerView bv = instanc.getView(i);
@@ -73,7 +73,7 @@ public class SimulationServer {
 						ac.getPageDatabase().getPage(bv.getPage()) +
 						" 0 0");
 				if (i % 1000 == 0){
-					ProgressIndicator.show(i, instanc.getViewCount());
+					//ProgressIndicator.show(i, instanc.getViewCount());
 					System.out.println("Result " + i + " : " + s);
 				}
 				int b = Integer.parseInt(s);
