@@ -44,6 +44,7 @@ public class SimulationServer {
 		int i=0;
 	    while ((request = ffp.readLine()) != null){
 	    	writer.write(request);
+	    	writer.flush();
 	    	String s = reader.readLine();
 	    	if (i % 1000 == 0){
 				//ProgressIndicator.show(i, instanc.getViewCount());
