@@ -28,7 +28,7 @@ public class BannerViewFlatFileWriter {
 			}
 		}
 		for (int i=0; i<FILE_COUNT;i++) {
-			File f = new File(directory, i+".user.db");
+			File f = new File(directory, "bannerview."+i+".db");
 			files.add(new FileWriter(f, append));
 		}
 	}

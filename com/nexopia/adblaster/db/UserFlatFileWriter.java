@@ -33,16 +33,18 @@ public class UserFlatFileWriter {
 			}
 		}
 		for (int i=0; i<FILE_COUNT;i++) {
-			File f = new File(directory, i+".user.db");
+			File f = new File(directory, "user."+i+".db");
 			files.add(new FileWriter(f, append));
 		}
 		if (trackUsers) {
 			users = new BitSet();
+		} else {
+			users = null;
 		}
 	}
 	
 	public void write(User u) throws IOException {
-		if (!users.get(u.getID())) {
+		if (users == null || !users.get(u.getID())) {
 			int fileID = u.getID()%FILE_COUNT;
 			files.get(fileID).write(u.databaseString());
 			users.set(u.getID());
