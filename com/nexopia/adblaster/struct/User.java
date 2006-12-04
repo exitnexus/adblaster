@@ -29,6 +29,15 @@ public class User {
 		location=0;
 	}
 	
+	public User(String databaseString) {
+		String words[] = databaseString.split(" ");
+		id = Integer.parseInt(words[0]);
+		age = Byte.parseByte(words[1]);
+		sex = Byte.parseByte(words[2]);
+		location = Short.parseShort(words[3]);
+		interests = new Interests(words[4], false);
+	}
+	
 	public User(int id, byte age, byte sex, short location, String interests) {
 		this(id,age,sex,location,new Interests(interests, false));
 		if (this.interests.negate == true){
@@ -119,7 +128,7 @@ public class User {
 	}
 
 	public String databaseString() {
-		return "";
+		return id + " " + age + " " + sex + " " + location + " " + interests;
 	}
 
 	
