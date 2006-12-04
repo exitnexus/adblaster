@@ -118,5 +118,9 @@ public class User {
 		return u;
 	}
 
+	public String databaseString() {
+		return "";
+	}
+
 	
 }
