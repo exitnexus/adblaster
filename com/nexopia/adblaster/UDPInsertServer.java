@@ -5,6 +5,7 @@ import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.util.Calendar;
 
+import com.nexopia.adblaster.db.BannerViewFlatFileWriter;
 import com.nexopia.adblaster.db.UserFlatFileWriter;
 import com.nexopia.adblaster.struct.User;
 import com.nexopia.adblaster.util.Integer;
@@ -13,6 +14,7 @@ import com.sleepycat.je.DatabaseException;
 public class UDPInsertServer {
 	private static class ThreadedDatabases{
 		private UserFlatFileWriter userWriter;
+		private BannerViewFlatFileWriter bannerViewWriter;
 		private int day;
 		
 		public ThreadedDatabases() throws IOException{
@@ -31,6 +33,7 @@ public class UDPInsertServer {
 		private void init() throws IOException {
 			day = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
 			userWriter = new UserFlatFileWriter("DB_" + day, true);
+			bannerViewWriter = new BannerViewFlatFileWriter("DB_" + day, true);
 		}
 		
 		synchronized public void renew() {
@@ -97,12 +100,13 @@ public class UDPInsertServer {
 				user.fill(userid, age, sex, location, interests);
 				try {
 					tdb.userWriter.write(user);
+					tdb.bannerViewWriter.write(userid, bannerid, time, size, pageIndex);
 				} catch (IOException e) {
 					System.err.println("Error handling input: " + input);
 					e.printStackTrace();
 				}
+				
 				/*int pageIndex = tdb.pageDb.insert(page);
-				tdb.bannerViewDb.insert(userid, bannerid, time, size, pageIndex);
 				if (tdb.bannerViewDb.getBannerViewCount()%1000 == 0) {
 					System.out.println("Banner Count: " + tdb.bannerViewDb.getBannerViewCount());
 				}*/
