@@ -129,7 +129,5 @@ public class User {
 
 	public String databaseString() {
 		return id + " " + age + " " + sex + " " + location + " " + interests;
-	}
-
-	
+	}	
 }

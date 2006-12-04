@@ -41,7 +41,7 @@ public class UserFlatFileWriter {
 		}
 	}
 	
-	public void insert(User u) throws IOException {
+	public void write(User u) throws IOException {
 		if (!users.get(u.getID())) {
 			int fileID = u.getID()%FILE_COUNT;
 			files.get(fileID).write(u.databaseString());
@@ -52,6 +52,13 @@ public class UserFlatFileWriter {
 	public void sync() throws IOException {
 		for (FileWriter file: files) {
 			file.flush();
+		}
+	}
+
+	public void close() throws IOException {
+		this.sync();
+		for (FileWriter file: files) {
+			file.close();
 		}
 	}
 }

@@ -5,32 +5,18 @@ import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.util.Calendar;
 
-import com.nexopia.adblaster.db.BannerViewBinding;
-import com.nexopia.adblaster.db.PageDatabase;
-import com.nexopia.adblaster.db.UserDatabase;
+import com.nexopia.adblaster.db.UserFlatFileWriter;
 import com.nexopia.adblaster.struct.User;
 import com.nexopia.adblaster.util.Integer;
 import com.sleepycat.je.DatabaseException;
 
 public class UDPInsertServer {
 	private static class ThreadedDatabases{
-		static BannerViewBinding bvb = new BannerViewBinding(null,null);
-		private BannerViewDatabase bannerViewDb;
-		private UserDatabase userDb;
-		private PageDatabase pageDb;
+		private UserFlatFileWriter userWriter;
 		private int day;
 		
-		public ThreadedDatabases(){
-			day = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
-			try {
-				bannerViewDb = new BannerViewDatabase(""+day, bvb);
-				userDb = new UserDatabase(""+day);
-				pageDb = new PageDatabase(""+day);
-			} catch (DatabaseException dbe) {
-				System.err.println("Unable to open databases: " + dbe);
-				dbe.printStackTrace();
-				System.exit(-1);
-			}
+		public ThreadedDatabases() throws IOException{
+			this.init();
 		}
 		
 		public boolean isOld() {
@@ -42,27 +28,31 @@ public class UDPInsertServer {
 			return false;
 		}
 		
+		private void init() throws IOException {
+			day = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
+			userWriter = new UserFlatFileWriter("DB_" + day, true);
+		}
+		
 		synchronized public void renew() {
 			try {
-				bannerViewDb.close();
-				userDb.close();
-				pageDb.close();
-			} catch (DatabaseException dbe) {
-				System.err.println("Unable to close databases: " + dbe);
-				dbe.printStackTrace();
+				userWriter.sync();
+			} catch (IOException e) {
+				System.err.println("Unable to sync file writers at days end: " + e);
+				e.printStackTrace();
 				System.exit(-1);
 			}
 			
-			day = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
 			try {
-				bannerViewDb = new BannerViewDatabase(""+day, bvb);
-				userDb = new UserDatabase(""+day);
-				pageDb = new PageDatabase(""+day);
-			} catch (DatabaseException dbe) {
-				System.err.println("Unable to open databases: " + dbe);
-				dbe.printStackTrace();
+				this.init();
+			} catch (IOException e) {
+				System.err.println("Unable to initialize writing for a new day: " + e);
+				e.printStackTrace();
 				System.exit(-1);
 			}
+		}
+
+		public void close() throws IOException {
+			userWriter.close();
 		}
 		
 	}//end threadeddatabase
@@ -102,32 +92,28 @@ public class UDPInsertServer {
 			String page = words[8];
 			int bannerid = Integer.parseInt(words[12]);
 			
-			try {
-				//we don't create a new user object here to save on object creation overhead, just reuse one user repeatedly
-				synchronized (tdb){
-					user.fill(userid, age, sex, location, interests);
-					tdb.userDb.insert(user);
-					int pageIndex = tdb.pageDb.insert(page);
-					tdb.bannerViewDb.insert(userid, bannerid, time, size, pageIndex);
-					if (tdb.bannerViewDb.getBannerViewCount()%1000 == 0) {
-						System.out.println("Banner Count: " + tdb.bannerViewDb.getBannerViewCount());
-					}
+			//we don't create a new user object here to save on object creation overhead, just reuse one user repeatedly
+			synchronized (tdb){
+				user.fill(userid, age, sex, location, interests);
+				try {
+					tdb.userWriter.write(user);
+				} catch (IOException e) {
+					System.err.println("Error handling input: " + input);
+					e.printStackTrace();
 				}
-			} catch (DatabaseException e) {
-				System.err.println("Failed to insert into bannerview database: "+Integer.parseInt(words[1])+" "+Integer.parseInt(words[2])+" "+Integer.parseInt(words[3]));
-				e.printStackTrace();
-				System.exit(0);
+				/*int pageIndex = tdb.pageDb.insert(page);
+				tdb.bannerViewDb.insert(userid, bannerid, time, size, pageIndex);
+				if (tdb.bannerViewDb.getBannerViewCount()%1000 == 0) {
+					System.out.println("Banner Count: " + tdb.bannerViewDb.getBannerViewCount());
+				}*/
 			}
 		} else if (command.indexOf("shutdown") == 0) {
 			shutdown = true;
 			try {
-				tdb.pageDb.dump();
-				tdb.userDb.close();
-				tdb.bannerViewDb.close();
-				tdb.pageDb.close();
-			} catch (DatabaseException dbe) {
-				System.err.println("Databases not closed properly at shutdown.");
-				dbe.printStackTrace();
+				tdb.close();
+			} catch (IOException e) {
+				System.err.println("Files not all closed properly at shutdown.");
+				e.printStackTrace();
 			}
 		}
 	}
@@ -139,8 +125,9 @@ public class UDPInsertServer {
 	private static ThreadedDatabases tdb;
 	/**
 	 * @param args
+	 * @throws IOException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		tdb = new ThreadedDatabases();
 		user = new User();
 		
