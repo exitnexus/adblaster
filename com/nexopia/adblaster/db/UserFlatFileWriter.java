@@ -7,11 +7,12 @@ import java.util.Vector;
 
 import com.nexopia.adblaster.struct.User;
 
-public class UserFlatFile {
+public class UserFlatFileWriter {
 	private static final int FILE_COUNT = 100; //How many files should the users be split across 
 	Vector<FileWriter> files;
 	File directory;
-	public UserFlatFile(String directoryName, boolean append) throws IOException {
+	
+	public UserFlatFileWriter(String directoryName, boolean append) throws IOException {
 		files = new Vector<FileWriter>();
 		directory = new File(directoryName);
 		if (!directory.isDirectory()) {
@@ -35,5 +36,5 @@ public class UserFlatFile {
 		for (FileWriter file: files) {
 			file.flush();
 		}
-	}	
+	}
 }
