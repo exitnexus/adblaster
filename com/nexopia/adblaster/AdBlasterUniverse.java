@@ -172,4 +172,8 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+	@Override
+	public Collection<Banner> getBannerList() {
+		return b.values();
+	}
 }

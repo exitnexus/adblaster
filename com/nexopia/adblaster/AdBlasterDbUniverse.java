@@ -3,6 +3,7 @@ package com.nexopia.adblaster;
 import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Vector;
 
 import com.nexopia.adblaster.db.BannerDatabase;
 import com.nexopia.adblaster.db.PageDatabase;
@@ -127,5 +128,9 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 
 	public PageDatabase getPageDatabase() {
 		return this.pageDb;
+	}
+
+	public Collection<Banner> getBannerList() {
+		return bannerDB.getBanners();
 	}
 }

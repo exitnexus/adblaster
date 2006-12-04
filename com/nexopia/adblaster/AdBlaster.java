@@ -59,7 +59,7 @@ public class AdBlaster {
 
 		long start_time = System.currentTimeMillis();
 		
-		AdBlasterPolicy pol = AdBlasterPolicy.randomPolicy(ac);
+		AdBlasterPolicy pol = AdBlasterPolicy.randomPolicy(ac.getBannerList());
 
 		if (dataFile != null){
 			((AdBlasterDbInstance)instanc).loadNoCount(bv_dir, dataFile);

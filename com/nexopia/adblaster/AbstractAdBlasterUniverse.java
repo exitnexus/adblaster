@@ -1,11 +1,13 @@
 package com.nexopia.adblaster;
 
 import java.util.Collection;
+import java.util.Vector;
 
 import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.BannerView;
 import com.nexopia.adblaster.struct.Campaign;
 import com.nexopia.adblaster.struct.User;
+
 
 public abstract class AbstractAdBlasterUniverse {
 	
@@ -22,6 +24,7 @@ public abstract class AbstractAdBlasterUniverse {
 	abstract public Campaign getCampaignByIndex(int i);
 	abstract public int getCampaignCount();
 
+	abstract public Collection<Banner>getBannerList();
 	
 	public Banner getRandomBannerMatching(BannerView bv, AbstractAdBlasterInstance instance) {
 		Banner match = null;

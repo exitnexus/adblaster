@@ -110,7 +110,7 @@ public class BannerDatabase {
 		return banners.size();
 	}
 	
-	public Collection getBanners() {
+	public Collection<Banner> getBanners() {
 		return banners.values(); 
 	}
 

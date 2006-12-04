@@ -58,7 +58,7 @@ public final class AdBlasterThreadedOperation implements Runnable {
 
 	
 		System.out.println("Upgrading policy.");
-		gd.pol.upgradePolicy(chunk, this);
+		new PolicyLearner(gd.pol, gd.universe).upgradePolicy(chunk, this);
 		
 		if (tab != null){
 			createTab(chunk, tab, "Perfect", original_profit);

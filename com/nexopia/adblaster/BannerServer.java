@@ -132,7 +132,8 @@ public class BannerServer {
 	private String logserver;
 
 	public BannerServer(BannerDatabase db, CampaignDB cdb, int numservers) {
-		this.policy = new OldPolicy(cdb);
+		//this.policy = new OldPolicy(cdb);
+		this.policy = new AdBlasterPolicy(db.getBanners());
 		this.db = db;
 		this.cdb = cdb;
 		BannerServer.numservers = numservers;

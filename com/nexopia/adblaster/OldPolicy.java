@@ -21,16 +21,6 @@ public class OldPolicy implements I_Policy {
 		throw new UnsupportedOperationException();
 	}
 
-	public Float getCoefficient(ServablePropertyHolder bannerByIndex) {
-		throw new UnsupportedOperationException();
-	}
-
-	public void upgradePolicy(AbstractAdBlasterInstance instance,
-			AdBlasterThreadedOperation op) {
-		throw new UnsupportedOperationException();
-	}
-
-
 	/*
 	 * weighting based on (1 + priority) * (2 - (1-(time since last view/max
 	 * view rate)) * (3 - ((views today)/(max views per day))) * (3 - ((clicks

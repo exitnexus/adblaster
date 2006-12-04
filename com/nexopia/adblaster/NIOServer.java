@@ -220,7 +220,7 @@ public class NIOServer {
 							e.printStackTrace();
 						}
 						try {
-							ByteBuffer output = charset.encode(result+"-"+index+'\n');
+							ByteBuffer output = charset.encode(result + "\n");//+"-"+index+'\n');
 							//System.out.println(output.toString());
 							client.write(output);
 							index++;
