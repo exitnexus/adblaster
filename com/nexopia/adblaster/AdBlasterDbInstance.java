@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.WeakHashMap;
 
 import com.nexopia.adblaster.db.BannerViewBinding;
+import com.nexopia.adblaster.db.BannerViewFlatFileReader;
+import com.nexopia.adblaster.db.UserDatabase;
 import com.nexopia.adblaster.db.PageFlatFileDatabase;
 import com.nexopia.adblaster.db.UserFlatFileReader;
 import com.nexopia.adblaster.struct.Banner;
@@ -22,10 +24,9 @@ import com.sleepycat.je.DatabaseException;
 
 public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	HashMap swappedViews; //always look for a view here before checking the database
-	BannerViewFFDatabase db;
+	BannerViewFlatFileReader db;
 	private UserFlatFileReader userDB;
 	public BannerViewBinding instanceBinding;
-	PageFlatFileDatabase pageDb;
 
 	public AdBlasterDbInstance(AbstractAdBlasterUniverse c){
 		super(c);
@@ -33,7 +34,7 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	}
 	public void loadNoCount(File dbf, File u_dbf, File data) {
 		try {
-			db = new BannerViewFFDatabase(dbf, instanceBinding);
+			db = new BannerViewFlatFileReader(dbf, instanceBinding);
 			userDB = new UserFlatFileReader(u_dbf);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -64,7 +65,7 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	public void load(File f, File u_dbf) {
 		try {
 			System.out.println("Counting Bannerviews.");
-			db = new BannerViewFFDatabase(f, instanceBinding);
+			db = new BannerViewFlatFileReader(f, instanceBinding);
 			ProgressIndicator.setTitle("Counting bannerviews...");
 			userDB = new UserFlatFileReader(u_dbf);
 			/*{
