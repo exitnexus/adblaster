@@ -87,13 +87,13 @@ public class UDPInsertServer {
 	}
 	
 	private void processInput(String input) {
-		System.out.println("Received: " + input);
+		//System.out.println("Received: " + input);
 		String[] words = input.split("\\s");
 		if (words.length == 0) return;
 		String command = words[0];
 		//get usertime size userid age sex location interests page passback => bannerid
 		if (command.indexOf("get") == 0 && words.length == 14) {
-			System.out.println("Actual request");
+			//System.out.println("Actual request");
 			int time = Integer.parseInt(words[1]);
 			byte size = Byte.parseByte(words[2]);
 			int userid = Integer.parseInt(words[3]);
