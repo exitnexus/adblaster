@@ -10,7 +10,6 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import com.nexopia.adblaster.db.BannerDatabase;
-import com.nexopia.adblaster.db.UserDatabase;
 import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.BannerView;
 import com.nexopia.adblaster.struct.Campaign;

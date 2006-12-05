@@ -12,7 +12,7 @@ import java.util.MissingResourceException;
 
 import com.nexopia.adblaster.db.BannerViewBinding;
 import com.nexopia.adblaster.db.PageFlatFileDatabase;
-import com.nexopia.adblaster.db.UserDatabase;
+import com.nexopia.adblaster.db.UserFlatFileWriter;
 import com.nexopia.adblaster.struct.User;
 import com.nexopia.adblaster.util.Integer;
 import com.sleepycat.je.DatabaseException;
@@ -27,7 +27,7 @@ public class InsertServer implements Runnable {
 	
 	private static class ThreadedDatabases{
 		private BannerViewDatabase bannerViewDb;
-		private UserDatabase userDb;
+		private UserFlatFileWriter userDb;
 		private PageFlatFileDatabase pageDb;
 		private int day;
 		private static final long DAY_MS = 86400000;
@@ -36,7 +36,7 @@ public class InsertServer implements Runnable {
 			day = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
 			try {
 				bannerViewDb = new BannerViewDatabase(""+day, bvb);
-				userDb = new UserDatabase(""+day);
+				userDb = new UserFlatFileWriter(""+day, false);
 				pageDb = new PageFlatFileDatabase(""+day, false);
 			} catch (DatabaseException dbe) {
 				System.err.println("Unable to open databases: " + dbe);
@@ -74,7 +74,7 @@ public class InsertServer implements Runnable {
 			day = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
 			try {
 				bannerViewDb = new BannerViewDatabase(""+day, bvb);
-				userDb = new UserDatabase(""+day);
+				userDb = new UserFlatFileWriter(""+day, false);
 				pageDb = new PageFlatFileDatabase(""+day, false);
 			} catch (DatabaseException dbe) {
 				System.err.println("Unable to open databases: " + dbe);
@@ -167,7 +167,7 @@ public class InsertServer implements Runnable {
 					//we don't create a new user object here to save on object creation overhead, just reuse one user repeatedly
 					synchronized (tdb){
 						user.fill(userid, age, sex, location, interests);
-						tdb.userDb.insert(user);
+						tdb.userDb.write(user);
 						int pageIndex = tdb.pageDb.write(page);
 						tdb.bannerViewDb.insert(userid, bannerid, time, size, pageIndex);
 						if (tdb.bannerViewDb.getBannerViewCount()%1000 == 0) {
