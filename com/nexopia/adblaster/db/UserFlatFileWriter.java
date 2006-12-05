@@ -46,7 +46,7 @@ public class UserFlatFileWriter {
 	public void write(User u) throws IOException {
 		if (u.getID() >= 0 && (users == null || !users.get(u.getID()))) {
 			int fileID = u.getID()%FILE_COUNT;
-			files.get(fileID).write(u.databaseString());
+			files.get(fileID).write(u.databaseString() + "\n");
 			users.set(u.getID());
 		}
 	}
