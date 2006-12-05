@@ -34,7 +34,7 @@ public class BannerViewFlatFileWriter {
 	}
 	
 	public void write(int userid, int bannerid, int time, int size, int pageIndex) throws IOException {
-		int fileID = userid%FILE_COUNT;
+		int fileID = Math.abs(userid%FILE_COUNT);
 		files.get(fileID).write(userid + " " + bannerid + " " + time + " " + size + " " + pageIndex + "\n");
 	}
 	
