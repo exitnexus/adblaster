@@ -17,7 +17,6 @@ import com.sleepycat.je.DatabaseException;
 
 public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 	private BannerDatabase bannerDB;
-	private UserDatabase userDB;
 	PageDatabase pageDb;
 	public Campaign.CampaignDB campaignDB;
 
@@ -29,17 +28,12 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 	}
 
 	public AdBlasterDbUniverse(String s, PageDatabase pageDb){
-		try {
-			this.pageDb = pageDb;
-			Object args[] = {pageDb};
-			PageValidatorFactory factory = 
-				new PageValidatorFactory(PageValidator2.class,args);
-			campaignDB = new Campaign.CampaignDB(factory);
-			bannerDB = new BannerDatabase(campaignDB, factory);
-			userDB = new UserDatabase(s);
-		} catch (DatabaseException e) {
-			e.printStackTrace();
-		}
+		this.pageDb = pageDb;
+		Object args[] = {pageDb};
+		PageValidatorFactory factory = 
+			new PageValidatorFactory(PageValidator2.class,args);
+		campaignDB = new Campaign.CampaignDB(factory);
+		bannerDB = new BannerDatabase(campaignDB, factory);
 	}
 
 	public AdBlasterDbUniverse(File userdb_file, File pagedb_file){
@@ -51,7 +45,6 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 				new PageValidatorFactory(PageValidator2.class,args);
 			campaignDB = new Campaign.CampaignDB(factory);
 			bannerDB = new BannerDatabase(campaignDB, factory);
-			userDB = new UserDatabase(userdb_file);
 		} catch (DatabaseException e) {
 			e.printStackTrace();
 		}
@@ -85,41 +78,12 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 		return bannerDB.getBannerCount();
 	}
 
-	/* (non-Javadoc)
-	 * @see com.nexopia.adblaster.AbstractAdBlasterUniverse#getUser(int)
-	 */
-	public User getUser(int i) {
-		//Integer I = Integer.valueOf(i);
-		User u = userDB.getUser(i);
-		//I.free();
-		return u;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.nexopia.adblaster.AbstractAdBlasterUniverse#getUserCount()
-	 */
-	public int getUserCount() {
-		return userDB.getUserCount();
-	}
 
 	/* (non-Javadoc)
 	 * @see com.nexopia.adblaster.AbstractAdBlasterUniverse#getBanners()
 	 */
 	public Collection getBanners() {
 		return bannerDB.getBanners();
-	}
-
-	public User getRandomUser() {
-		return userDB.getUserByIndex((int)(Math.random()*(userDB.getUserCount()-1)));
-	}
-
-	public User getUserByIndex(int randomPick) {
-		return userDB.getUserByIndex(randomPick);
-	}
-
-	public void addUser(User u) {
-		userDB.cache.put(u.getID(), u);
-		
 	}
 
 	public void saveCoefficients(HashMap<Banner,Float> coefficients) {

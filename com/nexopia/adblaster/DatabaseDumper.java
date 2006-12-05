@@ -50,7 +50,7 @@ public class DatabaseDumper {
 		instanc = new AdBlasterDbInstance(ac);
 
 		try {
-			((AdBlasterDbInstance)instanc).loadNoCount(bv_dir, null);
+			((AdBlasterDbInstance)instanc).loadNoCount(bv_dir, user_dir, null);
 		} catch (Exception ignored)	{}
 		System.out.println("Running...");
 		//ProgressIndicator.setTitle("Running...");

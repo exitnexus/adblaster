@@ -45,7 +45,7 @@ public class BannerView{
 	}
 
 	public User getUser() {
-		return inst.universe.getUser(this.uid);
+		return inst.getUser(this.uid);
 	}
 
 	public int getTime() {

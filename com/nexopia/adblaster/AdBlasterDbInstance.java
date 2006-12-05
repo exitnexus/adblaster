@@ -9,27 +9,31 @@ import java.util.HashMap;
 import java.util.WeakHashMap;
 
 import com.nexopia.adblaster.db.BannerViewBinding;
+import com.nexopia.adblaster.db.UserDatabase;
 import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.BannerView;
 import com.nexopia.adblaster.struct.I_Policy;
 import com.nexopia.adblaster.struct.ServablePropertyHolder;
+import com.nexopia.adblaster.struct.User;
 import com.nexopia.adblaster.util.Integer;
 import com.nexopia.adblaster.util.ProgressIndicator;
 import com.sleepycat.je.DatabaseException;
 
 public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	HashMap swappedViews; //always look for a view here before checking the database
-	BannerViewDatabase db;
+	BannerViewFFDatabase db;
+	private UserDatabase userDB;
 	public BannerViewBinding instanceBinding;
 
 	public AdBlasterDbInstance(AbstractAdBlasterUniverse c){
 		super(c);
 		instanceBinding = new BannerViewBinding(this.universe, this);
 	}
-	public void loadNoCount(File dbf, File data) {
+	public void loadNoCount(File dbf, File u_dbf, File data) {
 		try {
-			db = new BannerViewDatabase(dbf, instanceBinding);
-		} catch (DatabaseException e) {
+			db = new BannerViewFFDatabase(dbf, instanceBinding);
+			userDB = new UserDatabase(u_dbf);
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -55,11 +59,12 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 			e.printStackTrace();
 		}
 	}
-	public void load(File f) {
+	public void load(File f, File u_dbf) {
 		try {
 			System.out.println("Counting Bannerviews.");
-			db = new BannerViewDatabase(f, instanceBinding);
+			db = new BannerViewFFDatabase(f, instanceBinding);
 			ProgressIndicator.setTitle("Counting bannerviews...");
+			userDB = new UserDatabase(u_dbf);
 			/*{
 				long time = System.currentTimeMillis();
 				for (int i = 0; i < db.getBannerViewCount(); i++){
@@ -98,12 +103,40 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 				}
 			}
 			System.out.println("Done.");
-		} catch (DatabaseException e) {
+		} catch (Exception e) {
 			System.err.println("Failed to make a BannerViewDatabase object: " + e);
 			e.printStackTrace();
 		}
 	}
 	
+	public User getUser(int i) {
+		//Integer I = Integer.valueOf(i);
+		User u = userDB.getUser(i);
+		//I.free();
+		return u;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.nexopia.adblaster.AbstractAdBlasterUniverse#getUserCount()
+	 */
+	public int getUserCount() {
+		return userDB.getUserCount();
+	}
+
+	public User getRandomUser() {
+		return userDB.getUserByIndex((int)(Math.random()*(userDB.getUserCount()-1)));
+	}
+
+	public User getUserByIndex(int randomPick) {
+		return userDB.getUserByIndex(randomPick);
+	}
+
+	public void addUser(User u) {
+		userDB.cache.put(u.getID(), u);
+		
+	}
+
+
 	public float totalProfit(){
 		float count = 0;
 		for (int i = 0; i < this.universe.getBannerCount(); i++){
@@ -141,7 +174,7 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	public void close(){
 		try {
 			db.close();
-		} catch (DatabaseException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

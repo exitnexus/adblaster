@@ -9,7 +9,7 @@ import java.util.Vector;
 import com.nexopia.adblaster.struct.User;
 
 public class UserFlatFileWriter {
-	private static final int FILE_COUNT = 100; //How many files should the users be split across 
+	static final int FILE_COUNT = 100; //How many files should the users be split across 
 	Vector<FileWriter> files;
 	File directory;
 	private BitSet users; //track the users that have been written.

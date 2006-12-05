@@ -62,9 +62,9 @@ public class AdBlaster {
 		AdBlasterPolicy pol = AdBlasterPolicy.randomPolicy(ac.getBannerList());
 
 		if (dataFile != null){
-			((AdBlasterDbInstance)instanc).loadNoCount(bv_dir, dataFile);
+			((AdBlasterDbInstance)instanc).loadNoCount(bv_dir, user_dir, dataFile);
 		} else {
-			((AdBlasterDbInstance)instanc).load(bv_dir);
+			((AdBlasterDbInstance)instanc).load(bv_dir, user_dir);
 		}
 		System.out.println("Total original profit: " + instanc.totalProfit());
 		
@@ -190,15 +190,15 @@ public class AdBlaster {
 	 */
 	private static AdBlasterThreadedInstance[] getChunk(GlobalData gd, int num, int size) {
 		AdBlasterThreadedInstance r[] = new AdBlasterThreadedInstance[num];
-		int modCount = ac.getUserCount() / size;
+		int modCount = gd.instance.getUserCount() / size;
 		for (int i = 0; i < num; i++){
 			r[i] = new AdBlasterThreadedInstance(gd);
 		}
-		for (int i = 0; i < ac.getUserCount()-1; i++){
-			ProgressIndicator.show(i, ac.getUserCount());
-			int hash = Math.abs(ac.getUserByIndex(i).getID() % modCount);
+		for (int i = 0; i < gd.instance.getUserCount()-1; i++){
+			ProgressIndicator.show(i, gd.instance.getUserCount());
+			int hash = Math.abs(gd.instance.getUserByIndex(i).getID() % modCount);
 			if (hash < num){
-				Vector <BannerView>vec = gd.instance.db.getByUser(ac.getUserByIndex(i).getID());
+				Vector <BannerView>vec = gd.instance.db.getByUser(gd.instance.getUserByIndex(i).getID());
 				for (BannerView bv : vec){
 					r[hash].addView(bv);
 				}

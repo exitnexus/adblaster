@@ -21,8 +21,8 @@ import com.sleepycat.je.EnvironmentConfig;
  * targetting info that can relate the banners and users.
  * 
  */
+
 public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
-	private HashMap <Integer, User> u;
 	private HashMap <Integer, Banner> b;
 
 	public int getBannerCount(){
@@ -32,20 +32,7 @@ public class AdBlasterUniverse extends AbstractAdBlasterUniverse {
 		b.put(new Integer(banner.getID()), banner);
 	}
 
-	public User getUser(int i) {
-		return u.get(new Integer(i));
-	}
-
-	public int getUserCount(){
-		return u.size();
-	}
-	
-	protected void addUser(User user) {
-		u.put(new Integer(user.getID()), user);
-	}
-
 	public AdBlasterUniverse(int interests, int num_banners, int num_users){
-		u = new HashMap<Integer, User>();
 		b = new HashMap<Integer, Banner>();
 		
 		for (int i = 0; i < num_users; i++){

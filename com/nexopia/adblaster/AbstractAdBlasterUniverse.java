@@ -16,10 +16,6 @@ public abstract class AbstractAdBlasterUniverse {
 
 	abstract public int getBannerCount();
 
-	abstract public User getUser(int i);
-
-	abstract public int getUserCount();
-
 	abstract public Collection getBanners();
 	abstract public Campaign getCampaignByIndex(int i);
 	abstract public int getCampaignCount();

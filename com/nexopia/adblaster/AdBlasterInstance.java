@@ -1,10 +1,13 @@
 package com.nexopia.adblaster;
 
+import java.util.HashMap;
 import java.util.Vector;
 
 import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.BannerView;
 import com.nexopia.adblaster.struct.I_Policy;
+import com.nexopia.adblaster.struct.User;
+import com.nexopia.adblaster.util.Integer;
 import com.nexopia.adblaster.util.ProgressIndicator;
 import com.sleepycat.je.DatabaseException;
 
@@ -15,10 +18,12 @@ import com.sleepycat.je.DatabaseException;
  */
 public class AdBlasterInstance extends AbstractAdBlasterInstance{
 	private Vector<BannerView> views;
+	private HashMap <Integer, User> u;
 	
 	public AdBlasterInstance(AbstractAdBlasterUniverse ac) {
 		super(ac);
 		views = new Vector<BannerView>();
+		u = new HashMap<Integer, User>();
 		
 	}
 
@@ -84,10 +89,10 @@ public class AdBlasterInstance extends AbstractAdBlasterInstance{
 
 	public BannerView randomView(AdBlasterDbUniverse ac, 
 			AdBlasterInstance instance) {
-		int randomPick = (int) (Math.random()*(universe.getUserCount()-1.0));
+		int randomPick = (int) (Math.random()*(instance.getUserCount()-1.0));
 		int time = (int) (Math.random()*60*60*24);
 		byte size = (byte) (Math.random()*8);
-		return new BannerView(instance, index++, ac.getUserByIndex(randomPick).getID(), -1, time, size, 0);
+		return new BannerView(instance, index++, instance.getUserByIndex(randomPick).getID(), -1, time, size, 0);
 	}
 
 	public static AdBlasterInstance randomInstance(int num, AdBlasterDbUniverse ac) {
@@ -137,5 +142,18 @@ public class AdBlasterInstance extends AbstractAdBlasterInstance{
 	protected BannerView getView(int i) {
 		return this.views.get(i);
 	}
+
+	public User getUser(int i) {
+		return u.get(new Integer(i));
+	}
+
+	public int getUserCount(){
+		return u.size();
+	}
+	
+	protected void addUser(User user) {
+		u.put(new Integer(user.getID()), user);
+	}
+
 
 }
