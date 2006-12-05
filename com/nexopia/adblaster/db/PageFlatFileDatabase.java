@@ -39,16 +39,17 @@ public class PageFlatFileDatabase {
 		file = new File(directory, "page.db");
 		writer = new FileWriter(file, append);
 		reader = new BufferedReader(new FileReader(file));
+		pages_reverse = new HashMap<String, Integer>();
+		pages = new IntObjectHashMap<String>();
 		if (append) {
 			this.load();
-		} else {
-			pages_reverse = new HashMap<String, Integer>();
-			pages = new IntObjectHashMap<String>();
 		}
 	}
 	
 	public void load() throws IOException {
 		String line;
+		pages_reverse = new HashMap<String, Integer>();
+		pages = new IntObjectHashMap<String>();
 		while ((line = reader.readLine()) != null) {
 			String words[] = line.split(" ");
 			pages_reverse.put(words[1], Integer.valueOf(words[0]));
