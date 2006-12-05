@@ -371,8 +371,8 @@ public abstract class AbstractAdBlasterInstance {
 	public abstract void fillInstance(I_Policy pol);
 	protected abstract BannerView getView(int i);
 	public abstract int getViewCount();
-	public abstract User getUserByIndex(int randomPick);
-	public abstract int getUserCount();
+	//public abstract User getUserByIndex(int randomPick);
+	//public abstract int getUserCount();
 	public abstract User getUser(int uid);
 
 

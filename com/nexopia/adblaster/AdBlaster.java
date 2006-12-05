@@ -70,7 +70,7 @@ public class AdBlaster {
 		
 		System.out.println("Chunking.");
 		GlobalData gd = new GlobalData(instanc, pol);
-		AdBlasterThreadedInstance[] chunk = getChunk(gd, THREAD_COUNT, 1000);
+		AdBlasterThreadedInstance[] chunk = getChunk(gd, THREAD_COUNT);
 		Runnable[] r = new Runnable[THREAD_COUNT];
 		Thread[] t = new Thread[THREAD_COUNT];
 		
@@ -188,21 +188,12 @@ public class AdBlaster {
 	/*
 	 * Get "num" chunks of average size "size".
 	 */
-	private static AdBlasterThreadedInstance[] getChunk(GlobalData gd, int num, int size) {
+	private static AdBlasterThreadedInstance[] getChunk(GlobalData gd, int num) {
 		AdBlasterThreadedInstance r[] = new AdBlasterThreadedInstance[num];
-		int modCount = gd.instance.getUserCount() / size;
+		//int modCount = gd.instance.getUserCount() / size;
 		for (int i = 0; i < num; i++){
 			r[i] = new AdBlasterThreadedInstance(gd);
-		}
-		for (int i = 0; i < gd.instance.getUserCount()-1; i++){
-			ProgressIndicator.show(i, gd.instance.getUserCount());
-			int hash = Math.abs(gd.instance.getUserByIndex(i).getID() % modCount);
-			if (hash < num){
-				Vector <BannerView>vec = gd.instance.db.getByUser(gd.instance.getUserByIndex(i).getID());
-				for (BannerView bv : vec){
-					r[hash].addView(bv);
-				}
-			}
+			r[i].addAddAllViews(gd.instance.db.getSubset(i));
 		}
 		return r;
 	}								

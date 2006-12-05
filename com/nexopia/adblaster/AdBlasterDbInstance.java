@@ -10,6 +10,7 @@ import java.util.WeakHashMap;
 
 import com.nexopia.adblaster.db.BannerViewBinding;
 import com.nexopia.adblaster.db.UserDatabase;
+import com.nexopia.adblaster.db.UserFlatFileReader;
 import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.BannerView;
 import com.nexopia.adblaster.struct.I_Policy;
@@ -22,7 +23,7 @@ import com.sleepycat.je.DatabaseException;
 public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	HashMap swappedViews; //always look for a view here before checking the database
 	BannerViewFFDatabase db;
-	private UserDatabase userDB;
+	private UserFlatFileReader userDB;
 	public BannerViewBinding instanceBinding;
 
 	public AdBlasterDbInstance(AbstractAdBlasterUniverse c){
@@ -32,7 +33,7 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	public void loadNoCount(File dbf, File u_dbf, File data) {
 		try {
 			db = new BannerViewFFDatabase(dbf, instanceBinding);
-			userDB = new UserDatabase(u_dbf);
+			userDB = new UserFlatFileReader(u_dbf);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -64,7 +65,7 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 			System.out.println("Counting Bannerviews.");
 			db = new BannerViewFFDatabase(f, instanceBinding);
 			ProgressIndicator.setTitle("Counting bannerviews...");
-			userDB = new UserDatabase(u_dbf);
+			userDB = new UserFlatFileReader(u_dbf);
 			/*{
 				long time = System.currentTimeMillis();
 				for (int i = 0; i < db.getBannerViewCount(); i++){
@@ -114,26 +115,6 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 		User u = userDB.getUser(i);
 		//I.free();
 		return u;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.nexopia.adblaster.AbstractAdBlasterUniverse#getUserCount()
-	 */
-	public int getUserCount() {
-		return userDB.getUserCount();
-	}
-
-	public User getRandomUser() {
-		return userDB.getUserByIndex((int)(Math.random()*(userDB.getUserCount()-1)));
-	}
-
-	public User getUserByIndex(int randomPick) {
-		return userDB.getUserByIndex(randomPick);
-	}
-
-	public void addUser(User u) {
-		userDB.cache.put(u.getID(), u);
-		
 	}
 
 

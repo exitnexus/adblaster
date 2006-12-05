@@ -1,5 +1,6 @@
 package com.nexopia.adblaster;
 
+import java.util.Collection;
 import java.util.Vector;
 
 import com.nexopia.adblaster.db.UserDatabase;
@@ -109,6 +110,10 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 		User u = userDB.getUser(i);
 		//I.free();
 		return u;
+	}
+
+	public void addAddAllViews(Collection<BannerView> subset) {
+		this.views.addAll(subset);
 	}
 
 	
