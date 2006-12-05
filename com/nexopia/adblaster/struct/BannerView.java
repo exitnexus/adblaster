@@ -11,6 +11,7 @@ import com.nexopia.adblaster.AbstractAdBlasterInstance;
  * change.
  */
 public class BannerView{
+	private int id;
 	private int uid;
 	private int bid;
 	private int time;
