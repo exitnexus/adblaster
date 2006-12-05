@@ -28,7 +28,7 @@ public class PageFlatFileDatabase {
 				throw new SecurityException(directoryName + " is not a directory and cannot be created as one.");
 			}
 		}
-		file = new File("page.db");
+		file = new File(directory, "page.db");
 		writer = new FileWriter(file, append);
 		reader = new BufferedReader(new FileReader(file));
 		if (append) {
