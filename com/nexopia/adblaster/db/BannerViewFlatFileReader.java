@@ -4,8 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Vector;
 
 import com.nexopia.adblaster.BannerViewCursor;
@@ -66,18 +64,30 @@ public class BannerViewFlatFileReader {
 
 	public BannerView get(int index) {
 		// TODO Auto-generated method stub
+		//It is not obvious exactly how this should behave, when implementing it be careful to
+		//check how it is used and implement it sanely.
 		throw new UnsupportedOperationException("You should now implement this method!");
 	}
 
 	public Vector<BannerView> getByUser(int id) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("You should now implement this method!");
+		return userBannerViewMap.get(id);
 	}
 
 	
-	public void load(int i) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("You should now implement this method!");
+	public void load(int fileNumber) throws IOException {
+		files.get(fileNumber);
+		File f = new File(directory, "bannerview."+fileNumber+".db");
+		BufferedReader reader = new BufferedReader(new FileReader(f));
+		String bannerViewString;
+		
+		bannerViews = new Vector<BannerView>();
+		userBannerViewMap = new IntObjectHashMap<Vector<BannerView>>();
+		
+		while ((bannerViewString = reader.readLine()) != null) {
+			BannerView bv = new BannerView(bannerViewString);
+			bannerViews.add(bv);
+			userBannerViewMap.get(bv.getUserID()).add(bv);
+		}
 	}
 
 }

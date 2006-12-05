@@ -29,6 +29,12 @@ public class BannerView{
 	}
 	
 	
+	public BannerView(String bannerViewString) {
+		//TODO: Fix this.
+		throw new UnsupportedOperationException("Implement this, you need to factor AbstractAdBlasterInstance out of this class.");
+	}
+
+
 	public Banner getBanner() {
 		if (bid == -1){
 			return null;
