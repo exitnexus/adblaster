@@ -62,6 +62,7 @@ public class PageFlatFileDatabase {
 		if (!pages_reverse.containsKey(page)) {
 			pages_reverse.put(page, Integer.valueOf(count));
 			pages.put(count, page);
+			writer.write(count + " " + page + "\n");
 			count++;
 		}
 		return pages_reverse.get(page).intValue();
