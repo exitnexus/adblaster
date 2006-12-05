@@ -20,6 +20,7 @@ import com.nexopia.adblaster.db.BannerDatabase;
 import com.nexopia.adblaster.db.JDBCConfig;
 import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.BannerStat;
+import com.nexopia.adblaster.struct.BannerView;
 import com.nexopia.adblaster.struct.Campaign;
 import com.nexopia.adblaster.struct.HourlyStat;
 import com.nexopia.adblaster.struct.I_Policy;
@@ -119,7 +120,7 @@ public class BannerServer {
 	//public HashMap<Integer, Integer> campaignids; // array( bannerid => campaignid );
 	
 	//public int time;
-	private HashMap<ServablePropertyHolder,IntObjectHashMap> viewMap = new HashMap<ServablePropertyHolder, IntObjectHashMap>();
+	private HashMap<ServablePropertyHolder,IntObjectHashMap<int[]>> viewMap = new HashMap<ServablePropertyHolder, IntObjectHashMap<int[]>>();
 	Vector<Banner> banners = new Vector<Banner>();
 	FastMap<Banner, BannerStat> bannerstats;
 	private FastMap<Integer, TypeStat> viewstats = new FastMap<Integer,TypeStat>();
@@ -226,14 +227,14 @@ public class BannerServer {
 	 */
 	public int[] getViewsForUser(int userid, ServablePropertyHolder b) {
 		/* Get records of all views for the banner.*/
-		IntObjectHashMap userViewMap = viewMap.get(b);
+		IntObjectHashMap<int[]> userViewMap = viewMap.get(b);
 		if (userViewMap == null){
-			userViewMap = new IntObjectHashMap();
+			userViewMap = new IntObjectHashMap<int[]>();
 			viewMap.put(b, userViewMap);
 		}
 		
 		/* From the above records, get all views for this user.*/
-		int []views = (int[])userViewMap.get(userid);
+		int []views = userViewMap.get(userid);
 		if (views == null){
 			views = new int[b.getViewsPerUser()];
 			userViewMap.put(userid, views);

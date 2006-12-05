@@ -11,13 +11,13 @@ public class CacheBannerViewDatabase {
 	BannerViewDatabase bv_db;
 	//private int datacache[];
 	//Vector<BannerView> vec;
-	IntObjectHashMap map;
+	IntObjectHashMap<BannerView> map;
 	public int lastid;
 	
 	public CacheBannerViewDatabase(File f, AdBlasterDbInstance inst) throws DatabaseException{
 		bv_db = new BannerViewDatabase(f,inst.instanceBinding);
 		//vec = new Vector<BannerView>();
-		map = new IntObjectHashMap();
+		map = new IntObjectHashMap<BannerView>();
 /*		BannerView bv = null;
 		for (int i = 0; i < bv_db.getBannerViewCount(); i++){
 			bv = bv_db.get(i);
@@ -36,7 +36,7 @@ public class CacheBannerViewDatabase {
 
 	public BannerView get(int index) {
 		if (map.containsKey(index)){
-			return (BannerView)map.get(index);
+			return map.get(index);
 		} else {
 			BannerView bv = bv_db.get(index);
 			map.put(index, bv);

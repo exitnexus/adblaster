@@ -37,12 +37,12 @@ package com.nexopia.adblaster.util;
  * @version 1.1
  */
 
-public class IntObjectHashMap extends PrimitiveKeyBase {
+public class IntObjectHashMap<Value> extends PrimitiveKeyBase {
 	/** Array of key table slots. */
 	protected int[] m_keyTable;
 
 	/** Array of value table slots. */
-	protected Object[] m_valueTable;
+	protected Value[] m_valueTable;
 
 	/**
 	 * Constructor with full specification.
@@ -84,7 +84,7 @@ public class IntObjectHashMap extends PrimitiveKeyBase {
 	 *            instance being copied
 	 */
 
-	public IntObjectHashMap(IntObjectHashMap base) {
+	public IntObjectHashMap(IntObjectHashMap<Value> base) {
 		super(base);
 	}
 
@@ -135,7 +135,7 @@ public class IntObjectHashMap extends PrimitiveKeyBase {
 	 */
 
 	protected final void setValueArray(Object array) {
-		m_valueTable = (Object[]) array;
+		m_valueTable = (Value[]) array;
 	}
 
 	/**
@@ -171,7 +171,7 @@ public class IntObjectHashMap extends PrimitiveKeyBase {
 
 	protected void restructure(boolean[] flags, Object karray, Object varray) {
 		int[] keys = (int[]) karray;
-		Object[] values = (Object[]) varray;
+		Value[] values = (Value[]) varray;
 		for (int i = 0; i < flags.length; i++) {
 			if (flags[i]) {
 				assignSlot(keys[i], values[i]);
@@ -205,7 +205,7 @@ public class IntObjectHashMap extends PrimitiveKeyBase {
 	 * @return slot at which entry was added
 	 */
 
-	protected int assignSlot(int key, Object value) {
+	protected int assignSlot(int key, Value value) {
 		int offset = freeSlot(computeSlot(key));
 		m_flagTable[offset] = true;
 		m_keyTable[offset] = key;
@@ -225,7 +225,7 @@ public class IntObjectHashMap extends PrimitiveKeyBase {
 	 *         not previously present in table
 	 */
 
-	public Object put(int key, Object value) {
+	public Object put(int key, Value value) {
 		ensureCapacity(m_entryCount + 1);
 		int offset = internalFind(key);
 		if (offset >= 0) {
@@ -285,7 +285,7 @@ public class IntObjectHashMap extends PrimitiveKeyBase {
 	 * @return value for key, or <code>null</code> if key not found
 	 */
 
-	public final Object get(int key) {
+	public final Value get(int key) {
 		int slot = internalFind(key);
 		if (slot >= 0) {
 			return m_valueTable[slot];
@@ -337,6 +337,6 @@ public class IntObjectHashMap extends PrimitiveKeyBase {
 	 */
 
 	public Object clone() {
-		return new IntObjectHashMap(this);
+		return new IntObjectHashMap<Value>(this);
 	}
 }

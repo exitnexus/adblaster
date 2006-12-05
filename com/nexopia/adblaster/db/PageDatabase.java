@@ -36,7 +36,7 @@ public class PageDatabase {
 	private Database db;
 	private Environment env;
 	int userCount;
-	IntObjectHashMap cache;
+	IntObjectHashMap<Object> cache;
 	int keys[] = null;
 	int lastid;
 	int count;
@@ -49,7 +49,7 @@ public class PageDatabase {
 		EnvironmentConfig envConf = new EnvironmentConfig();
 		envConf.setAllowCreate(true);
 		env = new Environment(f, envConf);
-		cache = new IntObjectHashMap();
+		cache = new IntObjectHashMap<Object>();
 		openDatabases();
 	}
 

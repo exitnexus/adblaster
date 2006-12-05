@@ -34,7 +34,7 @@ public class UserDatabase {
 	private Database db;
 	private Environment env;
 	int userCount;
-	public IntObjectHashMap cache;
+	public IntObjectHashMap<User> cache;
 	int keys[] = null;
 	//Vector <Integer>keys = null;
 	
@@ -60,7 +60,7 @@ public class UserDatabase {
 		envConf.setAllowCreate(true);
 		env = new Environment(f, envConf);
 		openDatabases();
-		cache = new IntObjectHashMap();
+		cache = new IntObjectHashMap<User>();
 		this.refreshUserCount();
 	}
 
@@ -95,7 +95,7 @@ public class UserDatabase {
 	}
 	
 	public User getUser(int i){
-		User u = (User)cache.get(i);
+		User u = cache.get(i);
 		if (u != null){
 			return u;
 		}
