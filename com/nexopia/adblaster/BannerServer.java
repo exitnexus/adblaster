@@ -85,7 +85,7 @@ public class BannerServer {
 		debug.put("tick", Boolean.FALSE);
 		debug.put("connect", Boolean.FALSE);
 		debug.put("get", Boolean.FALSE);
-		debug.put("getlog", Boolean.FALSE);
+		debug.put("getlog", Boolean.TRUE);
 		debug.put("getfail", Boolean.FALSE);
 		debug.put("click", Boolean.TRUE);
 		debug.put("timeupdates", Boolean.TRUE);

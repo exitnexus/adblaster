@@ -55,6 +55,8 @@ public class SimulationServer {
 				profit += banner.getPayRate();
 			i++;
 		}
+	    writer.write("shutdown \n");
+	    writer.flush();
 	    System.out.println("Total profit: " + profit);
 
 		
