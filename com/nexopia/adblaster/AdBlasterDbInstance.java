@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.WeakHashMap;
 
 import com.nexopia.adblaster.db.BannerViewBinding;
+import com.nexopia.adblaster.db.PageFlatFileDatabase;
 import com.nexopia.adblaster.db.UserDatabase;
 import com.nexopia.adblaster.db.UserFlatFileReader;
 import com.nexopia.adblaster.struct.Banner;
@@ -25,6 +26,7 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	BannerViewFFDatabase db;
 	private UserFlatFileReader userDB;
 	public BannerViewBinding instanceBinding;
+	PageFlatFileDatabase pageDb;
 
 	public AdBlasterDbInstance(AbstractAdBlasterUniverse c){
 		super(c);

@@ -11,7 +11,7 @@ import java.util.Calendar;
 import java.util.MissingResourceException;
 
 import com.nexopia.adblaster.db.BannerViewBinding;
-import com.nexopia.adblaster.db.PageDatabase;
+import com.nexopia.adblaster.db.PageFlatFileDatabase;
 import com.nexopia.adblaster.db.UserDatabase;
 import com.nexopia.adblaster.struct.User;
 import com.nexopia.adblaster.util.Integer;
@@ -28,7 +28,7 @@ public class InsertServer implements Runnable {
 	private static class ThreadedDatabases{
 		private BannerViewDatabase bannerViewDb;
 		private UserDatabase userDb;
-		private PageDatabase pageDb;
+		private PageFlatFileDatabase pageDb;
 		private int day;
 		private static final long DAY_MS = 86400000;
 		
@@ -37,11 +37,14 @@ public class InsertServer implements Runnable {
 			try {
 				bannerViewDb = new BannerViewDatabase(""+day, bvb);
 				userDb = new UserDatabase(""+day);
-				pageDb = new PageDatabase(""+day);
+				pageDb = new PageFlatFileDatabase(""+day, false);
 			} catch (DatabaseException dbe) {
 				System.err.println("Unable to open databases: " + dbe);
 				dbe.printStackTrace();
 				System.exit(-1);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 		
@@ -63,17 +66,23 @@ public class InsertServer implements Runnable {
 				System.err.println("Unable to close databases: " + dbe);
 				dbe.printStackTrace();
 				System.exit(-1);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 			
 			day = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
 			try {
 				bannerViewDb = new BannerViewDatabase(""+day, bvb);
 				userDb = new UserDatabase(""+day);
-				pageDb = new PageDatabase(""+day);
+				pageDb = new PageFlatFileDatabase(""+day, false);
 			} catch (DatabaseException dbe) {
 				System.err.println("Unable to open databases: " + dbe);
 				dbe.printStackTrace();
 				System.exit(-1);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 		
@@ -159,7 +168,7 @@ public class InsertServer implements Runnable {
 					synchronized (tdb){
 						user.fill(userid, age, sex, location, interests);
 						tdb.userDb.insert(user);
-						int pageIndex = tdb.pageDb.insert(page);
+						int pageIndex = tdb.pageDb.write(page);
 						tdb.bannerViewDb.insert(userid, bannerid, time, size, pageIndex);
 						if (tdb.bannerViewDb.getBannerViewCount()%1000 == 0) {
 							System.out.println("Banner Count: " + tdb.bannerViewDb.getBannerViewCount());
@@ -177,7 +186,7 @@ public class InsertServer implements Runnable {
 				out.println("Shutting down...");
 				shutdown = true;
 				try {
-					tdb.pageDb.dump();
+					tdb.pageDb.sync();
 					tdb.userDb.close();
 					tdb.bannerViewDb.close();
 					tdb.pageDb.close();

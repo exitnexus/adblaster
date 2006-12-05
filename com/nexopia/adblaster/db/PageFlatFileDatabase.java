@@ -7,25 +7,33 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 
+import com.nexopia.adblaster.util.IntObjectHashMap;
+
 public class PageFlatFileDatabase {
 	File file;
 	File directory;
 	FileWriter writer;
 	BufferedReader reader;
 	
-	private HashMap<String, Integer> pages; //track the pages in the database
+	private HashMap<String, Integer> pages_reverse; //track the pages in the database
+	private IntObjectHashMap<String> pages;
 	private int count;
 	
+	public PageFlatFileDatabase(File directory, boolean append) throws IOException {
+		this.directory = directory;
+		this.init(append);
+	}
+
 	public PageFlatFileDatabase(String directoryName, boolean append) throws IOException {
-		this.init(directoryName, append);
+		directory = new File(directoryName);
+		this.init(append);
 	}
 	
-	private void init(String directoryName, boolean append) throws IOException {
-		directory = new File(directoryName);
+	private void init(boolean append) throws IOException {
 		if (!directory.isDirectory()) {
 			directory.mkdir();
 			if (!directory.isDirectory()) {
-				throw new SecurityException(directoryName + " is not a directory and cannot be created as one.");
+				throw new SecurityException(directory.getName() + " is not a directory and cannot be created as one.");
 			}
 		}
 		file = new File(directory, "page.db");
@@ -34,26 +42,28 @@ public class PageFlatFileDatabase {
 		if (append) {
 			this.load();
 		} else {
-			pages = new HashMap<String, Integer>();
+			pages_reverse = new HashMap<String, Integer>();
+			pages = new IntObjectHashMap<String>();
 		}
 	}
 	
 	public void load() throws IOException {
-		pages = new HashMap<String, Integer>();
 		String line;
 		while ((line = reader.readLine()) != null) {
 			String words[] = line.split(" ");
-			pages.put(words[1], Integer.valueOf(words[0]));
+			pages_reverse.put(words[1], Integer.valueOf(words[0]));
+			pages.put(Integer.valueOf(words[0]), words[1]);
 		}
 	}
 	
 	//returns the id assigned to the page
 	public int write(String page) throws IOException {
-		if (!pages.containsKey(page)) {
-			pages.put(page, Integer.valueOf(count));
+		if (!pages_reverse.containsKey(page)) {
+			pages_reverse.put(page, Integer.valueOf(count));
+			pages.put(count, page);
 			count++;
 		}
-		return pages.get(page).intValue();
+		return pages_reverse.get(page).intValue();
 	}
 	
 	public void sync() throws IOException {
@@ -63,6 +73,14 @@ public class PageFlatFileDatabase {
 	public void close() throws IOException {
 		this.sync();
 		writer.close();
+	}
+
+	public String getPage(int page) {
+		return pages.get(page);
+	}
+
+	public int getPage(String p) {
+		return pages_reverse.get(p);
 	}
 	
 }

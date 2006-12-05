@@ -5,14 +5,14 @@ package com.nexopia.adblaster.util;
 
 import java.util.Vector;
 
-import com.nexopia.adblaster.db.PageDatabase;
+import com.nexopia.adblaster.db.PageFlatFileDatabase;
 import com.nexopia.adblaster.struct.BannerView;
 
 public class PageValidator2 implements PageValidator{
 	Vector<Integer> pages;
-	PageDatabase pdb;
+	PageFlatFileDatabase pdb;
 	
-	public PageValidator2(PageDatabase pdb){
+	public PageValidator2(PageFlatFileDatabase pdb){
 		this.pdb = pdb;
 		pages = new Vector<Integer>();
 	}

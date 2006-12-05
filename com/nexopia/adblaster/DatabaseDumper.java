@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import com.nexopia.adblaster.db.BannerDatabase;
+import com.nexopia.adblaster.db.PageFlatFileDatabase;
 import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.BannerView;
 import com.nexopia.adblaster.struct.Campaign.CampaignDB;
@@ -13,6 +14,7 @@ import com.nexopia.adblaster.util.Integer;
 import com.nexopia.adblaster.util.PageValidator2;
 import com.nexopia.adblaster.util.PageValidatorFactory;
 import com.nexopia.adblaster.util.Utilities;
+import com.sleepycat.je.DatabaseException;
 
 public class DatabaseDumper {
 	private static File user_dir = null;
@@ -46,7 +48,13 @@ public class DatabaseDumper {
 			//dataFile = new File(args[3]);
 		//}
 
-		ac = new AdBlasterDbUniverse(user_dir, page_dir);
+		PageFlatFileDatabase pageDb = null;
+		pageDb = new PageFlatFileDatabase(page_dir, false);
+		Object args2[] = {pageDb};
+		PageValidatorFactory factory = 
+			new PageValidatorFactory(PageValidator2.class,args2);
+
+		ac = new AdBlasterDbUniverse(factory);
 		instanc = new AdBlasterDbInstance(ac);
 
 		try {
@@ -71,7 +79,7 @@ public class DatabaseDumper {
 							bv.getUser().getInterests().toString() + " "
 						:
 							"0 0 0 0 ") +
-						ac.getPageDatabase().getPage(bv.getPage()) +
+						pageDb.getPage(bv.getPage()) +
 						" 0 0\n";
 				bw.write(request);
 				if (i % 1000 == 0){

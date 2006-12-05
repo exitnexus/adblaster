@@ -21,15 +21,20 @@ public class UserFlatFileReader {
 	private BufferedReader reader;
 	private IntObjectHashMap<User> users;
 	
+	public UserFlatFileReader(File directory) throws FileNotFoundException{
+		this.directory = directory;
+		this.init();
+	}
+
 	public UserFlatFileReader(String directoryName) throws FileNotFoundException{
-		this.init(directoryName);
+		directory = new File(directoryName);
+		this.init();
 	}
 	
-	public void init(String directoryName) throws FileNotFoundException{
+	public void init() throws FileNotFoundException{
 		files = new Vector<FileReader>();
-		directory = new File(directoryName);
 		if (!directory.isDirectory()) {
-			throw new SecurityException(directoryName + " is not a directory.");
+			throw new SecurityException(directory.getName() + " is not a directory.");
 		}
 		users = new IntObjectHashMap<User>();
 	}

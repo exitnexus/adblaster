@@ -8,6 +8,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.Vector;
 
 import javax.swing.BoxLayout;
@@ -20,9 +21,13 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
+import com.nexopia.adblaster.db.PageFlatFileDatabase;
 import com.nexopia.adblaster.struct.BannerView;
+import com.nexopia.adblaster.util.PageValidator2;
+import com.nexopia.adblaster.util.PageValidatorFactory;
 import com.nexopia.adblaster.util.ProgressIndicator;
 import com.nexopia.adblaster.util.Utilities;
+import com.sleepycat.je.DatabaseException;
 
 public class AdBlaster {
 
@@ -53,7 +58,18 @@ public class AdBlaster {
 			dataFile = new File(args[3]);
 		}
 
-		ac = new AdBlasterDbUniverse(user_dir, page_dir);
+		PageFlatFileDatabase pageDb = null;
+		try {
+			pageDb = new PageFlatFileDatabase(page_dir, false);
+		} catch (IOException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+		Object args2[] = {pageDb};
+		PageValidatorFactory factory = 
+			new PageValidatorFactory(PageValidator2.class,args2);
+
+		ac = new AdBlasterDbUniverse(factory);
 		instanc = new AdBlasterDbInstance(ac);
 		//instanceBinding = new BannerViewBinding(ac, instanc);
 
