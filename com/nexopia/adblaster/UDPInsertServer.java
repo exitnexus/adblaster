@@ -42,6 +42,8 @@ public class UDPInsertServer {
 		synchronized public void renew() {
 			try {
 				userWriter.sync();
+				pageWriter.sync();
+				bannerViewWriter.sync();
 			} catch (IOException e) {
 				System.err.println("Unable to sync file writers at days end: " + e);
 				e.printStackTrace();
@@ -59,6 +61,8 @@ public class UDPInsertServer {
 
 		public void close() throws IOException {
 			userWriter.close();
+			pageWriter.close();
+			bannerViewWriter.close();
 		}
 		
 	}//end threadeddatabase
@@ -83,11 +87,13 @@ public class UDPInsertServer {
 	}
 	
 	private void processInput(String input) {
+		System.out.println("Received: " + input);
 		String[] words = input.split("\\s");
 		if (words.length == 0) return;
 		String command = words[0];
 		//get usertime size userid age sex location interests page passback => bannerid
 		if (command.indexOf("get") == 0 && words.length == 14) {
+			System.out.println("Actual request");
 			int time = Integer.parseInt(words[1]);
 			byte size = Byte.parseByte(words[2]);
 			int userid = Integer.parseInt(words[3]);
@@ -135,7 +141,7 @@ public class UDPInsertServer {
 		user = new User();
 		
 		UDPInsertServer server = new UDPInsertServer();
-		System.out.println("Listening for connections on port " + SERVER_PORT + ".");
+		System.out.println("Listening for packets on port " + SERVER_PORT + ".");
 		while (!shutdown) {
 			if (tdb.isOld()){
 				tdb.renew();
