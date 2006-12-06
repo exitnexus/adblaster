@@ -50,8 +50,8 @@ public class UserFlatFileReader {
 		}
 	}
 	
-	//TODO: Make this method work.
+	//Requires the user be in the current loaded set
 	public User getUser(int uid) {
-		return null;
+		return users.get(uid);
 	}
 }

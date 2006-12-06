@@ -16,17 +16,21 @@ public class BannerViewFlatFileReader {
 	private Vector<FileReader> files;
 	private File directory;
 	private int bannerViewCount = 0;
+	private BannerDatabase bannerDB;
+	private UserFlatFileReader userDB;
 	
-	public BannerViewFlatFileReader(File directory) {
+	public BannerViewFlatFileReader(File directory, BannerDatabase bannerDB, UserFlatFileReader userDB) {
 		this.directory = directory;
-		this.init();
+		this.init(bannerDB, userDB);
 	}
-	public BannerViewFlatFileReader(String directoryName) {
+	public BannerViewFlatFileReader(String directoryName, BannerDatabase bannerDB, UserFlatFileReader userDB) {
 		directory = new File(directoryName);
-		this.init();
+		this.init(bannerDB, userDB);
 	}
 	
-	private void init(){
+	private void init(BannerDatabase bannerDB, UserFlatFileReader userDB){
+		this.bannerDB = bannerDB;
+		this.userDB = userDB;
 		files = new Vector<FileReader>();
 		if (!directory.isDirectory()) {
 			throw new SecurityException(directory.getName() + " is not a directory.");
@@ -89,7 +93,7 @@ public class BannerViewFlatFileReader {
 		userBannerViewMap = new IntObjectHashMap<Vector<BannerView>>();
 		
 		while ((bannerViewString = reader.readLine()) != null) {
-			BannerView bv = new BannerView(bannerViewString);
+			BannerView bv = new BannerView(bannerViewString, bannerDB, userDB);
 			bannerViews.add(bv);
 			userBannerViewMap.get(bv.getUserID()).add(bv);
 		}
