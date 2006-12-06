@@ -1,5 +1,6 @@
 package com.nexopia.adblaster;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Vector;
@@ -20,7 +21,12 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 	
 	public AdBlasterThreadedInstance(GlobalData gd, int subset_num) {
 		super(gd.universe);
-		bannerDB = new BannerViewFlatFileReader(gd.bannerViewDirectory);
+		try {
+			bannerDB = new BannerViewFlatFileReader(gd.bannerViewDirectory);
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		try {
 			bannerDB.load(subset_num);
 		} catch (IOException e) {
