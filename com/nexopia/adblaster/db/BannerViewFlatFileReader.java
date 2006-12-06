@@ -89,7 +89,9 @@ public class BannerViewFlatFileReader {
 		while ((bannerViewString = reader.readLine()) != null) {
 			BannerView bv = new BannerView(bannerViewString);
 			bannerViews.add(bv);
-			userBannerViewMap.get(bv.getUserID()).add(bv);
+			if (bv.getUserID() > 0){
+				userBannerViewMap.get(bv.getUserID()).add(bv);
+			}
 		}
 	}
 
