@@ -70,13 +70,6 @@ public class BannerViewFlatFileReader {
 		}
 	}
 
-	public BannerView get(int index) {
-		// TODO Auto-generated method stub
-		//It is not obvious exactly how this should behave, when implementing it be careful to
-		//check how it is used and implement it sanely.
-		throw new UnsupportedOperationException("You should now implement this method!");
-	}
-
 	public Vector<BannerView> getByUser(int id) {
 		return userBannerViewMap.get(id);
 	}
