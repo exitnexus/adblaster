@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.Vector;
 import java.util.WeakHashMap;
 
-import com.nexopia.adblaster.db.BannerViewBinding;
 import com.nexopia.adblaster.db.BannerViewFlatFileReader;
 import com.nexopia.adblaster.db.BannerViewFlatFileWriter;
 import com.nexopia.adblaster.db.PageFlatFileDatabase;
@@ -27,11 +26,9 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	HashMap swappedViews; //always look for a view here before checking the database
 	BannerViewFlatFileReader db;
 	private UserFlatFileReader userDB;
-	public BannerViewBinding instanceBinding;
 
 	public AdBlasterDbInstance(AbstractAdBlasterUniverse c){
 		super(c);
-		instanceBinding = new BannerViewBinding(this.universe, this);
 	}
 	public void loadNoCount(File dbf, File u_dbf, File data) {
 		try {
@@ -86,7 +83,7 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 			for (int i = 0; i < BannerViewFlatFileWriter.FILE_COUNT; i++){
 				db.load(i);
 				for (BannerView bv : db.getCurrentBannerViews()){
-					if (bv.getBanner() != null){
+					if (bv.getBannerId() != -1){
 						updateMap(bv);
 					}
 				}
@@ -219,10 +216,10 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 		}*/
 	}
 	public void notifyChangeUser(BannerView view) {
-		updateDB(view, view.getBanner());
+		updateDB(view, universe.getBannerByID(view.getBannerId()));
 	}
 	public void notifyChangeTime(BannerView view) {
-		updateDB(view, view.getBanner());
+		updateDB(view, universe.getBannerByID(view.getBannerId()));
 	}
 	@Override
 	public int getViewCount() {

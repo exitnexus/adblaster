@@ -93,9 +93,8 @@ public final class AdBlasterThreadedOperation implements Runnable {
 					s += "User: " + chunk.getViews().elementAt(j).getUserID() + "; ";
 					s += "Page: " + chunk.getViews().elementAt(j).getPage() + "; ";
 					s += "Size: " + chunk.getViews().elementAt(j).getSize() + "; ";
-					s += chunk.getViews().elementAt(j).comment;
 					model.setValueAt(s, j,0);
-					model.setValueAt(chunk.getViews().elementAt(j).getBanner(), j,1);
+					model.setValueAt(chunk.universe.getBannerByID(chunk.getViews().elementAt(j).getBannerId()), j,1);
 					model.setValueAt(AdBlaster.outputTime(chunk.getViews().elementAt(j).getTime()), j,2);
 				}
 				resultPanel.add(table, BorderLayout.CENTER);
@@ -125,7 +124,7 @@ public final class AdBlasterThreadedOperation implements Runnable {
 					j++){
 				// System.out.println("Trying bannerview " + j);
 				BannerView bv = instanc.getViews().elementAt(j);
-				if (bv.getBanner() == null || bv.getBanner().getPayrate(instanc) < b.getPayrate(instanc)){
+				if (bv.getBannerId() == -1 || gd.universe.getBannerByID(bv.getBannerId()).getPayrate(instanc) < b.getPayrate(instanc)){
 					if (instanc.isValidBannerForView(bv,b)){
 						// single swap
 						bv.setBanner(b);
@@ -151,7 +150,7 @@ public final class AdBlasterThreadedOperation implements Runnable {
 				j++){
 					// System.out.println("Trying bannerview " + j);
 					BannerView bv = instanc.getViews().elementAt(j);
-					if (bv.getBanner() == null || bv.getBanner().getPayrate(instanc) < b.getPayrate(instanc)){
+					if (bv.getBannerId() == -1 || gd.universe.getBannerByID(bv.getBannerId()).getPayrate(instanc) < b.getPayrate(instanc)){
 						Vector swaps = null;
 						int swap_max = 0;
 						for (int l = 1; l < swap_max; l+=2){

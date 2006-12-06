@@ -42,7 +42,7 @@ public abstract class AbstractAdBlasterInstance {
 	public boolean isValidBannerForViewWithComments(BannerView bv, Banner b, StringBuffer buf) {
 		boolean b1 = (b == null);
 		boolean b2 = bv.getSize() == b.getSize();
-		boolean b3 = b.validUser(bv.getUser());
+		boolean b3 = b.validUser(this.getUser(bv.getUserID()));
 		boolean b4 = b.getPageValidator().validate(bv);
 		boolean b5 = this.nearestWithinTimeRange(b, bv);
 		buf.append(b1 + ":"); 
@@ -55,7 +55,7 @@ public abstract class AbstractAdBlasterInstance {
 
 	public boolean isValidBannerForView(BannerView bv, Banner b) {
 		return (b == null) || (bv.getSize() == b.getSize() &&
-				b.validUser(bv.getUser()) &&
+				b.validUser(getUser(bv.getUserID())) &&
 				b.getPageValidator().validate(bv) &&
 				this.nearestWithinTimeRange(b, bv));
 	}
@@ -109,7 +109,7 @@ public abstract class AbstractAdBlasterInstance {
 		Vector<BannerView> vec2 = new Vector<BannerView>();
 		for (int i = 0; i < vec.size(); i++){
 			BannerView bv = vec.get(i);
-			if (bv.getTime() > time - period && bv.getTime() < time + period && bv.getBanner() == b){
+			if (bv.getTime() > time - period && bv.getTime() < time + period && universe.getBannerByID(bv.getBannerId()) == b){
 				vec2.add(bv);
 			}
 		}
@@ -120,16 +120,16 @@ public abstract class AbstractAdBlasterInstance {
 		HashMap<User, HashMap<Banner, Vector<BannerView>>> userHash = new HashMap<User, HashMap<Banner, Vector<BannerView>>>();
 		for (int i = 0; i < this.getViewCount(); i++){
 			BannerView bv = getView(i);
-			User u = bv.getUser();
+			User u = getUser(bv.getUserID());
 			HashMap<Banner,Vector<BannerView>> bannerHash = userHash.get(u);
 			if (bannerHash == null){
 				bannerHash = new HashMap<Banner, Vector<BannerView>>();
 				userHash.put(u, bannerHash);
 			}
-			Vector<BannerView> vec = bannerHash.get(bv.getBanner());
+			Vector<BannerView> vec = bannerHash.get(universe.getBannerByID(bv.getBannerId()));
 			if (vec == null) {
 				vec = new Vector<BannerView>();
-				bannerHash.put(bv.getBanner(), vec);
+				bannerHash.put(universe.getBannerByID(bv.getBannerId()), vec);
 			}
 			vec.add(bv);
 		}
@@ -140,7 +140,7 @@ public abstract class AbstractAdBlasterInstance {
 	private HashMap<User, Vector<BannerView>> getAllMatching() {
 		HashMap<User, Vector<BannerView>> userHash = new HashMap<User, Vector<BannerView>>();
 		for(BannerView bv: getViews()){
-			User u = bv.getUser();
+			User u = getUser(bv.getUserID());
 			Vector<BannerView> vec = userHash.get(u);
 			if (vec == null) {
 				vec = new Vector<BannerView>();
@@ -158,7 +158,7 @@ public abstract class AbstractAdBlasterInstance {
 			System.out.println("Building map: " + this.getClass());
 			allMatching = getAllMatching();
 		}
-		User user = bv.getUser();
+		User user = getUser(bv.getUserID());
 		Vector<BannerView>hb = allMatching.get(user);
 		
 		Vector <BannerView> vec = (Vector<BannerView>) getAllMatching(hb, b, bv.getTime(), b.getLimitByPeriod());
@@ -176,7 +176,7 @@ public abstract class AbstractAdBlasterInstance {
 			System.out.println("Building map." + this.getClass());
 			allMatching = getAllMatching();
 		}
-		User user = bv.getUser();
+		User user = getUser(bv.getUserID());
 		Vector<BannerView>hb = allMatching.get(user);
 		
 		Vector <BannerView> vec = getAllMatching(hb, c, bv.getTime(), c.getLimitByPeriod());
@@ -191,7 +191,7 @@ public abstract class AbstractAdBlasterInstance {
 		Vector<BannerView> vec2 = new Vector<BannerView>();
 		for (int i = 0; i < vec.size(); i++){
 			BannerView bv = vec.get(i);
-			if (bv.getTime() > time - period && bv.getTime() < time + period && bv.getBanner() != null && bv.getBanner().getCampaign() == c){
+			if (bv.getTime() > time - period && bv.getTime() < time + period && universe.getBannerByID(bv.getBannerId()) != null && universe.getBannerByID(bv.getBannerId()).getCampaign() == c){
 				vec2.add(bv);
 			}
 		}
@@ -263,11 +263,11 @@ public abstract class AbstractAdBlasterInstance {
 	}
 	
 	synchronized protected void updateMap(BannerView bv) {
-		Integer count = this.bannerCountMap.get(bv.getBanner());
-		this.bannerCountMap.put(bv.getBanner(), Integer.valueOf(count.intValue() + 1));
+		Integer count = this.bannerCountMap.get(universe.getBannerByID(bv.getBannerId()));
+		this.bannerCountMap.put(universe.getBannerByID(bv.getBannerId()), Integer.valueOf(count.intValue() + 1));
 
-		count = this.campaignCountMap.get(bv.getBanner().getCampaign());
-		this.campaignCountMap.put(bv.getBanner().getCampaign(), Integer.valueOf(count.intValue() + 1));
+		count = this.campaignCountMap.get(universe.getBannerByID(bv.getBannerId()).getCampaign());
+		this.campaignCountMap.put(universe.getBannerByID(bv.getBannerId()).getCampaign(), Integer.valueOf(count.intValue() + 1));
 
 	}
 
@@ -293,7 +293,7 @@ public abstract class AbstractAdBlasterInstance {
 		if (depth < 0){
 			return null;
 		}
-		Vector<BannerView> v2 = getAllBannerViewsThatCanSwapWith(src.getBanner());
+		Vector<BannerView> v2 = getAllBannerViewsThatCanSwapWith(universe.getBannerByID(src.getBannerId()));
 		for (Iterator it = v2.iterator(); it.hasNext() ;){
 			BannerView next_vert = (BannerView)it.next();
 			Vector<BannerView> result = depthLimitedDFS(next_vert, b, depth-1);
@@ -309,23 +309,24 @@ public abstract class AbstractAdBlasterInstance {
 		//System.out.println("Swapping " + swaps);
 		Iterator it = swaps.iterator();
 		BannerView second = (BannerView)it.next();
-		this.bannerCountMap.put(second.getBanner(), 
-				new Integer(((Integer)bannerCountMap.get(second.getBanner())).intValue()-1));
-		this.campaignCountMap.put(second.getBanner().getCampaign(), 
-				new Integer(((Integer)campaignCountMap.get(second.getBanner().getCampaign())).intValue()-1));
+		Banner secondBanner = universe.getBannerByID(second.getBannerId());
+		this.bannerCountMap.put(secondBanner, 
+				new Integer(((Integer)bannerCountMap.get(secondBanner)).intValue()-1));
+		this.campaignCountMap.put(secondBanner.getCampaign(), 
+				new Integer(((Integer)campaignCountMap.get(secondBanner.getCampaign())).intValue()-1));
 		
-		if (bannerCountMap.get(second.getBanner()).intValue() < 0){
+		if (bannerCountMap.get(secondBanner).intValue() < 0){
 			throw new UnsupportedOperationException();
 		}
-		if (campaignCountMap.get(second.getBanner().getCampaign()).intValue() < 0){
+		if (campaignCountMap.get(secondBanner.getCampaign()).intValue() < 0){
 			throw new UnsupportedOperationException();
 		}
 		for (; it.hasNext(); ){
 			BannerView first = second;
 			second = (BannerView)it.next();
 			
-			if (isValidBannerForView(first, second.getBanner())){
-				first.setBanner(second.getBanner());
+			if (isValidBannerForView(first, secondBanner)){
+				first.setBanner(secondBanner);
 			} else {
 				System.err.println("Error:  Bad switch.");
 			}
@@ -344,17 +345,17 @@ public abstract class AbstractAdBlasterInstance {
 	 * @param b
 	 */
 	public synchronized void notifyChange(BannerView bv, Banner b){
-		if (bv.getBanner() != null){
-			this.bannerCountMap.put(bv.getBanner(), 
-					new Integer((bannerCountMap.get(bv.getBanner())).intValue()-1));
+		if (universe.getBannerByID(bv.getBannerId()) != null){
+			this.bannerCountMap.put(universe.getBannerByID(bv.getBannerId()), 
+					new Integer((bannerCountMap.get(universe.getBannerByID(bv.getBannerId()))).intValue()-1));
 
-			this.campaignCountMap.put(bv.getBanner().getCampaign(), 
-					new Integer((campaignCountMap.get(bv.getBanner().getCampaign())).intValue()-1));
+			this.campaignCountMap.put(universe.getBannerByID(bv.getBannerId()).getCampaign(), 
+					new Integer((campaignCountMap.get(universe.getBannerByID(bv.getBannerId()).getCampaign())).intValue()-1));
 
-			if (bannerCountMap.get(bv.getBanner()).intValue() < 0){
-				throw new UnsupportedOperationException("" + bv.getBanner());
+			if (bannerCountMap.get(universe.getBannerByID(bv.getBannerId())).intValue() < 0){
+				throw new UnsupportedOperationException("" + universe.getBannerByID(bv.getBannerId()));
 			}
-			if(campaignCountMap.get(bv.getBanner().getCampaign()).intValue() < 0){
+			if(campaignCountMap.get(universe.getBannerByID(bv.getBannerId()).getCampaign()).intValue() < 0){
 				throw new UnsupportedOperationException();
 			}
 		}

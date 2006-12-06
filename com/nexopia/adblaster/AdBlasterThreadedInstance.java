@@ -42,8 +42,8 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 				//ProgressIndicator.show(i, getViewCount());
 				time = System.currentTimeMillis();
 			}
-			if (bv.getBanner() != null){
-				count += bv.getBanner().getRealPayrate();
+			if (bv.getBannerId() != -1){
+				count += universe.getBannerByID(bv.getBannerId()).getRealPayrate();
 			}
 		}
 		return count;
@@ -55,7 +55,7 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 		System.out.println("Filling instance.");
 		ProgressIndicator.setTitle("% Complete Filling");
 		for (BannerView bv : getViews()){
-			if (bv.getBanner() != null){
+			if (bv.getBannerId() != -1){
 				throw new UnsupportedOperationException();
 			}
 			if ((System.currentTimeMillis() - time) > 5000){

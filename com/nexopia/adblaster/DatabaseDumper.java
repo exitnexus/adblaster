@@ -72,11 +72,11 @@ public class DatabaseDumper {
 				String request = "get " + bv.getTime() + " " + 
 						bv.getSize() + " " + 
 						bv.getUserID() + " " + 
-						(bv.getUser() != null?
-							bv.getUser().getAge() + " " + 
-							bv.getUser().getSex() + " " + 
-							bv.getUser().getLocation() + " " + 
-							bv.getUser().getInterests().toString() + " "
+						(instanc.getUser(bv.getUserID()) != null?
+								instanc.getUser(bv.getUserID()).getAge() + " " + 
+								instanc.getUser(bv.getUserID()).getSex() + " " + 
+								instanc.getUser(bv.getUserID()).getLocation() + " " + 
+								instanc.getUser(bv.getUserID()).getInterests().toString() + " "
 						:
 							"0 0 0 0 ") +
 						pageDb.getPage(bv.getPage()) +

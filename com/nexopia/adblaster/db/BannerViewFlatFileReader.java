@@ -6,7 +6,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Vector;
 
-import com.nexopia.adblaster.BannerViewCursor;
 import com.nexopia.adblaster.struct.BannerView;
 import com.nexopia.adblaster.util.IntObjectHashMap;
 
@@ -33,11 +32,6 @@ public class BannerViewFlatFileReader {
 		}
 		bannerViews = new Vector<BannerView>();
 		userBannerViewMap = new IntObjectHashMap<Vector<BannerView>>(); 
-	}
-
-	public BannerViewCursor getCursor() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("You should now implement this method!");
 	}
 
 	//If you want this value recalculated call refreshBannerViewCount
