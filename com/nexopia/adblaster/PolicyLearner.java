@@ -5,7 +5,6 @@ import java.util.Vector;
 import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.BannerView;
 import com.nexopia.adblaster.struct.ServablePropertyHolder;
-import com.nexopia.adblaster.util.ProgressIndicator;
 
 public class PolicyLearner {
 	AbstractAdBlasterUniverse universe;
@@ -36,10 +35,9 @@ public class PolicyLearner {
 			count = newcount;
 			op.iterativeImprove(chunk);
 		}
-		ProgressIndicator.setTitle("Calculating Banner Coefficients...");
+		System.out.println("Calculating Banner Coefficients...");
 		for (int i = 0; i < universe.getBannerCount(); i++){
 			Banner b = universe.getBannerByIndex(i);
-			ProgressIndicator.show(i, universe.getBannerCount());
 			int after = chunk.bannerCount(b);
 			int before = sbefore[i];
 			float f = ((float)((1.0f + after) / (1.0f + before)));

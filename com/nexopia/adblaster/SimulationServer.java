@@ -18,7 +18,6 @@ import com.nexopia.adblaster.util.Integer;
 import com.nexopia.adblaster.util.PageValidator1;
 import com.nexopia.adblaster.util.PageValidator2;
 import com.nexopia.adblaster.util.PageValidatorFactory;
-import com.nexopia.adblaster.util.ProgressIndicator;
 import com.nexopia.adblaster.util.Utilities;
 
 public class SimulationServer {

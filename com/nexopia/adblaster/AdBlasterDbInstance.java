@@ -19,7 +19,6 @@ import com.nexopia.adblaster.struct.I_Policy;
 import com.nexopia.adblaster.struct.ServablePropertyHolder;
 import com.nexopia.adblaster.struct.User;
 import com.nexopia.adblaster.util.Integer;
-import com.nexopia.adblaster.util.ProgressIndicator;
 
 public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	HashMap swappedViews; //always look for a view here before checking the database
@@ -63,7 +62,6 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 		try {
 			System.out.println("Counting Bannerviews.");
 			db = new BannerViewFlatFileReader(f);
-			ProgressIndicator.setTitle("Counting bannerviews...");
 			userDB = new UserFlatFileReader(u_dbf);
 			/*{
 				long time = System.currentTimeMillis();
@@ -157,7 +155,6 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 
 	public void fillInstance(I_Policy pol) {
 		System.out.println("Clearing " + getViewCount() + " instances.");
-		ProgressIndicator.setTitle("% complete clearing");
 		long time = System.currentTimeMillis();
 		for (BannerView bv : getViews()){
 			bv.setBanner(null);
@@ -167,7 +164,6 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 			}
 		}
 		System.out.println("Filling " + getViewCount() + " instances.");
-		ProgressIndicator.setTitle("% complete filling");
 		for (BannerView bv : getViews()){
 			if ((System.currentTimeMillis() - time) > 5000){
 				//ProgressIndicator.show(i, getViewCount());

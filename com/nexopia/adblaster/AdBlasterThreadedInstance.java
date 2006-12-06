@@ -11,7 +11,6 @@ import com.nexopia.adblaster.struct.BannerView;
 import com.nexopia.adblaster.struct.I_Policy;
 import com.nexopia.adblaster.struct.ServablePropertyHolder;
 import com.nexopia.adblaster.struct.User;
-import com.nexopia.adblaster.util.ProgressIndicator;
 
 public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 	private Vector<BannerView> views;
@@ -53,7 +52,6 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 	public void fillInstance(I_Policy pol) {
 		long time = System.currentTimeMillis();
 		System.out.println("Filling instance.");
-		ProgressIndicator.setTitle("% Complete Filling");
 		for (BannerView bv : getViews()){
 			if (bv.getBannerId() != -1){
 				throw new UnsupportedOperationException();
