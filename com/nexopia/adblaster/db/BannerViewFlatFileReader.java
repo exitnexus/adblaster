@@ -90,7 +90,12 @@ public class BannerViewFlatFileReader {
 			BannerView bv = new BannerView(bannerViewString);
 			bannerViews.add(bv);
 			if (bv.getUserID() > 0){
-				userBannerViewMap.get(bv.getUserID()).add(bv);
+				Vector<BannerView> viewMap = userBannerViewMap.get(bv.getUserID());
+				if (viewMap == null){
+					viewMap = new Vector<BannerView>();
+					userBannerViewMap.put(bv.getUserID(), viewMap);
+				}
+				viewMap.add(bv);
 			}
 		}
 	}
