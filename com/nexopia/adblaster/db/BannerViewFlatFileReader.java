@@ -11,7 +11,7 @@ import com.nexopia.adblaster.struct.BannerView;
 import com.nexopia.adblaster.util.IntObjectHashMap;
 
 public class BannerViewFlatFileReader {
-	public Vector<BannerView> bannerViews;
+	private Vector<BannerView> bannerViews;
 	private IntObjectHashMap<Vector<BannerView>> userBannerViewMap;
 	private Vector<FileReader> files;
 	private File directory;
@@ -79,6 +79,10 @@ public class BannerViewFlatFileReader {
 
 	public Vector<BannerView> getByUser(int id) {
 		return userBannerViewMap.get(id);
+	}
+	
+	public Vector<BannerView> getCurrentBannerViews() {
+		return bannerViews;
 	}
 
 	
