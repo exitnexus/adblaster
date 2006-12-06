@@ -27,7 +27,6 @@ import com.nexopia.adblaster.util.PageValidator2;
 import com.nexopia.adblaster.util.PageValidatorFactory;
 import com.nexopia.adblaster.util.ProgressIndicator;
 import com.nexopia.adblaster.util.Utilities;
-import com.sleepycat.je.DatabaseException;
 
 public class AdBlaster {
 

@@ -13,7 +13,6 @@ import java.util.Vector;
 import javax.swing.JFileChooser;
 
 import com.nexopia.adblaster.struct.Banner;
-import com.sleepycat.je.DatabaseException;
 
 /**
  * @author wolfe

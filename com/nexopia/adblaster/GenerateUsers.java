@@ -6,8 +6,6 @@
  */
 package com.nexopia.adblaster;
 
-import com.sleepycat.je.DatabaseException;
-
 /**
  * @author wolfe
  *

@@ -10,7 +10,6 @@ import com.nexopia.adblaster.db.PageFlatFileDatabase;
 import com.nexopia.adblaster.db.UserFlatFileWriter;
 import com.nexopia.adblaster.struct.User;
 import com.nexopia.adblaster.util.Integer;
-import com.sleepycat.je.DatabaseException;
 
 public class UDPInsertServer {
 	private static class ThreadedDatabases{

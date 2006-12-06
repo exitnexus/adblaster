@@ -20,7 +20,6 @@ import com.nexopia.adblaster.struct.ServablePropertyHolder;
 import com.nexopia.adblaster.struct.User;
 import com.nexopia.adblaster.util.Integer;
 import com.nexopia.adblaster.util.ProgressIndicator;
-import com.sleepycat.je.DatabaseException;
 
 public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	HashMap swappedViews; //always look for a view here before checking the database
