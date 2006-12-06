@@ -15,7 +15,6 @@ import java.util.WeakHashMap;
 import com.nexopia.adblaster.db.BannerTimeKeyCreator;
 import com.nexopia.adblaster.db.BannerViewBinding;
 import com.nexopia.adblaster.db.IntegerBinding;
-import com.nexopia.adblaster.db.UserBinding;
 import com.nexopia.adblaster.struct.BannerView;
 import com.nexopia.adblaster.util.Integer;
 import com.sleepycat.bind.tuple.TupleBinding;
@@ -51,7 +50,6 @@ public class BannerViewDatabase {
 	private DatabaseEntry data = new DatabaseEntry();
 	private IntegerBinding ib = new IntegerBinding();
 	private BannerViewBinding instanceBinding;
-	UserBinding userKey;
 	BannerTimeKeyCreator bt;
 	
 	/*public BannerViewDatabase() throws DatabaseException {
@@ -72,7 +70,6 @@ public class BannerViewDatabase {
 		env = new Environment(f, envConf);
 		this.openDatabases();
 		bt = new BannerTimeKeyCreator(this.instanceBinding);
-		userKey = new UserBinding();
 	}
 
 	public BannerViewDatabase(String string, BannerViewBinding bvb ) throws DatabaseException {

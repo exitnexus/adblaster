@@ -67,7 +67,7 @@ public class DatabaseDumper {
 		fw = new FileWriter(new File(args[3]));
 		BufferedWriter bw = new BufferedWriter(fw);
 		for (int i = 0; i < instanc.getViewCount(); i++){
-			BannerView bv = instanc.getView(i);
+			BannerView bv = instanc.getViews().elementAt(i);
 			try {
 				String request = "get " + bv.getTime() + " " + 
 						bv.getSize() + " " + 

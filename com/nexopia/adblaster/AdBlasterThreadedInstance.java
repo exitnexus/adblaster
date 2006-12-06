@@ -37,12 +37,11 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 		System.out.println("Calculating profit.");
 		float count = 0;
 		long time = System.currentTimeMillis();
-		for (int i = 0; i < getViewCount(); i++){
+		for (BannerView bv : getViews()){ 
 			if (System.currentTimeMillis() - time > 5000){
-				ProgressIndicator.show(i, getViewCount());
+				//ProgressIndicator.show(i, getViewCount());
 				time = System.currentTimeMillis();
 			}
-			BannerView bv =((BannerView)getView(i)); 
 			if (bv.getBanner() != null){
 				count += bv.getBanner().getRealPayrate();
 			}
@@ -55,13 +54,12 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 		long time = System.currentTimeMillis();
 		System.out.println("Filling instance.");
 		ProgressIndicator.setTitle("% Complete Filling");
-		for (int i = 0; i < getViewCount(); i++){
-			BannerView bv = getView(i);
+		for (BannerView bv : getViews()){
 			if (bv.getBanner() != null){
 				throw new UnsupportedOperationException();
 			}
 			if ((System.currentTimeMillis() - time) > 5000){
-				ProgressIndicator.show(i, getViewCount());
+				//ProgressIndicator.show(i, getViewCount());
 				time = System.currentTimeMillis();
 			}
 			Banner b = pol.getBestBanner(this, bv);
@@ -70,11 +68,11 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 		}
 	}
 
-	@Override
+/*	@Override
 	protected BannerView getView(int i) {
 		return views.get(i);
 	}
-
+*/
 	@Override
 	public int getViewCount() {
 		return views.size();
@@ -93,6 +91,11 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 
 	public void addAddAllViews(Collection<BannerView> subset) {
 		this.views.addAll(subset);
+	}
+
+	@Override
+	public Vector<BannerView> getViews() {
+		return views;
 	}
 
 	

@@ -134,7 +134,7 @@ public class AdBlaster {
 			
 			for (int j=0; j<THREAD_COUNT; j++) {
 				for (int k = 0; k < chunk[j].getViewCount(); k++){
-					BannerView bv = chunk[j].getView(k);
+					BannerView bv = chunk[j].getViews().elementAt(k);
 					bv.setBanner(null);
 				}
 				if (i == 0 || i == num_serves-1){
@@ -178,11 +178,11 @@ public class AdBlaster {
 			DefaultTableModel model = new DefaultTableModel(Math.min(instanc.getViewCount(),1000),3);
 			JTable table = new JTable(model);
 			System.out.println("Filling table...");
-			for (int j = 0; j < Math.min(instanc.getViewCount(),1000); j++){
-				model.setValueAt(instanc.getView(j).getUser(), j,0);
-				model.setValueAt(instanc.getView(j).getBanner(), j,1);
-				model.setValueAt(AdBlaster.outputTime(instanc.getView(j).getTime()), j,2);
-			}
+			//for (int j = 0; j < Math.min(instanc.getViewCount(),1000); j++){
+			//	model.setValueAt(instanc.getView(j).getUser(), j,0);
+			//	model.setValueAt(instanc.getView(j).getBanner(), j,1);
+			//	model.setValueAt(AdBlaster.outputTime(instanc.getView(j).getTime()), j,2);
+			//}
 			resultPanel.add(table, BorderLayout.CENTER);
 			JPanel statsPanel = new JPanel(new FlowLayout());
 			resultPanel.add(statsPanel, BorderLayout.PAGE_START);

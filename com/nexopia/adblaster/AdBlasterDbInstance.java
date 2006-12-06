@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Vector;
 import java.util.WeakHashMap;
 
 import com.nexopia.adblaster.db.BannerViewBinding;
@@ -84,7 +85,7 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 			long time = System.currentTimeMillis();
 			for (int i = 0; i < BannerViewFlatFileWriter.FILE_COUNT; i++){
 				db.load(i);
-				for (BannerView bv : db.bannerViews){
+				for (BannerView bv : db.getCurrentBannerViews()){
 					if (bv.getBanner() != null){
 						updateMap(bv);
 					}
@@ -162,19 +163,18 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 		System.out.println("Clearing " + getViewCount() + " instances.");
 		ProgressIndicator.setTitle("% complete clearing");
 		long time = System.currentTimeMillis();
-		for (int i = 0; i < getViewCount(); i++){
-			getView(i).setBanner(null);
+		for (BannerView bv : getViews()){
+			bv.setBanner(null);
 			if ((System.currentTimeMillis() - time) > 5000){
-				ProgressIndicator.show(i, getViewCount());
+				//ProgressIndicator.show(i, getViewCount());
 				time = System.currentTimeMillis();
 			}
 		}
 		System.out.println("Filling " + getViewCount() + " instances.");
 		ProgressIndicator.setTitle("% complete filling");
-		for (int i = 0; i < getViewCount(); i++){
-			BannerView bv = getView(i);
+		for (BannerView bv : getViews()){
 			if ((System.currentTimeMillis() - time) > 5000){
-				ProgressIndicator.show(i, getViewCount());
+				//ProgressIndicator.show(i, getViewCount());
 				time = System.currentTimeMillis();
 			}
 			Banner b = pol.getBestBanner(this, bv);
@@ -193,11 +193,6 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 
 	}*/
 	
-	protected BannerView getView(int index) {
-		BannerView bv = db.get(index);
-		return bv;
-	}
-
 //	public int getViewCount() {
 	//	return db.lastid;
 	//}
@@ -232,6 +227,11 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	@Override
 	public int getViewCount() {
 		return db.getBannerViewCount();
+	}
+	@Override
+	public Vector<BannerView> getViews() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

@@ -63,7 +63,7 @@ public final class AdBlasterThreadedOperation implements Runnable {
 		}
 
 		for (int i = 0; i < chunk.getViewCount(); i++){
-			chunk.getView(i).setBanner(null);
+			chunk.getViews().elementAt(i).setBanner(null);
 		}
 
 		chunk.fillInstance(gd.pol);
@@ -90,13 +90,13 @@ public final class AdBlasterThreadedOperation implements Runnable {
 				JTable table = new JTable(model);
 				for (int j = 0; j < chunk.getViewCount(); j++){
 					String s = "";
-					s += "User: " + chunk.getView(j).getUserID() + "; ";
-					s += "Page: " + chunk.getView(j).getPage() + "; ";
-					s += "Size: " + chunk.getView(j).getSize() + "; ";
-					s += chunk.getView(j).comment;
+					s += "User: " + chunk.getViews().elementAt(j).getUserID() + "; ";
+					s += "Page: " + chunk.getViews().elementAt(j).getPage() + "; ";
+					s += "Size: " + chunk.getViews().elementAt(j).getSize() + "; ";
+					s += chunk.getViews().elementAt(j).comment;
 					model.setValueAt(s, j,0);
-					model.setValueAt(chunk.getView(j).getBanner(), j,1);
-					model.setValueAt(AdBlaster.outputTime(chunk.getView(j).getTime()), j,2);
+					model.setValueAt(chunk.getViews().elementAt(j).getBanner(), j,1);
+					model.setValueAt(AdBlaster.outputTime(chunk.getViews().elementAt(j).getTime()), j,2);
 				}
 				resultPanel.add(table, BorderLayout.CENTER);
 				JPanel statPanel = new JPanel(new FlowLayout());
@@ -124,7 +124,7 @@ public final class AdBlasterThreadedOperation implements Runnable {
 					(instanc.campaignCount(b) < b.getCampaign().getIntegerMaxViewsPerDay());
 					j++){
 				// System.out.println("Trying bannerview " + j);
-				BannerView bv = instanc.getView(j);
+				BannerView bv = instanc.getViews().elementAt(j);
 				if (bv.getBanner() == null || bv.getBanner().getPayrate(instanc) < b.getPayrate(instanc)){
 					if (instanc.isValidBannerForView(bv,b)){
 						// single swap
@@ -139,7 +139,7 @@ public final class AdBlasterThreadedOperation implements Runnable {
 				(instanc.bannerCount(b) < b.getIntegerMaxViewsPerDay()) &&
 				(instanc.campaignCount(b) < b.getCampaign().getIntegerMaxViewsPerDay());
 				j++){
-				BannerView bv = instanc.getView(j);
+				BannerView bv = instanc.getViews().elementAt(j);
 				if (instanc.isValidBannerForView(bv,b)){
 					doable = true;
 				}
@@ -150,7 +150,7 @@ public final class AdBlasterThreadedOperation implements Runnable {
 				(instanc.campaignCount(b) < b.getCampaign().getIntegerMaxViewsPerDay());
 				j++){
 					// System.out.println("Trying bannerview " + j);
-					BannerView bv = instanc.getView(j);
+					BannerView bv = instanc.getViews().elementAt(j);
 					if (bv.getBanner() == null || bv.getBanner().getPayrate(instanc) < b.getPayrate(instanc)){
 						Vector swaps = null;
 						int swap_max = 0;

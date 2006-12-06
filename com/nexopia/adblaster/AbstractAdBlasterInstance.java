@@ -139,8 +139,7 @@ public abstract class AbstractAdBlasterInstance {
 */
 	private HashMap<User, Vector<BannerView>> getAllMatching() {
 		HashMap<User, Vector<BannerView>> userHash = new HashMap<User, Vector<BannerView>>();
-		for (int i = 0; i < this.getViewCount(); i++) {
-			BannerView bv = getView(i);
+		for(BannerView bv: getViews()){
 			User u = bv.getUser();
 			Vector<BannerView> vec = userHash.get(u);
 			if (vec == null) {
@@ -277,8 +276,7 @@ public abstract class AbstractAdBlasterInstance {
 	/*//These functions need to be redesigned based on new indexes plan*/ 
 	Vector<BannerView> getAllBannerViewsThatCanSwapWith(Banner b) {
 		Vector<BannerView> v = new Vector<BannerView>();
-		for (int i = 0; i < getViewCount(); i++){
-			BannerView bv = getView(i);
+		for (BannerView bv : getViews()){
 			if (isValidBannerForView(bv, b)){
 				v.add(bv);
 			}
@@ -369,8 +367,8 @@ public abstract class AbstractAdBlasterInstance {
 	}
 
 	public abstract void fillInstance(I_Policy pol);
-	protected abstract BannerView getView(int i);
 	public abstract int getViewCount();
+	public abstract Vector<BannerView>getViews();
 	//public abstract User getUserByIndex(int randomPick);
 	//public abstract int getUserCount();
 	public abstract User getUser(int uid);
