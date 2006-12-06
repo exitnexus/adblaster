@@ -3,11 +3,6 @@
  */
 package com.nexopia.adblaster.struct;
 
-import com.nexopia.adblaster.AbstractAdBlasterInstance;
-import com.nexopia.adblaster.db.BannerDatabase;
-import com.nexopia.adblaster.db.UserFlatFileReader;
-
-
 /**
  * BannerView objects should know their instance, and inform their instances when they
  * change.
@@ -19,23 +14,18 @@ public class BannerView{
 	private int index;
 	private byte size;
 	private int page;
-	//private AbstractAdBlasterInstance inst;
-	private BannerDatabase bannerDB;
-	private UserFlatFileReader userDB;
-	public String comment = "";
 	
-	public BannerView(AbstractAdBlasterInstance instance, int index, int uid, int bid, int t, byte size, int page){
-		//TODO: Set bannerDB and userDB from the instance here.
-		this.uid = uid; this.bid = bid; time = t; 
+	public BannerView(int index, int uid, int bid, int t, byte size, int page){
+		this.uid = uid; 
+		this.bid = bid; 
+		this.time = t; 
 		this.size = size;
 		this.page = page;
 		this.index = index;
 	}
 	
 	
-	public BannerView(String bannerViewString, BannerDatabase bannerDB, UserFlatFileReader userDB) {
-		this.bannerDB = bannerDB;
-		this.userDB = userDB;
+	public BannerView(String bannerViewString) {
 		String words[] = bannerViewString.split(" ");
 		uid = Integer.valueOf(words[0]);
 		bid = Integer.valueOf(words[1]);
@@ -45,25 +35,15 @@ public class BannerView{
 	}
 
 
-	public Banner getBanner() {
-		if (bid == -1){
-			return null;
-		}
-		return bannerDB.getBannerByID(this.bid);
-	}
-	
-	
 	public void setBanner(Banner b) {
-		//TODO: Determine how this line should be dealt with.
-		//this.inst.notifyChange(this, b);
 		if (b == null)
 			this.bid = -1;
 		else 
 			this.bid = b.id;
 	}
-
-	public User getUser() {
-		return userDB.getUser(this.uid);
+	
+	public void setBannerID(int bannerid) {
+		this.bid = bannerid;
 	}
 
 	public int getTime() {
@@ -76,14 +56,6 @@ public class BannerView{
 	
 	public String toString(){
 		return "Banner ID: " + ((bid == -1)?null:bid) + " - Time: " + time + " User ID: " + uid + " Size: " + size; 
-	}
-
-	public void setBannerWithoutFire(Banner b) {
-		if (b == null){
-			this.bid = -1;
-		} else {
-			this.bid = b.id;
-		}
 	}
 
 	public int getUserID() {
