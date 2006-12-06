@@ -11,17 +11,25 @@ import com.nexopia.adblaster.struct.BannerView;
 import com.nexopia.adblaster.util.IntObjectHashMap;
 
 public class BannerViewFlatFileReader {
-	private Vector<BannerView> bannerViews;
+	public Vector<BannerView> bannerViews;
 	private IntObjectHashMap<Vector<BannerView>> userBannerViewMap;
 	private Vector<FileReader> files;
 	private File directory;
 	private int bannerViewCount = 0;
 	
+	public BannerViewFlatFileReader(File directory) {
+		this.directory = directory;
+		this.init();
+	}
 	public BannerViewFlatFileReader(String directoryName) {
-		files = new Vector<FileReader>();
 		directory = new File(directoryName);
+		this.init();
+	}
+	
+	private void init(){
+		files = new Vector<FileReader>();
 		if (!directory.isDirectory()) {
-			throw new SecurityException(directoryName + " is not a directory.");
+			throw new SecurityException(directory.getName() + " is not a directory.");
 		}
 		bannerViews = new Vector<BannerView>();
 		userBannerViewMap = new IntObjectHashMap<Vector<BannerView>>(); 

@@ -9,7 +9,7 @@ import java.util.Vector;
 import com.nexopia.adblaster.struct.User;
 
 public class BannerViewFlatFileWriter {
-	private static final int FILE_COUNT = 100; //How many files should the bannerviews be split across 
+	public static final int FILE_COUNT = 100; //How many files should the bannerviews be split across 
 	Vector<FileWriter> files;
 	File directory;
 	

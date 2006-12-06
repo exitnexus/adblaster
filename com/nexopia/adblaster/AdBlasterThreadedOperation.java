@@ -26,18 +26,16 @@ import com.nexopia.adblaster.util.ProgressIndicator;
 public final class AdBlasterThreadedOperation implements Runnable {
 	private final GlobalData gd;
 	private final AdBlasterThreadedInstance chunk;
-	private final String name;
 	private boolean finished;
 	private float original_profit;
 	JTabbedPane tab;
 	
-	public AdBlasterThreadedOperation(GlobalData globalData, AdBlasterThreadedInstance chunk, String name, JTabbedPane tab) {
+	public AdBlasterThreadedOperation(GlobalData globalData, AdBlasterThreadedInstance chunk, JTabbedPane tab) {
 		super();
 		this.gd = globalData;
 		this.chunk = chunk;
 		this.tab = tab;
 		
-		this.name = name;
 		finished = false;
 	}
 
@@ -113,7 +111,7 @@ public final class AdBlasterThreadedOperation implements Runnable {
 	}
 	
 	public void iterativeImprove(AbstractAdBlasterInstance instanc) {
-		Vector<Banner> unserved = gd.getUnserved();
+		Vector<Banner> unserved = gd.fullDay.getUnserved();
 		System.out.println("Improving based on unserved banners.");
 		ProgressIndicator.setTitle("Using Unserved Banners...");
 		for (int i = 0; i < unserved.size(); i++){

@@ -1,23 +1,20 @@
 package com.nexopia.adblaster;
 
-import java.util.Vector;
-
-import com.nexopia.adblaster.struct.Banner;
+import java.io.File;
 
 public class GlobalData {
 
 	public AdBlasterPolicy pol;
 	public AbstractAdBlasterUniverse universe;
-	public AdBlasterDbInstance instance;
-
-	public GlobalData(AdBlasterDbInstance instance, AdBlasterPolicy pol){
+	public AbstractAdBlasterInstance fullDay;
+	public File bannerViewDirectory;
+	
+	public GlobalData(AdBlasterPolicy pol, AbstractAdBlasterInstance inst, AbstractAdBlasterUniverse universe, File bvdir){
 		this.pol = pol;
-		this.instance = instance;
-		this.universe = instance.universe;
+		fullDay = inst;
+		this.universe = universe;
+		this.bannerViewDirectory = bvdir;
 		
 	}
 
-	public Vector<Banner> getUnserved() {
-		return instance.getUnserved();
-	}
 }

@@ -85,7 +85,7 @@ public class AdBlaster {
 		System.out.println("Total original profit: " + instanc.totalProfit());
 		
 		System.out.println("Chunking.");
-		GlobalData gd = new GlobalData(instanc, pol);
+		GlobalData gd = new GlobalData(pol, instanc, ac, bv_dir);
 		AdBlasterThreadedInstance[] chunk = getChunk(gd, THREAD_COUNT);
 		Runnable[] r = new Runnable[THREAD_COUNT];
 		Thread[] t = new Thread[THREAD_COUNT];
@@ -138,9 +138,9 @@ public class AdBlaster {
 					bv.setBanner(null);
 				}
 				if (i == 0 || i == num_serves-1){
-					r[j] = new AdBlasterThreadedOperation(gd, chunk[j], "ThreadSet " + j, tabs[j]);
+					r[j] = new AdBlasterThreadedOperation(gd, chunk[j], tabs[j]);
 				} else {
-					r[j] = new AdBlasterThreadedOperation(gd, chunk[j], "ThreadSet " + j, null);
+					r[j] = new AdBlasterThreadedOperation(gd, chunk[j], null);
 				}
 				t[j] = new Thread(r[j], "operateOnChunk");
 				
@@ -208,8 +208,7 @@ public class AdBlaster {
 		AdBlasterThreadedInstance r[] = new AdBlasterThreadedInstance[num];
 		//int modCount = gd.instance.getUserCount() / size;
 		for (int i = 0; i < num; i++){
-			r[i] = new AdBlasterThreadedInstance(gd);
-			r[i].addAddAllViews(gd.instance.db.getSubset(i));
+			r[i] = new AdBlasterThreadedInstance(gd, i);
 		}
 		return r;
 	}								

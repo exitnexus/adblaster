@@ -10,7 +10,7 @@ import java.util.WeakHashMap;
 
 import com.nexopia.adblaster.db.BannerViewBinding;
 import com.nexopia.adblaster.db.BannerViewFlatFileReader;
-import com.nexopia.adblaster.db.UserDatabase;
+import com.nexopia.adblaster.db.BannerViewFlatFileWriter;
 import com.nexopia.adblaster.db.PageFlatFileDatabase;
 import com.nexopia.adblaster.db.UserFlatFileReader;
 import com.nexopia.adblaster.struct.Banner;
@@ -34,7 +34,7 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	}
 	public void loadNoCount(File dbf, File u_dbf, File data) {
 		try {
-			db = new BannerViewFlatFileReader(dbf, instanceBinding);
+			db = new BannerViewFlatFileReader(dbf);
 			userDB = new UserFlatFileReader(u_dbf);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -65,7 +65,7 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	public void load(File f, File u_dbf) {
 		try {
 			System.out.println("Counting Bannerviews.");
-			db = new BannerViewFlatFileReader(f, instanceBinding);
+			db = new BannerViewFlatFileReader(f);
 			ProgressIndicator.setTitle("Counting bannerviews...");
 			userDB = new UserFlatFileReader(u_dbf);
 			/*{
@@ -81,23 +81,18 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 				System.out.println(System.currentTimeMillis() - time);
 			}*/
 			
-			int i=0;
 			long time = System.currentTimeMillis();
-			BannerViewCursor c = db.getCursor();
-			BannerView bv;
-			while ((bv = c.getNext()) != null){
-				i++;
-				if (i > db.getBannerViewCount()){
-					System.out.println(bv.getIndex() + ":" + bv.getUserID());
-				}
-				ProgressIndicator.show(i, db.getBannerViewCount());
-				if (bv.getBanner() != null){
-					updateMap(bv);
+			for (int i = 0; i < BannerViewFlatFileWriter.FILE_COUNT; i++){
+				db.load(i);
+				for (BannerView bv : db.bannerViews){
+					if (bv.getBanner() != null){
+						updateMap(bv);
+					}
 				}
 			}
 			System.out.println(System.currentTimeMillis() - time);
 
-			for (i = 0; i < this.universe.getBannerCount(); i++){
+			for (int i = 0; i < this.universe.getBannerCount(); i++){
 				Banner b = this.universe.getBannerByIndex(i);
 				if (b != null){
 					System.out.print(i + ", ");
@@ -203,9 +198,9 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 		return bv;
 	}
 
-	public int getViewCount() {
-		return db.lastid;
-	}
+//	public int getViewCount() {
+	//	return db.lastid;
+	//}
 
 	/*XXX: Next three should update the database.*/
 	public void notifyChange(BannerView view, Banner b) {
@@ -233,6 +228,10 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	}
 	public void notifyChangeTime(BannerView view) {
 		updateDB(view, view.getBanner());
+	}
+	@Override
+	public int getViewCount() {
+		return db.getBannerViewCount();
 	}
 
 

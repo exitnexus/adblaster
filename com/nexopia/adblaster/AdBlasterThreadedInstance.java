@@ -1,8 +1,10 @@
 package com.nexopia.adblaster;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Vector;
 
+import com.nexopia.adblaster.db.BannerViewFlatFileReader;
 import com.nexopia.adblaster.db.UserFlatFileReader;
 import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.BannerView;
@@ -14,10 +16,18 @@ import com.nexopia.adblaster.util.ProgressIndicator;
 public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 	private Vector<BannerView> views;
 	private UserFlatFileReader userDB;
+	private BannerViewFlatFileReader bannerDB;
 	private GlobalData gd;
 	
-	public AdBlasterThreadedInstance(GlobalData gd) {
+	public AdBlasterThreadedInstance(GlobalData gd, int subset_num) {
 		super(gd.universe);
+		bannerDB = new BannerViewFlatFileReader(gd.bannerViewDirectory);
+		try {
+			bannerDB.load(subset_num);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		this.gd = gd;
 		views = new Vector<BannerView>();
 		
@@ -68,20 +78,6 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 	@Override
 	public int getViewCount() {
 		return views.size();
-	}
-
-	@Override
-	public int bannerCount(ServablePropertyHolder banner) {
-		return gd.instance.bannerCount(banner);
-	}
-
-	int campaignCount(Banner banner) {
-		return gd.instance.campaignCount(banner);
-	}
-
-	@Override
-	public Vector<Banner> getUnserved() {
-		return gd.getUnserved();
 	}
 
 	public void addView(BannerView bv) {
