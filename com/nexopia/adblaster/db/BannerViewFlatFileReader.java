@@ -16,21 +16,17 @@ public class BannerViewFlatFileReader {
 	private Vector<FileReader> files;
 	private File directory;
 	private int bannerViewCount = 0;
-	private BannerDatabase bannerDB;
-	private UserFlatFileReader userDB;
 	
-	public BannerViewFlatFileReader(File directory, BannerDatabase bannerDB, UserFlatFileReader userDB) {
+	public BannerViewFlatFileReader(File directory) {
 		this.directory = directory;
-		this.init(bannerDB, userDB);
+		this.init();
 	}
-	public BannerViewFlatFileReader(String directoryName, BannerDatabase bannerDB, UserFlatFileReader userDB) {
+	public BannerViewFlatFileReader(String directoryName) {
 		directory = new File(directoryName);
-		this.init(bannerDB, userDB);
+		this.init();
 	}
 	
-	private void init(BannerDatabase bannerDB, UserFlatFileReader userDB){
-		this.bannerDB = bannerDB;
-		this.userDB = userDB;
+	private void init(){
 		files = new Vector<FileReader>();
 		if (!directory.isDirectory()) {
 			throw new SecurityException(directory.getName() + " is not a directory.");
