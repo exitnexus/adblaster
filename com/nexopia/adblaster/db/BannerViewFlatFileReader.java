@@ -93,7 +93,7 @@ public class BannerViewFlatFileReader {
 		userBannerViewMap = new IntObjectHashMap<Vector<BannerView>>();
 		
 		while ((bannerViewString = reader.readLine()) != null) {
-			BannerView bv = new BannerView(bannerViewString, bannerDB, userDB);
+			BannerView bv = new BannerView(bannerViewString);
 			bannerViews.add(bv);
 			userBannerViewMap.get(bv.getUserID()).add(bv);
 		}
