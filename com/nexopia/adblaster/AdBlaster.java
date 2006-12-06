@@ -40,7 +40,7 @@ public class AdBlaster {
 
 		PageFlatFileDatabase pageDb = null;
 		try {
-			pageDb = new PageFlatFileDatabase(page_dir, false);
+			pageDb = new PageFlatFileDatabase(page_dir, true);
 		} catch (IOException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();

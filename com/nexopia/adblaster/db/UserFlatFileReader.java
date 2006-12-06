@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Vector;
 
@@ -36,13 +37,16 @@ public class UserFlatFileReader {
 		if (!directory.isDirectory()) {
 			throw new SecurityException(directory.getName() + " is not a directory.");
 		}
+		for (int i=0; i<FlatFileConfig.FILE_COUNT;i++) {
+			File f = new File(directory, "user."+i+".db");
+			files.add(new FileReader(f));
+		}
 		users = new IntObjectHashMap<User>();
 	}
 	
 	public void load(int fileNumber) throws IOException {
-		files.get(fileNumber);
-		File f = new File(directory, "user."+fileNumber+".db");
-		reader = new BufferedReader(new FileReader(f));
+		FileReader f = files.get(fileNumber);
+		reader = new BufferedReader(f);
 		String userString;
 		while ((userString = reader.readLine()) != null) {
 			User u = new User(userString);

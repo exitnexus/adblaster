@@ -2,6 +2,7 @@ package com.nexopia.adblaster.db;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Vector;
@@ -16,19 +17,23 @@ public class BannerViewFlatFileReader {
 	private File directory;
 	private int bannerViewCount = 0;
 	
-	public BannerViewFlatFileReader(File directory) {
+	public BannerViewFlatFileReader(File directory) throws FileNotFoundException {
 		this.directory = directory;
 		this.init();
 	}
-	public BannerViewFlatFileReader(String directoryName) {
+	public BannerViewFlatFileReader(String directoryName) throws FileNotFoundException {
 		directory = new File(directoryName);
 		this.init();
 	}
 	
-	private void init(){
+	private void init() throws FileNotFoundException{
 		files = new Vector<FileReader>();
 		if (!directory.isDirectory()) {
 			throw new SecurityException(directory.getName() + " is not a directory.");
+		}
+		for (int i=0; i<FlatFileConfig.FILE_COUNT;i++) {
+			File f = new File(directory, "bannerview."+i+".db");
+			files.add(new FileReader(f));
 		}
 		bannerViews = new Vector<BannerView>();
 		userBannerViewMap = new IntObjectHashMap<Vector<BannerView>>(); 
@@ -74,9 +79,8 @@ public class BannerViewFlatFileReader {
 
 	
 	public void load(int fileNumber) throws IOException {
-		files.get(fileNumber);
-		File f = new File(directory, "bannerview."+fileNumber+".db");
-		BufferedReader reader = new BufferedReader(new FileReader(f));
+		FileReader f = files.get(fileNumber);
+		BufferedReader reader = new BufferedReader(f);
 		String bannerViewString;
 		
 		bannerViews = new Vector<BannerView>();
