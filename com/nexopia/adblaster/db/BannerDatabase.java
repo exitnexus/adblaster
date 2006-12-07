@@ -16,6 +16,7 @@ import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.Campaign;
 import com.nexopia.adblaster.struct.ServablePropertyHolder;
 import com.nexopia.adblaster.struct.Campaign.CampaignDB;
+import com.nexopia.adblaster.util.IntObjectHashMap;
 import com.nexopia.adblaster.util.Integer;
 import com.nexopia.adblaster.util.PageValidator;
 import com.nexopia.adblaster.util.PageValidatorFactory;
@@ -63,13 +64,14 @@ import com.nexopia.adblaster.util.PageValidatorFactory;
 
 public class BannerDatabase {
 	
-	private HashMap<Integer, Banner> banners;
+	private IntObjectHashMap<Banner> banners;
 	Vector<Integer> keyset = new Vector<Integer>();
+	Vector<Banner> valueset = new Vector<Banner>();
 	CampaignDB cdb;
 	
 	public BannerDatabase(Campaign.CampaignDB cdb, PageValidatorFactory pvfactory) {
 		this.cdb = cdb;
-		banners = new HashMap<Integer, Banner>();
+		banners = new IntObjectHashMap<Banner>();
 		try {
 			String sql = "SELECT * FROM " + JDBCConfig.BANNER_TABLE;
 			Statement stmt = JDBCConfig.createStatement();
@@ -84,7 +86,7 @@ public class BannerDatabase {
 				if (Banner.precheck(rs) &&
 						cdb.get(rs.getInt("CAMPAIGNID")).precheck()) {
 					try {
-						banners.put(new Integer(id), new Banner(rs, cdb, pvfactory.make()));
+						banners.put(id, new Banner(rs, cdb, pvfactory.make()));
 					} catch (SQLException e){
 						System.out.println("This probably indicates a bad campaign. Continue if you know what you're doing.");
 						e.printStackTrace();
@@ -92,7 +94,10 @@ public class BannerDatabase {
 					i++;
 				}
 			}
-			keyset.addAll(this.banners.keySet());
+			for (int k : this.banners.getKeyArray()){
+				keyset.add(Integer.valueOf(k));
+				valueset.add(this.banners.get(k));
+			}
 			System.out.println("Total: " + i + " banners.");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -100,10 +105,10 @@ public class BannerDatabase {
 	}
 	
 	public Banner getBannerByID(int i) {
-		return (Banner)this.banners.get(new Integer(i));
+		return (Banner)this.banners.get(i);
 	}
 	public Banner getBannerByIndex(int i) {
-		return (Banner)this.banners.get(keyset.get(i));
+		return (Banner)this.banners.get(keyset.get(i).intValue());
 	}
 	
 	public int getBannerCount() {
@@ -111,14 +116,14 @@ public class BannerDatabase {
 	}
 	
 	public Collection<Banner> getBanners() {
-		return banners.values(); 
+		return valueset; 
 	}
 
 	public void loadCoefficients(HashMap<Banner, Float> coefficients) {
 		Statement stmt;
 		try {
 			stmt = JDBCConfig.createStatement();
-			for (Banner banner: banners.values()) {
+			for (Banner banner: valueset) {
 				try {
 					Float f = coefficients.get(banner);
 					String st = "SELECT c.* " 
@@ -146,7 +151,7 @@ public class BannerDatabase {
 		Statement stmt;
 		try {
 			stmt = JDBCConfig.createStatement();
-			for (Banner banner: banners.values()) {
+			for (Banner banner: valueset) {
 				try {
 					if (coefficients.get(banner) != null) {
 						Float f = coefficients.get(banner);
@@ -174,9 +179,8 @@ public class BannerDatabase {
 			stmt = JDBCConfig.createStatement();
 			ResultSet rs = stmt.executeQuery("SELECT * FROM coefficients");
 			while (rs.next()) {
-				Integer bannerid = Integer.valueOf(rs.getInt("BANNERID"));
+				int bannerid = rs.getInt("BANNERID");
 				coefficients.put(banners.get(bannerid), new Float(rs.getFloat("COEFFICIENT")));
-				bannerid.free();
 			}
 		} catch (SQLException sqle) {
 			System.err.println("Unable to load coefficients from database.");
@@ -195,9 +199,9 @@ public class BannerDatabase {
 						cdb.get(rs.getInt("CAMPAIGNID")).precheck()) {
 					try {
 						Banner b = new Banner(rs, cdb, pv);
-						Integer i = Integer.valueOf(id);
-						banners.put(i, b);
-						keyset.add(i);
+						banners.put(id, b);
+						keyset.add(Integer.valueOf(id));
+						valueset.add(b);
 						return b;
 					} catch (SQLException e){
 						System.out.println("This probably indicates a bad campaign. Continue if you know what you're doing.");
@@ -212,10 +216,7 @@ public class BannerDatabase {
 	}
 
 	public ServablePropertyHolder update(int bannerID, PageValidator pv) {
-		Integer id = Integer.valueOf(bannerID);
-		Banner b = banners.get(id);
-		id.free();
-		id = null;
+		Banner b = banners.get(bannerID);
 		if (b != null) {
 			try {
 				String sql = "SELECT * FROM banners WHERE id = " + bannerID;
@@ -224,11 +225,9 @@ public class BannerDatabase {
 				if (rs.next()) {
 					return b.update(rs, cdb);
 				} else {
-					id = Integer.valueOf(bannerID);
-					banners.remove(id);
-					keyset.remove(id);
-					id.free();
-					id = null;
+					banners.remove(bannerID);
+					keyset.remove(bannerID);
+					valueset.remove(b);
 					return null;
 				}
 			} catch (SQLException e) {
@@ -257,12 +256,11 @@ public class BannerDatabase {
 	}
 
 	public void delete(int bannerID) {
-		Integer id = Integer.valueOf(bannerID);
-		Banner b = this.banners.get(id);
+		Banner b = this.banners.get(bannerID);
 		b.getCampaign().removeBanner(b);
-		banners.remove(id);
-		keyset.remove(id);
-		id.free();
+		banners.remove(bannerID);
+		keyset.remove(Integer.valueOf(bannerID));
+		valueset.remove(b);
 	}
 	
 }
