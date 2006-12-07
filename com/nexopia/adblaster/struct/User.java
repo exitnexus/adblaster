@@ -37,6 +37,8 @@ public class User {
 		location = Short.parseShort(words[3]);
 		if (words.length > 4){
 			interests = new Interests(words[4], false);
+		} else {
+			interests = new Interests("", false);
 		}
 	}
 	

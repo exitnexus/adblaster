@@ -190,9 +190,20 @@ public abstract class AbstractAdBlasterInstance {
 	private Vector<BannerView> getAllMatching(Vector<BannerView> vec, Campaign c, int time, int period) {
 		Vector<BannerView> vec2 = new Vector<BannerView>();
 		for (int i = 0; i < vec.size(); i++){
+			if (i % 1 == 0){
+				System.out.println(i / vec.size() + " percent complete.");
+			}
 			BannerView bv = vec.get(i);
-			if (bv.getTime() > time - period && bv.getTime() < time + period && universe.getBannerByID(bv.getBannerId()) != null && universe.getBannerByID(bv.getBannerId()).getCampaign() == c){
-				vec2.add(bv);
+			if (bv.getTime() > time - period && bv.getTime() < time + period){
+				System.out.println("Passed time test.");
+				if (universe.getBannerByID(bv.getBannerId()) != null) {
+					System.out.println("Passed banner not null test...");
+					if (universe.getBannerByID(bv.getBannerId()).getCampaign() == c){
+						System.out.println("Adding...");
+						vec2.add(bv);
+						System.out.println("Added.");
+					}
+				}
 			}
 		}
 		return vec2;
@@ -264,6 +275,9 @@ public abstract class AbstractAdBlasterInstance {
 	
 	synchronized protected void updateMap(BannerView bv) {
 		Integer count = this.bannerCountMap.get(universe.getBannerByID(bv.getBannerId()));
+		if (count == null){
+			System.out.println("Banner not known - " + bv.getBannerId() + " : " + universe.getBannerByID(bv.getBannerId()) + " : " + this.bannerCountMap.size());
+		}
 		Banner key = universe.getBannerByID(bv.getBannerId());
 		Integer value = Integer.valueOf(count.intValue() + 1);
 		this.bannerCountMap.put(key, value);

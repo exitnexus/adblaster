@@ -103,7 +103,8 @@ public class BannerDatabase {
 	}
 	
 	public Banner getBannerByID(int i) {
-		return (Banner)this.banners.get(i);
+		System.out.println("BannerDatabase: getting banner " + i);
+		return this.banners.get(i);
 	}
 	public Banner getBannerByIndex(int i) {
 		return (Banner)this.banners.get(this.banners.getKeyArray()[i]);

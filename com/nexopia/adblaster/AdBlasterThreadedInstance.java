@@ -34,12 +34,14 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 	}
 
 	public float totalProfit(){
+		int i = 0;
 		System.out.println("Calculating profit.");
 		float count = 0;
 		long time = System.currentTimeMillis();
 		for (BannerView bv : getViews()){ 
+			i++;
 			if (System.currentTimeMillis() - time > 5000){
-				//ProgressIndicator.show(i, getViewCount());
+				System.out.println("Percent: " + i/getViewCount());
 				time = System.currentTimeMillis();
 			}
 			if ((bv != null) && (bv.getBannerId() != 0)){
@@ -54,14 +56,16 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 	
 	@Override
 	public void fillInstance(I_Policy pol) {
+		int i = 0;
 		long time = System.currentTimeMillis();
 		System.out.println("Filling instance.");
 		for (BannerView bv : getViews()){
+			i++;
 			if (bv.getBannerId() != 0){
 				throw new UnsupportedOperationException();
 			}
 			if ((System.currentTimeMillis() - time) > 5000){
-				//ProgressIndicator.show(i, getViewCount());
+				System.out.println("Percent: " + i / getViewCount());
 				time = System.currentTimeMillis();
 			}
 			Banner b = pol.getBestBanner(this, bv);
