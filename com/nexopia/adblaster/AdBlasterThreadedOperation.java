@@ -61,7 +61,7 @@ public final class AdBlasterThreadedOperation implements Runnable {
 					j++){
 				// System.out.println("Trying bannerview " + j);
 				BannerView bv = instanc.getViews().elementAt(j);
-				if (bv.getBannerId() == -1 || gd.universe.getBannerByID(bv.getBannerId()).getPayrate(instanc) < b.getPayrate(instanc)){
+				if (bv.getBannerId() == 0 || gd.universe.getBannerByID(bv.getBannerId()).getPayrate(instanc) < b.getPayrate(instanc)){
 					if (instanc.isValidBannerForView(bv,b)){
 						// single swap
 						bv.setBanner(b);
@@ -87,7 +87,7 @@ public final class AdBlasterThreadedOperation implements Runnable {
 				j++){
 					// System.out.println("Trying bannerview " + j);
 					BannerView bv = instanc.getViews().elementAt(j);
-					if (bv.getBannerId() == -1 || gd.universe.getBannerByID(bv.getBannerId()).getPayrate(instanc) < b.getPayrate(instanc)){
+					if (bv.getBannerId() == 0 || gd.universe.getBannerByID(bv.getBannerId()).getPayrate(instanc) < b.getPayrate(instanc)){
 						Vector swaps = null;
 						int swap_max = 0;
 						for (int l = 1; l < swap_max; l+=2){

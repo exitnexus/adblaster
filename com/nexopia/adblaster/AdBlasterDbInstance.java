@@ -80,7 +80,7 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 			for (int i = 0; i < BannerViewFlatFileWriter.FILE_COUNT; i++){
 				db.load(i);
 				for (BannerView bv : db.getCurrentBannerViews()){
-					if (bv.getBannerId() != -1){
+					if (bv.getBannerId() != 0){
 						updateMap(bv);
 					}
 				}
