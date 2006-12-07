@@ -43,6 +43,9 @@ public final class AdBlasterThreadedOperation implements Runnable {
 
 		chunk.fillInstance(gd.pol);
 		
+		System.out.println("Profits compared");
+		System.out.println("original: " + original_profit);
+		System.out.println("new: " + chunk.totalProfit());
 		this.finished = true;
 		this.notify();
 	}
