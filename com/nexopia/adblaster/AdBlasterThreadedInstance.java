@@ -29,7 +29,8 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 		}
 		this.gd = gd;
 		views = new Vector<BannerView>();
-		views.addAll(gd.fullDay.db.getCurrentBannerViews());		
+		views.addAll(gd.fullDay.db.getCurrentBannerViews());
+		System.out.println("Loaded " + views.size() + " banner views.");
 	}
 
 	public float totalProfit(){

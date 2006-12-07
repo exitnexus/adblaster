@@ -105,6 +105,9 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	
 	public User getUser(int i) {
 		User u = userDB.getUser(i);
+		if (u == null){
+			throw new UnsupportedOperationException("User " + i + " is null.");
+		}
 		return u;
 	}
 

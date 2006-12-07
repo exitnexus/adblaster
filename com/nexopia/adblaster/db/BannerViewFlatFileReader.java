@@ -85,7 +85,6 @@ public class BannerViewFlatFileReader {
 		
 		bannerViews = new Vector<BannerView>();
 		userBannerViewMap = new IntObjectHashMap<Vector<BannerView>>();
-		
 		while ((bannerViewString = reader.readLine()) != null) {
 			BannerView bv = new BannerView(bannerViewString);
 			bannerViews.add(bv);
@@ -98,6 +97,7 @@ public class BannerViewFlatFileReader {
 				viewMap.add(bv);
 			}
 		}
+		System.out.println("Loaded " + bannerViews.size() + " views in set " + fileNumber);
 	}
 
 }

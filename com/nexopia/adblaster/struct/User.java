@@ -35,7 +35,9 @@ public class User {
 		age = Byte.parseByte(words[1]);
 		sex = Byte.parseByte(words[2]);
 		location = Short.parseShort(words[3]);
-		interests = new Interests(words[4], false);
+		if (words.length > 4){
+			interests = new Interests(words[4], false);
+		}
 	}
 	
 	public User(int id, byte age, byte sex, short location, String interests) {
