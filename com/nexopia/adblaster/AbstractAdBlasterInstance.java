@@ -28,12 +28,12 @@ public abstract class AbstractAdBlasterInstance {
 	
 	public AbstractAdBlasterInstance(AbstractAdBlasterUniverse ac){
 		bannerCountMap = new HashMap<Banner, Integer>();
-		for (int i = 0; i < ac.getBannerCount(); i++){
-			bannerCountMap.put(ac.getBannerByIndex(i), Integer.valueOf(0));
+		for (Banner b : ac.getBanners()){
+			bannerCountMap.put(b, Integer.valueOf(0));
 		}
 		campaignCountMap = new HashMap<Campaign, Integer>();
-		for (int i = 0; i < ac.getCampaignCount(); i++){
-			campaignCountMap.put(ac.getCampaignByIndex(i), Integer.valueOf(0));
+		for (Campaign c : ac.getCampaigns()){
+			campaignCountMap.put(c, Integer.valueOf(0));
 		}
 		universe = ac;
 	}

@@ -130,8 +130,7 @@ public class AdBlasterPolicy implements I_Policy {
 		Vector<Banner> vec = new Vector<Banner>();
 		//int bestMatch = -1;
 		//float bestScore = Float.NEGATIVE_INFINITY;
-		for (int j = 0; j < instance.universe.getBannerCount(); j++){
-			Banner b = instance.universe.getBannerByIndex(j);
+		for (Banner b : instance.universe.getBanners()){
 			float score = ((Float)getCoefficient(b)).floatValue();
 			int i = -1;
 			while (true){

@@ -20,9 +20,9 @@ public class PolicyLearner {
 	public void upgradePolicy(AbstractAdBlasterInstance chunk, AdBlasterThreadedOperation op) {
 		System.out.println("Upgrading.");
 		int sbefore[] = new int[universe.getBannerCount()];
-		for (int i = 0; i < universe.getBannerCount(); i++){
-			ServablePropertyHolder b = universe.getBannerByIndex(i);
-			sbefore[i] = chunk.bannerCount(b);
+		int i = 0;
+		for (ServablePropertyHolder b : universe.getBanners()){
+			sbefore[i++] = chunk.bannerCount(b);
 		}
 		
 
@@ -36,8 +36,7 @@ public class PolicyLearner {
 			op.iterativeImprove(chunk);
 		}
 		System.out.println("Calculating Banner Coefficients...");
-		for (int i = 0; i < universe.getBannerCount(); i++){
-			Banner b = universe.getBannerByIndex(i);
+		for (Banner b : universe.getBanners()){
 			int after = chunk.bannerCount(b);
 			int before = sbefore[i];
 			float f = ((float)((1.0f + after) / (1.0f + before)));

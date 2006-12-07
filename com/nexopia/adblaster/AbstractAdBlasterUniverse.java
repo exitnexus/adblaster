@@ -11,18 +11,14 @@ import com.nexopia.adblaster.struct.User;
 
 public abstract class AbstractAdBlasterUniverse {
 	
-	abstract public Banner getBannerByIndex(int i);
 	abstract public Banner getBannerByID(int i);
 
 	abstract public int getBannerCount();
 
-	abstract public Collection getBanners();
-	abstract public Campaign getCampaignByIndex(int i);
-	abstract public int getCampaignCount();
-
-	abstract public Collection<Banner>getBannerList();
+	abstract public Collection<Banner> getBanners();
+	abstract public Collection<Campaign> getCampaigns();
 	
-	public Banner getRandomBannerMatching(BannerView bv, AbstractAdBlasterInstance instance) {
+	/*public Banner getRandomBannerMatching(BannerView bv, AbstractAdBlasterInstance instance) {
 		Banner match = null;
 		while (match == null){
 			int index = (int)(Math.random()*getBannerCount());
@@ -37,6 +33,6 @@ public abstract class AbstractAdBlasterUniverse {
 			}
 		}
 		return match;	
-	}
+	}*/
 	
 }

@@ -88,10 +88,10 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 			}
 			System.out.println(System.currentTimeMillis() - time);
 
-			for (int i = 0; i < this.universe.getBannerCount(); i++){
-				Banner b = this.universe.getBannerByIndex(i);
+			int i = 0;
+			for (Banner b : this.universe.getBanners()){
 				if (b != null){
-					System.out.print(i + ", ");
+					System.out.print(i++ + ", ");
 					System.out.print(b.getID() + ", ");
 					System.out.println(bannerCount(b));
 				}
@@ -114,8 +114,7 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 
 	public float totalProfit(){
 		float count = 0;
-		for (int i = 0; i < this.universe.getBannerCount(); i++){
-			Banner b = this.universe.getBannerByIndex(i);
+		for (Banner b : this.universe.getBanners()){
 			float worth = this.bannerCount(b) * b.getRealPayrate();
 			count += worth;
 		}

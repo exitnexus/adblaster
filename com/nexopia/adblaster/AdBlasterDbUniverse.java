@@ -33,13 +33,6 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see com.nexopia.adblaster.AbstractAdBlasterUniverse#getBanner(int)
-	 */
-	public Banner getBannerByIndex(int i) {
-		/*This is by index...*/
-		return bannerDB.getBannerByIndex(i);
-	}
 
 	public Banner getBannerByID(int i) {
 		/*This is by ID...*/
@@ -57,7 +50,7 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 	/* (non-Javadoc)
 	 * @see com.nexopia.adblaster.AbstractAdBlasterUniverse#getBanners()
 	 */
-	public Collection getBanners() {
+	public Collection<Banner> getBanners() {
 		return bannerDB.getBanners();
 	}
 
@@ -65,7 +58,9 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 		bannerDB.saveCoefficients(coefficients);
 	}
 
-	public Collection<Banner> getBannerList() {
-		return bannerDB.getBanners();
+	@Override
+	public Collection<Campaign> getCampaigns() {
+		return this.campaignDB.getCampaigns();
 	}
+
 }
