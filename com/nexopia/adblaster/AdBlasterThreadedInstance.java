@@ -35,6 +35,7 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 		}
 		this.gd = gd;
 		views = new Vector<BannerView>();
+		views.addAll(bannerDB.getCurrentBannerViews());
 		
 	}
 
@@ -47,7 +48,7 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 				//ProgressIndicator.show(i, getViewCount());
 				time = System.currentTimeMillis();
 			}
-			if (bv.getBannerId() != 0){
+			if ((bv != null) && (bv.getBannerId() != 0)){
 				count += universe.getBannerByID(bv.getBannerId()).getRealPayrate();
 			}
 		}

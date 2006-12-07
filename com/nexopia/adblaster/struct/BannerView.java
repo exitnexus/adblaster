@@ -37,7 +37,7 @@ public class BannerView{
 
 	public void setBanner(Banner b) {
 		if (b == null)
-			this.bid = -1;
+			this.bid = 0;
 		else 
 			this.bid = b.id;
 	}
@@ -55,7 +55,7 @@ public class BannerView{
 	}
 	
 	public String toString(){
-		return "Banner ID: " + ((bid == -1)?null:bid) + " - Time: " + time + " User ID: " + uid + " Size: " + size; 
+		return "Banner ID: " + ((bid == 0)?null:bid) + " - Time: " + time + " User ID: " + uid + " Size: " + size; 
 	}
 
 	public int getUserID() {
