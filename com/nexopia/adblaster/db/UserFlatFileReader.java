@@ -17,7 +17,6 @@ public class UserFlatFileReader {
 		
 	}
 	
-	private Vector<FileReader> files;
 	private File directory;
 	private BufferedReader reader;
 	private IntObjectHashMap<User> users;
@@ -33,20 +32,16 @@ public class UserFlatFileReader {
 	}
 	
 	public void init() throws FileNotFoundException{
-		files = new Vector<FileReader>();
 		if (!directory.isDirectory()) {
 			throw new SecurityException(directory.getName() + " is not a directory.");
-		}
-		for (int i=0; i<FlatFileConfig.FILE_COUNT;i++) {
-			File f = new File(directory, "user."+i+".db");
-			files.add(new FileReader(f));
 		}
 		users = new IntObjectHashMap<User>();
 	}
 	
 	public void load(int fileNumber) throws IOException {
-		FileReader f = files.get(fileNumber);
-		reader = new BufferedReader(f);
+		File f = new File(directory, "user."+fileNumber+".db");
+		FileReader fr = new FileReader(f);
+		reader = new BufferedReader(fr);
 		String userString;
 		while ((userString = reader.readLine()) != null) {
 			User u = new User(userString);

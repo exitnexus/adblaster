@@ -13,7 +13,6 @@ import com.nexopia.adblaster.util.IntObjectHashMap;
 public class BannerViewFlatFileReader {
 	private Vector<BannerView> bannerViews;
 	private IntObjectHashMap<Vector<BannerView>> userBannerViewMap;
-	private Vector<FileReader> files;
 	private File directory;
 	private int bannerViewCount = 0;
 	
@@ -27,13 +26,8 @@ public class BannerViewFlatFileReader {
 	}
 	
 	private void init() throws FileNotFoundException{
-		files = new Vector<FileReader>();
 		if (!directory.isDirectory()) {
 			throw new SecurityException(directory.getName() + " is not a directory.");
-		}
-		for (int i=0; i<FlatFileConfig.FILE_COUNT;i++) {
-			File f = new File(directory, "bannerview."+i+".db");
-			files.add(new FileReader(f));
 		}
 		bannerViews = new Vector<BannerView>();
 		userBannerViewMap = new IntObjectHashMap<Vector<BannerView>>(); 
@@ -49,24 +43,21 @@ public class BannerViewFlatFileReader {
 	
 	public int refreshBannerViewCount() {
 		bannerViewCount = 0;
-		for (FileReader f: files) {
-			BufferedReader reader = new BufferedReader(f);
+		for (int i=0; i<100; i++) {
 			try {
+				BufferedReader reader = getFile(i);
 				while (reader.readLine() != null) {
 					bannerViewCount++;
 				}
+				reader.close();
+			} catch (FileNotFoundException e1) {
+				e1.printStackTrace();
 			} catch (IOException e) {
 				System.err.println("IO Error while counting banner views.");
 				e.printStackTrace();
 			}
 		}
 		return bannerViewCount;
-	}
-
-	public void close() throws IOException {
-		for (FileReader f: files) {
-			f.close();
-		}
 	}
 
 	public Vector<BannerView> getByUser(int id) {
@@ -79,8 +70,7 @@ public class BannerViewFlatFileReader {
 
 	
 	public void load(int fileNumber) throws IOException {
-		FileReader f = files.get(fileNumber);
-		BufferedReader reader = new BufferedReader(f);
+		BufferedReader reader = getFile(fileNumber);
 		String bannerViewString;
 		
 		bannerViews = new Vector<BannerView>();
@@ -97,7 +87,14 @@ public class BannerViewFlatFileReader {
 				viewMap.add(bv);
 			}
 		}
+		reader.close();
 		System.out.println("Loaded " + bannerViews.size() + " views in set " + fileNumber);
+	}
+	private BufferedReader getFile(int fileNumber) throws FileNotFoundException {
+		File f = new File(directory, "bannerview."+fileNumber+".db");
+		FileReader fr = new FileReader(f);
+		BufferedReader reader = new BufferedReader(fr);
+		return reader;
 	}
 
 }
