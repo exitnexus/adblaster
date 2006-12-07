@@ -15,7 +15,6 @@ import com.nexopia.adblaster.struct.User;
 
 public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 	private Vector<BannerView> views;
-	private UserFlatFileReader userDB;
 	private BannerViewFlatFileReader bannerDB;
 	private GlobalData gd;
 	
@@ -89,13 +88,6 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 		views.add(bv);
 	}
 
-	public User getUser(int i) {
-		//Integer I = Integer.valueOf(i);
-		User u = userDB.getUser(i);
-		//I.free();
-		return u;
-	}
-
 	public void addAddAllViews(Collection<BannerView> subset) {
 		this.views.addAll(subset);
 	}
@@ -103,6 +95,11 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 	@Override
 	public Vector<BannerView> getViews() {
 		return views;
+	}
+
+	@Override
+	public User getUser(int uid) {
+		return gd.fullDay.getUser(uid);
 	}
 
 	
