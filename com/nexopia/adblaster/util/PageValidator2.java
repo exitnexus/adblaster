@@ -61,7 +61,9 @@ public class PageValidator2 implements PageValidator{
 		String[] pages = string.split(",");
 		for (int i=0; i<pages.length; i++) {
 			if (i==0) {
-				if (pages[i].equals("0")) {
+				if (pages[i].trim().equals("")){
+					//do nothing!
+				} else if (pages[i].equals("0")) {
 					add(Integer.NEGATE);
 				} else {
 					add(Integer.IDENTITY);

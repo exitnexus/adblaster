@@ -165,6 +165,7 @@ public class NIOServer {
 					// get client socket channel
 					BufferedSocketChannel client;
 					try {
+						//System.out.println("Accepting connection.");
 						SocketChannel original = server.accept();
 						client = new BufferedSocketChannel(original);
 						if (BannerServer.debug.get("tick").booleanValue()) {
@@ -183,6 +184,7 @@ public class NIOServer {
 				}
 				
 				if (key.isConnectable()) {
+					//System.out.println("Close.");
 					BannerServer.bannerDebug("Client closed");
 					BufferedSocketChannel client = socketMap.get( key.channel() );
 					client.close();
@@ -220,7 +222,7 @@ public class NIOServer {
 							e.printStackTrace();
 						}
 						try {
-							ByteBuffer output = charset.encode(result + "\n");//+"-"+index+'\n');
+							ByteBuffer output = charset.encode(result+'\n');
 							//System.out.println(output.toString());
 							client.write(output);
 							index++;
@@ -253,6 +255,7 @@ public class NIOServer {
 	public static int getString(BufferedSocketChannel client, StringBuffer s) throws IOException{
 		// Read byte coming from the client
 		int i = client.read(s);
+		//System.out.println(s);
 		if (i == -1 && s.length() == 0){
 			return -1;
 		}

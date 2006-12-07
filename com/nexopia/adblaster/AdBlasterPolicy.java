@@ -16,6 +16,7 @@ public class AdBlasterPolicy implements I_Policy {
 	private HashMap<Banner, Float> coefficients;
 	Collection<Banner> banners;
 	public AdBlasterPolicy(Collection<Banner> bannerList) {
+		banners = new Vector<Banner>();
 		coefficients = new HashMap<Banner, Float>();
 		for (Banner b : bannerList){
 			coefficients.put(b, new Float(1.0/*Math.random()*/));

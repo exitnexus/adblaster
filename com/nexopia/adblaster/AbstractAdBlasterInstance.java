@@ -29,11 +29,11 @@ public abstract class AbstractAdBlasterInstance {
 	public AbstractAdBlasterInstance(AbstractAdBlasterUniverse ac){
 		bannerCountMap = new HashMap<Banner, Integer>();
 		for (int i = 0; i < ac.getBannerCount(); i++){
-			bannerCountMap.put(ac.getBannerByIndex(i), new Integer(0));
+			bannerCountMap.put(ac.getBannerByIndex(i), Integer.valueOf(0));
 		}
 		campaignCountMap = new HashMap<Campaign, Integer>();
 		for (int i = 0; i < ac.getCampaignCount(); i++){
-			campaignCountMap.put(ac.getCampaignByIndex(i), new Integer(0));
+			campaignCountMap.put(ac.getCampaignByIndex(i), Integer.valueOf(0));
 		}
 		universe = ac;
 	}
@@ -268,6 +268,10 @@ public abstract class AbstractAdBlasterInstance {
 		Integer value = Integer.valueOf(count.intValue() + 1);
 		this.bannerCountMap.put(key, value);
 
+		if (universe.getBannerByID(bv.getBannerId()) == null){
+			System.out.println("The following banner is not in the database: " + bv.getBannerId());
+			return;
+		}
 		count = this.campaignCountMap.get(universe.getBannerByID(bv.getBannerId()).getCampaign());
 		this.campaignCountMap.put(universe.getBannerByID(bv.getBannerId()).getCampaign(), Integer.valueOf(count.intValue() + 1));
 

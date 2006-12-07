@@ -10,6 +10,7 @@ import com.nexopia.adblaster.util.PageValidatorFactory;
 
 public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 	private BannerDatabase bannerDB;
+
 	public Campaign.CampaignDB campaignDB;
 
 	public Campaign getCampaignByIndex(int i) {

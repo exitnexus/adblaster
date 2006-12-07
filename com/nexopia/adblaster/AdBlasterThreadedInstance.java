@@ -35,8 +35,7 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 		}
 		this.gd = gd;
 		views = new Vector<BannerView>();
-		views.addAll(bannerDB.getCurrentBannerViews());
-		
+		views.addAll(bannerDB.getCurrentBannerViews());		
 	}
 
 	public float totalProfit(){
@@ -49,7 +48,10 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 				time = System.currentTimeMillis();
 			}
 			if ((bv != null) && (bv.getBannerId() != 0)){
-				count += universe.getBannerByID(bv.getBannerId()).getRealPayrate();
+				if (universe.getBannerByID(bv.getBannerId()) == null)
+					System.out.println("Banner " + bv.getBannerId() + " is bad.");
+				else
+					count += universe.getBannerByID(bv.getBannerId()).getRealPayrate();
 			}
 		}
 		return count;

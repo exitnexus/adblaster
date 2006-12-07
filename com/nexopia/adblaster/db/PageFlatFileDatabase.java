@@ -15,7 +15,7 @@ public class PageFlatFileDatabase {
 	FileWriter writer;
 	BufferedReader reader;
 	
-	private HashMap<String, Integer> pages_reverse; //track the pages in the database
+	public HashMap<String, Integer> pages_reverse; //track the pages in the database
 	private IntObjectHashMap<String> pages;
 	private int count;
 	
@@ -33,6 +33,7 @@ public class PageFlatFileDatabase {
 		if (!directory.isDirectory()) {
 			directory.mkdir();
 			if (!directory.isDirectory()) {
+				System.exit(0);
 				throw new SecurityException(directory.getName() + " is not a directory and cannot be created as one.");
 			}
 		}
@@ -86,7 +87,10 @@ public class PageFlatFileDatabase {
 	}
 
 	public int getPage(String p) {
-		return pages_reverse.get(p);
+		Integer i = pages_reverse.get(p);
+		if (i != null)
+			return i.intValue();
+		return -1;
 	}
 	
 }

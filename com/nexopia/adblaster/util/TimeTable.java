@@ -224,7 +224,7 @@ public class TimeTable {
 		int h = c.get(Calendar.HOUR_OF_DAY);
 		int d = (c.get(Calendar.DAY_OF_WEEK)-2) % 7;
 		if (d < 0) d += 7;
-		Utilities.bannerDebug("Checking time for day " + d + " and hour " + h + ". - " + this.allowed[d][h] );
+		//Utilities.bannerDebug("Checking time for day " + d + " and hour " + h + ". - " + this.allowed[d][h] );
 		return this.allowed[d][h];
 	}
 	/**

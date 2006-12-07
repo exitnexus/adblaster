@@ -11,11 +11,12 @@ public class FileScanTest {
 		String request;
 		int i=0;
 	    while ((request = ffp.readLine()) != null){
-	    	/*if (i % 1000 == 0){
+/*	    	if (i % 1000 == 0){
 				//ProgressIndicator.show(i, instanc.getViewCount());
-				System.out.println("Result " + i + " : " + s);
+				System.out.println("Line: " + i );
 			}*/
 			i++;
+
 		}
 	    System.out.println("Total lines = " + i);
 		

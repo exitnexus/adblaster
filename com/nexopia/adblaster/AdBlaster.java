@@ -11,8 +11,8 @@ import com.nexopia.adblaster.util.Utilities;
 
 public class AdBlaster {
 
-	private static final int THREAD_COUNT = 2;
-	static int num_serves = 4;
+	private static final int THREAD_COUNT = 1;
+	static int num_serves = 1;
 	static AdBlasterDbUniverse ac;
 	static AdBlasterDbInstance instanc;
 	

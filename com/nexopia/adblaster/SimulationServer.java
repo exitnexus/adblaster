@@ -41,9 +41,11 @@ public class SimulationServer {
 		                  socket.getInputStream()));
 		int i=0;
 	    while ((request = ffp.readLine()) != null){
-	    	writer.write(request);
+	    	writer.write(request + "\n");
 	    	writer.flush();
+		//System.out.println("Written...");
 	    	String s = reader.readLine();
+		//System.out.println("Read: " + s);
 	    	if (i % 1000 == 0){
 				//ProgressIndicator.show(i, instanc.getViewCount());
 				System.out.println("Result " + i + " : " + s);
