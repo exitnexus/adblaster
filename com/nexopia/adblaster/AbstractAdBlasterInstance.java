@@ -264,7 +264,9 @@ public abstract class AbstractAdBlasterInstance {
 	
 	synchronized protected void updateMap(BannerView bv) {
 		Integer count = this.bannerCountMap.get(universe.getBannerByID(bv.getBannerId()));
-		this.bannerCountMap.put(universe.getBannerByID(bv.getBannerId()), Integer.valueOf(count.intValue() + 1));
+		Banner key = universe.getBannerByID(bv.getBannerId());
+		Integer value = Integer.valueOf(count.intValue() + 1);
+		this.bannerCountMap.put(key, value);
 
 		count = this.campaignCountMap.get(universe.getBannerByID(bv.getBannerId()).getCampaign());
 		this.campaignCountMap.put(universe.getBannerByID(bv.getBannerId()).getCampaign(), Integer.valueOf(count.intValue() + 1));
