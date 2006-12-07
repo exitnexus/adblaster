@@ -146,15 +146,6 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 
 	}*/
 	
-	public void close(){
-		try {
-			db.close();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
 	public void fillInstance(I_Policy pol) {
 		System.out.println("Clearing " + getViewCount() + " instances.");
 		long time = System.currentTimeMillis();
