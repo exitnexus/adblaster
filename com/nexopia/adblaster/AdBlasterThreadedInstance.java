@@ -15,26 +15,21 @@ import com.nexopia.adblaster.struct.User;
 
 public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 	private Vector<BannerView> views;
-	private BannerViewFlatFileReader bannerDB;
 	private GlobalData gd;
 	
 	public AdBlasterThreadedInstance(GlobalData gd, int subset_num) {
 		super(gd.universe);
 		try {
-			bannerDB = new BannerViewFlatFileReader(gd.bannerViewDirectory);
-		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		try {
-			bannerDB.load(subset_num);
+			gd.fullDay.db.load(subset_num);
+			gd.fullDay.userDB.load(subset_num);
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		this.gd = gd;
 		views = new Vector<BannerView>();
-		views.addAll(bannerDB.getCurrentBannerViews());		
+		views.addAll(gd.fullDay.db.getCurrentBannerViews());		
 	}
 
 	public float totalProfit(){

@@ -23,7 +23,7 @@ import com.nexopia.adblaster.util.Integer;
 public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	HashMap swappedViews; //always look for a view here before checking the database
 	BannerViewFlatFileReader db;
-	private UserFlatFileReader userDB;
+	UserFlatFileReader userDB;
 
 	public AdBlasterDbInstance(AbstractAdBlasterUniverse c){
 		super(c);
@@ -79,6 +79,7 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 			long time = System.currentTimeMillis();
 			for (int i = 0; i < BannerViewFlatFileWriter.FILE_COUNT; i++){
 				db.load(i);
+				userDB.load(i);
 				for (BannerView bv : db.getCurrentBannerViews()){
 					if (bv.getBannerId() != 0){
 						updateMap(bv);
@@ -103,9 +104,7 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	}
 	
 	public User getUser(int i) {
-		//Integer I = Integer.valueOf(i);
 		User u = userDB.getUser(i);
-		//I.free();
 		return u;
 	}
 
