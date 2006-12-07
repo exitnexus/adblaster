@@ -41,6 +41,7 @@ public class PageFlatFileDatabase {
 		reader = new BufferedReader(new FileReader(file));
 		pages_reverse = new HashMap<String, Integer>();
 		pages = new IntObjectHashMap<String>();
+		count = 1;
 		if (append) {
 			this.load();
 		}
@@ -54,6 +55,9 @@ public class PageFlatFileDatabase {
 			String words[] = line.split(" ");
 			pages_reverse.put(words[1], Integer.valueOf(words[0]));
 			pages.put(Integer.valueOf(words[0]), words[1]);
+			if (Integer.valueOf(words[0]).intValue() > count) {
+				count = Integer.valueOf(words[0]).intValue() + 1;
+			}
 		}
 	}
 	
