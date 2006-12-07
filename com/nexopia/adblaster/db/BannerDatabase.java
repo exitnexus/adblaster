@@ -65,13 +65,13 @@ import com.nexopia.adblaster.util.PageValidatorFactory;
 public class BannerDatabase {
 	
 	private IntObjectHashMap<Banner> banners;
-	Vector<Integer> keyset = new Vector<Integer>();
-	Vector<Banner> valueset = new Vector<Banner>();
+	private Vector<Banner> bannerList;
 	CampaignDB cdb;
 	
 	public BannerDatabase(Campaign.CampaignDB cdb, PageValidatorFactory pvfactory) {
 		this.cdb = cdb;
 		banners = new IntObjectHashMap<Banner>();
+		bannerList = new Vector<Banner>();
 		try {
 			String sql = "SELECT * FROM " + JDBCConfig.BANNER_TABLE;
 			Statement stmt = JDBCConfig.createStatement();
@@ -86,17 +86,15 @@ public class BannerDatabase {
 				if (Banner.precheck(rs) &&
 						cdb.get(rs.getInt("CAMPAIGNID")).precheck()) {
 					try {
-						banners.put(id, new Banner(rs, cdb, pvfactory.make()));
+						Banner b = new Banner(rs, cdb, pvfactory.make());
+						banners.put(id, b);
+						bannerList.add(b);
 					} catch (SQLException e){
 						System.out.println("This probably indicates a bad campaign. Continue if you know what you're doing.");
 						e.printStackTrace();
 					}
 					i++;
 				}
-			}
-			for (int k : this.banners.getKeyArray()){
-				keyset.add(Integer.valueOf(k));
-				valueset.add(this.banners.get(k));
 			}
 			System.out.println("Total: " + i + " banners.");
 		} catch (Exception e) {
@@ -108,7 +106,7 @@ public class BannerDatabase {
 		return (Banner)this.banners.get(i);
 	}
 	public Banner getBannerByIndex(int i) {
-		return (Banner)this.banners.get(keyset.get(i).intValue());
+		return (Banner)this.banners.get(this.banners.getKeyArray()[i]);
 	}
 	
 	public int getBannerCount() {
@@ -116,14 +114,14 @@ public class BannerDatabase {
 	}
 	
 	public Collection<Banner> getBanners() {
-		return valueset; 
+		return bannerList; 
 	}
 
 	public void loadCoefficients(HashMap<Banner, Float> coefficients) {
 		Statement stmt;
 		try {
 			stmt = JDBCConfig.createStatement();
-			for (Banner banner: valueset) {
+			for (Banner banner: bannerList) {
 				try {
 					Float f = coefficients.get(banner);
 					String st = "SELECT c.* " 
@@ -151,7 +149,7 @@ public class BannerDatabase {
 		Statement stmt;
 		try {
 			stmt = JDBCConfig.createStatement();
-			for (Banner banner: valueset) {
+			for (Banner banner: bannerList) {
 				try {
 					if (coefficients.get(banner) != null) {
 						Float f = coefficients.get(banner);
@@ -199,9 +197,11 @@ public class BannerDatabase {
 						cdb.get(rs.getInt("CAMPAIGNID")).precheck()) {
 					try {
 						Banner b = new Banner(rs, cdb, pv);
+						if (banners.containsKey(id)){
+							bannerList.remove(banners.get(id));
+						}
 						banners.put(id, b);
-						keyset.add(Integer.valueOf(id));
-						valueset.add(b);
+						bannerList.add(b);
 						return b;
 					} catch (SQLException e){
 						System.out.println("This probably indicates a bad campaign. Continue if you know what you're doing.");
@@ -225,9 +225,10 @@ public class BannerDatabase {
 				if (rs.next()) {
 					return b.update(rs, cdb);
 				} else {
+					if (banners.containsKey(bannerID)){
+						bannerList.remove(banners.get(bannerID));
+					}
 					banners.remove(bannerID);
-					keyset.remove(bannerID);
-					valueset.remove(b);
 					return null;
 				}
 			} catch (SQLException e) {
@@ -258,9 +259,10 @@ public class BannerDatabase {
 	public void delete(int bannerID) {
 		Banner b = this.banners.get(bannerID);
 		b.getCampaign().removeBanner(b);
+		if (banners.containsKey(bannerID)){
+			bannerList.remove(banners.get(bannerID));
+		}
 		banners.remove(bannerID);
-		keyset.remove(Integer.valueOf(bannerID));
-		valueset.remove(b);
 	}
 	
 }
