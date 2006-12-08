@@ -20,6 +20,7 @@ public class UserFlatFileReader {
 	private File directory;
 	private BufferedReader reader;
 	private IntObjectHashMap<User> users;
+	User anon = new User(0,(byte)0,(byte)0,(short)0,"");
 	
 	public UserFlatFileReader(File directory) throws FileNotFoundException{
 		this.directory = directory;
@@ -51,6 +52,9 @@ public class UserFlatFileReader {
 	
 	//Requires the user be in the current loaded set
 	public User getUser(int uid) {
-		return users.get(uid);
+		if (users.containsKey(uid))
+			return users.get(uid);
+		else 
+			return anon;
 	}
 }

@@ -12,6 +12,7 @@ import com.nexopia.adblaster.struct.BannerView;
 import com.nexopia.adblaster.struct.I_Policy;
 import com.nexopia.adblaster.struct.ServablePropertyHolder;
 import com.nexopia.adblaster.struct.User;
+import com.nexopia.adblaster.util.Integer;
 
 public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 	private Vector<BannerView> views;
@@ -29,13 +30,19 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 		}
 		this.gd = gd;
 		views = new Vector<BannerView>();
-		views.addAll(gd.fullDay.db.getCurrentBannerViews());
+		for (BannerView bv : gd.fullDay.db.getCurrentBannerViews()){
+			views.add(bv);
+			Banner b = universe.getBannerByID(bv.getBannerId());
+			if (!this.bannerCountMap.containsKey(b))
+				this.bannerCountMap.put(b, Integer.valueOf(0));
+			this.updateMap(bv);
+		}
 		System.out.println("Loaded " + views.size() + " banner views.");
 	}
 
 	public float totalProfit(){
 		int i = 0;
-		System.out.println("Calculating profit.");
+		System.out.println("Calculating profit on " + getViews().size() + " views.");
 		float count = 0;
 		long time = System.currentTimeMillis();
 		for (BannerView bv : getViews()){ 
@@ -44,13 +51,15 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 				System.out.println("Percent: " + i/getViewCount());
 				time = System.currentTimeMillis();
 			}
-			if ((bv != null) && (bv.getBannerId() != 0)){
-				if (universe.getBannerByID(bv.getBannerId()) == null)
-					System.out.println("Banner " + bv.getBannerId() + " is bad.");
-				else
-					count += universe.getBannerByID(bv.getBannerId()).getRealPayrate();
+			if (bv == null){
+				throw new UnsupportedOperationException("Null bannerview in the list!");
 			}
+			if (bv.getBannerId() == 0){
+				continue;
+			}
+			count += universe.getBannerByID(bv.getBannerId()).getRealPayrate();
 		}
+		System.out.println("profit:" + count);
 		return count;
 	}
 	
@@ -65,11 +74,12 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 				throw new UnsupportedOperationException();
 			}
 			if ((System.currentTimeMillis() - time) > 5000){
-				System.out.println("Percent: " + i / getViewCount());
+				System.out.println("Percent: " + (float)i / (float)getViewCount());
 				time = System.currentTimeMillis();
 			}
 			Banner b = pol.getBestBanner(this, bv);
 			//Banner b = universe.getRandomBannerMatching(bv, this);
+			notifyChange(bv, b);
 			bv.setBanner(b);
 		}
 	}

@@ -29,7 +29,16 @@ public final class AdBlasterThreadedOperation implements Runnable {
 	
 	public synchronized void operateOnChunk(AdBlasterThreadedInstance chunk) {
 		System.out.println("Operating on a chunk...");
+		for (Banner b : gd.universe.getBanners()){
+			System.out.println(b.getID() + " : " + chunk.bannerCount(b));
+		}
 		original_profit = chunk.totalProfit();
+
+		for (int k = 0; k < chunk.getViewCount(); k++){
+			BannerView bv = chunk.getViews().elementAt(k);
+			chunk.notifyChange(bv, null);
+			bv.setBanner(null);
+		}
 
 		chunk.fillInstance(gd.pol);
 		
@@ -37,8 +46,9 @@ public final class AdBlasterThreadedOperation implements Runnable {
 		System.out.println("Upgrading policy.");
 		new PolicyLearner(gd.pol, gd.universe).upgradePolicy(chunk, this);
 		
-		for (int i = 0; i < chunk.getViewCount(); i++){
-			chunk.getViews().elementAt(i).setBanner(null);
+		for (BannerView bv : chunk.getViews()){
+			chunk.notifyChange(bv, null);
+			bv.setBanner(null);
 		}
 
 		chunk.fillInstance(gd.pol);
@@ -58,7 +68,7 @@ public final class AdBlasterThreadedOperation implements Runnable {
 		for (int i = 0; i < unserved.size(); i++){
 			Banner b = (Banner)unserved.get(i);
 			
-			// First try simple search
+			// First try simple search...mo
 			for (int j = 0; j < instanc.getViewCount() && 
 					(instanc.bannerCount(b) < b.getIntegerMaxViewsPerDay()) &&
 					(instanc.campaignCount(b) < b.getCampaign().getIntegerMaxViewsPerDay());
@@ -68,6 +78,7 @@ public final class AdBlasterThreadedOperation implements Runnable {
 				if (bv.getBannerId() == 0 || gd.universe.getBannerByID(bv.getBannerId()).getPayrate(instanc) < b.getPayrate(instanc)){
 					if (instanc.isValidBannerForView(bv,b)){
 						// single swap
+						chunk.notifyChange(bv, b);
 						bv.setBanner(b);
 					}
 				}

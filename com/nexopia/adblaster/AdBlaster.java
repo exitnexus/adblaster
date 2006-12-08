@@ -74,15 +74,7 @@ public class AdBlaster {
 		for (int i = 0; i < num_serves; i++){
 			
 			for (int j=0; j<THREAD_COUNT; j++) {
-				for (int k = 0; k < chunk[j].getViewCount(); k++){
-					BannerView bv = chunk[j].getViews().elementAt(k);
-					bv.setBanner(null);
-				}
-				if (i == 0 || i == num_serves-1){
-					r[j] = new AdBlasterThreadedOperation(gd, chunk[j]);
-				} else {
-					r[j] = new AdBlasterThreadedOperation(gd, chunk[j]);
-				}
+				r[j] = new AdBlasterThreadedOperation(gd, chunk[j]);
 				t[j] = new Thread(r[j], "operateOnChunk");
 				
 				t[j].start();

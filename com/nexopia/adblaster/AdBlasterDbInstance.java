@@ -146,6 +146,7 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 		System.out.println("Clearing " + getViewCount() + " instances.");
 		long time = System.currentTimeMillis();
 		for (BannerView bv : getViews()){
+			notifyChange(bv, null);
 			bv.setBanner(null);
 			if ((System.currentTimeMillis() - time) > 5000){
 				//ProgressIndicator.show(i, getViewCount());
@@ -160,6 +161,7 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 			}
 			Banner b = pol.getBestBanner(this, bv);
 			//Banner b = universe.getRandomBannerMatching(bv, this);
+			notifyChange(bv, b);
 			bv.setBanner(b);
 		}
 	}
@@ -211,8 +213,8 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 	}
 	@Override
 	public Vector<BannerView> getViews() {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException("Don't call this method - no way to" +
+				"load all bannerviews into memory at once.");
 	}
 
 

@@ -190,18 +190,11 @@ public abstract class AbstractAdBlasterInstance {
 	private Vector<BannerView> getAllMatching(Vector<BannerView> vec, Campaign c, int time, int period) {
 		Vector<BannerView> vec2 = new Vector<BannerView>();
 		for (int i = 0; i < vec.size(); i++){
-			if (i % 1 == 0){
-				System.out.println(i / vec.size() + " percent complete.");
-			}
 			BannerView bv = vec.get(i);
 			if (bv.getTime() > time - period && bv.getTime() < time + period){
-				System.out.println("Passed time test.");
 				if (universe.getBannerByID(bv.getBannerId()) != null) {
-					System.out.println("Passed banner not null test...");
 					if (universe.getBannerByID(bv.getBannerId()).getCampaign() == c){
-						System.out.println("Adding...");
 						vec2.add(bv);
-						System.out.println("Added.");
 					}
 				}
 			}
@@ -275,17 +268,13 @@ public abstract class AbstractAdBlasterInstance {
 	
 	synchronized protected void updateMap(BannerView bv) {
 		Integer count = this.bannerCountMap.get(universe.getBannerByID(bv.getBannerId()));
-		if (count == null){
-			System.out.println("Banner not known - " + bv.getBannerId() + " : " + universe.getBannerByID(bv.getBannerId()) + " : " + this.bannerCountMap.size());
-		}
 		Banner key = universe.getBannerByID(bv.getBannerId());
 		Integer value = Integer.valueOf(count.intValue() + 1);
 		this.bannerCountMap.put(key, value);
 
-		if (universe.getBannerByID(bv.getBannerId()) == null){
-			System.out.println("The following banner is not in the database: " + bv.getBannerId());
+		if (bv.getBannerId() == 0)
 			return;
-		}
+		
 		count = this.campaignCountMap.get(universe.getBannerByID(bv.getBannerId()).getCampaign());
 		this.campaignCountMap.put(universe.getBannerByID(bv.getBannerId()).getCampaign(), Integer.valueOf(count.intValue() + 1));
 
@@ -330,7 +319,7 @@ public abstract class AbstractAdBlasterInstance {
 		Iterator it = swaps.iterator();
 		BannerView second = (BannerView)it.next();
 		Banner secondBanner = universe.getBannerByID(second.getBannerId());
-		this.bannerCountMap.put(secondBanner, 
+		/*this.bannerCountMap.put(secondBanner, 
 				new Integer(((Integer)bannerCountMap.get(secondBanner)).intValue()-1));
 		this.campaignCountMap.put(secondBanner.getCampaign(), 
 				new Integer(((Integer)campaignCountMap.get(secondBanner.getCampaign())).intValue()-1));
@@ -340,22 +329,24 @@ public abstract class AbstractAdBlasterInstance {
 		}
 		if (campaignCountMap.get(secondBanner.getCampaign()).intValue() < 0){
 			throw new UnsupportedOperationException();
-		}
+		}*/
 		for (; it.hasNext(); ){
 			BannerView first = second;
 			second = (BannerView)it.next();
 			
 			if (isValidBannerForView(first, secondBanner)){
+				notifyChange(first, secondBanner);
 				first.setBanner(secondBanner);
 			} else {
 				System.err.println("Error:  Bad switch.");
 			}
 			
 		}
+		notifyChange(second, endBanner);
 		second.setBanner(endBanner);
-		this.bannerCountMap.put(endBanner, new Integer((bannerCountMap.get(endBanner)).intValue()+1));
-		this.campaignCountMap.put(endBanner.getCampaign(), 
-				new Integer(campaignCountMap.get(endBanner.getCampaign()).intValue()+1));
+		//this.bannerCountMap.put(endBanner, new Integer((bannerCountMap.get(endBanner)).intValue()+1));
+		//this.campaignCountMap.put(endBanner.getCampaign(), 
+		//		new Integer(campaignCountMap.get(endBanner.getCampaign()).intValue()+1));
 		
 	}
 

@@ -107,7 +107,7 @@ public class AdBlasterPolicy implements I_Policy {
 		while (!all.isEmpty()){
 			int banner = getRandomBanner(all, getCoefficients());
 			
-			if (banner == 0){
+			if (banner == -1){
 				continue;
 			}
 

@@ -36,6 +36,7 @@ public class PolicyLearner {
 			op.iterativeImprove(chunk);
 		}
 		System.out.println("Calculating Banner Coefficients...");
+		i=0;
 		for (Banner b : universe.getBanners()){
 			int after = chunk.bannerCount(b);
 			int before = sbefore[i];

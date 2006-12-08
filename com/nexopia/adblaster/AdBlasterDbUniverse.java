@@ -35,7 +35,6 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 
 
 	public Banner getBannerByID(int i) {
-		System.out.println("DbUniverse: Getting banner " + i);
 		return bannerDB.getBannerByID(i);
 	}
 
