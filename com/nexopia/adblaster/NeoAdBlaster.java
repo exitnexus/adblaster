@@ -2,13 +2,16 @@ package com.nexopia.adblaster;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Vector;
 
 import com.nexopia.adblaster.db.BannerDatabase;
 import com.nexopia.adblaster.db.BannerViewFlatFileReader;
+import com.nexopia.adblaster.db.FlatFileConfig;
 import com.nexopia.adblaster.db.PageFlatFileDatabase;
 import com.nexopia.adblaster.db.UserFlatFileReader;
 import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.BannerStat;
+import com.nexopia.adblaster.struct.BannerView;
 import com.nexopia.adblaster.struct.Campaign.CampaignDB;
 import com.nexopia.adblaster.util.IntObjectHashMap;
 import com.nexopia.adblaster.util.PageValidator2;
@@ -41,11 +44,30 @@ public class NeoAdBlaster {
 		for (Banner b: banners) {
 			bannerViewStats.put(b.getID(), new BannerStat());
 		}
-		
 	}
 	
 	public void run() {
-		//do something
+		calculateViewStats();
+	}
+	
+	public void calculateViewStats() {
+		for (int i=0; i<FlatFileConfig.FILE_COUNT; i++) {
+			System.out.println("Calculating view stats for subsection " + i + ".");
+			try {
+				bannerViewReader.load(i);
+			} catch (IOException e) {
+				System.err.println("Failed to load banner view file " + i);
+				e.printStackTrace();
+			}
+			Vector<BannerView> bannerViews = bannerViewReader.getCurrentBannerViews();
+			for (BannerView bv: bannerViews) {
+				BannerStat stat = bannerViewStats.get(bv.getBannerId());
+				if (stat != null) {
+					stat.dailyviews++;
+				}
+			}
+		}
+		System.out.println("View stat calculation complete.");
 	}
 	
 	/**
