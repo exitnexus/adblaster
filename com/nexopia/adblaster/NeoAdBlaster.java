@@ -36,6 +36,7 @@ public class NeoAdBlaster {
 			e.printStackTrace();
 			System.exit(-1);
 		}
+		bannerViewStats = new IntObjectHashMap<BannerStat>();
 		Collection<Banner> banners = bannerDB.getBanners();
 		for (Banner b: banners) {
 			bannerViewStats.put(b.getID(), new BannerStat());
