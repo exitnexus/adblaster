@@ -109,8 +109,8 @@ public class IntObjectHashMap<Value> extends PrimitiveKeyBase {
 	 *            backing key array object
 	 */
 
-	protected final void setKeyArray(Object array) {
-		m_keyTable = (int[]) array;
+	protected final void setKeyArray(int[] array) {
+		m_keyTable = array;
 	}
 
 	/**
@@ -121,7 +121,7 @@ public class IntObjectHashMap<Value> extends PrimitiveKeyBase {
 	 * @return backing key array object
 	 */
 
-	protected final Object getValueArray() {
+	protected final Value[] getValueArray() {
 		return m_valueTable;
 	}
 
@@ -134,8 +134,8 @@ public class IntObjectHashMap<Value> extends PrimitiveKeyBase {
 	 *            backing value array object
 	 */
 
-	protected final void setValueArray(Object array) {
-		m_valueTable = (Value[]) array;
+	protected final void setValueArray(Value[] array) {
+		m_valueTable = array;
 	}
 
 	/**
@@ -169,7 +169,7 @@ public class IntObjectHashMap<Value> extends PrimitiveKeyBase {
 	 *            array of values
 	 */
 
-	protected void restructure(boolean[] flags, Object karray, Object varray) {
+	protected void restructure(boolean[] flags, int[] karray, Value[] varray) {
 		int[] keys = (int[]) karray;
 		Value[] values = (Value[]) varray;
 		for (int i = 0; i < flags.length; i++) {
@@ -225,11 +225,11 @@ public class IntObjectHashMap<Value> extends PrimitiveKeyBase {
 	 *         not previously present in table
 	 */
 
-	public Object put(int key, Value value) {
+	public Value put(int key, Value value) {
 		ensureCapacity(m_entryCount + 1);
 		int offset = internalFind(key);
 		if (offset >= 0) {
-			Object prior = m_valueTable[offset];
+			Value prior = m_valueTable[offset];
 			m_valueTable[offset] = value;
 			return prior;
 		} else {
@@ -303,10 +303,10 @@ public class IntObjectHashMap<Value> extends PrimitiveKeyBase {
 	 *         found in table
 	 */
 
-	public Object remove(int key) {
+	public Value remove(int key) {
 		int slot = internalFind(key);
 		if (slot >= 0) {
-			Object value = m_valueTable[slot];
+			Value value = m_valueTable[slot];
 			m_flagTable[slot] = false;
 			m_entryCount--;
 			while (m_flagTable[(slot = stepSlot(slot))]) {
@@ -336,7 +336,25 @@ public class IntObjectHashMap<Value> extends PrimitiveKeyBase {
 	 * @return shallow copy of table
 	 */
 
-	public Object clone() {
+	public IntObjectHashMap<Value> clone() {
 		return new IntObjectHashMap<Value>(this);
+	}
+
+	@Override
+	protected void restructure(boolean[] flags, Object karray, Object varray) {
+		restructure(flags, (int[])karray, (Value[])varray);
+		
+	}
+
+	@Override
+	protected void setValueArray(Object array) {
+		setValueArray((Value[]) array);
+		
+	}
+
+	@Override
+	protected void setKeyArray(Object array) {
+		setKeyArray((int[])array);
+		
 	}
 }
