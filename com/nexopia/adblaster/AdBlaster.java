@@ -14,7 +14,7 @@ public class AdBlaster {
 	private static final int THREAD_COUNT = 1;
 	static int num_serves = 1;
 	static AdBlasterDbUniverse ac;
-	static AdBlasterDbInstance instanc;
+	//static AdBlasterDbInstance instanc;
 	
 	private static File user_dir = null;
 	private static File page_dir = null;
@@ -49,13 +49,14 @@ public class AdBlaster {
 		PageValidatorFactory factory = 
 			new PageValidatorFactory(PageValidator2.class,args2);
 
+		long start_time = System.currentTimeMillis();
+
 		ac = new AdBlasterDbUniverse(factory);
-		instanc = new AdBlasterDbInstance(ac);
+
+/*		instanc = new AdBlasterDbInstance(ac);
 		//instanceBinding = new BannerViewBinding(ac, instanc);
 
-		long start_time = System.currentTimeMillis();
 		
-		AdBlasterPolicy pol = AdBlasterPolicy.randomPolicy(ac.getBanners());
 
 		if (dataFile != null){
 			((AdBlasterDbInstance)instanc).loadNoCount(bv_dir, user_dir, dataFile);
@@ -63,9 +64,11 @@ public class AdBlaster {
 			((AdBlasterDbInstance)instanc).load(bv_dir, user_dir);
 		}
 		System.out.println("Total original profit: " + instanc.totalProfit());
-		
-		System.out.println("Chunking.");
-		GlobalData gd = new GlobalData(pol, instanc, ac, bv_dir);
+*/		
+
+		AdBlasterPolicy pol = AdBlasterPolicy.randomPolicy(ac.getBanners());
+
+		GlobalData gd = new GlobalData(pol, ac, bv_dir);
 		AdBlasterThreadedInstance[] chunk = getChunk(gd, THREAD_COUNT);
 		Runnable[] r = new Runnable[THREAD_COUNT];
 		Thread[] t = new Thread[THREAD_COUNT];

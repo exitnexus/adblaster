@@ -37,7 +37,6 @@ public class JDBCConfig {
 			Class.forName("com.mysql.jdbc.Driver");
 			String url = "jdbc:mysql://192.168.0.50:3306/newbanners";
 			con = DriverManager.getConnection(url, "root", "Hawaii");
-			sqlQueue = new SQLQueue(1);
 		} catch (ClassNotFoundException e) {
 			System.err.println("Unable to load JDBC driver.");
 			e.printStackTrace();
@@ -52,6 +51,10 @@ public class JDBCConfig {
 		}
 	}
 	
+	public static void initThreadedSQLQueue() {
+		sqlQueue = new SQLQueue(1);
+	}
+
 	public static Statement createStatement() throws SQLException {
 		return con.createStatement();
 	}

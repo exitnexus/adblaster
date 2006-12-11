@@ -137,6 +137,7 @@ public class BannerServer {
 		//this.policy = new AdBlasterPolicy(db.getBanners());
 		this.db = db;
 		this.cdb = cdb;
+		JDBCConfig.initThreadedSQLQueue();
 		BannerServer.numservers = numservers;
 		Integer sizes[] = {BANNER_BANNER, BANNER_LEADERBOARD,
 				BANNER_BIGBOX, BANNER_SKY120, BANNER_SKY160,

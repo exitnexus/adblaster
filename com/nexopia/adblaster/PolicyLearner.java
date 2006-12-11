@@ -41,7 +41,7 @@ public class PolicyLearner {
 			int after = chunk.bannerCount(b);
 			int before = sbefore[i];
 			float f = ((float)((1.0f + after) / (1.0f + before)));
-			pol.incrementMultiply(b, (float)Math.pow(f, 50.0f)); 
+			pol.incrementMultiply(b, (float)Math.pow(f, 1.0f)); 
 		}
 		
 		synchronized(banners) {

@@ -3,9 +3,12 @@ package com.nexopia.adblaster;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Vector;
 
+import com.nexopia.adblaster.db.BannerDatabase;
 import com.nexopia.adblaster.db.BannerViewFlatFileReader;
+import com.nexopia.adblaster.db.FlatFileConfig;
 import com.nexopia.adblaster.db.UserFlatFileReader;
 import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.BannerView;
@@ -17,12 +20,16 @@ import com.nexopia.adblaster.util.Integer;
 public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 	private Vector<BannerView> views;
 	private GlobalData gd;
+	private BannerViewFlatFileReader db;
+	private UserFlatFileReader userDB;
 	
 	public AdBlasterThreadedInstance(GlobalData gd, int subset_num) {
 		super(gd.universe);
 		try {
-			gd.fullDay.db.load(subset_num);
-			gd.fullDay.userDB.load(subset_num);
+			db = new BannerViewFlatFileReader(gd.bannerViewDirectory);
+			db.load(subset_num);
+			userDB = new UserFlatFileReader(gd.bannerViewDirectory);
+			userDB.load(subset_num);
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -30,7 +37,7 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 		}
 		this.gd = gd;
 		views = new Vector<BannerView>();
-		for (BannerView bv : gd.fullDay.db.getCurrentBannerViews()){
+		for (BannerView bv : db.getCurrentBannerViews()){
 			views.add(bv);
 			Banner b = universe.getBannerByID(bv.getBannerId());
 			if (!this.bannerCountMap.containsKey(b))
@@ -84,11 +91,28 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 		}
 	}
 
-/*	@Override
-	protected BannerView getView(int i) {
-		return views.get(i);
+	public Vector<Banner> getUnserved() {
+		/**Loaded bannerview
+		 * For a particular instance, get a list of all of the banners that were not served
+		 * that could have made a profit.
+		 * @return A vector of banners.
+		 */
+		Vector<Banner> unserved = new Vector<Banner>();
+		Collection banners = this.universe.getBanners();
+		Banner b = null;
+		for (Iterator i = banners.iterator(); i.hasNext(); ){
+			b = (Banner)i.next();
+			if (b == null){
+				System.err.println("Error here: null banners in the list?");
+			}  else {
+				if (bannerCount(b) < (b.getIntegerMaxViewsPerDay()/FlatFileConfig.FILE_COUNT) && campaignCount(b) < (b.getCampaign().getIntegerMaxViewsPerDay()/FlatFileConfig.FILE_COUNT)){
+					unserved.add(b);
+				}
+			}
+		}
+		return unserved;
 	}
-*/
+
 	@Override
 	public int getViewCount() {
 		return views.size();
@@ -109,7 +133,7 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 
 	@Override
 	public User getUser(int uid) {
-		return gd.fullDay.getUser(uid);
+		return userDB.getUser(uid);
 	}
 
 	

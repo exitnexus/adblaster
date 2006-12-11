@@ -53,6 +53,10 @@ public final class AdBlasterThreadedOperation implements Runnable {
 
 		chunk.fillInstance(gd.pol);
 		
+		for (Banner b : gd.universe.getBanners()){
+			System.out.println(b.getID() + " : " + chunk.bannerCount(b));
+		}
+
 		System.out.println(chunk.getViewCount());
 		System.out.println("Profits compared");
 		System.out.println("original: " + original_profit);
@@ -63,7 +67,7 @@ public final class AdBlasterThreadedOperation implements Runnable {
 
 	
 	public void iterativeImprove(AbstractAdBlasterInstance instanc) {
-		Vector<Banner> unserved = gd.fullDay.getUnserved();
+		Vector<Banner> unserved = instanc.getUnserved();
 		System.out.println("Improving based on unserved banners.");
 		for (int i = 0; i < unserved.size(); i++){
 			Banner b = (Banner)unserved.get(i);
