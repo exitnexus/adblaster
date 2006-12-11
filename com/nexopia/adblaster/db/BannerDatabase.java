@@ -117,11 +117,11 @@ public class BannerDatabase {
 		return bannerList; 
 	}
 
-	public void loadCoefficients(HashMap<Banner, Float> coefficients) {
+	public static void loadCoefficients(HashMap<Banner, Float> coefficients) {
 		Statement stmt;
 		try {
 			stmt = JDBCConfig.createStatement();
-			for (Banner banner: bannerList) {
+			for (Banner banner: coefficients.keySet()) {
 				try {
 					Float f = coefficients.get(banner);
 					String st = "SELECT c.* " 
@@ -132,7 +132,9 @@ public class BannerDatabase {
 					stmt.execute(st);
 					ResultSet rs = stmt.getResultSet();
 					rs.first();
-					System.out.println(rs.getInt("bannerid") + ":" + rs.getFloat("coefficient"));
+					f = rs.getFloat("coefficient");
+					System.out.println(rs.getInt("bannerid") + ":" + f);
+					coefficients.put(banner, f);
 				} catch (SQLException sqle) {
 					System.err.println("Error during coefficient retrieval.");
 					sqle.printStackTrace();

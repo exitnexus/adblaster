@@ -6,6 +6,7 @@ import java.util.Vector;
 import java.util.Arrays;
 
 import com.nexopia.adblaster.db.BannerDatabase;
+import com.nexopia.adblaster.db.JDBCConfig;
 import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.BannerView;
 import com.nexopia.adblaster.struct.I_Policy;
@@ -21,6 +22,7 @@ public class AdBlasterPolicy implements I_Policy {
 		for (Banner b : bannerList){
 			coefficients.put(b, new Float(1.0/*Math.random()*/));
 		}
+		BannerDatabase.loadCoefficients(coefficients);
 	}
 
 	public static AdBlasterPolicy randomPolicy(Collection<Banner> bannerList) {
