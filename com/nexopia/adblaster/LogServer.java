@@ -11,7 +11,7 @@ import com.nexopia.adblaster.db.UserFlatFileWriter;
 import com.nexopia.adblaster.struct.User;
 import com.nexopia.adblaster.util.Integer;
 
-public class UDPInsertServer {
+public class LogServer {
 	private static class ThreadedDatabases{
 		private UserFlatFileWriter userWriter;
 		private BannerViewFlatFileWriter bannerViewWriter;
@@ -69,7 +69,7 @@ public class UDPInsertServer {
 	private DatagramSocket socket;
 	private DatagramPacket packet;
 	
-	public UDPInsertServer() {
+	public LogServer() {
 		try {
 			socket = new DatagramSocket(SERVER_PORT);
 		} catch (SocketException e) {
@@ -139,7 +139,7 @@ public class UDPInsertServer {
 		tdb = new ThreadedDatabases();
 		user = new User();
 		
-		UDPInsertServer server = new UDPInsertServer();
+		LogServer server = new LogServer();
 		System.out.println("Listening for packets on port " + SERVER_PORT + ".");
 		while (!shutdown) {
 			if (tdb.isOld()){
