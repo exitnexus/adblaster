@@ -7,6 +7,7 @@ import java.util.Calendar;
 
 import com.nexopia.adblaster.db.BannerViewFlatFileWriter;
 import com.nexopia.adblaster.db.PageFlatFileDatabase;
+import com.nexopia.adblaster.db.PassbackFlatFileDatabase;
 import com.nexopia.adblaster.db.UserFlatFileWriter;
 import com.nexopia.adblaster.struct.User;
 import com.nexopia.adblaster.util.Integer;
@@ -16,6 +17,7 @@ public class LogServer {
 		private UserFlatFileWriter userWriter;
 		private BannerViewFlatFileWriter bannerViewWriter;
 		private PageFlatFileDatabase pageWriter;
+		private PassbackFlatFileDatabase passbackWriter;
 		private int day;
 		
 		public ThreadedDatabases() throws IOException{
@@ -35,6 +37,7 @@ public class LogServer {
 			day = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
 			userWriter = new UserFlatFileWriter("DB_" + day, true);
 			bannerViewWriter = new BannerViewFlatFileWriter("DB_" + day, true);
+			passbackWriter = new PassbackFlatFileDatabase("DB_" + day, true);
 			pageWriter = new PageFlatFileDatabase("DB_" + day, true);
 		}
 		
@@ -101,6 +104,8 @@ public class LogServer {
 			int location = Integer.parseInt(words[6]);
 			String interests = words[7];
 			String page = words[8];
+			int passback = Integer.parseInt(words[9]);
+			
 			int bannerid = Integer.parseInt(words[12]);
 			
 			//we don't create a new user object here to save on object creation overhead, just reuse one user repeatedly
@@ -110,6 +115,7 @@ public class LogServer {
 					tdb.userWriter.write(user);
 					int pageIndex = tdb.pageWriter.write(page);
 					tdb.bannerViewWriter.write(userid, bannerid, time, size, pageIndex);
+					tdb.passbackWriter.write(passback);
 				} catch (IOException e) {
 					System.err.println("Error handling input: " + input);
 					e.printStackTrace();

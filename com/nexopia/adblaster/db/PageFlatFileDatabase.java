@@ -80,6 +80,7 @@ public class PageFlatFileDatabase {
 	public void close() throws IOException {
 		this.sync();
 		writer.close();
+		reader.close();
 	}
 
 	public String getPage(int page) {
