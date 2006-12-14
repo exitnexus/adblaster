@@ -114,8 +114,7 @@ public class LogServer {
 				try {
 					tdb.userWriter.write(user);
 					int pageIndex = tdb.pageWriter.write(page);
-					tdb.bannerViewWriter.write(userid, bannerid, time, size, pageIndex);
-					tdb.passbackWriter.write(passback);
+					tdb.bannerViewWriter.write(userid, bannerid, time, size, pageIndex, passback);
 				} catch (IOException e) {
 					System.err.println("Error handling input: " + input);
 					e.printStackTrace();

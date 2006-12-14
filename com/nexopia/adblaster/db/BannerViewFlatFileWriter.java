@@ -33,9 +33,9 @@ public class BannerViewFlatFileWriter {
 		}
 	}
 	
-	public void write(int userid, int bannerid, int time, int size, int pageIndex) throws IOException {
+	public void write(int userid, int bannerid, int time, int size, int pageIndex, int passback) throws IOException {
 		int fileID = Math.abs(userid)%FILE_COUNT;
-		files.get(fileID).write(userid + " " + bannerid + " " + time + " " + size + " " + pageIndex + "\n");
+		files.get(fileID).write(userid + " " + bannerid + " " + time + " " + size + " " + pageIndex + " " + passback + "\n");
 	}
 	
 	public void sync() throws IOException {
