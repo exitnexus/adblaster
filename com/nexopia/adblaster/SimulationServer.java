@@ -53,7 +53,7 @@ public class SimulationServer {
 			int b = Integer.parseInt(s);
 			Banner banner = bannerDB.getBannerByID(b);
 			if (banner != null)
-				profit += banner.getPayRate();
+				profit += banner.getRealPayrate();
 			i++;
 		}
 	    writer.write("shutdown \n");

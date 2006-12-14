@@ -164,14 +164,6 @@ public class Banner extends ServablePropertyHolder{
 	}
 
 
-	public int getPayRate() {
-		if (this.payrate == Banner.PAYRATE_INHERIT) {
-			return campaign.getPayrate();
-		} else {
-			return this.payrate;
-		}
-	}
-	
 	public byte getSize() {
 		return this.size;
 	}
@@ -244,7 +236,7 @@ public class Banner extends ServablePropertyHolder{
 				this.payrate = rs.getInt("PAYRATE")/100; //assume 1% clickthrough if we have no data
 			}
 		}
-		this.coefficient = this.getPayRate();
+		this.coefficient = this.getRealPayrate();
 		return this;
 	}
 

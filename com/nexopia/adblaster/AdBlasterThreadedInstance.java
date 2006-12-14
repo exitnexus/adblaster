@@ -1,25 +1,21 @@
 package com.nexopia.adblaster;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Vector;
 
-import com.nexopia.adblaster.db.BannerDatabase;
 import com.nexopia.adblaster.db.BannerViewFlatFileReader;
 import com.nexopia.adblaster.db.FlatFileConfig;
 import com.nexopia.adblaster.db.UserFlatFileReader;
 import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.BannerView;
 import com.nexopia.adblaster.struct.I_Policy;
-import com.nexopia.adblaster.struct.ServablePropertyHolder;
 import com.nexopia.adblaster.struct.User;
 import com.nexopia.adblaster.util.Integer;
 
 public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 	private Vector<BannerView> views;
-	private GlobalData gd;
 	private BannerViewFlatFileReader db;
 	private UserFlatFileReader userDB;
 	
@@ -34,15 +30,18 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		this.gd = gd;
 		
 		views = new Vector<BannerView>();
 		for (BannerView bv : db.getCurrentBannerViews()){
 			views.add(bv);
 			Banner b = universe.getBannerByID(bv.getBannerId());
-			if (!this.bannerCountMap.containsKey(b))
-				this.bannerCountMap.put(b, Integer.valueOf(0));
-			this.updateMap(bv);
+			if (b == null){
+				System.out.println("Banner " + bv.getBannerId() + " does not exist.");
+			} else {
+				if (!this.bannerCountMap.containsKey(b))
+					this.bannerCountMap.put(b, Integer.valueOf(0));
+				this.updateMap(bv);
+			}
 		}
 		System.out.println("Loaded " + views.size() + " banner views.");
 	}

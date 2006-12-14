@@ -9,6 +9,8 @@ import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.BannerView;
 
 public final class AdBlasterThreadedOperation implements Runnable {
+	private static final int swap_max = 4; //The maximum depth of swap searches
+	
 	private final GlobalData gd;
 	private final AdBlasterThreadedInstance chunk;
 	private boolean finished;
@@ -108,7 +110,6 @@ public final class AdBlasterThreadedOperation implements Runnable {
 					BannerView bv = instanc.getViews().elementAt(j);
 					if (bv.getBannerId() == 0 || gd.universe.getBannerByID(bv.getBannerId()).getPayrate(instanc) < b.getPayrate(instanc)){
 						Vector swaps = null;
-						int swap_max = 0;
 						for (int l = 1; l < swap_max; l+=2){
 							Vector path = instanc.depthLimitedDFS(bv, b, l);
 							if (path != null){

@@ -530,7 +530,7 @@ public class BannerServer {
 		JDBCConfig.queueQuery("REPLACE INTO " + JDBCConfig.BANNERSTAT_TABLE + " (bannerid, time, views, potentialviews, clicks, passbacks) SELECT id, lastupdatetime, views, potentialviews, clicks, passbacks FROM banners WHERE id = " + b.getID());
 		if (b.getPayType() == Banner.PAYTYPE_CPC) {
 			HourlyStat hourlystat = hourlystats.get(b);
-			b.setCoefficient(hourlystat.getClickRate()*b.getPayRate());
+			b.setCoefficient(hourlystat.getClickRate()*b.getRealPayrate());
 			hourlystat.shift();
 		}
 	}

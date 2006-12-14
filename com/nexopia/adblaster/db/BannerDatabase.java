@@ -131,10 +131,14 @@ public class BannerDatabase {
 					+ "AND c.bannerid = " + banner.getID();
 					stmt.execute(st);
 					ResultSet rs = stmt.getResultSet();
-					rs.first();
-					f = rs.getFloat("coefficient");
-					System.out.println(rs.getInt("bannerid") + ":" + f);
-					coefficients.put(banner, f);
+					if (rs.first()){
+						f = rs.getFloat("coefficient");
+						System.out.println(rs.getInt("bannerid") + ":" + f);
+						coefficients.put(banner, f);
+					} else {
+						coefficients.put(banner, Float.valueOf(0));
+					}
+					
 				} catch (SQLException sqle) {
 					System.err.println("Error during coefficient retrieval.");
 					sqle.printStackTrace();
