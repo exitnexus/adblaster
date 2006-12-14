@@ -77,7 +77,7 @@ public class BannerViewFlatFileReader {
 		userBannerViewMap = new IntObjectHashMap<Vector<BannerView>>();
 		while ((bannerViewString = reader.readLine()) != null) {
 			BannerView bv = new BannerView(bannerViewString);
-			if (bv.getPassback() != 0) { //ignore reserves from passbacks
+			if (bv.getPassback() == 0) { //ignore reserves from passbacks
 				bannerViews.add(bv);
 				if (bv.getUserID() > 0){ //only create user hashmaps for non anonymous users
 					Vector<BannerView> viewMap = userBannerViewMap.get(bv.getUserID());
