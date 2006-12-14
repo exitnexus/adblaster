@@ -14,6 +14,7 @@ public class BannerView{
 	private int index;
 	private byte size;
 	private int page;
+	private int passback;
 	
 	public BannerView(int index, int uid, int bid, int t, byte size, int page){
 		this.uid = uid; 
@@ -22,16 +23,30 @@ public class BannerView{
 		this.size = size;
 		this.page = page;
 		this.index = index;
+		this.passback = 0;
 	}
+	
+	public BannerView(int index, int uid, int bid, int t, byte size, int page, int passback){
+		this.uid = uid; 
+		this.bid = bid; 
+		this.time = t; 
+		this.size = size;
+		this.page = page;
+		this.index = index;
+		this.passback = passback;
+	}
+	
+
 	
 	
 	public BannerView(String bannerViewString) {
 		String words[] = bannerViewString.split(" ");
-		uid = Integer.valueOf(words[0]);
-		bid = Integer.valueOf(words[1]);
-		time = Integer.valueOf(words[2]);
-		size = Byte.valueOf(words[3]);
-		page = Integer.valueOf(words[4]);
+		uid = Integer.parseInt(words[0]);
+		bid = Integer.parseInt(words[1]);
+		time = Integer.parseInt(words[2]);
+		size = Byte.parseByte(words[3]);
+		page = Integer.parseInt(words[4]);
+		passback = Integer.parseInt(words[5]);
 	}
 
 
@@ -71,6 +86,14 @@ public class BannerView{
 	}
 	public int getBannerId(){
 		return this.bid;
+	}
+
+	public int getPassback() {
+		return passback;
+	}
+
+	public void setPassback(int passback) {
+		this.passback = passback;
 	}
 
 }
