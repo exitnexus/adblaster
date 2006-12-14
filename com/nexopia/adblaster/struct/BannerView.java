@@ -46,7 +46,11 @@ public class BannerView{
 		time = Integer.parseInt(words[2]);
 		size = Byte.parseByte(words[3]);
 		page = Integer.parseInt(words[4]);
-		passback = Integer.parseInt(words[5]);
+		if (words.length > 5) {
+			passback = Integer.parseInt(words[5]);
+		} else {
+			passback = 0;
+		}
 	}
 
 
