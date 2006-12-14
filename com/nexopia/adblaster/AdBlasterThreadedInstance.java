@@ -9,7 +9,6 @@ import java.util.Vector;
 import com.nexopia.adblaster.db.BannerDatabase;
 import com.nexopia.adblaster.db.BannerViewFlatFileReader;
 import com.nexopia.adblaster.db.FlatFileConfig;
-import com.nexopia.adblaster.db.PassbackFlatFileDatabase;
 import com.nexopia.adblaster.db.UserFlatFileReader;
 import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.BannerView;
@@ -23,7 +22,6 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 	private GlobalData gd;
 	private BannerViewFlatFileReader db;
 	private UserFlatFileReader userDB;
-	private PassbackFlatFileDatabase passbackDB;
 	
 	public AdBlasterThreadedInstance(GlobalData gd, int subset_num) {
 		super(gd.universe);
