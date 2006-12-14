@@ -32,18 +32,11 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 			db.load(subset_num);
 			userDB = new UserFlatFileReader(gd.bannerViewDirectory);
 			userDB.load(subset_num);
-			passbackDB = new PassbackFlatFileDatabase(gd.bannerViewDirectory, true);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		this.gd = gd;
-		
-		//update max views per day based on pass backs.
-		for (Banner b: gd.universe.getBanners()) {
-			b.setViewsPerDay(b.getViewsPerDay() - passbackDB.getPassbackCount(b.getID()));
-		}
-		
 		
 		views = new Vector<BannerView>();
 		for (BannerView bv : db.getCurrentBannerViews()){
