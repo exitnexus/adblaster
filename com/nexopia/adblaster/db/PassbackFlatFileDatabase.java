@@ -6,6 +6,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import com.nexopia.adblaster.util.IntObjectHashMap;
+
 public class PassbackFlatFileDatabase {
 	File file;
 	File directory;
@@ -15,11 +17,16 @@ public class PassbackFlatFileDatabase {
 	private static final int INITIAL_ARRAY_SIZE = 500;
 	
 	public PassbackFlatFileDatabase(String directoryName, boolean append) throws IOException {
-		this.init(directoryName, append);
+		directory = new File(directoryName);
+		this.init(append);
 	}
 	
-	private void init(String directoryName, boolean append) throws IOException {
-		directory = new File(directoryName);
+	public PassbackFlatFileDatabase(File directory, boolean append) throws IOException {
+		this.directory = directory;
+		this.init(append);
+	}
+
+	private void init(boolean append) throws IOException {
 		if (!directory.isDirectory()) {
 			directory.mkdir();
 			if (!directory.isDirectory()) {
@@ -75,6 +82,16 @@ public class PassbackFlatFileDatabase {
 		} else {
 			return 0;
 		}
+	}
+	
+	public IntObjectHashMap<Integer> getHashMap() {
+		IntObjectHashMap<Integer> hash = new IntObjectHashMap<Integer>(); 
+		for (int i=0; i < passbackCounts.length; i++) {
+			if (passbackCounts[i] > 0) {
+				hash.put(i, Integer.valueOf(passbackCounts[i]));
+			}
+		}
+		return hash;
 	}
 
 }

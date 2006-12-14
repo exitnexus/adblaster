@@ -9,6 +9,7 @@ import java.util.Vector;
 import com.nexopia.adblaster.db.BannerDatabase;
 import com.nexopia.adblaster.db.BannerViewFlatFileReader;
 import com.nexopia.adblaster.db.FlatFileConfig;
+import com.nexopia.adblaster.db.PassbackFlatFileDatabase;
 import com.nexopia.adblaster.db.UserFlatFileReader;
 import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.BannerView;
@@ -22,6 +23,7 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 	private GlobalData gd;
 	private BannerViewFlatFileReader db;
 	private UserFlatFileReader userDB;
+	private PassbackFlatFileDatabase passbackDB;
 	
 	public AdBlasterThreadedInstance(GlobalData gd, int subset_num) {
 		super(gd.universe);
@@ -30,12 +32,19 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 			db.load(subset_num);
 			userDB = new UserFlatFileReader(gd.bannerViewDirectory);
 			userDB.load(subset_num);
-			
+			passbackDB = new PassbackFlatFileDatabase(gd.bannerViewDirectory, true);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		this.gd = gd;
+		
+		//update max views per day based on pass backs.
+		for (Banner b: gd.universe.getBanners()) {
+			b.setViewsPerDay(b.getViewsPerDay() - passbackDB.getPassbackCount(b.getID()));
+		}
+		
+		
 		views = new Vector<BannerView>();
 		for (BannerView bv : db.getCurrentBannerViews()){
 			views.add(bv);
