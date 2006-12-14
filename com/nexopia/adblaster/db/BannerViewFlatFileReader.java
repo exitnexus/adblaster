@@ -77,14 +77,16 @@ public class BannerViewFlatFileReader {
 		userBannerViewMap = new IntObjectHashMap<Vector<BannerView>>();
 		while ((bannerViewString = reader.readLine()) != null) {
 			BannerView bv = new BannerView(bannerViewString);
-			bannerViews.add(bv);
-			if (bv.getUserID() > 0){
-				Vector<BannerView> viewMap = userBannerViewMap.get(bv.getUserID());
-				if (viewMap == null){
-					viewMap = new Vector<BannerView>();
-					userBannerViewMap.put(bv.getUserID(), viewMap);
+			if (bv.getPassback() != 0) { //ignore reserves from passbacks
+				bannerViews.add(bv);
+				if (bv.getUserID() > 0){ //only create user hashmaps for non anonymous users
+					Vector<BannerView> viewMap = userBannerViewMap.get(bv.getUserID());
+					if (viewMap == null){
+						viewMap = new Vector<BannerView>();
+						userBannerViewMap.put(bv.getUserID(), viewMap);
+					}
+					viewMap.add(bv);
 				}
-				viewMap.add(bv);
 			}
 		}
 		reader.close();
