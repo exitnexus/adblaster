@@ -106,6 +106,7 @@ public class BannerServer {
 	
 	public BannerDatabase db;
 	public CampaignDB cdb;
+	private long creationTime;
 	public HashMap<String,Integer> sizes;
 	Integer sizes_array[] = {BANNER_BANNER, BANNER_LEADERBOARD,
 			BANNER_BIGBOX, BANNER_SKY120, BANNER_SKY160,
@@ -159,7 +160,7 @@ public class BannerServer {
 			e.printStackTrace();
 		}
 		 
-		 //this.time = (int) (System.currentTimeMillis()/1000);
+		 this.creationTime = System.currentTimeMillis();
 	}
 	
 	public boolean addCampaign(int id){
@@ -727,8 +728,11 @@ public class BannerServer {
 			return out;
 			
 		case UPTIME:
-			//socket_write(sock,  "Uptime: " . (time - stats[STARTTIME]) + "\n");
-			break;
+			long ms = System.currentTimeMillis() - this.creationTime;
+			int hours = (int) ms/3600000;
+			int minutes = (int) (ms-(hours*3600000))/60000;
+			int seconds = (int) ((ms-hours*3600000)-(minutes*60000))/1000; 
+			return "Uptime: " + hours + ":" + minutes + ":" + seconds + "\n";  
 			
 		case SHOW:
 			/*I don't know how we're going to do this command yet. -Thomas*/
@@ -753,7 +757,6 @@ public class BannerServer {
 		case SHUTDOWN: //dump stats, clean up most memory, and quit. Good for upgrading the server early :p
 			//socket_write(sock, "shutting down\n");
 			bannerDebug("shutting down");
-			final int TIMEUPDATES = 12;
 			daily(true);
 			//daily(debug[TIMEUPDATES]);
 			System.exit(0);
