@@ -735,23 +735,19 @@ public class BannerServer {
 			return "Uptime: " + hours + ":" + minutes + ":" + seconds + "\n";  
 			
 		case SHOW:
-			/*I don't know how we're going to do this command yet. -Thomas*/
-			/*if(isset(debug[params])){
-			 debug[params] = true;
-			 socket_write(sock, "debug enabled for params\n");
-			 }else{
-			 socket_write(sock, "unknown debug variable: params\n");
-			 }*/
+			if (debug.get(params[0]) != null) {
+				debug.put(params[0], Boolean.TRUE);
+			} else {
+				return params[0] + " is not a valid debug option.\n";
+			}
 			break;
 			
 		case HIDE:
-			/*I don't know how we're going to do this command yet. -Thomas*/
-			//if(debug[params]){
-			//debug[params] = false;
-			//socket_write(sock, "debug disabled for params\n");
-			//}else{
-			//socket_write(sock, "unknown debug variable: params\n");
-			//}
+			if (debug.get(params[0]) != null) {
+				debug.put(params[0], Boolean.FALSE);
+			} else {
+				return params[0] + " is not a valid debug option.\n";
+			}
 			break;
 			
 		case SHUTDOWN: //dump stats, clean up most memory, and quit. Good for upgrading the server early :p
