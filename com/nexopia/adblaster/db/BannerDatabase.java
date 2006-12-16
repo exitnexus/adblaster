@@ -118,10 +118,12 @@ public class BannerDatabase {
 	}
 
 	public static void loadCoefficients(HashMap<Banner, Float> coefficients) {
+		System.out.println("Loading coefficients...");
 		Statement stmt;
 		try {
 			stmt = JDBCConfig.createStatement();
 			for (Banner banner: coefficients.keySet()) {
+				System.out.println("Loading banner " + banner.getID());
 				try {
 					Float f = coefficients.get(banner);
 					String st = "SELECT c.* " 

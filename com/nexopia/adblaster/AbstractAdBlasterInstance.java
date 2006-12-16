@@ -154,6 +154,7 @@ public abstract class AbstractAdBlasterInstance {
 	//returns a time sorted vector of bannerviews that are from the same user and banner that could 
 	//potentially have frequency conflicts the vector also contains @param bv.
 	private Vector<BannerView> scan(Banner b, BannerView bv) {
+		System.out.println("Scanning.");
 		if (allMatching == null){
 			System.out.println("Building map: " + this.getClass());
 			allMatching = getAllMatching();
@@ -172,9 +173,11 @@ public abstract class AbstractAdBlasterInstance {
 	//returns a time sorted vector of bannerviews that are from the same user and campaign that could 
 	//potentially have frequency conflicts the vector also contains @param bv.
 	private Vector<BannerView> scan(Campaign c, BannerView bv) {
+		System.out.println("Scanning campaign.");
 		if (allMatching == null){
 			System.out.println("Building map." + this.getClass());
 			allMatching = getAllMatching();
+			System.out.println("Done.");
 		}
 		User user = getUser(bv.getUserID());
 		Vector<BannerView>hb = allMatching.get(user);

@@ -37,11 +37,11 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 			Banner b = universe.getBannerByID(bv.getBannerId());
 			if (b == null){
 				System.out.println("Banner " + bv.getBannerId() + " does not exist.");
-			} else {
-				if (!this.bannerCountMap.containsKey(b))
-					this.bannerCountMap.put(b, Integer.valueOf(0));
-				this.updateMap(bv);
+				bv.setBannerID(0);
 			}
+			if (!this.bannerCountMap.containsKey(b))
+				this.bannerCountMap.put(b, Integer.valueOf(0));
+			this.updateMap(bv);
 		}
 		System.out.println("Loaded " + views.size() + " banner views.");
 	}
@@ -88,6 +88,7 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 			notifyChange(bv, b);
 			bv.setBanner(b);
 		}
+		System.out.println("Done filling instance.");
 	}
 
 	public Vector<Banner> getUnserved() {

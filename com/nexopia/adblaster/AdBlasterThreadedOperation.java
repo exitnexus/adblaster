@@ -9,7 +9,7 @@ import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.BannerView;
 
 public final class AdBlasterThreadedOperation implements Runnable {
-	private static final int swap_max = 4; //The maximum depth of swap searches
+	private static final int swap_max = 0; //The maximum depth of swap searches
 	
 	private final GlobalData gd;
 	private final AdBlasterThreadedInstance chunk;
