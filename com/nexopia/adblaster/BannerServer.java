@@ -38,7 +38,11 @@ import com.nexopia.adblaster.util.Utilities;
 
 public class BannerServer {
 	private static final int LOG_PORT = 5556;
+	private static final int HIT_LOG_PORT = 6666;
 	private static final String LOG_HOST = "localhost";
+	private static final String HIT_LOG_HOST = "10.0.0.85";
+	
+	
 	public static final String CURRENT_VERSION = "0.0";
 	public static final Integer BANNER_BANNER = new Integer(1);
 	public static final Integer BANNER_LEADERBOARD = new Integer(2);
@@ -130,8 +134,11 @@ public class BannerServer {
 	private FastMap<Banner, HourlyStat> hourlystats = new FastMap<Banner,HourlyStat>();
 
 	private EasyDatagramSocket logsock;
+	private EasyDatagramSocket hitlogsock;
 	private int logserver_port;
+	private int hitlogserver_port;
 	private String logserver;
+	private String hitlogserver;
 
 	public BannerServer(BannerDatabase db, CampaignDB cdb, int numservers) {
 		//this.policy = new OldPolicy(cdb);
@@ -152,10 +159,15 @@ public class BannerServer {
 		
 		 try {
 			logsock = new EasyDatagramSocket();
+			hitlogsock = new EasyDatagramSocket();
 			logserver = LOG_HOST;
+			hitlogserver = HIT_LOG_HOST;
 			logserver_port = LOG_PORT;
+			hitlogserver_port = HIT_LOG_PORT;
 			logsock.connect(new InetSocketAddress(logserver, logserver_port));
+			hitlogsock.connect(new InetSocketAddress(hitlogserver, hitlogserver_port));
 			logsock.setSoTimeout(20);
+			hitlogsock.setSoTimeout(20);
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}
@@ -634,6 +646,16 @@ public class BannerServer {
 			
 			Integer retInt = Integer.valueOf(ret);
 			String retString = retInt.toString();
+			
+			//Hit logging
+			hitlogsock.send("b");
+			if (passback != 0) {
+				hitlogsock.send("p");
+			}
+			if (retInt.intValue() == 0) {
+				hitlogsock.send("f");
+			}
+			
 			retInt.free();
 			return retString;
 		}
@@ -768,7 +790,9 @@ public class BannerServer {
 			
 			logsock.connect(new InetSocketAddress(logserver, logserver_port));
 			logsock.setSoTimeout(20);
-			return "success: " + logserver + "," + logserver_port + "\n";
+			hitlogsock.connect(new InetSocketAddress(hitlogserver, hitlogserver_port));
+			hitlogsock.setSoTimeout(20);
+			return "success: " + logserver + "," + logserver_port + "\n" + "success: " + hitlogserver + "," + hitlogserver_port + "\n";
 		case LOGSTAT:
 			return (logsock.isConnected() ? "connected" : "not") + ": " + logserver + "," + logserver_port + "\n";
 		case MINUTELY:
@@ -793,7 +817,7 @@ public class BannerServer {
 			
 			stats.click++;
 			slidingstats[statstime%STATS_WINDOW].click++;
-			
+			hitlogsock.send("c");
 			break;
 		default:
 			//myerror("unknown command: 'msg'", __LINE__);
