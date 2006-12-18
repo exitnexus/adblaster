@@ -29,7 +29,7 @@ public class PolicyLearner {
 		float count = -1;
 		float newcount = 0;
 		int iterations = 0;
-		while((newcount = chunk.totalProfit()) != count && iterations < 50){
+		while((newcount = chunk.totalProfit()) != count && iterations < 2){
 			System.out.println("An iteration...");
 			iterations++;
 			count = newcount;

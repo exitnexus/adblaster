@@ -149,7 +149,7 @@ public class Banner extends ServablePropertyHolder{
 
 	public int getPayrate(AbstractAdBlasterInstance i) {
 		if (i.bannerCount(this) < this.minviewsperday || 
-				i.bannerCount(this) < this.getCampaign().getMinViewsPerDay() ){
+				i.bannerCount(this) < i.getMinViewsPerInstance(this)){
 			return MAXRATE;
 		}
 		if (payrate == PAYRATE_INHERIT) {

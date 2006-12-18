@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
 
+import com.nexopia.adblaster.db.FlatFileConfig;
 import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.BannerView;
 import com.nexopia.adblaster.struct.Campaign;
@@ -78,9 +79,9 @@ public abstract class AbstractAdBlasterInstance {
 		}
 		if (b.getCampaign().getViewsPerUser() != 0) {
 			Campaign c = b.getCampaign();
-			if (range == null){
+			//if (range == null){
 				range = scan(c, bv);
-			}
+			//}
 			for (int i = 0; (i + c.getViewsPerUser()) < range.size(); i++) {
 				BannerView first = range.get(i);
 				BannerView last = range.get(i + c.getViewsPerUser());
@@ -154,7 +155,6 @@ public abstract class AbstractAdBlasterInstance {
 	//returns a time sorted vector of bannerviews that are from the same user and banner that could 
 	//potentially have frequency conflicts the vector also contains @param bv.
 	private Vector<BannerView> scan(Banner b, BannerView bv) {
-		System.out.println("Scanning.");
 		if (allMatching == null){
 			System.out.println("Building map: " + this.getClass());
 			allMatching = getAllMatching();
@@ -173,7 +173,6 @@ public abstract class AbstractAdBlasterInstance {
 	//returns a time sorted vector of bannerviews that are from the same user and campaign that could 
 	//potentially have frequency conflicts the vector also contains @param bv.
 	private Vector<BannerView> scan(Campaign c, BannerView bv) {
-		System.out.println("Scanning campaign.");
 		if (allMatching == null){
 			System.out.println("Building map." + this.getClass());
 			allMatching = getAllMatching();
@@ -207,6 +206,32 @@ public abstract class AbstractAdBlasterInstance {
 
 
 	HashMap <User, Vector<BannerView>> allMatching = null;
+	
+	public Vector<Banner> orderBannersByPayrate(Vector<Banner> input) {
+		Vector<Banner> vec = new Vector<Banner>();
+		for (int j = 0; j < input.size(); j++){
+			Banner b = (Banner) input.get(j);
+			int score = b.getPayrate(this);
+			int i = 0;
+			int score2 = Integer.MAX_VALUE;
+			while (i < vec.size()){
+				Banner b2 = vec.get(i);
+				score2 = b2.getPayrate(this);
+				if (score2 > score) {
+					i++;
+				} else {
+					break;
+				}
+			}
+			vec.insertElementAt(b, i);
+			
+		}
+		if (input.size() != vec.size()){
+			
+			throw new UnsupportedOperationException();
+		}
+		return vec;
+	}
 	
 	private Vector<BannerView> orderBannersByTime(Vector input) {
 		Vector<BannerView> vec = new Vector<BannerView>();
@@ -254,7 +279,7 @@ public abstract class AbstractAdBlasterInstance {
 			if (b == null){
 				System.err.println("Error here: null banners in the list?");
 			}  else {
-				if (bannerCount(b) < b.getIntegerMaxViewsPerDay() && campaignCount(b) < b.getCampaign().getIntegerMaxViewsPerDay()){
+				if (bannerCount(b) < b.getIntegerMaxViewsPerDay()/FlatFileConfig.FILE_COUNT && campaignCount(b) < b.getCampaign().getIntegerMaxViewsPerDay()/FlatFileConfig.FILE_COUNT){
 					unserved.add(b);
 				}
 			}
@@ -389,6 +414,9 @@ public abstract class AbstractAdBlasterInstance {
 	//public abstract User getUserByIndex(int randomPick);
 	//public abstract int getUserCount();
 	public abstract User getUser(int uid);
+
+
+	public abstract int getMinViewsPerInstance(Banner banner);
 
 
 

@@ -136,5 +136,10 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 		return userDB.getUser(uid);
 	}
 
-	
+	@Override
+	public int getMinViewsPerInstance(Banner banner) {
+		return banner.getCampaign().getMinViewsPerDay() / FlatFileConfig.FILE_COUNT;
+	}
+
+
 }

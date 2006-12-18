@@ -216,6 +216,10 @@ public class AdBlasterDbInstance extends AbstractAdBlasterInstance	{
 		throw new UnsupportedOperationException("Don't call this method - no way to" +
 				"load all bannerviews into memory at once.");
 	}
+	@Override
+	public int getMinViewsPerInstance(Banner banner) {
+		return banner.getCampaign().getMinViewsPerDay();
+	}
 
 
 }
