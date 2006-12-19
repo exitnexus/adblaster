@@ -205,9 +205,10 @@ public abstract class AbstractAdBlasterInstance {
 	//returns a time sorted vector of bannerviews that are from the same user and banner that could 
 	//potentially have frequency conflicts the vector also contains @param bv.
 	private Vector<BannerView> scan(Banner b, BannerView bv) {
-		if (userToBannerViews == null){
+		if (userToBannerToBannerViews == null){
 			System.out.println("Building map: " + this.getClass());
-			userToBannerViews = findUserToBannerViewsHash();
+			initializeHashMaps();
+			System.out.println("Done.");
 		}
 		User user = getUser(bv.getUserID());
 		Vector<BannerView> potentialConflictingBannerViews = userToBannerToBannerViews.get(user).get(b);
@@ -223,15 +224,15 @@ public abstract class AbstractAdBlasterInstance {
 	//returns a time sorted vector of bannerviews that are from the same user and campaign that could 
 	//potentially have frequency conflicts the vector also contains @param bv.
 	private Vector<BannerView> scan(Campaign c, BannerView bv) {
-		if (userToBannerViews == null){
+		if (userToCampaignToBannerViews == null){
 			System.out.println("Building map." + this.getClass());
-			userToBannerViews = findUserToBannerViewsHash();
+			initializeHashMaps();
 			System.out.println("Done.");
 		}
 		User user = getUser(bv.getUserID());
-		Vector<BannerView>hb = userToBannerViews.get(user);
+		Vector<BannerView> potentialConflictingBannerViews = userToCampaignToBannerViews.get(user).get(c);
 		
-		Vector <BannerView> vec = getAllMatching(hb, c, bv.getTime(), c.getLimitByPeriod());
+		Vector <BannerView> vec = getAllMatching(potentialConflictingBannerViews, c, bv.getTime(), c.getLimitByPeriod());
 		
 		//put bv in the list as well
 		vec.add(bv);
