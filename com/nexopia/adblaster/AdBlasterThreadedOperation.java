@@ -68,6 +68,52 @@ public final class AdBlasterThreadedOperation implements Runnable {
 		this.notify();
 	}
 
+	public boolean serveView(AbstractAdBlasterInstance instanc, BannerView bv, Banner b){
+			// System.out.println("Trying bannerview " + j);
+		if (bv.getBannerId() == 0 || gd.universe.getBannerByID(bv.getBannerId()).getPayrate(instanc) < b.getPayrate(instanc)){
+			if (instanc.isValidBannerForView(bv,b)){
+				// single swap
+				chunk.notifyChange(bv, b);
+				bv.setBanner(b);
+				return true;
+			}
+		}
+		
+		
+		if (swap_max > 0){
+			// Then try DFS
+			boolean doable = false;
+			if ((instanc.bannerCount(b) < b.getIntegerMaxViewsPerDay()/FlatFileConfig.FILE_COUNT) &&
+					(instanc.campaignCount(b) < b.getCampaign().getIntegerMaxViewsPerDay()/FlatFileConfig.FILE_COUNT)){
+		
+				if (instanc.isValidBannerForView(bv,b)){
+					doable = true;
+				}
+			}
+		
+			if (doable){
+		
+				// System.out.println("Trying bannerview " + j);
+				if (bv.getBannerId() == 0 || gd.universe.getBannerByID(bv.getBannerId()).getPayrate(instanc) < b.getPayrate(instanc)){
+					Vector swaps = null;
+					for (int l = 1; l < swap_max; l+=2){
+						Vector path = instanc.depthLimitedDFS(bv, b, l);
+						if (path != null){
+							swaps = path;
+							break;
+							
+						}
+					}
+					if (swaps != null){
+						instanc.doSwap(swaps, b);
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+
+	}
 	
 	public void iterativeImprove(AbstractAdBlasterInstance instanc) {
 		Vector<Banner> unserved = instanc.orderBannersByPayrate(instanc.getUnserved());
@@ -76,60 +122,21 @@ public final class AdBlasterThreadedOperation implements Runnable {
 			System.out.println(banner.getPayrate(instanc));
 		}
 		System.out.println("Improving based on unserved banners.");
-		for (int i = 0; i < unserved.size(); i++){
-			Banner b = (Banner)unserved.get(i);
-			System.out.println(i + " of " + unserved.size());
-			// First try simple search...mo
-			for (int j = 0; j < instanc.getViewCount() && 
-					(instanc.bannerCount(b) < b.getIntegerMaxViewsPerDay()/FlatFileConfig.FILE_COUNT) &&
-					(instanc.campaignCount(b) < b.getCampaign().getIntegerMaxViewsPerDay()/FlatFileConfig.FILE_COUNT);
-					j++){
-				// System.out.println("Trying bannerview " + j);
-				BannerView bv = instanc.getViews().elementAt(j);
-				if (bv.getBannerId() == 0 || gd.universe.getBannerByID(bv.getBannerId()).getPayrate(instanc) < b.getPayrate(instanc)){
-					if (instanc.isValidBannerForView(bv,b)){
-						// single swap
-						chunk.notifyChange(bv, b);
-						bv.setBanner(b);
-					}
-				}
-			}
-			
-			if (swap_max > 0){
-				// Then try DFS
-				boolean doable = false;
-				for (int j = 0; j < instanc.getViewCount() && 
-					(instanc.bannerCount(b) < b.getIntegerMaxViewsPerDay()/FlatFileConfig.FILE_COUNT) &&
-					(instanc.campaignCount(b) < b.getCampaign().getIntegerMaxViewsPerDay()/FlatFileConfig.FILE_COUNT);
-					j++){
-					BannerView bv = instanc.getViews().elementAt(j);
-					if (instanc.isValidBannerForView(bv,b)){
-						doable = true;
-					}
-				}
-				if (doable){
-					for (int j = 0; j < instanc.getViewCount() && 
-					(instanc.bannerCount(b) < b.getIntegerMaxViewsPerDay()/FlatFileConfig.FILE_COUNT) &&
-					(instanc.campaignCount(b) < b.getCampaign().getIntegerMaxViewsPerDay()/FlatFileConfig.FILE_COUNT);
-					j++){
-						// System.out.println("Trying bannerview " + j);
-						BannerView bv = instanc.getViews().elementAt(j);
-						if (bv.getBannerId() == 0 || gd.universe.getBannerByID(bv.getBannerId()).getPayrate(instanc) < b.getPayrate(instanc)){
-							Vector swaps = null;
-							for (int l = 1; l < swap_max; l+=2){
-								Vector path = instanc.depthLimitedDFS(bv, b, l);
-								if (path != null){
-									swaps = path;
-									break;
-									
-								}
-							}
-							if (swaps != null){
-								instanc.doSwap(swaps, b);
-								break;
-							}
-						}
-					}
+		
+		for (int j = 0; j < instanc.getViewCount();	j++){
+			BannerView bv = instanc.getViews().elementAt(j);
+			if (j % 1000 == 0)
+				System.out.println(j + " of " + instanc.getViewCount());
+
+			for (int i = 0; i < unserved.size(); i++){
+				Banner b = (Banner)unserved.get(i);
+				// First try simple search...mo
+				if ((instanc.bannerCount(b) < b.getIntegerMaxViewsPerDay()/FlatFileConfig.FILE_COUNT) &&
+						(instanc.campaignCount(b) < b.getCampaign().getIntegerMaxViewsPerDay()/FlatFileConfig.FILE_COUNT)){
+					 
+					if (serveView(instanc, bv, b))
+						break; 	//You already swapped in the best banner possible, 
+								//so don't try anymore.
 				}
 			}
 		}
