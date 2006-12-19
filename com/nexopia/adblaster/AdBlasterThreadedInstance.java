@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Vector;
 
+import com.nexopia.adblaster.db.BannerDatabase;
 import com.nexopia.adblaster.db.BannerViewFlatFileReader;
 import com.nexopia.adblaster.db.FlatFileConfig;
 import com.nexopia.adblaster.db.UserFlatFileReader;
@@ -18,6 +19,7 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 	private Vector<BannerView> views;
 	private BannerViewFlatFileReader db;
 	private UserFlatFileReader userDB;
+	private Vector<Banner> banners;
 	
 	public AdBlasterThreadedInstance(GlobalData gd, int subset_num) {
 		super(gd.universe);
@@ -26,6 +28,7 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 			db.load(subset_num);
 			userDB = new UserFlatFileReader(gd.bannerViewDirectory);
 			userDB.load(subset_num);
+			banners = gd.universe.getBanners();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -139,6 +142,11 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 	@Override
 	public int getMinViewsPerInstance(Banner banner) {
 		return banner.getCampaign().getMinViewsPerDay() / FlatFileConfig.FILE_COUNT;
+	}
+
+	@Override
+	public Banner getBanner(int bid) {
+		return banners.get(bid);
 	}
 
 

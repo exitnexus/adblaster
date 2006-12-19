@@ -15,7 +15,7 @@ public abstract class AbstractAdBlasterUniverse {
 
 	abstract public int getBannerCount();
 
-	abstract public Collection<Banner> getBanners();
+	abstract public Vector<Banner> getBanners();
 	abstract public Collection<Campaign> getCampaigns();
 	
 	/*public Banner getRandomBannerMatching(BannerView bv, AbstractAdBlasterInstance instance) {

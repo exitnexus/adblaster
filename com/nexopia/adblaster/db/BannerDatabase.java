@@ -113,7 +113,7 @@ public class BannerDatabase {
 		return banners.size();
 	}
 	
-	public Collection<Banner> getBanners() {
+	public Vector<Banner> getBanners() {
 		return bannerList; 
 	}
 

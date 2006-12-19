@@ -2,6 +2,7 @@ package com.nexopia.adblaster;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Vector;
 
 import com.nexopia.adblaster.db.BannerDatabase;
 import com.nexopia.adblaster.struct.Banner;
@@ -49,7 +50,7 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 	/* (non-Javadoc)
 	 * @see com.nexopia.adblaster.AbstractAdBlasterUniverse#getBanners()
 	 */
-	public Collection<Banner> getBanners() {
+	public Vector<Banner> getBanners() {
 		return bannerDB.getBanners();
 	}
 
