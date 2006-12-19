@@ -40,7 +40,8 @@ public class BannerServer {
 	private static final int LOG_PORT = 5556;
 	private static final int HIT_LOG_PORT = 6666;
 	private static final String LOG_HOST = "localhost";
-	private static final String HIT_LOG_HOST = "10.0.0.85";
+//	private static final String HIT_LOG_HOST = "10.0.0.85";
+	private static final String HIT_LOG_HOST = "localhost";
 	
 	
 	public static final String CURRENT_VERSION = "0.0";
@@ -648,13 +649,17 @@ public class BannerServer {
 			String retString = retInt.toString();
 			
 			//Hit logging
-			hitlogsock.send("b");
-			if (passback != 0) {
-				hitlogsock.send("p");
-			}
-			if (retInt.intValue() == 0) {
-				hitlogsock.send("f");
-			}
+			try {
+
+				hitlogsock.send("b");
+				if (passback != 0) {
+					hitlogsock.send("p");
+				}
+				if (retInt.intValue() == 0) {
+					hitlogsock.send("f");
+				}
+			} catch (Exception ignored){}
+			
 			
 			retInt.free();
 			return retString;

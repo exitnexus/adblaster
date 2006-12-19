@@ -40,10 +40,9 @@ public class SimulationServer {
 		          new InputStreamReader(
 		                  socket.getInputStream()));
 		int i=0;
+		System.out.println("Starting.");
 	    while ((request = ffp.readLine()) != null){
-	    	if (!request.endsWith("0")){
-	    		System.out.println("Skipping passback " + request);
-	    	}
+		//System.out.println("Writing.");
 	    	writer.write(request + "\n");
 	    	writer.flush();
 		//System.out.println("Written...");

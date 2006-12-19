@@ -35,8 +35,10 @@ public class FlatFileParser {
 	void loadNext(){
 		current_file++;
 		try {
+			System.out.println("Loading...");
 			bvffr.load(current_file);
 			uffr.load(current_file);
+			System.out.println("Done.");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -45,15 +47,18 @@ public class FlatFileParser {
 	}
 	
 	String readLine() throws IOException{
-		if (current_index >= bvffr.getBannerViewCount()){
+		System.out.println("reading...");
+		if (current_index == -1 || current_index >= bvffr.getCurrentBannerViews().size()){
 			loadNext();
 		}
 		
 		BannerView bv = bvffr.getCurrentBannerViews().get(current_index);
 		User u = uffr.getUser(bv.getUserID());
 		
-		return "get " + bv.getTime() + " " + bv.getSize() + " " + bv.getUserID() + 
+		String s = "get " + bv.getTime() + " " + bv.getSize() + " " + bv.getUserID() + 
 			" " + u.getAge() + " " + u.getSex() + " " + u.getLocation() + " " + 
-			u.getInterests()+ " " + bv.getPage() + " " + bv.getPassback() + " " + "0\n";  
+			u.getInterests()+ " " + bv.getPage() + " " + bv.getPassback() + " " + "0";  
+//		System.out.println(s);
+		return s;
 	}
 }
