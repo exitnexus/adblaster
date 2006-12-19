@@ -211,7 +211,17 @@ public abstract class AbstractAdBlasterInstance {
 			System.out.println("Done.");
 		}
 		User user = getUser(bv.getUserID());
-		Vector<BannerView> potentialConflictingBannerViews = userToBannerToBannerViews.get(user).get(b);
+		
+		HashMap<Banner, Vector<BannerView>> hash = userToBannerToBannerViews.get(user);
+		if (hash == null) {
+			hash = new HashMap<Banner, Vector<BannerView>>();
+			userToBannerToBannerViews.put(user, hash);
+		}
+		Vector<BannerView> potentialConflictingBannerViews = hash.get(b);
+		if (potentialConflictingBannerViews == null) {
+			potentialConflictingBannerViews = new Vector<BannerView>();
+			hash.put(b, potentialConflictingBannerViews);
+		}
 		
 		Vector <BannerView> vec = (Vector<BannerView>) getAllMatching(potentialConflictingBannerViews, b, bv.getTime(), b.getLimitByPeriod());
 		
@@ -230,14 +240,25 @@ public abstract class AbstractAdBlasterInstance {
 			System.out.println("Done.");
 		}
 		User user = getUser(bv.getUserID());
-		Vector<BannerView> potentialConflictingBannerViews = userToCampaignToBannerViews.get(user).get(c);
 		
-		Vector <BannerView> vec = getAllMatching(potentialConflictingBannerViews, c, bv.getTime(), c.getLimitByPeriod());
+		HashMap<Campaign, Vector<BannerView>> hash = userToCampaignToBannerViews.get(user);
+		if (hash == null) {
+			hash = new HashMap<Campaign, Vector<BannerView>>();
+			userToCampaignToBannerViews.put(user, hash);
+		}
+		Vector<BannerView> potentialConflictingBannerViews = hash.get(c);
+		if (potentialConflictingBannerViews == null) {
+			potentialConflictingBannerViews = new Vector<BannerView>();
+			hash.put(c, potentialConflictingBannerViews);
+		}
+		
+		Vector <BannerView> vec = (Vector<BannerView>) getAllMatching(potentialConflictingBannerViews, c, bv.getTime(), c.getLimitByPeriod());
 		
 		//put bv in the list as well
 		vec.add(bv);
 		//return orderBannersByTime(vec);
 		return vec;
+	
 	}
 	
 	private Vector<BannerView> getAllMatching(Vector<BannerView> vec, Campaign c, int time, int period) {
