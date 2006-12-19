@@ -45,7 +45,7 @@ public abstract class AbstractAdBlasterInstance {
 		boolean b2 = bv.getSize() == b.getSize();
 		boolean b3 = b.validUser(this.getUser(bv.getUserID()));
 		boolean b4 = b.getPageValidator().validate(bv);
-		boolean b5 = this.nearestWithinTimeRange(b, bv);
+		boolean b5 = this.validTimePeriod(b, bv);
 		buf.append(b1 + ":"); 
 		buf.append(b2 + ":"); 
 		buf.append(b3 + ":"); 
@@ -58,14 +58,14 @@ public abstract class AbstractAdBlasterInstance {
 		return (b == null) || (bv.getSize() == b.getSize() &&
 				b.validUser(getUser(bv.getUserID())) &&
 				b.getPageValidator().validate(bv) &&
-				this.nearestWithinTimeRange(b, bv));
+				this.validTimePeriod(b, bv));
 	}
 
 
 	Integer zero = new Integer(0);
 	
-	/*Poorly named... detects whether a bannerview satisfies time period per user*/
-	private boolean nearestWithinTimeRange(Banner b, BannerView bv) {
+	/*detects whether a bannerview satisfies time period per user*/
+	private boolean validTimePeriod(Banner b, BannerView bv) {
 		Vector<BannerView> range = null;
 		if (b.getViewsPerUser() != 0){
 			range = scan(b, bv);
