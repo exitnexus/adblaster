@@ -11,8 +11,8 @@ import java.util.Set;
 
 import com.nexopia.adblaster.db.BannerDatabase;
 import com.nexopia.adblaster.struct.Campaign.CampaignDB;
-import com.nexopia.adblaster.util.PageValidator1;
-import com.nexopia.adblaster.util.PageValidator2;
+import com.nexopia.adblaster.util.StringArrayPageValidator;
+import com.nexopia.adblaster.util.FlatFilePageValidator;
 import com.nexopia.adblaster.util.PageValidatorFactory;
 
 //Listen on a port for connections and write back the current time.
@@ -85,7 +85,7 @@ public class NIOServer {
 		Object args1[] = {};
 
 		PageValidatorFactory factory = 
-			new PageValidatorFactory(PageValidator1.class,args1);
+			new PageValidatorFactory(StringArrayPageValidator.class,args1);
 		
 		CampaignDB cdb = new CampaignDB(factory);
 		BannerDatabase bdb = new BannerDatabase(cdb, factory);
@@ -208,7 +208,7 @@ public class NIOServer {
 							}
 							if (strbuf.toString().equals("reset")) {
 								cdb = new CampaignDB(factory);
-								bdb = new BannerDatabase(cdb, new PageValidatorFactory(PageValidator1.class, args1));
+								bdb = new BannerDatabase(cdb, new PageValidatorFactory(StringArrayPageValidator.class, args1));
 								banners = new BannerServer(bdb, cdb, 1);
 								if (BannerServer.debug.get("development").booleanValue()) {
 									BannerServer.bannerDebug("Reinitialized the banner server.");

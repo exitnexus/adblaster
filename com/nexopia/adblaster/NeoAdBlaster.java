@@ -14,7 +14,7 @@ import com.nexopia.adblaster.struct.BannerStat;
 import com.nexopia.adblaster.struct.BannerView;
 import com.nexopia.adblaster.struct.Campaign.CampaignDB;
 import com.nexopia.adblaster.util.IntObjectHashMap;
-import com.nexopia.adblaster.util.PageValidator2;
+import com.nexopia.adblaster.util.FlatFilePageValidator;
 import com.nexopia.adblaster.util.PageValidatorFactory;
 
 public class NeoAdBlaster {
@@ -29,7 +29,7 @@ public class NeoAdBlaster {
 		try {
 			pageDB = new PageFlatFileDatabase(directoryName, true);
 			Object validatorArgs[] = {pageDB};
-			PageValidatorFactory pageValidator = new PageValidatorFactory(PageValidator2.class, validatorArgs);
+			PageValidatorFactory pageValidator = new PageValidatorFactory(FlatFilePageValidator.class, validatorArgs);
 			campaignDB = new CampaignDB(pageValidator);
 			bannerDB = new BannerDatabase(campaignDB, pageValidator);
 			bannerViewReader = new BannerViewFlatFileReader(directoryName);

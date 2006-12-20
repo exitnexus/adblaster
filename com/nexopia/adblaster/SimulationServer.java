@@ -15,8 +15,8 @@ import com.nexopia.adblaster.struct.BannerView;
 import com.nexopia.adblaster.struct.Campaign;
 import com.nexopia.adblaster.struct.Campaign.CampaignDB;
 import com.nexopia.adblaster.util.Integer;
-import com.nexopia.adblaster.util.PageValidator1;
-import com.nexopia.adblaster.util.PageValidator2;
+import com.nexopia.adblaster.util.StringArrayPageValidator;
+import com.nexopia.adblaster.util.FlatFilePageValidator;
 import com.nexopia.adblaster.util.PageValidatorFactory;
 import com.nexopia.adblaster.util.Utilities;
 
@@ -25,7 +25,7 @@ public class SimulationServer {
 	public static void main(String args[]) throws UnknownHostException, IOException{
 		Object arg[] = {};
 		PageValidatorFactory factory = 
-			new PageValidatorFactory(PageValidator1.class,arg);
+			new PageValidatorFactory(StringArrayPageValidator.class,arg);
 		CampaignDB campaignDB = new Campaign.CampaignDB(factory);
 		BannerDatabase bannerDB = new BannerDatabase(campaignDB, factory);
 		float profit = 0;

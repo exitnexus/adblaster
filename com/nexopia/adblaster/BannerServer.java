@@ -33,7 +33,7 @@ import com.nexopia.adblaster.util.FastMap;
 import com.nexopia.adblaster.util.IntObjectHashMap;
 import com.nexopia.adblaster.util.Integer;
 import com.nexopia.adblaster.util.Interests;
-import com.nexopia.adblaster.util.PageValidator1;
+import com.nexopia.adblaster.util.StringArrayPageValidator;
 import com.nexopia.adblaster.util.Utilities;
 
 public class BannerServer {
@@ -195,11 +195,11 @@ public class BannerServer {
 		this.db.deleteCampaign(id);
 	}
 	public boolean addBanner(int id) {
-		return this.db.add(id,new PageValidator1()) != null;
+		return this.db.add(id,new StringArrayPageValidator()) != null;
 	}
 	
 	public boolean updateBanner(int id) {
-		return this.db.update(id,new PageValidator1()) != null;
+		return this.db.update(id,new StringArrayPageValidator()) != null;
 	}
 	
 	public void deleteBanner(int id) {
@@ -666,13 +666,13 @@ public class BannerServer {
 		}
 		case ADD: // "add id"
 			id = Integer.parseInt(params[0]);
-			db.add(id, new PageValidator1()); //addBannerD(params);
+			db.add(id, new StringArrayPageValidator()); //addBannerD(params);
 			bannerDebug("add " + Arrays.toString(params));
 			break;
 		case UPDATE: // "update id"
 			//updateBannerD(params);
 			id = Integer.parseInt(params[0]);
-			db.add(id, new PageValidator1()); 
+			db.add(id, new StringArrayPageValidator()); 
 			bannerDebug("update " + Arrays.toString(params));
 			break;
 			
@@ -691,7 +691,7 @@ public class BannerServer {
 				ResultSet rs = st.executeQuery("SELECT id FROM banners WHERE campaignid = " + id);
 				while (rs.next()) {
 					int bannerid = rs.getInt("id");
-					db.add(bannerid, new PageValidator1());
+					db.add(bannerid, new StringArrayPageValidator());
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -707,7 +707,7 @@ public class BannerServer {
 				ResultSet rs = st.executeQuery("SELECT id FROM banners WHERE campaignid = " + id);
 				while (rs.next()) {
 					int bannerid = rs.getInt("id");
-					db.add(bannerid, new PageValidator1());
+					db.add(bannerid, new StringArrayPageValidator());
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();

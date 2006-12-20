@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import com.nexopia.adblaster.db.PageFlatFileDatabase;
 import com.nexopia.adblaster.struct.BannerView;
-import com.nexopia.adblaster.util.PageValidator2;
+import com.nexopia.adblaster.util.FlatFilePageValidator;
 import com.nexopia.adblaster.util.PageValidatorFactory;
 import com.nexopia.adblaster.util.Utilities;
 
@@ -47,7 +47,7 @@ public class AdBlaster {
 		}
 		Object args2[] = {pageDb};
 		PageValidatorFactory factory = 
-			new PageValidatorFactory(PageValidator2.class,args2);
+			new PageValidatorFactory(FlatFilePageValidator.class,args2);
 
 		long start_time = System.currentTimeMillis();
 
