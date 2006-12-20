@@ -8,17 +8,17 @@ import java.util.Vector;
 import com.nexopia.adblaster.db.PageFlatFileDatabase;
 import com.nexopia.adblaster.struct.BannerView;
 
-public class PageValidator2 implements PageValidator{
+public class FlatFilePageValidator implements PageValidator{
 	Vector<Integer> pages;
 	PageFlatFileDatabase pdb;
 	
-	public PageValidator2(PageFlatFileDatabase pdb){
+	public FlatFilePageValidator(PageFlatFileDatabase pdb){
 		this.pdb = pdb;
 		pages = new Vector<Integer>();
 	}
 	
 	public PageValidator clone(){
-		PageValidator2 pv = new PageValidator2(pdb);
+		FlatFilePageValidator pv = new FlatFilePageValidator(pdb);
 		pv.pages = (Vector<Integer>) this.pages.clone();
 		return pv;
 	}

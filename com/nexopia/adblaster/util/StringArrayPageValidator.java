@@ -7,15 +7,15 @@ import java.util.Vector;
 
 import com.nexopia.adblaster.struct.BannerView;
 
-public class PageValidator1 implements PageValidator{
+public class StringArrayPageValidator implements PageValidator{
 	boolean negated;
 	Vector <String>pages;
-	public PageValidator1(){
+	public StringArrayPageValidator(){
 		negated = true;
 		pages = new Vector<String>();
 	}
 	public PageValidator clone(){
-		PageValidator1 pv = new PageValidator1();
+		StringArrayPageValidator pv = new StringArrayPageValidator();
 		pv.negated = negated;
 		pv.pages = (Vector<String>) this.pages.clone();
 		return pv;
