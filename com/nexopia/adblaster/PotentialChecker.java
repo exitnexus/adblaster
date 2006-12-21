@@ -35,9 +35,11 @@ public class PotentialChecker {
 	private UserFlatFileReader userReader;
 	private BannerDatabase bannerDB;
 	private BannerViewFlatFileReader bannerViewReader;
+	private boolean skipFrequency;
 	
-	public PotentialChecker(String directory, int bid) throws IOException {
+	public PotentialChecker(String directory, int bid, boolean skipFrequencyCheck) throws IOException {
 		bannerID = bid;
+		skipFrequency = skipFrequencyCheck;
 		Object args1[] = {new PageFlatFileDatabase(directory, true)};
 
 		PageValidatorFactory factory = 
@@ -72,15 +74,17 @@ public class PotentialChecker {
 							views = new int[banner.getViewsPerUser()];
 							userViewMap.put(u.getID(), views);
 						}
-						if (banner.validUser(u) && views[0] < bv.getTime()-banner.getLimitByPeriod()) {
-							viewCount++;
-							for (int j=1; j<banner.getViewsPerUser(); j++) {
-								views[j-1] = views[j];
-								if (views[j-1] != 0) {
-									System.out.println("Limit by period expired and then started over.  Things are working right.");
+						if (banner.validUser(u)) {
+							if  (skipFrequency || views[0] < bv.getTime()-banner.getLimitByPeriod()) {
+								viewCount++;
+								for (int j=1; j<banner.getViewsPerUser(); j++) {
+									views[j-1] = views[j];
+									if (views[j-1] != 0) {
+										System.out.println("Limit by period expired and then started over.  Things are working right.");
+									}
 								}
+								views[banner.getViewsPerUser()-1] = bv.getTime();
 							}
-							views[banner.getViewsPerUser()-1] = bv.getTime();
 						}
 					} else {
 						System.err.println("BannerView for non-existant user: " + bv.getUserID());
@@ -105,11 +109,19 @@ public class PotentialChecker {
 		}
 		String directory = args[0];
 		int bid = Integer.parseInt(args[1]);
-		
+		boolean skipFrequencyChecks = false;
+		if (args.length > 2) {
+			skipFrequencyChecks = Boolean.parseBoolean(args[2]);
+			if (skipFrequencyChecks) {
+				System.out.println("Skipping frequency checks.");
+			} else {
+				System.out.println("Performing frequency checks.");
+			}
+		}
 		System.out.println("Running a potential check using the directory '" + directory + "' and banner '" + bid + "'");
 		long startTime = System.currentTimeMillis();
 		try {
-			PotentialChecker checker = new PotentialChecker(directory, bid);
+			PotentialChecker checker = new PotentialChecker(directory, bid, skipFrequencyChecks);
 			long startCalculation = System.currentTimeMillis();
 			System.out.println("Maximum potential views: " + checker.potentialViews());
 			System.out.println("Running time: " + (double)(System.currentTimeMillis() - startTime)/1000 + "s");
