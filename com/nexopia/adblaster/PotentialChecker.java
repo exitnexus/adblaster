@@ -90,8 +90,8 @@ public class PotentialChecker {
 			PotentialChecker checker = new PotentialChecker(directory, bid);
 			long startCalculation = System.currentTimeMillis();
 			System.out.println("Maximum potential views: " + checker.potentialViews());
-			System.out.println("Running time: " + (double)(startTime - System.currentTimeMillis())/1000 + "s");
-			System.out.println("Calculation time: " + (double)(startCalculation - System.currentTimeMillis())/1000 + "s");
+			System.out.println("Running time: " + (double)(System.currentTimeMillis() - startTime)/1000 + "s");
+			System.out.println("Calculation time: " + (double)(System.currentTimeMillis() - startCalculation)/1000 + "s");
 		} catch (IOException e) {
 			System.err.println("Invalid directory specified: " + directory);
 			e.printStackTrace();
