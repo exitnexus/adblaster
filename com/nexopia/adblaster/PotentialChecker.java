@@ -70,7 +70,7 @@ public class PotentialChecker {
 							for (int j=1; j<banner.getViewsPerUser(); j++) {
 								views[j-1] = views[j];
 							}
-							views[banner.getViewsPerUser()] = bv.getTime();
+							views[banner.getViewsPerUser()-1] = bv.getTime();
 						}
 					} else {
 						System.err.println("BannerView for non-existant user: " + bv.getUserID());
