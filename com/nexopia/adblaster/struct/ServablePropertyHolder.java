@@ -11,6 +11,7 @@ import com.nexopia.adblaster.util.PageValidator;
 import com.nexopia.adblaster.util.PageValidatorFactory;
 import com.nexopia.adblaster.util.TimeTable;
 import com.nexopia.adblaster.util.Utilities;
+import com.nexopia.adblaster.util.LowMemMap.LowMemArray;
 
 public class ServablePropertyHolder {
 
@@ -272,11 +273,11 @@ public class ServablePropertyHolder {
 			return true;
 		
 		/* Find the oldest view*/
-		int[] views = server.getViewsForUser(userid, this);
+		LowMemArray views = server.getViewsForUser(userid, this);
 
-		if (views[0] != 0){
-			if (debug) System.out.println(time + ":" + views[0] + " > " + getLimitByPeriod());
-			if (time - views[0] > getLimitByPeriod())
+		if (views.get(0) != 0){
+			if (debug) System.out.println(time + ":" + views.get(0) + " > " + getLimitByPeriod());
+			if (time - views.get(0) > getLimitByPeriod())
 				/* If the oldest view is outside of limit period, we're golden */
 				return true;
 			else

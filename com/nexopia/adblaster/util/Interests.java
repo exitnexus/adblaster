@@ -163,6 +163,8 @@ public class Interests{
 		String interests = "";
 		if (negate) {
 			interests = "0,";
+		} else if (checked.isEmpty()){
+			interests = "0";
 		}
 		boolean first = true;
 		for(int i=checked.nextSetBit(0); i>=0; i=checked.nextSetBit(i+1)) { 

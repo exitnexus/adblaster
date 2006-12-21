@@ -33,8 +33,11 @@ import com.nexopia.adblaster.util.FastMap;
 import com.nexopia.adblaster.util.IntObjectHashMap;
 import com.nexopia.adblaster.util.Integer;
 import com.nexopia.adblaster.util.Interests;
+import com.nexopia.adblaster.util.LowMemMap;
+import com.nexopia.adblaster.util.LowMemMultiMap;
 import com.nexopia.adblaster.util.StringArrayPageValidator;
 import com.nexopia.adblaster.util.Utilities;
+import com.nexopia.adblaster.util.LowMemMap.LowMemArray;
 
 public class BannerServer {
 	private static final int LOG_PORT = 5556;
@@ -126,7 +129,7 @@ public class BannerServer {
 	//public HashMap<Integer, Integer> campaignids; // array( bannerid => campaignid );
 	
 	//public int time;
-	private HashMap<ServablePropertyHolder,IntObjectHashMap<int[]>> viewMap = new HashMap<ServablePropertyHolder, IntObjectHashMap<int[]>>();
+	private LowMemMultiMap viewMap = new LowMemMultiMap();
 	Vector<Banner> banners = new Vector<Banner>();
 	FastMap<Banner, BannerStat> bannerstats;
 	private FastMap<Integer, TypeStat> viewstats = new FastMap<Integer,TypeStat>();
@@ -211,24 +214,24 @@ public class BannerServer {
 	 */
 	public void markBannerUsed(int age, int sex, int loc, Interests interests, String page, int time, int userid, Banner b){
 		if (b.getViewsPerUser() != 0){
-			int[] views = getViewsForUser(userid, b);
+			LowMemArray views = getViewsForUser(userid, b);
 			
 			/* Throw out the oldest, insert the new view. */
-			for (int i = 0; i < views.length - 1; i++){
-				views[i] = views[i+1];
+			for (int i = 0; i < views.size() - 1; i++){
+				views.set(i, views.get(i+1));
 			}
-			views[views.length - 1] = time;
-			if (debug.get("development").booleanValue()) System.out.println(Arrays.toString(views));
+			views.set(views.size()-1, time);
+			if (debug.get("development").booleanValue()) System.out.println(views);
 		}
 		
 		if (b.getCampaign().getViewsPerUser() != 0){
-			int[] cviews = getViewsForUser(userid, b.getCampaign());
+			LowMemArray cviews = getViewsForUser(userid, b.getCampaign());
 			
 			/* Throw out the oldest, insert the new view. */
-			for (int i = 0; i < cviews.length - 1; i++){
-				cviews[i] = cviews[i+1];
+			for (int i = 0; i < cviews.size() - 1; i++){
+				cviews.set(i, cviews.get(i+1));
 			}
-			cviews[cviews.length - 1] = time;
+			cviews.set(cviews.size() - 1, time);
 		}
 
 		hourlystats.getOrCreate(b, HourlyStat.class).view();
@@ -240,21 +243,8 @@ public class BannerServer {
 	/**
 	 *  Return an int array of the times the user has viewed the banner. 
 	 */
-	public int[] getViewsForUser(int userid, ServablePropertyHolder b) {
-		/* Get records of all views for the banner.*/
-		IntObjectHashMap<int[]> userViewMap = viewMap.get(b);
-		if (userViewMap == null){
-			userViewMap = new IntObjectHashMap<int[]>();
-			viewMap.put(b, userViewMap);
-		}
-		
-		/* From the above records, get all views for this user.*/
-		int []views = userViewMap.get(userid);
-		if (views == null){
-			views = new int[b.getViewsPerUser()];
-			userViewMap.put(userid, views);
-		}
-		return views;
+	public LowMemArray getViewsForUser(int userid, ServablePropertyHolder b) {
+		return viewMap.get(userid, b);
 	}
 	
 	/**
@@ -846,9 +836,9 @@ public class BannerServer {
 		Banner b = db.getBannerByID(passback);
 		if (b != null) {
 			bannerstats.getOrCreate(b, BannerStat.class).passbacks++;
-			int[] userviews = getViewsForUser(userid, b);
-			for (int i=0; i<userviews.length; i++) {
-				userviews[i] = (int)(System.currentTimeMillis()/1000);
+			LowMemArray userviews = getViewsForUser(userid, b);
+			for (int i=0; i<userviews.size(); i++) {
+				userviews.set(i, (int)(System.currentTimeMillis()/1000));
 			}
 		} else {
 			if (debug.get("passback").booleanValue()) {

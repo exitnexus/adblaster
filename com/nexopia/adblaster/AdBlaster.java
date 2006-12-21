@@ -14,10 +14,7 @@ public class AdBlaster {
 	private static final int THREAD_COUNT = 1;
 	static int num_serves = 1;
 	static AdBlasterDbUniverse ac;
-	//static AdBlasterDbInstance instanc;
 	
-	private static File user_dir = null;
-	private static File page_dir = null;
 	private static File bv_dir = null;
 
 	
@@ -26,12 +23,8 @@ public class AdBlaster {
 		if (args.length >= 3){
 			System.out.println("Running with selected directories.");
 			bv_dir = new File(args[0]);
-			user_dir = new File(args[1]);
-			page_dir = new File(args[2]);
 		} else {
 			bv_dir = Utilities.getDir("BannerView");
-			user_dir = Utilities.getDir("User");
-			page_dir = Utilities.getDir("Page");
 		}
 		
 		if (args.length == 4){
@@ -40,7 +33,7 @@ public class AdBlaster {
 
 		PageFlatFileDatabase pageDb = null;
 		try {
-			pageDb = new PageFlatFileDatabase(page_dir, true);
+			pageDb = new PageFlatFileDatabase(bv_dir, true);
 		} catch (IOException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();

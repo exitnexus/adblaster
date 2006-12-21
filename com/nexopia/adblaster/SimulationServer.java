@@ -43,10 +43,10 @@ public class SimulationServer {
 		System.out.println("Starting.");
 	    while ((request = ffp.readLine()) != null){
 		//System.out.println("Writing.");
-	    	writer.write(request + "\n");
-	    	writer.flush();
+	    writer.write(request + "\n");
+	    writer.flush();
 		//System.out.println("Written...");
-	    	String s = reader.readLine();
+	    String s = reader.readLine();
 		//System.out.println("Read: " + s);
 	    	if (i % 1000 == 0){
 				//ProgressIndicator.show(i, instanc.getViewCount());

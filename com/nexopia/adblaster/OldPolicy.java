@@ -7,6 +7,7 @@ import com.nexopia.adblaster.struct.BannerView;
 import com.nexopia.adblaster.struct.I_Policy;
 import com.nexopia.adblaster.struct.ServablePropertyHolder;
 import com.nexopia.adblaster.struct.Campaign.CampaignDB;
+import com.nexopia.adblaster.util.LowMemMap.LowMemArray;
 
 public class OldPolicy implements I_Policy {
 
@@ -58,11 +59,11 @@ public class OldPolicy implements I_Policy {
 					/ server.numservers;
 
 		if (viewsperuser != 0) {
-			int[] viewTimes = server.getViewsForUser(uid, b);
-			if (viewTimes.length != 0 && viewTimes[viewTimes.length - 1] != 0
+			LowMemArray viewTimes = server.getViewsForUser(uid, b);
+			if (viewTimes.size() != 0 && viewTimes.get(viewTimes.size() - 1) != 0
 					&& period != 0) {
 				priority *= 2 - Math.max(1
-						- ((time - viewTimes[viewTimes.length - 1]) / period)
+						- ((time - viewTimes.get(viewTimes.size() - 1)) / period)
 						* viewsperuser, 0);
 			} else {
 				priority *= 2;
