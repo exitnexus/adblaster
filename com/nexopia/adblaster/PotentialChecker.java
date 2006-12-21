@@ -36,7 +36,7 @@ public class PotentialChecker {
 			new PageValidatorFactory(FlatFilePageValidator.class,args1);
 		
 		CampaignDB cdb = new CampaignDB(factory);
-		bannerDB = new BannerDatabase(cdb, factory);
+		bannerDB = new BannerDatabase(cdb, factory, false);
 		banner = bannerDB.getBannerByID(bid);
 		
 		userReader = new UserFlatFileReader(directory);

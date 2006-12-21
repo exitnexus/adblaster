@@ -68,7 +68,16 @@ public class BannerDatabase {
 	private Vector<Banner> bannerList;
 	CampaignDB cdb;
 	
+	public BannerDatabase(Campaign.CampaignDB cdb, PageValidatorFactory pvfactory, boolean precheck) {
+		init(cdb, pvfactory, precheck);
+	}
+	
 	public BannerDatabase(Campaign.CampaignDB cdb, PageValidatorFactory pvfactory) {
+		init(cdb, pvfactory, true);
+	}
+	
+	
+	private void init(Campaign.CampaignDB cdb, PageValidatorFactory pvfactory, boolean precheck) {
 		this.cdb = cdb;
 		banners = new IntObjectHashMap<Banner>();
 		bannerList = new Vector<Banner>();
@@ -83,8 +92,8 @@ public class BannerDatabase {
 			int i = 0;
 			while (rs.next()) {
 				int id = rs.getInt("ID");
-				if (Banner.precheck(rs) &&
-						cdb.get(rs.getInt("CAMPAIGNID")).precheck()) {
+				if (!precheck || (Banner.precheck(rs) &&
+						cdb.get(rs.getInt("CAMPAIGNID")).precheck())) {
 					try {
 						Banner b = new Banner(rs, cdb, pvfactory.make());
 						banners.put(id, b);
@@ -101,6 +110,7 @@ public class BannerDatabase {
 			e.printStackTrace();
 		}
 	}
+	
 	
 	public Banner getBannerByID(int i) {
 		return this.banners.get(i);
