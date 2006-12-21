@@ -14,6 +14,7 @@ import com.nexopia.adblaster.struct.BannerView;
 import com.nexopia.adblaster.struct.User;
 import com.nexopia.adblaster.struct.Campaign.CampaignDB;
 import com.nexopia.adblaster.util.FlatFilePageValidator;
+import com.nexopia.adblaster.util.IntObjectHashMap;
 import com.nexopia.adblaster.util.PageValidatorFactory;
 
 /* Run this file with 2 arguments:
@@ -44,6 +45,8 @@ public class PotentialChecker {
 	}
 	
 	public int potentialViews() {
+		IntObjectHashMap<int[]> userViewMap = new IntObjectHashMap<int[]>();
+		
 		if (banner == null) {
 			System.err.println("Potential views called for non-existant banner: " + bannerID);
 			return 0;
@@ -57,8 +60,17 @@ public class PotentialChecker {
 				for (BannerView bv: bannerViewReader.getCurrentBannerViews()) {
 					User u = userReader.getUser(bv.getUserID());
 					if (u != null) {
-						if (banner.validUser(u)) {
+						int[] views = userViewMap.get(u.getID());
+						if (views == null) {
+							views = new int[banner.getViewsPerUser()];
+							userViewMap.put(u.getID(), views);
+						}
+						if (banner.validUser(u) && views[0] < bv.getTime()-banner.getLimitByPeriod()) {
 							viewCount++;
+							for (int j=1; j<banner.getViewsPerUser(); j++) {
+								views[j-1] = views[j];
+							}
+							views[banner.getViewsPerUser()] = bv.getTime();
 						}
 					} else {
 						System.err.println("BannerView for non-existant user: " + bv.getUserID());
