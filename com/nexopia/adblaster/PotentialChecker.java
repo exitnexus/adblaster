@@ -1,3 +1,10 @@
+/*
+ * Maximum potential views: 9788233
+Running time: 651.116s
+Calculation time: 612.292s
+
+ */
+
 package com.nexopia.adblaster;
 
 import java.io.FileNotFoundException;
@@ -45,7 +52,6 @@ public class PotentialChecker {
 	}
 	
 	public int potentialViews() {
-		IntObjectHashMap<int[]> userViewMap = new IntObjectHashMap<int[]>();
 		
 		if (banner == null) {
 			System.err.println("Potential views called for non-existant banner: " + bannerID);
@@ -54,6 +60,7 @@ public class PotentialChecker {
 		
 		int viewCount = 0;
 		for (int i=0; i<FlatFileConfig.FILE_COUNT; i++) {
+			IntObjectHashMap<int[]> userViewMap = new IntObjectHashMap<int[]>();
 			try {
 				bannerViewReader.load(i);
 				userReader.load(i);
