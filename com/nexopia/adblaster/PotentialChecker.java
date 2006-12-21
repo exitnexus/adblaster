@@ -79,9 +79,6 @@ public class PotentialChecker {
 								viewCount++;
 								for (int j=1; j<banner.getViewsPerUser(); j++) {
 									views[j-1] = views[j];
-									if (views[j-1] != 0) {
-										System.out.println("Limit by period expired and then started over.  Things are working right.");
-									}
 								}
 								views[banner.getViewsPerUser()-1] = bv.getTime();
 							}
