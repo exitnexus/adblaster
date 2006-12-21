@@ -45,6 +45,7 @@ public class PotentialChecker {
 	
 	public int potentialViews() {
 		if (banner == null) {
+			System.err.println("Potential views called for non-existant banner: " + bannerID);
 			return 0;
 		}
 		
@@ -84,9 +85,13 @@ public class PotentialChecker {
 		int bid = Integer.parseInt(args[1]);
 		
 		System.out.println("Running a potential check using the directory '" + directory + "' and banner '" + bid + "'");
+		long startTime = System.currentTimeMillis();
 		try {
 			PotentialChecker checker = new PotentialChecker(directory, bid);
+			long startCalculation = System.currentTimeMillis();
 			System.out.println("Maximum potential views: " + checker.potentialViews());
+			System.out.println("Running time: " + (double)(startTime - System.currentTimeMillis())/1000 + "s");
+			System.out.println("Calculation time: " + (double)(startCalculation - System.currentTimeMillis())/1000 + "s");
 		} catch (IOException e) {
 			System.err.println("Invalid directory specified: " + directory);
 			e.printStackTrace();
