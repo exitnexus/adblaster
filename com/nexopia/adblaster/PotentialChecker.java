@@ -27,9 +27,9 @@ public class PotentialChecker {
 	private BannerDatabase bannerDB;
 	private BannerViewFlatFileReader bannerViewReader;
 	
-	public PotentialChecker(String directory, int bid) throws FileNotFoundException {
+	public PotentialChecker(String directory, int bid) throws IOException {
 		bannerID = bid;
-		Object args1[] = {};
+		Object args1[] = {new PageFlatFileDatabase(directory, true)};
 
 		PageValidatorFactory factory = 
 			new PageValidatorFactory(FlatFilePageValidator.class,args1);
@@ -76,7 +76,7 @@ public class PotentialChecker {
 		try {
 			PotentialChecker checker = new PotentialChecker(directory, bid);
 			System.out.println("Maximum potential views: " + checker.potentialViews());
-		} catch (FileNotFoundException e) {
+		} catch (IOException e) {
 			System.err.println("Invalid directory specified: " + directory);
 			e.printStackTrace();
 			System.exit(-1);
