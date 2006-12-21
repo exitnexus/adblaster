@@ -11,6 +11,7 @@ import com.nexopia.adblaster.db.PageFlatFileDatabase;
 import com.nexopia.adblaster.db.UserFlatFileReader;
 import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.BannerView;
+import com.nexopia.adblaster.struct.User;
 import com.nexopia.adblaster.struct.Campaign.CampaignDB;
 import com.nexopia.adblaster.util.FlatFilePageValidator;
 import com.nexopia.adblaster.util.PageValidatorFactory;
@@ -37,19 +38,29 @@ public class PotentialChecker {
 		CampaignDB cdb = new CampaignDB(factory);
 		bannerDB = new BannerDatabase(cdb, factory);
 		banner = bannerDB.getBannerByID(bid);
+		
 		userReader = new UserFlatFileReader(directory);
 		bannerViewReader = new BannerViewFlatFileReader(directory);
 	}
 	
 	public int potentialViews() {
+		if (banner == null) {
+			return 0;
+		}
+		
 		int viewCount = 0;
 		for (int i=0; i<FlatFileConfig.FILE_COUNT; i++) {
 			try {
 				bannerViewReader.load(i);
 				userReader.load(i);
 				for (BannerView bv: bannerViewReader.getCurrentBannerViews()) {
-					if (banner.validUser(userReader.getUser(bv.getUserID()))) {
-						viewCount++;
+					User u = userReader.getUser(bv.getUserID());
+					if (u != null) {
+						if (banner.validUser(u)) {
+							viewCount++;
+						}
+					} else {
+						System.err.println("BannerView for non-existant user: " + bv.getUserID());
 					}
 				}
 			} catch (IOException e) {
