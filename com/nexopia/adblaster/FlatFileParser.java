@@ -11,6 +11,7 @@ import com.nexopia.adblaster.db.UserFlatFileReader;
 import com.nexopia.adblaster.struct.BannerView;
 import com.nexopia.adblaster.struct.User;
 import com.nexopia.adblaster.util.Integer;
+import com.nexopia.adblaster.db.FlatFileConfig;
 
 public class FlatFileParser {
 	public File f;
@@ -34,6 +35,8 @@ public class FlatFileParser {
 	
 	void loadNext(){
 		current_file++;
+		if (current_file > FlatFileConfig.FILE_COUNT)
+			return;
 		try {
 			System.out.println("Loading...");
 			bvffr.load(current_file);
@@ -47,14 +50,17 @@ public class FlatFileParser {
 	}
 	
 	String readLine() throws IOException{
-		System.out.println("reading...");
 		if (current_index == -1 || current_index >= bvffr.getCurrentBannerViews().size()){
 			loadNext();
 		}
 		
+		if (current_file > FlatFileConfig.FILE_COUNT)
+			return null;
+
 		BannerView bv = bvffr.getCurrentBannerViews().get(current_index);
 		User u = uffr.getUser(bv.getUserID());
 		
+		current_index++;
 		String s = "get " + bv.getTime() + " " + bv.getSize() + " " + bv.getUserID() + 
 			" " + u.getAge() + " " + u.getSex() + " " + u.getLocation() + " " + 
 			u.getInterests()+ " " + bv.getPage() + " " + bv.getPassback() + " " + "0";  

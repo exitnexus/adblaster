@@ -50,6 +50,7 @@ public class SimulationServer {
 		//System.out.println("Read: " + s);
 	    	if (i % 1000 == 0){
 				//ProgressIndicator.show(i, instanc.getViewCount());
+				System.out.println("Request: " + request);
 				System.out.println("Result " + i + " : " + s + " : profit so far: " + profit);
 			}
 			int b = Integer.parseInt(s);

@@ -626,7 +626,8 @@ public class BannerServer {
 					logsock.send("get " + format(params) + " => " + ret + "\n");
 				} catch (IOException e) {
 					logsock.disconnect();
-					throw(e);
+					logsock = null;
+					//throw(e);
 				}
 			}
 			
