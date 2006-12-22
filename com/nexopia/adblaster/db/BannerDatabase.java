@@ -148,7 +148,7 @@ public class BannerDatabase {
 						System.out.println(rs.getInt("bannerid") + ":" + f);
 						coefficients.put(banner, f);
 					} else {
-						coefficients.put(banner, Float.valueOf(0));
+						coefficients.put(banner, Float.valueOf(1));
 					}
 					
 				} catch (SQLException sqle) {
