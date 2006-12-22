@@ -56,7 +56,7 @@ public class IntIntHashMap extends PrimitiveKeyBase {
 	 */
 
 	public IntIntHashMap(int count, double fill) {
-		super(count, fill, int.class, Object.class);
+		super(count, fill, int.class, int.class);
 	}
 
 	/**
@@ -136,7 +136,7 @@ public class IntIntHashMap extends PrimitiveKeyBase {
 	 *            backing int array object
 	 */
 
-	protected final void setintArray(int[] array) {
+	protected final void setIntArray(int[] array) {
 		m_intTable = array;
 	}
 
@@ -350,7 +350,7 @@ public class IntIntHashMap extends PrimitiveKeyBase {
 
 	@Override
 	protected void setValueArray(Object array) {
-		setintArray((int[]) array);
+		setIntArray((int[])array);
 		
 	}
 
