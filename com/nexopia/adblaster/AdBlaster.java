@@ -3,6 +3,7 @@ package com.nexopia.adblaster;
 import java.io.File;
 import java.io.IOException;
 
+import com.nexopia.adblaster.db.FlatFileConfig;
 import com.nexopia.adblaster.db.PageFlatFileDatabase;
 import com.nexopia.adblaster.struct.BannerView;
 import com.nexopia.adblaster.util.FlatFilePageValidator;
@@ -24,7 +25,7 @@ public class AdBlaster {
 			System.out.println("Running with selected directories.");
 			bv_dir = new File(args[0]);
 		} else {
-			bv_dir = Utilities.getDir("BannerView");
+			bv_dir = FlatFileConfig.getDefaultDirectory();
 		}
 		
 		if (args.length == 4){
