@@ -7,9 +7,8 @@ Calculation time: 612.292s
 
 package com.nexopia.adblaster;
 
-import java.io.FileNotFoundException;
+import java.io.File;
 import java.io.IOException;
-import java.util.Vector;
 
 import com.nexopia.adblaster.db.BannerDatabase;
 import com.nexopia.adblaster.db.BannerViewFlatFileReader;
@@ -37,7 +36,7 @@ public class PotentialChecker {
 	private BannerViewFlatFileReader bannerViewReader;
 	private boolean skipFrequency;
 	
-	public PotentialChecker(String directory, int bid, boolean skipFrequencyCheck) throws IOException {
+	public PotentialChecker(File directory, int bid, boolean skipFrequencyCheck) throws IOException {
 		bannerID = bid;
 		skipFrequency = skipFrequencyCheck;
 		Object args1[] = {new PageFlatFileDatabase(directory, true)};
@@ -98,13 +97,19 @@ public class PotentialChecker {
 	
 	
 	public static void main(String args[]) {
-		if (args.length < 2) {
+		if (args.length < 1) {
 			System.err.println("Run this file with 2 arguments:");
-			System.err.println("\targ1: The directory where flat file information is stored.");
-			System.err.println("\targ2: The id of the banner to check potential for.");
+			System.err.println("\targ1: The id of the banner to check potential for.");
+			System.err.println("\targ2 (Optional): The directory where flat file information is stored.");
 			System.exit(-1);
 		}
-		String directory = args[0];
+		File directory;
+		if (args.length > 1) {
+			directory = new File(args[1]);
+		} else {
+			directory = FlatFileConfig.getDefaultDirectory();
+		}
+		
 		int bid = Integer.parseInt(args[1]);
 		boolean skipFrequencyChecks = false;
 		if (args.length > 2) {
@@ -115,6 +120,7 @@ public class PotentialChecker {
 				System.out.println("Performing frequency checks.");
 			}
 		}
+		
 		System.out.println("Running a potential check using the directory '" + directory + "' and banner '" + bid + "'");
 		long startTime = System.currentTimeMillis();
 		try {
