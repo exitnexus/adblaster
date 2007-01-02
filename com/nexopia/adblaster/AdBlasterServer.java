@@ -3,6 +3,7 @@ package com.nexopia.adblaster;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
@@ -70,16 +71,43 @@ public class AdBlasterServer implements Runnable {
 	private void processInput() throws IOException {
 		String inputString;
 		while ((inputString=input.readLine()) != null && !shutdown) {
-			//process the input string here
+			String words[] = inputString.split(" ");
+			String command = words[0];
+			if (command.toUpperCase().equals(START_ADBLASTER)) {
+				if (words.length < START_ADBLASTER_MIN_PARAM_COUNT + 1) {
+					reportParamError(START_ADBLASTER);
+				}
+				
+				AdBlaster.main(new String[0]);
+				
+				//All parameters after the command will be bannerserver ips/ports in the form 0.0.0.0:1234
+				//We will tell all of these to reload their coefficients once the adblaster run has completed.
+				for (int i=1; i<words.length; i++) {
+					String ip = words[i].split(":")[0];
+					int port = Integer.parseInt(words[i].split(":")[1]);
+					Socket bannerServer = new Socket(ip, port);
+					PrintWriter bannerServerWriter = new PrintWriter(bannerServer.getOutputStream());
+					bannerServerWriter.write(BannerServer.RELOAD_COEFFICIENTS + "\n");
+				}
+			}
+			
 		}
 		input.close();
 		client.close();
 	}
+	
+	private void reportParamError(String command) {
+		System.err.println("Received command " + command + " with insufficient arguments.");
+	}
  
 	
-	private static final int SERVER_PORT = 5556;
+	private static final int SERVER_PORT = 8971;
 	private static final int SOCKET_TIMEOUT = 500; //ms
 	private static boolean shutdown = false;
+
+	//DEFINED COMMANDS
+	private static final String START_ADBLASTER = "START_ADBLASTER";
+	private static final int START_ADBLASTER_MIN_PARAM_COUNT = 1;
 	
 	/**
 	 * @param args
