@@ -80,13 +80,15 @@ public class BannerServer {
 	static final int HOURLY = 24;
 	static final int DAILY = 25;
 	static final int CLICK = 26;
+	private static final int RELOAD_COEFFICIENTS_CMD = 27;
 	public static final int BANNER_SLIDE_SIZE = 8;
 	public static final double BANNER_MIN_CLICKRATE = 0.0002;
 	public static final double BANNER_MAX_CLICKRATE = 0.005;
 	public static final int STATS_WINDOW = 60;
 	private static final int NO_BANNER = 0;
 	private static final int VIEW_WINDOWS = 5;
-	private final I_Policy policy;
+	private static final String RELOAD_COEFFICIENTS = "RELOAD_COEFFICIENTS";
+	private I_Policy policy;
 	
 	public static HashMap<String, Boolean> debug=new HashMap<String,Boolean>();
 	{
@@ -451,6 +453,8 @@ public class BannerServer {
 			cmd = DAILY;
 		} else if (command.toUpperCase().equals("CLICK")) {
 			cmd = CLICK;
+		} else if (command.toUpperCase().equals(RELOAD_COEFFICIENTS)) {
+			cmd = RELOAD_COEFFICIENTS_CMD;
 		} else {
 			cmd = BLANK;
 			System.out.println("'" + command + "'" + " not found.");
@@ -815,6 +819,9 @@ public class BannerServer {
 			slidingstats[statstime%STATS_WINDOW].click++;
 			hitlogsock.send("c");
 			break;
+		case RELOAD_COEFFICIENTS_CMD:
+			this.policy = new AdBlasterPolicy(db.getBanners());
+			return "Coefficients reloaded.";
 		default:
 			//myerror("unknown command: 'msg'", __LINE__);
 			throw new UnsupportedOperationException("Command:" + cmd + " : Params: " + Arrays.toString(params));			
