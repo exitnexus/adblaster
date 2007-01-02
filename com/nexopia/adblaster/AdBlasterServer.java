@@ -97,7 +97,7 @@ public class AdBlasterServer implements Runnable {
 				if (words.length < CHECK_POTENTIAL_MIN_PARAM_COUNT + 1) {
 					reportParamError(CHECK_POTENTIAL);
 				} else {
-					//takes 2 parameters, the DB directory, and the banner id
+					//takes 2 parameters, the banner id and optionally the directory
 					String args[] = new String[words.length-1];
 					for (int i=1; i< words.length; i++) {
 						args[i-1] = words[i];
@@ -127,7 +127,7 @@ public class AdBlasterServer implements Runnable {
 	private static final String START_ADBLASTER = "START_ADBLASTER";
 	private static final int START_ADBLASTER_MIN_PARAM_COUNT = 1;
 	private static final String CHECK_POTENTIAL = "CHECK_POTENTIAL";
-	private static final int CHECK_POTENTIAL_MIN_PARAM_COUNT = 2;
+	private static final int CHECK_POTENTIAL_MIN_PARAM_COUNT = 1;
 	private static final String SHUTDOWN = "SHUTDOWN";
 	
 	/**
