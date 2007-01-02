@@ -87,7 +87,7 @@ public class BannerServer {
 	public static final int STATS_WINDOW = 60;
 	private static final int NO_BANNER = 0;
 	private static final int VIEW_WINDOWS = 5;
-	private static final String RELOAD_COEFFICIENTS = "RELOAD_COEFFICIENTS";
+	public static final String RELOAD_COEFFICIENTS = "RELOAD_COEFFICIENTS";
 	private I_Policy policy;
 	
 	public static HashMap<String, Boolean> debug=new HashMap<String,Boolean>();
