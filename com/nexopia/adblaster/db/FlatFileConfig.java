@@ -17,6 +17,7 @@ public class FlatFileConfig {
 		if (!directory.canRead()) {
 			throw new RuntimeException("Unable to find any valid directories for default flat file directory.");
 		}
+		System.out.println("Chosen default directory is: " + directory);
 		return directory;			
 	}
 	
