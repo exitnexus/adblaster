@@ -71,27 +71,45 @@ public class AdBlasterServer implements Runnable {
 	private void processInput() throws IOException {
 		String inputString;
 		while ((inputString=input.readLine()) != null && !shutdown) {
+			System.out.println("Received command " + inputString);
 			String words[] = inputString.split(" ");
 			String command = words[0];
 			if (command.toUpperCase().equals(START_ADBLASTER)) {
 				if (words.length < START_ADBLASTER_MIN_PARAM_COUNT + 1) {
 					reportParamError(START_ADBLASTER);
+				} else {
+					System.out.println("Running AdBlaster");
+					AdBlaster.main(new String[0]);
+					//All parameters after the command will be bannerserver ips/ports in the form 0.0.0.0:1234
+					//We will tell all of these to reload their coefficients once the adblaster run has completed.
+					for (int i=1; i<words.length; i++) {
+						String ip = words[i].split(":")[0];
+						int port = Integer.parseInt(words[i].split(":")[1]);
+						System.out.println("Reloading coefficients for banner server " + ip + " on port " + port);
+						Socket bannerServer = new Socket(ip, port);
+						PrintWriter bannerServerWriter = new PrintWriter(bannerServer.getOutputStream());
+						bannerServerWriter.write(BannerServer.RELOAD_COEFFICIENTS + "\n");
+						bannerServerWriter.flush();
+						bannerServerWriter.close();
+					}
 				}
-				
-				AdBlaster.main(new String[0]);
-				
-				//All parameters after the command will be bannerserver ips/ports in the form 0.0.0.0:1234
-				//We will tell all of these to reload their coefficients once the adblaster run has completed.
-				for (int i=1; i<words.length; i++) {
-					String ip = words[i].split(":")[0];
-					int port = Integer.parseInt(words[i].split(":")[1]);
-					Socket bannerServer = new Socket(ip, port);
-					PrintWriter bannerServerWriter = new PrintWriter(bannerServer.getOutputStream());
-					bannerServerWriter.write(BannerServer.RELOAD_COEFFICIENTS + "\n");
+			} else if (command.toUpperCase().equals(CHECK_POTENTIAL)) {
+				if (words.length < CHECK_POTENTIAL_MIN_PARAM_COUNT + 1) {
+					reportParamError(CHECK_POTENTIAL);
+				} else {
+					//takes 2 parameters, the DB directory, and the banner id
+					String args[] = new String[words.length-1];
+					for (int i=1; i< words.length; i++) {
+						args[i-1] = words[i];
+					}
+					PotentialChecker.main(args);
 				}
+			} else if (command.toUpperCase().equals(SHUTDOWN)) {
+				System.out.println("Shutting down AdBlaster server.");
+				shutdown = true;
 			}
-			
 		}
+		System.out.println("Finished processing command, closing connections.");
 		input.close();
 		client.close();
 	}
@@ -108,6 +126,9 @@ public class AdBlasterServer implements Runnable {
 	//DEFINED COMMANDS
 	private static final String START_ADBLASTER = "START_ADBLASTER";
 	private static final int START_ADBLASTER_MIN_PARAM_COUNT = 1;
+	private static final String CHECK_POTENTIAL = "CHECK_POTENTIAL";
+	private static final int CHECK_POTENTIAL_MIN_PARAM_COUNT = 2;
+	private static final String SHUTDOWN = "SHUTDOWN";
 	
 	/**
 	 * @param args
