@@ -35,6 +35,8 @@ public class PotentialChecker {
 	private BannerDatabase bannerDB;
 	private BannerViewFlatFileReader bannerViewReader;
 	private boolean skipFrequency;
+	private int countEstimate = 20000000;
+	private int lastFile = 0;
 	
 	public PotentialChecker(File directory, int bid, boolean skipFrequencyCheck) throws IOException {
 		bannerID = bid;
@@ -58,14 +60,20 @@ public class PotentialChecker {
 			System.err.println("Potential views called for non-existant banner: " + bannerID);
 			return 0;
 		}
-		
+		Calendar lastSecond = Calendar.SECOND;
 		int viewCount = 0;
+		int totalViewCount = 0;
 		for (int i=0; i<FlatFileConfig.FILE_COUNT; i++) {
 			IntObjectHashMap<int[]> userViewMap = new IntObjectHashMap<int[]>();
 			try {
 				bannerViewReader.load(i);
 				userReader.load(i);
 				for (BannerView bv: bannerViewReader.getCurrentBannerViews()) {
+					totalViewCount++;
+					if (Calender.SECOND != lastSecond) {
+						lastSecond = Calender.SECOND;
+						updateProgress(i, totalViewCount, viewCount);
+					}
 					User u = userReader.getUser(bv.getUserID());
 					if (u != null) {
 						int[] views = userViewMap.get(u.getID());
@@ -91,9 +99,23 @@ public class PotentialChecker {
 				e.printStackTrace();
 			}
 		}
+		insertResult(viewCount);
 		return viewCount;
 	}
 	
+	private void updateProgress(int currentFile, int totalViewCount, int viewCount) {
+		if (lastFile != currentFile) {
+			countEstimate = (int)viewCount/(double)(currentFile/FlatFileConfig.FILE_COUNT);
+			lastFile = currentFile;
+		}
+		double completeEstimate = (double)viewCount/countEstimate;
+		int resultEstimate = (int)viewCount/completeEstimate;
+		//write the count estimate to the database
+	}
+	
+	private void insertResult(int viewCount) {
+		//write the final answer to the database
+	}
 	
 	
 	public static void main(String args[]) {
