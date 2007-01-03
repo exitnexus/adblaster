@@ -9,10 +9,14 @@ package com.nexopia.adblaster;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Calendar;
 
 import com.nexopia.adblaster.db.BannerDatabase;
 import com.nexopia.adblaster.db.BannerViewFlatFileReader;
 import com.nexopia.adblaster.db.FlatFileConfig;
+import com.nexopia.adblaster.db.JDBCConfig;
 import com.nexopia.adblaster.db.PageFlatFileDatabase;
 import com.nexopia.adblaster.db.UserFlatFileReader;
 import com.nexopia.adblaster.struct.Banner;
@@ -54,13 +58,22 @@ public class PotentialChecker {
 		bannerViewReader = new BannerViewFlatFileReader(directory);
 	}
 	
+	public int getSecond(){
+		return Calendar.getInstance().get(Calendar.SECOND) +
+			(60*	(Calendar.getInstance().get(Calendar.MINUTE) +
+				(60*	(Calendar.getInstance().get(Calendar.HOUR_OF_DAY) +
+					(24 * Calendar.getInstance().get(Calendar.DAY_OF_YEAR))
+				))
+			));
+			
+	}
 	public int potentialViews() {
 		
 		if (banner == null) {
 			System.err.println("Potential views called for non-existant banner: " + bannerID);
 			return 0;
 		}
-		Calendar lastSecond = Calendar.SECOND;
+		int lastSecond = getSecond();
 		int viewCount = 0;
 		int totalViewCount = 0;
 		for (int i=0; i<FlatFileConfig.FILE_COUNT; i++) {
@@ -70,8 +83,9 @@ public class PotentialChecker {
 				userReader.load(i);
 				for (BannerView bv: bannerViewReader.getCurrentBannerViews()) {
 					totalViewCount++;
-					if (Calender.SECOND != lastSecond) {
-						lastSecond = Calender.SECOND;
+					int second = getSecond();
+					if (second > lastSecond + 5) {
+						lastSecond = second;
 						updateProgress(i, totalViewCount, viewCount);
 					}
 					User u = userReader.getUser(bv.getUserID());
@@ -82,12 +96,14 @@ public class PotentialChecker {
 							userViewMap.put(u.getID(), views);
 						}
 						if (banner.validUser(u)) {
-							if  (skipFrequency || views[0] < bv.getTime()-banner.getLimitByPeriod()) {
+							if  (skipFrequency || banner.getViewsPerUser() == 0 || views[0] < bv.getTime()-banner.getLimitByPeriod()) {
 								viewCount++;
-								for (int j=1; j<banner.getViewsPerUser(); j++) {
-									views[j-1] = views[j];
+								if (banner.getViewsPerUser() > 0){
+									for (int j=1; j<banner.getViewsPerUser(); j++) {
+										views[j-1] = views[j];
+									}
+									views[banner.getViewsPerUser()-1] = bv.getTime();
 								}
-								views[banner.getViewsPerUser()-1] = bv.getTime();
 							}
 						}
 					} else {
@@ -105,16 +121,31 @@ public class PotentialChecker {
 	
 	private void updateProgress(int currentFile, int totalViewCount, int viewCount) {
 		if (lastFile != currentFile) {
-			countEstimate = (int)viewCount/(double)(currentFile/FlatFileConfig.FILE_COUNT);
+			countEstimate = (int) ( ((double)totalViewCount/(double)currentFile) * ((double)FlatFileConfig.FILE_COUNT) );
 			lastFile = currentFile;
 		}
-		double completeEstimate = (double)viewCount/countEstimate;
-		int resultEstimate = (int)viewCount/completeEstimate;
+		System.out.println(viewCount);
+		double completeEstimate = (double)totalViewCount/(double)countEstimate;
+		int resultEstimate = (int) (((double)viewCount/(double)totalViewCount) * countEstimate);
 		//write the count estimate to the database
+		try {
+			Statement statement = JDBCConfig.createStatement();
+			String sql = "REPLACE INTO `potentialviews` SET " +
+					"`bannerid` = " + this.bannerID + ", " +
+					"`day` = " + Calendar.DAY_OF_YEAR + ", " +
+					"`percentcomplete` = " + completeEstimate*100 + ", " +
+					"`potentialviews` = " + resultEstimate + ";";
+			System.out.println("Executing: " + sql);
+			statement.executeUpdate(sql);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 	
 	private void insertResult(int viewCount) {
-		//write the final answer to the database
+		updateProgress(100, this.countEstimate, viewCount);
 	}
 	
 	
@@ -132,9 +163,9 @@ public class PotentialChecker {
 			directory = FlatFileConfig.getDefaultDirectory();
 		}
 		
-		int bid = Integer.parseInt(args[1]);
+		int bid = Integer.parseInt(args[0]);
 		boolean skipFrequencyChecks = false;
-		if (args.length > 2) {
+		if (args.length > 3) {
 			skipFrequencyChecks = Boolean.parseBoolean(args[2]);
 			if (skipFrequencyChecks) {
 				System.out.println("Skipping frequency checks.");
