@@ -145,7 +145,7 @@ public class PotentialChecker {
 	}
 	
 	private void insertResult(int viewCount) {
-		updateProgress(100, this.countEstimate, viewCount);
+		updateProgress(FlatFileConfig.FILE_COUNT, this.countEstimate, viewCount);
 	}
 	
 	
