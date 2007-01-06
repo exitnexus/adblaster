@@ -35,8 +35,8 @@ public class JDBCConfig {
 	static {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
-			String url = "jdbc:mysql://192.168.0.50:3306/newbanners";
-			con = DriverManager.getConnection(url, "root", "Hawaii");
+			String url = "jdbc:mysql://192.168.0.213:3306/newbanners";
+			con = DriverManager.getConnection(url, "root", "root");
 		} catch (ClassNotFoundException e) {
 			System.err.println("Unable to load JDBC driver.");
 			e.printStackTrace();
