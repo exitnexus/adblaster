@@ -39,7 +39,7 @@ public class PotentialChecker {
 	private BannerDatabase bannerDB;
 	private BannerViewFlatFileReader bannerViewReader;
 	private boolean skipFrequency;
-	private int countEstimate = 20000000;
+	private int countEstimate = 20000000; //magic guess at how many banners we serve in a day, gets updated from real numbers as soon as one file has been scanned
 	private int lastFile = 0;
 	
 	public PotentialChecker(File directory, int bid, boolean skipFrequencyCheck) throws IOException {
@@ -95,7 +95,7 @@ public class PotentialChecker {
 							views = new int[banner.getViewsPerUser()];
 							userViewMap.put(u.getID(), views);
 						}
-						if (banner.validUser(u)) {
+						if (banner.validUser(u) && banner.getSize() == bv.getSize()) {
 							if  (skipFrequency || banner.getViewsPerUser() == 0 || views[0] < bv.getTime()-banner.getLimitByPeriod()) {
 								viewCount++;
 								if (banner.getViewsPerUser() > 0){
