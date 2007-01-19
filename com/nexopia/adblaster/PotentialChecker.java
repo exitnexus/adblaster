@@ -83,6 +83,9 @@ public class PotentialChecker {
 				userReader.load(i);
 				for (BannerView bv: bannerViewReader.getCurrentBannerViews()) {
 					totalViewCount++;
+					if (bv.getPassback() != 0) {
+						continue;
+					}
 					int second = getSecond();
 					if (second > lastSecond + 5) {
 						lastSecond = second;
