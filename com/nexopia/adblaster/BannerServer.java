@@ -59,6 +59,8 @@ public class BannerServer {
 	
 	public static final int PAGE_DOMINANCE_OFF = Integer.MIN_VALUE;
 	public static final int PAGE_DOMINANCE_POSSIBLE = Integer.MIN_VALUE+1;
+	public static final int PAGE_DOMINANCE_TYPE = 0; //array position
+	public static final int PAGE_DOMINANCE_TIME = 1; //array position
 	
 	private static final int BLANK = 0;
 	private static final int ADD = 1;
@@ -308,7 +310,7 @@ public class BannerServer {
 		int pageDominance;
 		
 		if (pageIDDominance.get(pageid) != null) {
-			pageDominance = pageIDDominance.get(pageid)[1];
+			pageDominance = pageIDDominance.get(pageid)[PAGE_DOMINANCE_TYPE];
 		} else {
 			pageDominance = PAGE_DOMINANCE_POSSIBLE;
 		}
@@ -342,12 +344,14 @@ public class BannerServer {
 		if (chosen != null) {
 			if (pageDominance == PAGE_DOMINANCE_POSSIBLE) {
 				if (chosen.getCampaign().getPageDominance()) {
-					int[] idTimePair = {chosen.getCampaign().getID(),(int)System.currentTimeMillis()/1000};
+					int[] idTimePair = new int[2];
+					idTimePair[PAGE_DOMINANCE_TYPE] = chosen.getCampaign().getID();
+					idTimePair[PAGE_DOMINANCE_TIME] = (int)System.currentTimeMillis()/1000;
 					pageIDDominance.put(pageid, idTimePair);
 				}
 			} else if (pageDominance != PAGE_DOMINANCE_OFF) {
 				int[] idTimePair = pageIDDominance.get(pageid);
-				idTimePair[1] = (int)System.currentTimeMillis()/1000;
+				idTimePair[PAGE_DOMINANCE_TIME] = (int)System.currentTimeMillis()/1000;
 			}
 			markBannerUsed(age, sex, location, interests, page,
 					usertime, userid, chosen);
