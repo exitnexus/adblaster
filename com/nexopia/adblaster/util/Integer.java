@@ -10,7 +10,7 @@ public class Integer {
 	public static final int MIN_VALUE = java.lang.Integer.MIN_VALUE;
 	public static final Integer NEGATE = new Integer(MIN_VALUE);
 	public static final int MAX_VALUE = java.lang.Integer.MAX_VALUE;
-	public static final Integer IDENTITY = new Integer(0);
+	public static final Integer IDENTITY = new Integer(Integer.MIN_VALUE+1);
 	
 	/*
 	static {
