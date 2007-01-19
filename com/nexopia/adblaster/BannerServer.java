@@ -61,6 +61,7 @@ public class BannerServer {
 	public static final int PAGE_DOMINANCE_POSSIBLE = Integer.MIN_VALUE+1;
 	public static final int PAGE_DOMINANCE_TYPE = 0; //array position
 	public static final int PAGE_DOMINANCE_TIME = 1; //array position
+	public static final int PAGE_DOMINANCE_RETENTION_TIME = 60; //seconds to keep page ids around
 	
 	private static final int BLANK = 0;
 	private static final int ADD = 1;
@@ -528,6 +529,7 @@ public class BannerServer {
 
 	@SuppressWarnings("unchecked")
 	public void minutely(boolean debug) {
+		prunePageIDs();
 		Collection<Banner> banners = (Collection<Banner>)this.db.getBanners();
 		for (Banner b: banners) {
 			minutely(b, (int)(System.currentTimeMillis()/1000), debug);
@@ -550,6 +552,17 @@ public class BannerServer {
 		}
 	}
 	
+	private void prunePageIDs() {
+		int[] keys = pageIDDominance.getKeyArray();
+		int time = (int)System.currentTimeMillis()/1000 - PAGE_DOMINANCE_RETENTION_TIME;
+		for (int key: keys) {
+			if (key != 0) { //Weirdness from IntObjectHashMap, 0 points to every unassigned bucket in the hash.
+				if (pageIDDominance.get(key)[PAGE_DOMINANCE_TIME] < time) {
+					pageIDDominance.remove(key);
+				}
+			}
+		}
+	}
 	
 	@SuppressWarnings("unchecked")
 	public void hourly(boolean debug) {
