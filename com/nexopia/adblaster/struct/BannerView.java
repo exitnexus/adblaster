@@ -15,8 +15,9 @@ public class BannerView{
 	private byte size;
 	private int page;
 	private int passback;
+	private int pageID;
 	
-	public BannerView(int index, int uid, int bid, int t, byte size, int page){
+	public BannerView(int index, int uid, int bid, int t, byte size, int page, int pageID){
 		this.uid = uid; 
 		this.bid = bid; 
 		this.time = t; 
@@ -24,9 +25,10 @@ public class BannerView{
 		this.page = page;
 		this.index = index;
 		this.passback = 0;
+		this.pageID = pageID;
 	}
 	
-	public BannerView(int index, int uid, int bid, int t, byte size, int page, int passback){
+	public BannerView(int index, int uid, int bid, int t, byte size, int page, int passback, int pageID){
 		this.uid = uid; 
 		this.bid = bid; 
 		this.time = t; 
@@ -34,6 +36,7 @@ public class BannerView{
 		this.page = page;
 		this.index = index;
 		this.passback = passback;
+		this.pageID = pageID;
 	}
 	
 
@@ -46,11 +49,8 @@ public class BannerView{
 		time = Integer.parseInt(words[2]);
 		size = Byte.parseByte(words[3]);
 		page = Integer.parseInt(words[4]);
-		if (words.length > 5) {
-			passback = Integer.parseInt(words[5]);
-		} else {
-			passback = 0;
-		}
+		passback = Integer.parseInt(words[5]);
+		pageID = Integer.parseInt(words[6]);
 	}
 
 

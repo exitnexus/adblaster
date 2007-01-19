@@ -90,8 +90,8 @@ public class LogServer {
 		String[] words = input.split("\\s");
 		if (words.length == 0) return;
 		String command = words[0];
-		//get usertime size userid age sex location interests page passback => bannerid
-		if (command.indexOf("get") == 0 && words.length == 14) {
+		//get usertime size userid age sex location interests page passback debugGet pageID => bannerid
+		if (command.indexOf("get") == 0 && words.length == 15) {
 			//System.out.println("Actual request");
 			int time = Integer.parseInt(words[1]);
 			byte size = Byte.parseByte(words[2]);
@@ -102,8 +102,8 @@ public class LogServer {
 			String interests = words[7];
 			String page = words[8];
 			int passback = Integer.parseInt(words[9]);
-			
-			int bannerid = Integer.parseInt(words[12]);
+			int pageID = Integer.parseInt(words[10]);
+			int bannerid = Integer.parseInt(words[13]);
 			
 			//we don't create a new user object here to save on object creation overhead, just reuse one user repeatedly
 			synchronized (tdb){
@@ -111,7 +111,7 @@ public class LogServer {
 				try {
 					tdb.userWriter.write(user);
 					int pageIndex = tdb.pageWriter.write(page);
-					tdb.bannerViewWriter.write(userid, bannerid, time, size, pageIndex, passback);
+					tdb.bannerViewWriter.write(userid, bannerid, time, size, pageIndex, passback, pageID);
 				} catch (IOException e) {
 					System.err.println("Error handling input: " + input);
 					e.printStackTrace();
