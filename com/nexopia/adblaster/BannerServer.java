@@ -56,6 +56,10 @@ public class BannerServer {
 	public static final Integer BANNER_BUTTON60 = new Integer(6);
 	public static final Integer BANNER_VULCAN = new Integer(7);
 	public static final Integer BANNER_LINK = new Integer(8);
+	
+	public static final int PAGE_DOMINANCE_OFF = Integer.MIN_VALUE;
+	public static final int PAGE_DOMINANCE_POSSIBLE = Integer.MIN_VALUE+1;
+	
 	private static final int BLANK = 0;
 	private static final int ADD = 1;
 	private static final int UPDATE = 2;
@@ -138,7 +142,8 @@ public class BannerServer {
 	private FastMap<Integer, TypeStat> clickstats = new FastMap<Integer,TypeStat>();
 	private FastMap<Campaign, BannerStat> campaignstats = new FastMap<Campaign,BannerStat>();
 	private FastMap<Banner, HourlyStat> hourlystats = new FastMap<Banner,HourlyStat>();
-
+	private IntObjectHashMap<int[]> pageIDDominance = new IntObjectHashMap<int[]>();
+	
 	private EasyDatagramSocket logsock;
 	private EasyDatagramSocket hitlogsock;
 	private int logserver_port;
@@ -195,7 +200,6 @@ public class BannerServer {
 	}
 	
 	public void deleteCampaign(int id) {
-		cdb.get(id).minutely();
 		cdb.delete(id);
 		this.db.deleteCampaign(id);
 	}
@@ -297,13 +301,24 @@ public class BannerServer {
 	}
 
 	public int getBestBanner(int usertime, int size, int userid, byte age,
-			byte sex, short location, Interests interests, String page,
+			byte sex, short location, Interests interests, String page, int pageid,
 			boolean debug) {
 		Vector<Banner> banners = new Vector<Banner>();
+		
+		int pageDominance;
+		
+		if (pageIDDominance.get(pageid) != null) {
+			pageDominance = pageIDDominance.get(pageid)[1];
+		} else {
+			pageDominance = PAGE_DOMINANCE_POSSIBLE;
+		}
+		
+		
 		for (Campaign campaign : cdb.getCampaigns()) {
 			banners.addAll(campaign.getBanners(usertime, size, userid, age,
-					sex, location, interests, page, debug));
+					sex, location, interests, page, pageDominance, debug));
 		}
+		
 		Vector<Banner> validBanners = new Vector<Banner>();
 
 		for (int i = 0; i < banners.size(); i++) {
@@ -314,7 +329,7 @@ public class BannerServer {
 			boolean b3 = !hasReachedViewsPerDay(banner_i);
 			boolean b4 = !hasReachedClicksPerDay(banner_i);
 			boolean b5 = !hasReachedMaxViews(banner_i);
-
+			
 			if (debug)
 				System.out.println("" + banner_i.getID() + ":" + b1 + ":" + b2 + ":"
 						+ b3 + ":" + b4);
@@ -325,6 +340,15 @@ public class BannerServer {
 
 		Banner chosen = weightedChoice(validBanners, userid, usertime);
 		if (chosen != null) {
+			if (pageDominance == PAGE_DOMINANCE_POSSIBLE) {
+				if (chosen.getCampaign().getPageDominance()) {
+					int[] idTimePair = {chosen.getCampaign().getID(),(int)System.currentTimeMillis()/1000};
+					pageIDDominance.put(pageid, idTimePair);
+				}
+			} else if (pageDominance != PAGE_DOMINANCE_OFF) {
+				int[] idTimePair = pageIDDominance.get(pageid);
+				idTimePair[1] = (int)System.currentTimeMillis()/1000;
+			}
 			markBannerUsed(age, sex, location, interests, page,
 					usertime, userid, chosen);
 			if (debug)
@@ -372,13 +396,13 @@ public class BannerServer {
 	/** 
 	 * Not used yet
 	 */
-	public int getBannerByCoef(int usertime, int size, int userid, byte age, byte sex, short location, Interests interests, String page, boolean debug){
+	public int getBannerByCoef(int usertime, int size, int userid, byte age, byte sex, short location, Interests interests, String page, int pageDominance, boolean debug){
 		//String debugLog = "";
 		//if (debug) debugLog += usertime+", "+size+", "+userid+", "+age+", "+sex+", "+loc+", "+page+", "+debug;
 		
 		Vector<Banner> valid = new Vector<Banner>();
 		for (Campaign campaign : cdb.getCampaigns()){
-			valid.addAll(campaign.getBanners(usertime, size, userid, age, sex, location, interests, page, debug));
+			valid.addAll(campaign.getBanners(usertime, size, userid, age, sex, location, interests, page, pageDominance, debug));
 		}
 		if (!valid.isEmpty()) {
 			Banner b = Utilities.priorityChoose(valid);
@@ -582,15 +606,16 @@ public class BannerServer {
 			short loc=Short.parseShort(params[5]); 
 			String interestsStr=params[6]; 
 			String page=params[7]; 
-			int passback=Integer.parseInt(params[8]); 
-			boolean debugGet=Boolean.parseBoolean(params[9]);
+			int passback=Integer.parseInt(params[8]);
+			int pageid=Integer.parseInt(params[9]);
+			boolean debugGet=Boolean.parseBoolean(params[10]);
 
 			Interests interests = new Interests(interestsStr, false);
 			
 			if(passback != 0)
 				passbackBanner(passback, userid);
 			
-			int ret = getBestBanner(usertime, size, userid, age, sex, loc, interests, page, debugGet);
+			int ret = getBestBanner(usertime, size, userid, age, sex, loc, interests, page, pageid, debugGet);
 			
 			if (debug.get("passback").booleanValue()) {
 				Integer uid = Integer.valueOf(userid);

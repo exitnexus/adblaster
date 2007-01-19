@@ -22,6 +22,7 @@ import com.nexopia.adblaster.db.JDBCConfig;
 import com.nexopia.adblaster.util.Integer;
 import com.nexopia.adblaster.util.Interests;
 import com.nexopia.adblaster.util.PageValidatorFactory;
+import com.nexopia.adblaster.util.Utilities;
 
 
 
@@ -129,6 +130,7 @@ public class Campaign extends ServablePropertyHolder{
 	public Set<Banner> banners;
 	private int views;
 	private int clicks;
+	private boolean pageDominance;
 	static int count = 0;
 	public static int counter(){
 		return count++;
@@ -155,7 +157,6 @@ public class Campaign extends ServablePropertyHolder{
 				i++;
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		int ret[] = {totalViews,totalClicks};
@@ -168,6 +169,7 @@ public class Campaign extends ServablePropertyHolder{
 		int viewsAndClicks[] = loadViewsAndClicks(this.id);
 		this.views = viewsAndClicks[0];
 		this.clicks = viewsAndClicks[0];
+		this.pageDominance = rs.getString("pagedominance").equals("y");
 	}
 	
 	public void update(ResultSet rs, PageValidatorFactory pvf) throws SQLException{
@@ -177,7 +179,7 @@ public class Campaign extends ServablePropertyHolder{
 		this.paytype = rs.getByte("PAYTYPE");
 	}
 	
-	int getID() {
+	public int getID() {
 		return id;
 	}
 	public String toString(){
@@ -188,11 +190,159 @@ public class Campaign extends ServablePropertyHolder{
 	}
 	
 	
+
+	//this does basic checks like enabled and within date range
+	//if it returns false then its banners will never be displayable today
+	public boolean precheck() {
+		boolean validDate = true;
+		if (startdate != 0){
+			if ((long)startdate*1000 > System.currentTimeMillis() + 86400*1000) {
+				//System.err.println(startdate*1000 + ">"+(System.currentTimeMillis() + 86400*1000));
+				validDate = false;
+			}
+		}
+		
+		if (enddate != 0){
+			if ((long)enddate*1000 < System.currentTimeMillis()) {
+				//System.err.println((long)enddate*1000 + "<"+(System.currentTimeMillis() + 86400*1000));
+				validDate = false;
+			}
+		}
+		
+		return enabled && validDate;
+	}
+
+	public byte getPayType() {
+		return this.paytype;
+	}
+
+	
+	public Set<Banner> getBanners(int usertime, int size, int userid, byte age, byte sex, short location, Interests interests, String page, int pageDominance, boolean debug) {
+		HashSet<Banner> hs = new HashSet<Banner>();
+		boolean b1 = this.banners.isEmpty();
+		boolean b2 = !this.valid(usertime, size, userid, age, sex, location, interests, page, pageDominance, debug);		
+		if (b1 || b2) {
+			if (BannerServer.debug.get("development").booleanValue())
+				System.out.println("Campaign " + this.toString() + " is: " + (b1?"empty":"non-empty") + ":" + (b2?"invalid":"valid"));
+			return hs;
+		} else {
+			for (Banner b : this.banners) {
+				if (b.valid(usertime, size, userid, age, sex, location, interests, page, pageDominance, debug)) {
+					hs.add(b);
+				}
+			}
+			return hs;
+		}
+	}
+
+	public void addBanner(Banner banner) {
+		this.banners.add(banner);
+	}
+	
+	public void removeBanner(Banner banner) {
+		this.banners.remove(banner);
+	}
+
+	public int getClicks() {
+		return clicks;
+	}
+
+	public void setClicks(int clicks) {
+		this.clicks = clicks;
+	}
+
+	public int getViews() {
+		return views;
+	}
+
+	public void setViews(int views) {
+		this.views = views;
+	}
+
+	@Override
+	protected boolean valid(int usertime, int size, int userid, byte age, byte sex, short location, Interests interests2, String page, int pageDominance, boolean debug) {
+		String debugLog = "";
+		if (debug) debugLog += "Checking campaign " + this.toString() + ": ";
+		if(!this.enabled)
+			return false;
+		//date
+		if(this.startdate >= usertime || (this.enddate != 0 && this.enddate <= usertime))
+			return false;
+	
+		if (debug) debugLog += " 0";
+		//targetting
+		//age
+		if (!this.validAge(age)) {
+			if (debug) Utilities.bannerDebug(debugLog);
+			return false;
+		}
+		
+		if (debug) debugLog += " 1";
+		//sex
+		if(!this.validSex(sex)) {
+			if (debug) Utilities.bannerDebug(debugLog);
+			return false;
+		}
+	
+		if (debug) debugLog += " PageDominance";
+		if (!this.validPageDominance(pageDominance)) {
+			if (debug) Utilities.bannerDebug(debugLog);
+			return false;
+		}
+		
+		//location
+		if(!this.validLocation(location)){ //default true
+			if (debug) Utilities.bannerDebug(debugLog);
+			return false;
+		}
+		
+		if (debug) debugLog += " 2";
+		//page
+		if(!this.validPage(page)){ //default true
+			if (debug) Utilities.bannerDebug(debugLog);
+			return false;
+		}
+		
+		if (debug) debugLog += " 3";
+		//interests
+		if(!this.validInterests(interests2)){
+			if (debug) Utilities.bannerDebug(debugLog);
+			return false;
+		}
+		
+		if (debug) debugLog += " 4";
+		if (!this.validTime((long)usertime*1000)) {
+			if (debug) Utilities.bannerDebug(debugLog);
+			return false;
+		}
+		
+		if (debug) debugLog += " 5";
+		//Utilities.bannerDebug("Campaign valid: this.id");
+		if (debug) Utilities.bannerDebug(debugLog);
+		return true;
+	}
+
+	private boolean validPageDominance(int pageDominanceID) {
+		if (pageDominanceID == BannerServer.PAGE_DOMINANCE_POSSIBLE) {
+			return true;
+		} else if (pageDominanceID == BannerServer.PAGE_DOMINANCE_OFF) {
+			return !this.pageDominance;
+		} else {
+			return (pageDominanceID == this.id);
+		}
+	}
+
+	public boolean getPageDominance() {
+		return pageDominance;
+	}
+
+}
+
 /*
- I left these functions commented out when I extracted these features to the superclass
- because some of them might have slight differences and you may want to compare the
- old implementation if you detect something going wrong.
- 
+I left these functions commented out when I extracted these features to the superclass
+because some of them might have slight differences and you may want to compare the
+old implementation if you detect something going wrong.
+
 	public Vector getAges() {
 		return ages;
 	}
@@ -291,86 +441,3 @@ public class Campaign extends ServablePropertyHolder{
 		return viewsperday;
 	}
 */
-
-	//this does basic checks like enabled and within date range
-	//if it returns false then its banners will never be displayable today
-	public boolean precheck() {
-		boolean validDate = true;
-		if (startdate != 0){
-			if ((long)startdate*1000 > System.currentTimeMillis() + 86400*1000) {
-				//System.err.println(startdate*1000 + ">"+(System.currentTimeMillis() + 86400*1000));
-				validDate = false;
-			}
-		}
-		
-		if (enddate != 0){
-			if ((long)enddate*1000 < System.currentTimeMillis()) {
-				//System.err.println((long)enddate*1000 + "<"+(System.currentTimeMillis() + 86400*1000));
-				validDate = false;
-			}
-		}
-		
-		return enabled && validDate;
-	}
-
-	public byte getPayType() {
-		return this.paytype;
-	}
-
-	public void minutely() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void hourly() {
-		// TODO fill this
-	}
-	
-	public void daily() {
-		// TODO fill this
-	}
-
-	public Set<Banner> getBanners(int usertime, int size, int userid, byte age, byte sex, short location, Interests interests, String page, boolean debug) {
-		HashSet<Banner> hs = new HashSet<Banner>();
-		boolean b1 = this.banners.isEmpty();
-		boolean b2 = !this.valid(usertime, size, userid, age, sex, location, interests, page, debug);		
-		if (b1 || b2) {
-			if (BannerServer.debug.get("development").booleanValue())
-				System.out.println("Campaign " + this.toString() + " is: " + (b1?"empty":"non-empty") + ":" + (b2?"invalid":"valid"));
-			return hs;
-		} else {
-			for (Banner b : this.banners) {
-				if (b.valid(usertime, size, userid, age, sex, location, interests, page, debug)) {
-					hs.add(b);
-				}
-			}
-			return hs;
-		}
-	}
-
-	public void addBanner(Banner banner) {
-		this.banners.add(banner);
-	}
-	
-	public void removeBanner(Banner banner) {
-		this.banners.remove(banner);
-	}
-
-	public int getClicks() {
-		return clicks;
-	}
-
-	public void setClicks(int clicks) {
-		this.clicks = clicks;
-	}
-
-	public int getViews() {
-		return views;
-	}
-
-	public void setViews(int views) {
-		this.views = views;
-	}
-	
-
-}

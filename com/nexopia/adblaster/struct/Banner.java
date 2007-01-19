@@ -240,7 +240,7 @@ public class Banner extends ServablePropertyHolder{
 		return this;
 	}
 
-	public boolean valid(int time, int size, int userid, byte age, byte sex, short location, Interests interests2, String page, boolean debug) {
+	public boolean valid(int time, int size, int userid, byte age, byte sex, short location, Interests interests2, String page, int pageDominance, boolean debug) {
 		String debugLog = "";
 		if (debug) debugLog += "Checking banner " + this.id + ": ";
 

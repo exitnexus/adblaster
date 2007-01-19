@@ -13,7 +13,7 @@ import com.nexopia.adblaster.util.TimeTable;
 import com.nexopia.adblaster.util.Utilities;
 import com.nexopia.adblaster.util.LowMemMap.LowMemArray;
 
-public class ServablePropertyHolder {
+abstract public class ServablePropertyHolder {
 
 	protected Vector<Integer> ages;
 	protected TimeTable allowedTimes;
@@ -31,7 +31,7 @@ public class ServablePropertyHolder {
 	protected int startdate;
 	protected int viewsPerUser;
 	protected int viewsperday;
-
+	private int validLocation = 0;
 	public ServablePropertyHolder() {
 		super();
 	}
@@ -186,61 +186,7 @@ public class ServablePropertyHolder {
 		
 	}
 
-	protected boolean valid(int usertime, int size, int userid, byte age, byte sex, short location, Interests interests2, String page, boolean debug) {
-		String debugLog = "";
-		if (debug) debugLog += "Checking campaign " + this.toString() + ": ";
-		if(!this.enabled)
-			return false;
-		//date
-		if(this.startdate >= usertime || (this.enddate != 0 && this.enddate <= usertime))
-			return false;
-	
-		if (debug) debugLog += " 0";
-		//targetting
-		//age
-		if (!this.validAge(age)) {
-			if (debug) Utilities.bannerDebug(debugLog);
-			return false;
-		}
-		
-		if (debug) debugLog += " 1";
-		//sex
-		if(!this.validSex(sex)) {
-			if (debug) Utilities.bannerDebug(debugLog);
-			return false;
-		}
-	
-		//location
-		if(!this.validLocation(location)){ //default true
-			if (debug) Utilities.bannerDebug(debugLog);
-			return false;
-		}
-		
-		if (debug) debugLog += " 2";
-		//page
-		if(!this.validPage(page)){ //default true
-			if (debug) Utilities.bannerDebug(debugLog);
-			return false;
-		}
-		
-		if (debug) debugLog += " 3";
-		//interests
-		if(!this.validInterests(interests2)){
-			if (debug) Utilities.bannerDebug(debugLog);
-			return false;
-		}
-		
-		if (debug) debugLog += " 4";
-		if (!this.validTime((long)usertime*1000)) {
-			if (debug) Utilities.bannerDebug(debugLog);
-			return false;
-		}
-		
-		if (debug) debugLog += " 5";
-		//Utilities.bannerDebug("Campaign valid: this.id");
-		if (debug) Utilities.bannerDebug(debugLog);
-		return true;
-	}
+	abstract protected boolean valid(int usertime, int size, int userid, byte age, byte sex, short location, Interests interests2, String page, int pageDominance, boolean debug);
 
 	public int getIntegerMaxViewsPerDay(){
 		if (this.viewsperday == 0)
