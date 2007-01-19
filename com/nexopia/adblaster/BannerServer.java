@@ -1,6 +1,5 @@
 package com.nexopia.adblaster;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
@@ -13,14 +12,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Vector;
-import java.util.zip.GZIPInputStream;
 
 
 import com.nexopia.adblaster.db.BannerDatabase;
 import com.nexopia.adblaster.db.JDBCConfig;
 import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.BannerStat;
-import com.nexopia.adblaster.struct.BannerView;
 import com.nexopia.adblaster.struct.Campaign;
 import com.nexopia.adblaster.struct.HourlyStat;
 import com.nexopia.adblaster.struct.I_Policy;
@@ -33,7 +30,6 @@ import com.nexopia.adblaster.util.FastMap;
 import com.nexopia.adblaster.util.IntObjectHashMap;
 import com.nexopia.adblaster.util.Integer;
 import com.nexopia.adblaster.util.Interests;
-import com.nexopia.adblaster.util.LowMemMap;
 import com.nexopia.adblaster.util.LowMemMultiMap;
 import com.nexopia.adblaster.util.StringArrayPageValidator;
 import com.nexopia.adblaster.util.Utilities;
