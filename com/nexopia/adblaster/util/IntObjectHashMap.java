@@ -89,6 +89,11 @@ public class IntObjectHashMap<Value> extends PrimitiveKeyBase {
 	}
 
 	/**
+	 * This function returns an array full of keys and non-keys. Non-keys
+	 * are initialized to 0 by default, and 0 may also be an acceptable key,
+	 * so be aware that there's no way to determine whether a 0 entry is a 
+	 * key or not without using the m_flagTable.
+	 * 
 	 * Get the backing array of keys. This implementation of an abstract method
 	 * is used by the type-agnostic base class code to access the array used for
 	 * type-specific storage by the child class.

@@ -103,7 +103,7 @@ public class NIOServer {
 			server.configureBlocking(false);
 			
 			//host-port 8000
-			server.socket().bind(new java.net.InetSocketAddress("localhost",8000));
+			server.socket().bind(new java.net.InetSocketAddress(8000));
 			
 			BannerServer.bannerDebug("Server listening on port 8000");
 			//Create the selector
@@ -200,45 +200,53 @@ public class NIOServer {
 					
 					StringBuffer strbuf = new StringBuffer("");
 					int len = 0;
-					while ((len = getString(client, strbuf)) == 1) {
-						String result = null;
-						try {
-							if (BannerServer.debug.get("development").booleanValue()) {
-								BannerServer.bannerDebug(strbuf.toString());
-							}
-							if (strbuf.toString().equals("reset")) {
-								cdb = new CampaignDB(factory);
-								bdb = new BannerDatabase(cdb, new PageValidatorFactory(StringArrayPageValidator.class, args1));
-								banners = new BannerServer(bdb, cdb, 1);
+					try {
+						while ((len = getString(client, strbuf)) == 1) {
+							String result = null;
+							try {
 								if (BannerServer.debug.get("development").booleanValue()) {
-									BannerServer.bannerDebug("Reinitialized the banner server.");
+									BannerServer.bannerDebug(strbuf.toString());
 								}
-							} else {
-								//The banner server deals with any commands except a server reset.
-								result = banners.receive(strbuf.toString());
+								if (strbuf.toString().equals("reset")) {
+									System.out.println("Resetting...");
+									cdb = new CampaignDB(factory);
+									bdb = new BannerDatabase(cdb, new PageValidatorFactory(StringArrayPageValidator.class, args1));
+									banners = new BannerServer(bdb, cdb, 1);
+									if (BannerServer.debug.get("development").booleanValue()) {
+										BannerServer.bannerDebug("Reinitialized the banner server.");
+									}
+								} else {
+									//The banner server deals with any commands except a server reset.
+									result = banners.receive(strbuf.toString());
+								}
+							} catch (Exception e) {
+								BannerServer.bannerDebug("Unexpected exception when attempting to handle input '" + strbuf.toString() + "'");
+								e.printStackTrace();
 							}
-						} catch (Exception e) {
-							BannerServer.bannerDebug("Unexpected exception when attempting to handle input '" + strbuf.toString() + "'");
-							e.printStackTrace();
+							try {
+								ByteBuffer output = charset.encode(result+'\n');
+								//System.out.println(output.toString());
+								client.write(output);
+								index++;
+							} catch (Exception e) {
+								//This happens often, it's not a problem condition.  It just means that the client
+								//didn't care about the result, for example they triggered a command for which there
+								//is no result.
+							}
+							strbuf.setLength(0);
 						}
-						try {
-							ByteBuffer output = charset.encode(result+'\n');
-							//System.out.println(output.toString());
-							client.write(output);
-							index++;
-						} catch (Exception e) {
-							//This happens often, it's not a problem condition.  It just means that the client
-							//didn't care about the result, for example they triggered a command for which there
-							//is no result.
+						if (len == -1){
+							//nothing readable
+							if (strbuf.length() > 0)
+								BannerServer.bannerDebug("Error! " + strbuf.toString());
+							client.close();
+							continue;
 						}
-						strbuf.setLength(0);
-					}
-					if (len == -1){
-						//nothing readable
-						if (strbuf.length() > 0)
-							BannerServer.bannerDebug("Error! " + strbuf.toString());
+					} catch (IOException e){
+						System.out.println("The following error was detected but the server will continue:");
+						System.out.println(e);
+						e.printStackTrace();
 						client.close();
-						continue;
 					}
 				}
 			}

@@ -151,8 +151,8 @@ public class BannerServer {
 	private String hitlogserver;
 
 	public BannerServer(BannerDatabase db, CampaignDB cdb, int numservers) {
-		//this.policy = new OldPolicy(cdb);
-		this.policy = new AdBlasterPolicy(db.getBanners());
+		this.policy = new OldPolicy(cdb);
+		//this.policy = new AdBlasterPolicy(db.getBanners());
 		this.db = db;
 		this.cdb = cdb;
 		JDBCConfig.initThreadedSQLQueue();
@@ -620,8 +620,8 @@ public class BannerServer {
 			String interestsStr=params[6]; 
 			String page=params[7]; 
 			int passback=Integer.parseInt(params[8]);
-			int pageid=Integer.parseInt(params[9]);
-			boolean debugGet=Boolean.parseBoolean(params[10]);
+			boolean debugGet=Boolean.parseBoolean(params[9]);
+			int pageid=Integer.parseInt(params[10]);
 
 			Interests interests = new Interests(interestsStr, false);
 			
