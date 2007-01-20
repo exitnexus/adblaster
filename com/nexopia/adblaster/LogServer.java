@@ -91,7 +91,7 @@ public class LogServer {
 		if (words.length == 0) return;
 		String command = words[0];
 		//get usertime size userid age sex location interests page passback debugGet pageID => bannerid
-		if (command.indexOf("get") == 0 && words.length == 15) {
+		if (command.indexOf("get") == 0 && words.length >= 14) {
 			//System.out.println("Actual request");
 			int time = Integer.parseInt(words[1]);
 			byte size = Byte.parseByte(words[2]);
@@ -102,7 +102,7 @@ public class LogServer {
 			String interests = words[7];
 			String page = words[8];
 			int passback = Integer.parseInt(words[9]);
-			int pageID = Integer.parseInt(words[10]);
+			int pageID = Integer.parseInt(words[11]);
 			int bannerid = Integer.parseInt(words[13]);
 			
 			//we don't create a new user object here to save on object creation overhead, just reuse one user repeatedly
