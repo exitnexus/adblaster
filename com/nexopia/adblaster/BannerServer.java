@@ -491,7 +491,8 @@ public class BannerServer {
 		String[] split = command.split(" ");
 		int cmd = BLANK;
 		String[] params;
-		if (split.length > 0){
+		System.out.println(split.length);
+		if (split.length > 1){
 			params = new String[split.length-1];
 			int i = 0;
 			boolean first = true;
@@ -506,7 +507,7 @@ public class BannerServer {
 			}
 		} else {
 			params = new String[0];
-			cmd = parseCommand(command);
+			cmd = parseCommand(command.trim());
 		}
 		
 		//System.out.println(cmd);
@@ -861,8 +862,8 @@ public class BannerServer {
 			this.policy = new AdBlasterPolicy(db.getBanners());
 			return "Coefficients reloaded.";
 		default:
-			//myerror("unknown command: 'msg'", __LINE__);
-			throw new UnsupportedOperationException("Command:" + cmd + " : Params: " + Arrays.toString(params));			
+			System.out.println("Unknown command: '" + cmd + "' Params: '" + Arrays.toString(params) + "'");
+			//throw new UnsupportedOperationException("Command:" + cmd + " : Params: " + Arrays.toString(params));			
 		}
 		return null;
 	}
