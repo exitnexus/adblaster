@@ -8,6 +8,8 @@ import java.util.Vector;
 import com.nexopia.adblaster.db.FlatFileConfig;
 import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.BannerView;
+import com.nexopia.adblaster.struct.Campaign;
+import com.nexopia.adblaster.struct.PageView;
 
 public final class AdBlasterThreadedOperation implements Runnable {
 	private static final int swap_max = 0; //The maximum depth of swap searches
@@ -16,6 +18,8 @@ public final class AdBlasterThreadedOperation implements Runnable {
 	private final AdBlasterThreadedInstance chunk;
 	private boolean finished;
 	private float original_profit;
+
+	private int[] pageDominanceOptions;
 	
 	public AdBlasterThreadedOperation(GlobalData globalData, AdBlasterThreadedInstance chunk) {
 		super();
@@ -123,22 +127,49 @@ public final class AdBlasterThreadedOperation implements Runnable {
 		}
 		System.out.println("Improving based on unserved banners.");
 		
-		for (int j = 0; j < instanc.getViewCount();	j++){
-			BannerView bv = instanc.getViews().elementAt(j);
-			if (j % 1000 == 0)
-				System.out.println(j + " of " + instanc.getViewCount());
-
-			for (int i = 0; i < unserved.size(); i++){
-				Banner b = (Banner)unserved.get(i);
-				// First try simple search...mo
-				if ((instanc.bannerCount(b) < b.getIntegerMaxViewsPerDay()/FlatFileConfig.FILE_COUNT) &&
-						(instanc.campaignCount(b) < b.getCampaign().getIntegerMaxViewsPerDay()/FlatFileConfig.FILE_COUNT)){
-					 
-					if (serveView(instanc, bv, b))
-						break; 	//You already swapped in the best banner possible, 
-								//so don't try anymore.
+		for (int j=0; j < instanc.getPageCount(); j++) {
+			PageView pv = instanc.getPages().elementAt(j);
+			if (j%500 == 0) {
+				System.out.println(j + " of " + instanc.getPageCount());
+			}
+			PageView bestPageView = pv;
+			for (int pageDominance: pageDominanceOptions) {
+				PageView newPage = pv.clone();
+				if (pageDominance == BannerServer.PAGE_DOMINANCE_OFF) {
+					for (BannerView bv: newPage.getViews()) {
+						for (Banner b: unserved) {
+							//First try simple search...mo
+							if ((instanc.bannerCount(b) < b.getIntegerMaxViewsPerDay()/FlatFileConfig.FILE_COUNT) &&
+									(instanc.campaignCount(b) < b.getCampaign().getIntegerMaxViewsPerDay()/FlatFileConfig.FILE_COUNT)){
+								 
+								if (serveView(instanc, bv, b))
+									break; 	//You already swapped in the best banner possible, 
+											//so don't try anymore.
+							}
+						}
+					}
+				} else { //pageDominance is a campaign id
+					newPage.clearViews(); //we don't want to ensure that our views are better than the original because we need to get everything from the campaign
+					Campaign c = instanc.getCampaign(pageDominance);
+					Vector<Banner> banners = c.getPayRateSortedBanners(instanc);
+					for (BannerView bv: newPage.getViews()) {
+						for (Banner b: banners) {
+							//First try simple search...mo
+							if ((instanc.bannerCount(b) < b.getIntegerMaxViewsPerDay()/FlatFileConfig.FILE_COUNT) &&
+									(instanc.campaignCount(b) < b.getCampaign().getIntegerMaxViewsPerDay()/FlatFileConfig.FILE_COUNT)){
+								 
+								if (serveView(instanc, bv, b))
+									break; 	//You already swapped in the best banner possible, 
+											//so don't try anymore.
+							}
+						}
+					}
+				}
+				if (newPage.getPayRate(instanc) > bestPageView.getPayRate(instanc)) {
+					bestPageView = newPage;
 				}
 			}
+			pv.update(bestPageView); //Set all the real views to be the way they are for the best page we found
 		}
 	}
 

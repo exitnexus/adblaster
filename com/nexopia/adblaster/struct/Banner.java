@@ -8,6 +8,7 @@ package com.nexopia.adblaster.struct;
 
 import java.sql.SQLException;
 import java.sql.ResultSet;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -21,7 +22,7 @@ import com.nexopia.adblaster.util.Utilities;
 
 
 
-public class Banner extends ServablePropertyHolder{
+public class Banner extends ServablePropertyHolder {
 	public static final int PAYRATE_INHERIT = -1;
 	public static final int PAYTYPE_CPM = 0;
 	public static final int PAYTYPE_CPC = 1;

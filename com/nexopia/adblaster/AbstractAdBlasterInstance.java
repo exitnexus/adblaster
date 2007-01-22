@@ -10,6 +10,7 @@ import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.BannerView;
 import com.nexopia.adblaster.struct.Campaign;
 import com.nexopia.adblaster.struct.I_Policy;
+import com.nexopia.adblaster.struct.PageView;
 import com.nexopia.adblaster.struct.ServablePropertyHolder;
 import com.nexopia.adblaster.struct.User;
 import com.nexopia.adblaster.util.Integer;
@@ -488,6 +489,21 @@ public abstract class AbstractAdBlasterInstance {
 	public abstract Banner getBanner(int bid);
 
 	public abstract int getMinViewsPerInstance(Banner banner);
+
+	public Vector<PageView> getPages() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public int getPageCount() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public Campaign getCampaign(int pageDominance) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 
 

@@ -31,7 +31,7 @@ abstract public class ServablePropertyHolder {
 	protected int startdate;
 	protected int viewsPerUser;
 	protected int viewsperday;
-	private int validLocation = 0;
+	
 	public ServablePropertyHolder() {
 		super();
 	}
