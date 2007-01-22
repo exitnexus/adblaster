@@ -12,11 +12,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
 
+import com.nexopia.adblaster.AbstractAdBlasterInstance;
 import com.nexopia.adblaster.BannerServer;
 import com.nexopia.adblaster.db.JDBCConfig;
 import com.nexopia.adblaster.util.Integer;
@@ -127,7 +129,8 @@ public class Campaign extends ServablePropertyHolder{
 	int id;
 	int payrate;
 	byte paytype;
-	public Set<Banner> banners;
+	private Set<Banner> banners;
+	private Vector<Banner> payRateSortedBanners = null;
 	private int views;
 	private int clicks;
 	private boolean pageDominance;
@@ -237,10 +240,12 @@ public class Campaign extends ServablePropertyHolder{
 
 	public void addBanner(Banner banner) {
 		this.banners.add(banner);
+		this.payRateSortedBanners = null;
 	}
 	
 	public void removeBanner(Banner banner) {
 		this.banners.remove(banner);
+		this.payRateSortedBanners.remove(banner);
 	}
 
 	public int getClicks() {
@@ -334,6 +339,18 @@ public class Campaign extends ServablePropertyHolder{
 
 	public boolean getPageDominance() {
 		return pageDominance;
+	}
+
+	public Vector<Banner> getPayRateSortedBanners(AbstractAdBlasterInstance instance) {
+		if (this.payRateSortedBanners == null) {
+			this.payRateSortedBanners = new Vector<Banner>(banners);
+			Collections.sort(this.payRateSortedBanners, new BannerPayRateComparator(instance));
+		}
+		return this.payRateSortedBanners;
+	}
+
+	public Set<Banner> getBanners() {
+		return banners;
 	}
 
 }

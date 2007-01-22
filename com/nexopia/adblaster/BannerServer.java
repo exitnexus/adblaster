@@ -751,7 +751,7 @@ public class BannerServer {
 			
 		case DELCAMPAIGN: // "delcampaign id"
 			id = Integer.parseInt(params[0]);
-			for (Banner b: cdb.get(id).banners) {
+			for (Banner b: cdb.get(id).getBanners()) {
 				db.delete(b.getID());
 			}
 			cdb.delete(id);
