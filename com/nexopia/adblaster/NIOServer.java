@@ -22,7 +22,7 @@ public class NIOServer {
 
 	static Charset charset=Charset.forName("ISO-8859-1");
 	static HashMap <SocketChannel, BufferedSocketChannel>socketMap;
-	
+	public static final long SELECTOR_TIMEOUT = 5000; //ms
 	
 	static class BufferedSocketChannel{
 		String previous_str = "";
@@ -146,8 +146,8 @@ public class NIOServer {
 				}
 			}
 			
-			selector.select();
-		
+			selector.select(SELECTOR_TIMEOUT);
+				
 			// Get keys
 			Set keys = selector.selectedKeys();
 			Iterator i = keys.iterator();
