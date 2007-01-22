@@ -5,6 +5,7 @@ import java.nio.channels.*;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
@@ -22,7 +23,7 @@ public class NIOServer {
 
 	static Charset charset=Charset.forName("ISO-8859-1");
 	static HashMap <SocketChannel, BufferedSocketChannel>socketMap;
-	public static final long SELECTOR_TIMEOUT = 5000; //ms
+	public static final long SELECTOR_TIMEOUT = 500; //ms
 	
 	static class BufferedSocketChannel{
 		String previous_str = "";
@@ -80,6 +81,10 @@ public class NIOServer {
 		}
 	}
 	
+	private static final int HOURLY_SECONDS_OFFSET = 20; //seconds
+	private static final int DAILY_SECONDS_OFFSET = 40; //seconds
+	private static final int DAILY_HOURS_OFFSET = 6; //hours
+	
 	public static void main (String args[]) throws IOException {
 		socketMap = new HashMap<SocketChannel, BufferedSocketChannel>();
 		Object args1[] = {};
@@ -118,27 +123,30 @@ public class NIOServer {
 		
 //		Infinite server loop
 		long time = System.currentTimeMillis();
-		long lastMinute = System.currentTimeMillis();
-		long lastHour = System.currentTimeMillis()+20000; //hourly is shifted by 20 seconds
-		long lastDay = System.currentTimeMillis()+40000; //daily is shifted by 40 seconds
+		int lastMinute = -1;
+		int lastHour = -1;
+		int lastDay = -1;
 		
-		for(int index=0; index > -1; ) {
+		while (true) {
 			if (BannerServer.debug.get("tick").booleanValue()) {
 				BannerServer.bannerDebug("Tick");
 			}
 			if (System.currentTimeMillis()-time > 1000) {
+				Calendar now = Calendar.getInstance();
 				time = System.currentTimeMillis();
 				banners.secondly();
-				if (time-lastMinute > 60000) {
-					lastMinute = time;
+				if (lastMinute != now.get(Calendar.MINUTE)) {
+					lastMinute = now.get(Calendar.MINUTE);
 					banners.minutely(BannerServer.debug.get("timeupdates").booleanValue());
 				}
-				if (time-lastHour > 60000*60) {
-					lastHour = time;
+				if (lastHour != now.get(Calendar.HOUR_OF_DAY) && now.get(Calendar.SECOND) > HOURLY_SECONDS_OFFSET) {
+					lastHour = now.get(Calendar.HOUR_OF_DAY);
 					banners.hourly(BannerServer.debug.get("timeupdates").booleanValue());
 				}
-				if (time-lastDay > 60000*60*24) {
-					lastDay = time;
+				if (lastDay != now.get(Calendar.DAY_OF_YEAR) &&
+						now.get(Calendar.HOUR_OF_DAY) > DAILY_HOURS_OFFSET &&
+						now.get(Calendar.SECOND) > DAILY_SECONDS_OFFSET) {
+					lastDay = now.get(Calendar.DAY_OF_YEAR);
 					banners.daily(BannerServer.debug.get("timeupdates").booleanValue());
 					if (BannerServer.debug.get("dailyrestart").booleanValue()) {
 						System.exit(0);
@@ -227,7 +235,6 @@ public class NIOServer {
 								ByteBuffer output = charset.encode(result+'\n');
 								//System.out.println(output.toString());
 								client.write(output);
-								index++;
 							} catch (Exception e) {
 								//This happens often, it's not a problem condition.  It just means that the client
 								//didn't care about the result, for example they triggered a command for which there
