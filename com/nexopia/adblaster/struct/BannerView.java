@@ -7,7 +7,7 @@ package com.nexopia.adblaster.struct;
  * BannerView objects should know their instance, and inform their instances when they
  * change.
  */
-public class BannerView{
+public class BannerView implements Cloneable {
 	private int uid;
 	private int bid;
 	private int time;
@@ -39,7 +39,13 @@ public class BannerView{
 		this.pageID = pageID;
 	}
 	
-
+	public BannerView clone() {
+		try {
+			return (BannerView)super.clone();
+		} catch (CloneNotSupportedException e) {
+			return null;
+		}
+	}
 	
 	
 	public BannerView(String bannerViewString) {

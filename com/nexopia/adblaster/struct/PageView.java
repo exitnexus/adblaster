@@ -5,7 +5,7 @@ import java.util.Vector;
 import com.nexopia.adblaster.AbstractAdBlasterInstance;
 import com.nexopia.adblaster.AdBlasterThreadedInstance;
 
-public class PageView {
+public class PageView implements Cloneable {
 	Vector<BannerView> bannerViews;
 	private int id;
 	
@@ -31,6 +31,10 @@ public class PageView {
 	}
 	
 	public PageView clone() {
+		Vector<BannerView> new_vector = new Vector<BannerView>(bannerViews);
+		for (int i=0; i< new_vector.size(); i++) {
+			new_vector.set(i, new_vector.get(i).clone());
+		}
 		return new PageView(this.id, new Vector<BannerView>(bannerViews));
 	}
 
