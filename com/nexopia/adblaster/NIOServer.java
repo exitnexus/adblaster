@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import com.nexopia.adblaster.db.BannerDatabase;
+import com.nexopia.adblaster.db.JDBCConfig;
 import com.nexopia.adblaster.struct.Campaign.CampaignDB;
 import com.nexopia.adblaster.util.StringArrayPageValidator;
 import com.nexopia.adblaster.util.FlatFilePageValidator;
@@ -86,6 +87,11 @@ public class NIOServer {
 	private static final int DAILY_HOURS_OFFSET = 6; //hours
 	
 	public static void main (String args[]) throws IOException {
+		if (args.length > 0)
+			JDBCConfig.initDBConnection(args[0]);
+		else
+			JDBCConfig.initDBConnection(null);
+		
 		socketMap = new HashMap<SocketChannel, BufferedSocketChannel>();
 		Object args1[] = {};
 

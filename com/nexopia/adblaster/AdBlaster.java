@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import com.nexopia.adblaster.db.FlatFileConfig;
+import com.nexopia.adblaster.db.JDBCConfig;
 import com.nexopia.adblaster.db.PageFlatFileDatabase;
 import com.nexopia.adblaster.struct.BannerView;
 import com.nexopia.adblaster.util.FlatFilePageValidator;
@@ -26,6 +27,11 @@ public class AdBlaster {
 			bv_dir = new File(args[0]);
 		} else {
 			bv_dir = FlatFileConfig.getDefaultDirectory();
+		}
+		if (args.length > 1){
+			JDBCConfig.initDBConnection(args[1]);
+		} else {
+			JDBCConfig.initDBConnection(null);
 		}
 		
 		if (args.length == 4){

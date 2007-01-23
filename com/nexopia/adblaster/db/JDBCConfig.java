@@ -34,12 +34,16 @@ public class JDBCConfig {
 		return "";
 	}
 	
-	static {
+	/* null means to use the default user directory for the config file. */
+	public static void initDBConnection(String fname){
 		String url = "blank";
 		String user = "blank";
 		String pass = "blank";
 		try {
-			FileReader fr = new FileReader("db.config");
+			if (fname == null){
+				fname = "db.config";
+			}
+			FileReader fr = new FileReader(fname);
 			BufferedReader br = new BufferedReader(fr);
 			url = br.readLine();
 			user = br.readLine();
