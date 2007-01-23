@@ -3,6 +3,7 @@ package com.nexopia.adblaster.struct;
 import java.util.Vector;
 
 import com.nexopia.adblaster.AbstractAdBlasterInstance;
+import com.nexopia.adblaster.AdBlasterThreadedInstance;
 
 public class PageView {
 	Vector<BannerView> bannerViews;
@@ -33,9 +34,12 @@ public class PageView {
 		}
 	}
 
-	public void update(PageView bestPageView) {
+	public void update(PageView bestPageView, AdBlasterThreadedInstance chunk) {
 		for (int i=0; i<this.bannerViews.size(); i++) {
-			this.bannerViews.get(i).setBannerID(bestPageView.getViews().get(i).getBannerId());
+			BannerView bv = this.bannerViews.get(i);
+			Banner b = chunk.getBanner(bv.getBannerId());
+			chunk.notifyChange(bv, b);
+			bv.setBannerID(bestPageView.getViews().get(i).getBannerId());
 		}
 	}
 

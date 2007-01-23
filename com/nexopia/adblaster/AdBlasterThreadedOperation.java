@@ -72,12 +72,11 @@ public final class AdBlasterThreadedOperation implements Runnable {
 		this.notify();
 	}
 
-	public boolean serveView(AbstractAdBlasterInstance instanc, BannerView bv, Banner b){
+	private boolean serveView(AbstractAdBlasterInstance instanc, BannerView bv, Banner b){
 			// System.out.println("Trying bannerview " + j);
 		if (bv.getBannerId() == 0 || gd.universe.getBannerByID(bv.getBannerId()).getPayrate(instanc) < b.getPayrate(instanc)){
 			if (instanc.isValidBannerForView(bv,b)){
 				// single swap
-				chunk.notifyChange(bv, b);
 				bv.setBanner(b);
 				return true;
 			}
@@ -169,7 +168,7 @@ public final class AdBlasterThreadedOperation implements Runnable {
 					bestPageView = newPage;
 				}
 			}
-			pv.update(bestPageView); //Set all the real views to be the way they are for the best page we found
+			pv.update(bestPageView, chunk); //Set all the real views to be the way they are for the best page we found
 		}
 	}
 
