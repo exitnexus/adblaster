@@ -51,9 +51,10 @@ public class PageView implements Cloneable {
 	public void update(PageView bestPageView, AdBlasterThreadedInstance chunk) {
 		for (int i=0; i<this.bannerViews.size(); i++) {
 			BannerView bv = this.bannerViews.get(i);
-			Banner b = chunk.getBanner(bv.getBannerId());
+			int newBannerID = bestPageView.getViews().get(i).getBannerId();
+			Banner b = chunk.getBanner(newBannerID);
 			chunk.notifyChange(bv, b);
-			bv.setBannerID(bestPageView.getViews().get(i).getBannerId());
+			bv.setBannerID(newBannerID);
 		}
 	}
 
