@@ -22,7 +22,10 @@ public class PageView {
 	public int getPayRate(AbstractAdBlasterInstance instance) {
 		int payrate = 0;
 		for (BannerView bv: bannerViews) {
-			payrate += instance.getBanner(bv.getBannerId()).getPayrate(instance);
+			Banner b = instance.getBanner(bv.getBannerId());
+			if (b != null) {
+				payrate += b.getPayrate(instance);
+			}
 		}
 		return payrate;
 	}
