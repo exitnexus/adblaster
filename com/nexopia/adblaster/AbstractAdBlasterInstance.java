@@ -484,6 +484,10 @@ public abstract class AbstractAdBlasterInstance {
 			this.campaignCountMap.put(b.getCampaign(), 
 					new Integer((campaignCountMap.get(b.getCampaign())).intValue()+1));
 		}
+		if (bv.lastChange != -1){
+			throw new UnsupportedOperationException("Damn fools! " + bv.lastChange + ":" + b.getID());
+		}
+		bv.lastChange = b.getID();
 	}
 
 	public abstract void fillInstance(I_Policy pol);
