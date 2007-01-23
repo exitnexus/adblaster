@@ -1,6 +1,8 @@
 package com.nexopia.adblaster.db;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Connection;
@@ -33,10 +35,28 @@ public class JDBCConfig {
 	}
 	
 	static {
+		String url = "blank";
+		String user = "blank";
+		String pass = "blank";
+		try {
+			FileReader fr = new FileReader("db.config");
+			BufferedReader br = new BufferedReader(fr);
+			url = br.readLine();
+			user = br.readLine();
+			pass = br.readLine();
+			fr.close();
+		} catch (FileNotFoundException e1) {
+			System.out.println("'db.config' file must be created in " + System.getProperty("user.dir"));
+			System.out.println("The format of db.config is: ");
+			System.out.println("db address\\n username\\n password\\n");
+			e1.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
-			String url = "jdbc:mysql://192.168.0.213:3306/testbanner";
-			con = DriverManager.getConnection(url, "root", "root");
+			
+			con = DriverManager.getConnection(url, user, pass);
 		} catch (ClassNotFoundException e) {
 			System.err.println("Unable to load JDBC driver.");
 			e.printStackTrace();

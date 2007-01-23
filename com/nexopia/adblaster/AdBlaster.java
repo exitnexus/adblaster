@@ -21,7 +21,7 @@ public class AdBlaster {
 	
 	public static void main(String args[]){
 		File dataFile = null;
-		if (args.length >= 3){
+		if (args.length >= 1){
 			System.out.println("Running with selected directories.");
 			bv_dir = new File(args[0]);
 		} else {
