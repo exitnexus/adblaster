@@ -491,7 +491,6 @@ public class BannerServer {
 		String[] split = command.split(" ");
 		int cmd = BLANK;
 		String[] params;
-		System.out.println(split.length);
 		if (split.length > 1){
 			params = new String[split.length-1];
 			int i = 0;
@@ -594,6 +593,7 @@ public class BannerServer {
 			JDBCConfig.queueQuery("INSERT INTO " + JDBCConfig.BANNERTYPESTAT_TABLE + " SET size = "+size+", time = "+time+", views = "+views.total+", clicks = "+clicks.total+", viewsdump = ?, clicksdump = ?", views.toXML(), clicks.toXML());
 			//System.err.println("****" + "INSERT INTO " + JDBCConfig.BANNERTYPESTAT_TABLE + " SET size = "+size+", time = "+time+", views = "+views.total+", clicks = "+clicks.total+", viewsdump = '"+views.toXML()+"', clicksdump = '"+clicks.toXML()+"'" + "****");
 		}
+		JDBCConfig.finishQueries(); //Waits until the queue is empty.
 	}
 	
 	public void daily(Banner b, boolean debug) {

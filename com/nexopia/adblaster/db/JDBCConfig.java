@@ -66,6 +66,12 @@ public class JDBCConfig {
 	public static void queueQuery(String query, byte[] a, byte[] b) {
 		sqlQueue.execute(query, a, b);
 	}
+	
+	//Wait until the query queue is empty before returning.
+	public static void finishQueries() {
+		while (!sqlQueue.isEmpty()) {
+		}
+	}
 
 	public static PreparedStatement prepareStatement(String sql) throws SQLException {
 		return con.prepareStatement(sql);

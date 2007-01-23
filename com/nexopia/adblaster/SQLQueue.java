@@ -29,11 +29,13 @@ public class SQLQueue
 	private final int nThreads;
 	private final SQLWorker[] threads;
 	private final LinkedList<QueryWrapper> queue;
+	private int workingCount;
 	
 	public SQLQueue(int nThreads)
 	{
 		this.nThreads = nThreads;
 		queue = new LinkedList<QueryWrapper>();
+		workingCount = 0;
 		threads = new SQLWorker[nThreads];
 		
 		for (int i=0; i<this.nThreads; i++) {
@@ -56,6 +58,10 @@ public class SQLQueue
 		}
 	}
 	
+	public boolean isEmpty() {
+		return (queue.isEmpty() && workingCount == 0);
+	}
+	
 	private class SQLWorker extends Thread {
 		public void run() {
 			QueryWrapper query;
@@ -71,8 +77,8 @@ public class SQLQueue
 						{
 						}
 					}
-					
 					query =  queue.removeFirst();
+					workingCount++;
 				}
 				
 				try {
@@ -82,6 +88,7 @@ public class SQLQueue
 						st.setBytes(2,query.b);
 					}
 					st.execute();
+					
 				}
 				catch (RuntimeException e) {
 					// If we don't catch RuntimeException, 
@@ -90,6 +97,10 @@ public class SQLQueue
 				} catch (SQLException e) {
 					System.err.println("Error executing query '" + query + "'.");
 					e.printStackTrace();
+				} finally {
+					synchronized(queue) {
+						workingCount--;
+					}
 				}
 			}
 		}

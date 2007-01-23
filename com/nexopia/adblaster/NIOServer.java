@@ -131,10 +131,10 @@ public class NIOServer {
 		}
 		
 		while (true) {
-			if (BannerServer.debug.get("tick").booleanValue()) {
-				BannerServer.bannerDebug("Tick");
-			}
 			if (System.currentTimeMillis()-time > 1000) {
+				if (BannerServer.debug.get("tick").booleanValue()) {
+					BannerServer.bannerDebug("Tick");
+				}
 				Calendar now = Calendar.getInstance();
 				time = System.currentTimeMillis();
 				banners.secondly();
