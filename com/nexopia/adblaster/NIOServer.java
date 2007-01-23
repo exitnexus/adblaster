@@ -123,9 +123,12 @@ public class NIOServer {
 		
 //		Infinite server loop
 		long time = System.currentTimeMillis();
-		int lastMinute = -1;
-		int lastHour = -1;
-		int lastDay = -1;
+		int lastMinute = Calendar.getInstance().get(Calendar.MINUTE);
+		int lastHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+		int lastDay = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
+		if (lastHour < DAILY_HOURS_OFFSET) {
+			lastDay--;
+		}
 		
 		while (true) {
 			if (BannerServer.debug.get("tick").booleanValue()) {
