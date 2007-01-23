@@ -35,7 +35,7 @@ public class PageView implements Cloneable {
 		for (int i=0; i< new_vector.size(); i++) {
 			new_vector.set(i, new_vector.get(i).clone());
 		}
-		return new PageView(this.id, new Vector<BannerView>(bannerViews));
+		return new PageView(this.id, new_vector);
 	}
 
 	public Vector<BannerView> getViews() {
