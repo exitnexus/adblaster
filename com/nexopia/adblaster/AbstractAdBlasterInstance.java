@@ -483,6 +483,7 @@ public abstract class AbstractAdBlasterInstance {
 	public abstract void fillInstance(I_Policy pol);
 	public abstract int getViewCount();
 	public abstract Vector<BannerView>getViews();
+	public abstract Vector<PageView>getPages();
 	//public abstract User getUserByIndex(int randomPick);
 	//public abstract int getUserCount();
 	public abstract User getUser(int uid);
@@ -490,19 +491,10 @@ public abstract class AbstractAdBlasterInstance {
 
 	public abstract int getMinViewsPerInstance(Banner banner);
 
-	public Vector<PageView> getPages() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public abstract int getPageCount();
 
-	public int getPageCount() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	public Campaign getCampaign(int pageDominance) {
-		// TODO Auto-generated method stub
-		return null;
+	public Campaign getCampaign(int campaignID) {
+		return universe.getCampaignByID(campaignID);
 	}
 
 

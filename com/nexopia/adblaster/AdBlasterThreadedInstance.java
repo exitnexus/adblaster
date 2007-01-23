@@ -12,7 +12,9 @@ import com.nexopia.adblaster.db.UserFlatFileReader;
 import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.BannerView;
 import com.nexopia.adblaster.struct.I_Policy;
+import com.nexopia.adblaster.struct.PageView;
 import com.nexopia.adblaster.struct.User;
+import com.nexopia.adblaster.util.IntObjectHashMap;
 import com.nexopia.adblaster.util.Integer;
 
 public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
@@ -20,6 +22,9 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 	private BannerViewFlatFileReader db;
 	private UserFlatFileReader userDB;
 	private Vector<Banner> banners;
+	private Vector<PageView> pages;
+	private IntObjectHashMap<PageView> pageMap;
+	
 	
 	public AdBlasterThreadedInstance(GlobalData gd, int subset_num) {
 		super(gd.universe);
@@ -35,8 +40,11 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 		}
 		
 		views = new Vector<BannerView>();
+		pages = new Vector<PageView>();
+		pageMap = new IntObjectHashMap<PageView>();
+		
 		for (BannerView bv : db.getCurrentBannerViews()){
-			views.add(bv);
+			this.addView(bv);
 			Banner b = universe.getBannerByID(bv.getBannerId());
 			if (b == null){
 				System.out.println("Banner " + bv.getBannerId() + " does not exist.");
@@ -47,6 +55,7 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 			this.updateMap(bv);
 		}
 		System.out.println("Loaded " + views.size() + " banner views.");
+		System.out.println("Loaded " + pages.size() + " pages.");
 	}
 
 	public float totalProfit(){
@@ -123,10 +132,19 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 
 	public void addView(BannerView bv) {
 		views.add(bv);
+		if (pageMap.get(bv.getPageID()) != null) {
+			pageMap.get(bv.getPageID()).addBannerView(bv);
+		} else {
+			PageView pv = new PageView(bv.getPageID());
+			pages.add(pv);
+			pageMap.put(pv.getID(), pv);
+		}
 	}
 
 	public void addAddAllViews(Collection<BannerView> subset) {
-		this.views.addAll(subset);
+		for (BannerView bv: subset) {
+			addView(bv);
+		}
 	}
 
 	@Override
@@ -147,6 +165,16 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 	@Override
 	public Banner getBanner(int bid) {
 		return universe.getBannerByID(bid);
+	}
+
+	@Override
+	public Vector<PageView> getPages() {
+		return this.pages;
+	}
+
+	@Override
+	public int getPageCount() {
+		return this.pages.size();
 	}
 
 

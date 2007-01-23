@@ -100,4 +100,8 @@ public class BannerView{
 		this.passback = passback;
 	}
 
+	public int getPageID() {
+		return this.pageID;
+	}
+
 }

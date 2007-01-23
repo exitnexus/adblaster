@@ -12,7 +12,8 @@ import com.nexopia.adblaster.struct.User;
 public abstract class AbstractAdBlasterUniverse {
 	
 	abstract public Banner getBannerByID(int i);
-
+	abstract public Campaign getCampaignByID(int i);
+	
 	abstract public int getBannerCount();
 
 	abstract public Vector<Banner> getBanners();

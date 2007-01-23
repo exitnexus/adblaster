@@ -62,5 +62,9 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 	public Collection<Campaign> getCampaigns() {
 		return this.campaignDB.getCampaigns();
 	}
+	@Override
+	public Campaign getCampaignByID(int i) {
+		return campaignDB.get(i);
+	}
 
 }

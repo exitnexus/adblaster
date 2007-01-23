@@ -22,6 +22,8 @@
 
 package com.nexopia.adblaster.util;
 
+import com.nexopia.adblaster.struct.BannerView;
+
 
 
 /**
