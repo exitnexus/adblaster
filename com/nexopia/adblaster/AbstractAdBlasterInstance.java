@@ -186,7 +186,13 @@ public abstract class AbstractAdBlasterInstance {
 		HashMap <User, HashMap<Campaign, Vector<BannerView>>> hash = new HashMap<User, HashMap<Campaign, Vector<BannerView>>>();
 		for(BannerView bv: getViews()){
 			User u = getUser(bv.getUserID());
-			Campaign c = getBanner(bv.getBannerId()).getCampaign();
+			Banner b = getBanner(bv.getBannerId());
+			Campaign c;
+			if (b != null) {
+				c = b.getCampaign();
+			} else {
+				c = null;
+			}
 			if (hash.get(u) == null) {
 				hash.put(u, new HashMap<Campaign, Vector<BannerView>>());
 			}
