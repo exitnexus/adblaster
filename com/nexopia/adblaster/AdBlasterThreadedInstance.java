@@ -11,6 +11,7 @@ import com.nexopia.adblaster.db.FlatFileConfig;
 import com.nexopia.adblaster.db.UserFlatFileReader;
 import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.BannerView;
+import com.nexopia.adblaster.struct.Campaign;
 import com.nexopia.adblaster.struct.I_Policy;
 import com.nexopia.adblaster.struct.PageView;
 import com.nexopia.adblaster.struct.User;
@@ -175,6 +176,10 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 	@Override
 	public int getPageCount() {
 		return this.pages.size();
+	}
+
+	public Vector<Campaign> getCampaigns() {
+		return new Vector<Campaign>(universe.getCampaigns());
 	}
 
 

@@ -27,6 +27,18 @@ public final class AdBlasterThreadedOperation implements Runnable {
 		this.chunk = chunk;
 		
 		finished = false;
+		Vector<Campaign> pageDominatingCampaigns = new Vector<Campaign>();
+		for (Campaign c: chunk.getCampaigns()) {
+			if (c.getPageDominance()) {
+				pageDominatingCampaigns.add(c);
+			}
+		}
+		pageDominanceOptions = new int[pageDominatingCampaigns.size()+1];
+		pageDominanceOptions[0] = BannerServer.PAGE_DOMINANCE_OFF;
+		for (int i=0; i< pageDominatingCampaigns.size(); i++) {
+			pageDominanceOptions[i+1] = pageDominatingCampaigns.get(i).getID();
+		}
+		
 	}
 
 	public void run() {
