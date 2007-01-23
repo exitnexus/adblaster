@@ -146,7 +146,7 @@ public class AdBlasterThreadedInstance extends AbstractAdBlasterInstance {
 
 	@Override
 	public Banner getBanner(int bid) {
-		return banners.get(bid);
+		return universe.getBannerByID(bid);
 	}
 
 
