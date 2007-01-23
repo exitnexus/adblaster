@@ -498,10 +498,10 @@ public class BannerServer {
 			boolean first = true;
 			for (String s : split) {
 				if (first) {
-					cmd = parseCommand(s);
+					cmd = parseCommand(s.trim());
 					first = false;
 				} else {
-					params[i] = s;
+					params[i] = s.trim();
 					i++;
 				}
 			}
@@ -848,7 +848,7 @@ public class BannerServer {
 				bannerDebug("click " + Arrays.toString(params));
 			}
 			
-			int bannerid=Integer.parseInt(params[0]); 
+			int bannerid=Integer.parseInt(params[0]);
 			Banner b = db.getBannerByID(bannerid);
 			
 			this.bannerstats.getOrCreate(b, BannerStat.class).click();
