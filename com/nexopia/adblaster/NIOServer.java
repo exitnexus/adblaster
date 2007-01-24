@@ -1,4 +1,5 @@
 package com.nexopia.adblaster;
+import java.io.File;
 import java.io.IOException;
 import java.nio.*;
 import java.nio.channels.*;
@@ -12,6 +13,7 @@ import java.util.Set;
 
 import com.nexopia.adblaster.db.BannerDatabase;
 import com.nexopia.adblaster.db.JDBCConfig;
+import com.nexopia.adblaster.struct.ConfigFile;
 import com.nexopia.adblaster.struct.Campaign.CampaignDB;
 import com.nexopia.adblaster.util.StringArrayPageValidator;
 import com.nexopia.adblaster.util.FlatFilePageValidator;
@@ -24,6 +26,7 @@ public class NIOServer {
 
 	static Charset charset=Charset.forName("ISO-8859-1");
 	static HashMap <SocketChannel, BufferedSocketChannel>socketMap;
+	private static ConfigFile config;
 	public static final long SELECTOR_TIMEOUT = 500; //ms
 	
 	static class BufferedSocketChannel{
@@ -86,13 +89,15 @@ public class NIOServer {
 	private static final int DAILY_SECONDS_OFFSET = 40; //seconds
 	private static final int DAILY_HOURS_OFFSET = 6; //hours
 	private static final int NUM_SERVERS = 1;
-	private static final int BANNER_SERVER_PORT = 8435;
 	
 	public static void main (String args[]) throws IOException {
-		if (args.length > 0)
-			JDBCConfig.initDBConnection(args[0]);
-		else
-			JDBCConfig.initDBConnection(null);
+		if (args.length > 0){
+			config = new ConfigFile(new File(args[0]));
+		} else {
+			config = new ConfigFile(new File("db.config"));
+		}
+		
+		JDBCConfig.initDBConnection(config);
 		
 		socketMap = new HashMap<SocketChannel, BufferedSocketChannel>();
 		Object args1[] = {};
@@ -108,7 +113,7 @@ public class NIOServer {
 		ServerSocketChannel server = null;
 		Selector selector = null;
 		
-		int banner_server_port = BANNER_SERVER_PORT;
+		int banner_server_port = config.getInt("port");
 		
 		try {
 			server = ServerSocketChannel.open();

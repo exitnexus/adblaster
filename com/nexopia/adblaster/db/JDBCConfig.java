@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import com.nexopia.adblaster.SQLQueue;
+import com.nexopia.adblaster.struct.ConfigFile;
 
 public class JDBCConfig {
 	public static final String BANNERSTAT_TABLE = "bannerstats";	
@@ -35,28 +36,13 @@ public class JDBCConfig {
 	}
 	
 	/* null means to use the default user directory for the config file. */
-	public static void initDBConnection(String fname){
+	public static void initDBConnection(ConfigFile config){
 		String url = "blank";
 		String user = "blank";
 		String pass = "blank";
-		try {
-			if (fname == null){
-				fname = "db.config";
-			}
-			FileReader fr = new FileReader(fname);
-			BufferedReader br = new BufferedReader(fr);
-			url = br.readLine();
-			user = br.readLine();
-			pass = br.readLine();
-			fr.close();
-		} catch (FileNotFoundException e1) {
-			System.out.println("'db.config' file must be created in " + System.getProperty("user.dir"));
-			System.out.println("The format of db.config is: ");
-			System.out.println("db address\\n username\\n password\\n");
-			e1.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		url = config.getString("db_url");
+		user = config.getString("db_user");
+		pass = config.getString("db_pass");
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			

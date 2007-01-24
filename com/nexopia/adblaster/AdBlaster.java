@@ -7,6 +7,7 @@ import com.nexopia.adblaster.db.FlatFileConfig;
 import com.nexopia.adblaster.db.JDBCConfig;
 import com.nexopia.adblaster.db.PageFlatFileDatabase;
 import com.nexopia.adblaster.struct.BannerView;
+import com.nexopia.adblaster.struct.ConfigFile;
 import com.nexopia.adblaster.util.FlatFilePageValidator;
 import com.nexopia.adblaster.util.PageValidatorFactory;
 import com.nexopia.adblaster.util.Utilities;
@@ -18,26 +19,25 @@ public class AdBlaster {
 	static AdBlasterDbUniverse ac;
 	
 	private static File bv_dir = null;
-
-	
+	public static ConfigFile config;
+		
 	public static void main(String args[]){
-		File dataFile = null;
+
 		if (args.length >= 1){
 			System.out.println("Running with selected directories.");
 			bv_dir = new File(args[0]);
 		} else {
 			bv_dir = FlatFileConfig.getDefaultDirectory();
 		}
+
 		if (args.length > 1){
-			JDBCConfig.initDBConnection(args[1]);
+			config = new ConfigFile(new File(args[1]));
 		} else {
-			JDBCConfig.initDBConnection(null);
+			config = new ConfigFile(new File("db.config"));
 		}
 		
-		if (args.length == 4){
-			dataFile = new File(args[3]);
-		}
-
+		JDBCConfig.initDBConnection(config);
+		
 		PageFlatFileDatabase pageDb = null;
 		try {
 			pageDb = new PageFlatFileDatabase(bv_dir, true);
@@ -45,6 +45,7 @@ public class AdBlaster {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
 		}
+		
 		Object args2[] = {pageDb};
 		PageValidatorFactory factory = 
 			new PageValidatorFactory(FlatFilePageValidator.class,args2);
