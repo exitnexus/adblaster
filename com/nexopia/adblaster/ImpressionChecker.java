@@ -22,6 +22,7 @@ import com.nexopia.adblaster.db.PageFlatFileDatabase;
 import com.nexopia.adblaster.db.UserFlatFileReader;
 import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.BannerView;
+import com.nexopia.adblaster.struct.ConfigFile;
 import com.nexopia.adblaster.struct.User;
 import com.nexopia.adblaster.struct.Campaign.CampaignDB;
 import com.nexopia.adblaster.util.FlatFilePageValidator;
@@ -34,6 +35,7 @@ import com.nexopia.adblaster.util.PageValidatorFactory;
  */
 
 public class ImpressionChecker {
+	private static ConfigFile config;
 	private int bannerID;
 	private UserFlatFileReader userReader;
 	private BannerViewFlatFileReader bannerViewReader;
@@ -141,6 +143,14 @@ public class ImpressionChecker {
 		} else {
 			directory = FlatFileConfig.getDefaultDirectory();
 		}
+		
+		if (args.length > 1){
+			config = new ConfigFile(new File(args[0]));
+		} else {
+			config = new ConfigFile(new File("banner.config"));
+		}
+		
+		JDBCConfig.initDBConnection(config);
 		
 		System.out.println("Running a impression checker using the directory '" + directory);
 		long startTime = System.currentTimeMillis();
