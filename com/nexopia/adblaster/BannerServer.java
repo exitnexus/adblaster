@@ -522,6 +522,10 @@ public class BannerServer {
 	}
 	
 	public void secondly() {
+		int t_sec = (int)(System.currentTimeMillis() / 1000);
+		int statstime = ((t_sec+1) % STATS_WINDOW); //clear the next seconds stats so when we get to it it is clear.
+		slidingstats[statstime] = new ServerStat();
+		
 		currentwindow = (currentwindow+1)%VIEW_WINDOWS;
 		if (recentviews.size() < currentwindow+1) {
 			recentviews.add(new HashMap<Integer, Vector<Integer>>());
