@@ -17,7 +17,6 @@ public class BannerView implements Cloneable {
 	private int passback;
 	private int pageID;
 	
-	public int lastChange = -1;
 	
 	public BannerView(int index, int uid, int bid, int t, byte size, int page, int pageID){
 		this.uid = uid; 
@@ -70,10 +69,7 @@ public class BannerView implements Cloneable {
 	}
 	
 	public void setBannerID(int bannerid) {
-		if (this.lastChange != bannerid)
-			throw new UnsupportedOperationException("You fools! " + bannerid + ": " + lastChange);
 		this.bid = bannerid;
-		this.lastChange = -1;
 	}
 
 	public int getTime() {
