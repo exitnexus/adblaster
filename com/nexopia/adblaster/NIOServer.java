@@ -85,6 +85,7 @@ public class NIOServer {
 	private static final int HOURLY_SECONDS_OFFSET = 20; //seconds
 	private static final int DAILY_SECONDS_OFFSET = 40; //seconds
 	private static final int DAILY_HOURS_OFFSET = 6; //hours
+	private static final int NUM_SERVERS = 1;
 	private static final int BANNER_SERVER_PORT = 8435;
 	
 	public static void main (String args[]) throws IOException {
@@ -101,7 +102,7 @@ public class NIOServer {
 		
 		CampaignDB cdb = new CampaignDB(factory);
 		BannerDatabase bdb = new BannerDatabase(cdb, factory);
-		BannerServer banners = new BannerServer(bdb, cdb, 1);
+		BannerServer banners = new BannerServer(bdb, cdb, NUM_SERVERS);
 		
 		//Create the server socket channel
 		ServerSocketChannel server = null;
