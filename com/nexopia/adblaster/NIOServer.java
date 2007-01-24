@@ -188,9 +188,10 @@ public class NIOServer {
 						//System.out.println("Accepting connection.");
 						SocketChannel original = server.accept();
 						client = new BufferedSocketChannel(original);
-						if (BannerServer.debug.get("tick").booleanValue()) {
+						if (BannerServer.debug.get("connect").booleanValue()) {
 							BannerServer.bannerDebug("[connection]: " + original.socket().getInetAddress());
 						}
+						banners.connection();
 						socketMap.put(original, client);
 						// Non Blocking I/O
 						client.configureBlocking(false);

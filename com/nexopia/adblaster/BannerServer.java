@@ -608,6 +608,13 @@ public class BannerServer {
 		bannerstats.get(b).dailyviews = 0;
 	}
 	
+	//records statistics, indicates a new connection was made.
+	public void connection() {
+		int t_sec = (int)(System.currentTimeMillis() / 1000);
+		int statstime = (t_sec % STATS_WINDOW);
+		slidingstats[statstime].connect++;
+	}
+	
 	public String receive(int cmd, String[] params) throws IOException{
 		int id;
 		int t_sec = (int)(System.currentTimeMillis() / 1000);
