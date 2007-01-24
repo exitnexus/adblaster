@@ -560,7 +560,7 @@ public class BannerServer {
 		int time = (int)System.currentTimeMillis()/1000 - PAGE_DOMINANCE_RETENTION_TIME;
 		for (int key: keys) {
 			if (key != 0) { //Weirdness from IntObjectHashMap, 0 points to every unassigned bucket in the hash.
-				if (pageIDDominance.get(key)[PAGE_DOMINANCE_TIME] < time) {
+				if (pageIDDominance.get(key) == null || pageIDDominance.get(key)[PAGE_DOMINANCE_TIME] < time) {
 					pageIDDominance.remove(key);
 				}
 			}
