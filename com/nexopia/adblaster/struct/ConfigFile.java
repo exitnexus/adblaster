@@ -21,7 +21,7 @@ public class ConfigFile {
 				options.put(kv[0].trim().toLowerCase(), kv[1].trim().toLowerCase()); 
 			}
 		} catch (FileNotFoundException e1) {
-			System.out.println("'db.config' file must be created in " + System.getProperty("user.dir"));
+			System.out.println("'banner.config' file must be created in " + System.getProperty("user.dir"));
 			System.out.println("The format of db.config is: ");
 			System.out.println("db_url=jdbc:mysql://server:port/tablename");
 			System.out.println("db_user=...");

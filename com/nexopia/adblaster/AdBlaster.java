@@ -33,7 +33,7 @@ public class AdBlaster {
 		if (args.length > 1){
 			config = new ConfigFile(new File(args[1]));
 		} else {
-			config = new ConfigFile(new File("db.config"));
+			config = new ConfigFile(new File("banner.config"));
 		}
 		
 		JDBCConfig.initDBConnection(config);

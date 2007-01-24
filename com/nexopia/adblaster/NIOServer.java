@@ -94,7 +94,7 @@ public class NIOServer {
 		if (args.length > 0){
 			config = new ConfigFile(new File(args[0]));
 		} else {
-			config = new ConfigFile(new File("db.config"));
+			config = new ConfigFile(new File("banner.config"));
 		}
 		
 		JDBCConfig.initDBConnection(config);
