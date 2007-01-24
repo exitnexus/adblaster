@@ -58,6 +58,7 @@ public class BannerServer {
 	public static final int PAGE_DOMINANCE_TYPE = 0; //array position
 	public static final int PAGE_DOMINANCE_TIME = 1; //array position
 	public static final int PAGE_DOMINANCE_RETENTION_TIME = 60; //seconds to keep page ids around
+	public static final int PAGE_DOMINANCE_NO_PAGE_ID = -1; //page id passed if no page id exists
 	
 	private static final int BLANK = 0;
 	private static final int ADD = 1;
@@ -308,6 +309,8 @@ public class BannerServer {
 		
 		if (pageIDDominance.get(pageid) != null) {
 			pageDominance = pageIDDominance.get(pageid)[PAGE_DOMINANCE_TYPE];
+		} else if (pageid == PAGE_DOMINANCE_NO_PAGE_ID) {
+			pageDominance = PAGE_DOMINANCE_OFF;
 		} else {
 			pageDominance = PAGE_DOMINANCE_POSSIBLE;
 		}
