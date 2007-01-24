@@ -85,6 +85,7 @@ public class NIOServer {
 	private static final int HOURLY_SECONDS_OFFSET = 20; //seconds
 	private static final int DAILY_SECONDS_OFFSET = 40; //seconds
 	private static final int DAILY_HOURS_OFFSET = 6; //hours
+	private static final int BANNER_SERVER_PORT = 8435;
 	
 	public static void main (String args[]) throws IOException {
 		if (args.length > 0)
@@ -106,7 +107,8 @@ public class NIOServer {
 		ServerSocketChannel server = null;
 		Selector selector = null;
 		
-
+		int banner_server_port = BANNER_SERVER_PORT;
+		
 		try {
 			server = ServerSocketChannel.open();
 			
@@ -114,9 +116,9 @@ public class NIOServer {
 			server.configureBlocking(false);
 			
 			//host-port 8000
-			server.socket().bind(new java.net.InetSocketAddress(8000));
+			server.socket().bind(new java.net.InetSocketAddress(banner_server_port));
 			
-			BannerServer.bannerDebug("Server listening on port 8000");
+			BannerServer.bannerDebug("Server listening on port " + banner_server_port);
 			//Create the selector
 			selector = Selector.open();
 			
