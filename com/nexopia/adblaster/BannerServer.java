@@ -315,6 +315,9 @@ public class BannerServer {
 			pageDominance = PAGE_DOMINANCE_POSSIBLE;
 		}
 		
+		System.out.println("PAGE DOMINANCE OFF = " + PAGE_DOMINANCE_OFF);
+		System.out.println("PAGE DOMINANCE POSSIBLE = " + PAGE_DOMINANCE_POSSIBLE);
+		System.out.println("PAGE DOMINANCE = " + pageDominance);
 		
 		for (Campaign campaign : cdb.getCampaigns()) {
 			banners.addAll(campaign.getBanners(usertime, size, userid, age,
@@ -346,6 +349,11 @@ public class BannerServer {
 				if (chosen.getCampaign().getPageDominance()) {
 					int[] idTimePair = new int[2];
 					idTimePair[PAGE_DOMINANCE_TYPE] = chosen.getCampaign().getID();
+					idTimePair[PAGE_DOMINANCE_TIME] = (int)System.currentTimeMillis()/1000;
+					pageIDDominance.put(pageid, idTimePair);
+				} else {
+					int[] idTimePair = new int[2];
+					idTimePair[PAGE_DOMINANCE_TYPE] = PAGE_DOMINANCE_OFF;
 					idTimePair[PAGE_DOMINANCE_TIME] = (int)System.currentTimeMillis()/1000;
 					pageIDDominance.put(pageid, idTimePair);
 				}
