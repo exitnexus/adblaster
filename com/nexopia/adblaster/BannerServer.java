@@ -315,10 +315,6 @@ public class BannerServer {
 			pageDominance = PAGE_DOMINANCE_POSSIBLE;
 		}
 		
-		System.out.println("PAGE DOMINANCE OFF = " + PAGE_DOMINANCE_OFF);
-		System.out.println("PAGE DOMINANCE POSSIBLE = " + PAGE_DOMINANCE_POSSIBLE);
-		System.out.println("PAGE DOMINANCE = " + pageDominance);
-		
 		for (Campaign campaign : cdb.getCampaigns()) {
 			banners.addAll(campaign.getBanners(usertime, size, userid, age,
 					sex, location, interests, page, pageDominance, debug));
