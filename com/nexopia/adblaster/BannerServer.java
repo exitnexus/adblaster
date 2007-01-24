@@ -788,10 +788,10 @@ public class BannerServer {
 			}
 			
 			String out  = "Uptime: " + (System.currentTimeMillis()/1000 - stats.starttime) + "\n";
-			out += "Connect:  " + str_pad(stats.connect, 9) + str_pad(totalstat.connect, 7) + (slidingstats[(statstime+STATS_WINDOW-1)%STATS_WINDOW].connect) + "\n";
-			out += "Get:  " + str_pad(stats.get, 9) + str_pad(totalstat.get, 7) + (slidingstats[(statstime+STATS_WINDOW-1)%STATS_WINDOW].get) + "\n";
-			out += "Get Fail:  " + str_pad(stats.getfail, 9) + str_pad(totalstat.getfail, 7) + (slidingstats[(statstime+STATS_WINDOW-1)%STATS_WINDOW].getfail) + "\n";
-			out += "Click:  " + str_pad(stats.click, 9) + str_pad(totalstat.click, 7) + (slidingstats[(statstime+STATS_WINDOW-1)%STATS_WINDOW].click) + "\n";
+			out += "Connect:  " + str_pad(stats.connect, 9) + " " + str_pad(totalstat.connect, 7) + " " + (slidingstats[(statstime+STATS_WINDOW-1)%STATS_WINDOW].connect) + "\n";
+			out += "Get:  " + str_pad(stats.get, 9) + " " + str_pad(totalstat.get, 7) + " " +  (slidingstats[(statstime+STATS_WINDOW-1)%STATS_WINDOW].get) + "\n";
+			out += "Get Fail:  " + str_pad(stats.getfail, 9) + " " + str_pad(totalstat.getfail, 7) + " " + (slidingstats[(statstime+STATS_WINDOW-1)%STATS_WINDOW].getfail) + "\n";
+			out += "Click:  " + str_pad(stats.click, 9) + " " + str_pad(totalstat.click, 7) + " " + (slidingstats[(statstime+STATS_WINDOW-1)%STATS_WINDOW].click) + "\n";
 			
 			return out;
 			
