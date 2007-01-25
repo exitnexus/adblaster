@@ -18,7 +18,7 @@ public class ConfigFile {
 			String s;
 			while ((s = br.readLine()) != null){
 				String kv[] = s.split("=");
-				options.put(kv[0].trim().toLowerCase(), kv[1].trim().toLowerCase()); 
+				options.put(kv[0].trim().toLowerCase(), kv[1].trim()); 
 			}
 		} catch (FileNotFoundException e1) {
 			System.out.println("'banner.config' file must be created in " + System.getProperty("user.dir"));
