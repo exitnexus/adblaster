@@ -4,7 +4,7 @@
 package com.nexopia.adblaster.struct;
 
 public class BannerStat{
-	public static final int MEMORY_USAGE = 20;
+	public static final int MEMORY_USAGE = 46;
 	public int dailyviews;
 	public int dailyclicks;
 	public int passbacks;

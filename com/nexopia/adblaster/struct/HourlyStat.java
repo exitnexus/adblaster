@@ -6,7 +6,7 @@ package com.nexopia.adblaster.struct;
 import com.nexopia.adblaster.BannerServer;
 
 public class HourlyStat {
-	public static final int MEMORY_USAGE = BannerServer.BANNER_SLIDE_SIZE*8+4;
+	public static final int MEMORY_USAGE = BannerServer.BANNER_SLIDE_SIZE*8+30;
 	private int[] views = new int[BannerServer.BANNER_SLIDE_SIZE];
 	private int[] clicks = new int[BannerServer.BANNER_SLIDE_SIZE];
 	private int current_pos = 0;

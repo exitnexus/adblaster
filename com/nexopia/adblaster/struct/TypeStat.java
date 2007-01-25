@@ -108,7 +108,7 @@ public class TypeStat {
 	}
 
 	public int memory_usage() {
-		int bytes = 0;
+		int bytes = 26;
 		for (int[] sex: agesex) {
 			bytes += sex.length*4;
 		}
