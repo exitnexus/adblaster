@@ -85,6 +85,8 @@ public class BannerServer {
 	static final int DAILY = 25;
 	static final int CLICK = 26;
 	private static final int RELOAD_COEFFICIENTS_CMD = 27;
+	private static final int COLLECT_GARBAGE_CMD = 28;
+	
 	public static final int BANNER_SLIDE_SIZE = 8;
 	public static final double BANNER_MIN_CLICKRATE = 0.0002;
 	public static final double BANNER_MAX_CLICKRATE = 0.005;
@@ -92,6 +94,8 @@ public class BannerServer {
 	private static final int NO_BANNER = 0;
 	private static final int VIEW_WINDOWS = 5;
 	public static final String RELOAD_COEFFICIENTS = "RELOAD_COEFFICIENTS";
+	public static final String COLLECT_GARBAGE = "GC";
+	
 	private I_Policy policy;
 	
 	public static HashMap<String, Boolean> debug=new HashMap<String,Boolean>();
@@ -487,6 +491,8 @@ public class BannerServer {
 			cmd = CLICK;
 		} else if (command.toUpperCase().equals(RELOAD_COEFFICIENTS)) {
 			cmd = RELOAD_COEFFICIENTS_CMD;
+		} else if (command.toUpperCase().equals(COLLECT_GARBAGE)) {
+			cmd = COLLECT_GARBAGE_CMD;
 		} else {
 			cmd = BLANK;
 			System.out.println("'" + command + "'" + " not found.");
@@ -879,6 +885,10 @@ public class BannerServer {
 		case RELOAD_COEFFICIENTS_CMD:
 			this.policy = new AdBlasterPolicy(db.getBanners());
 			return "Coefficients reloaded.";
+		case COLLECT_GARBAGE_CMD:
+			bannerDebug("Performing garbage collection...");
+			System.gc();
+			bannerDebug("Garbarge collection complete.");
 		default:
 			System.out.println("Unknown command: '" + cmd + "' Params: '" + Arrays.toString(params) + "'");
 			//throw new UnsupportedOperationException("Command:" + cmd + " : Params: " + Arrays.toString(params));			
