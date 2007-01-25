@@ -25,4 +25,12 @@ public class LowMemMultiMap {
 		return views;
 	}
 
+	public int memory_usage() {
+		int bytes = 0;
+		for (ServablePropertyHolder s: multiMap.keySet()) {
+			bytes += multiMap.get(s).memory_usage();
+		}
+		return bytes;
+	}
+
 }

@@ -86,6 +86,7 @@ public class BannerServer {
 	static final int CLICK = 26;
 	private static final int RELOAD_COEFFICIENTS_CMD = 27;
 	private static final int COLLECT_GARBAGE_CMD = 28;
+	private static final int MEMORY_STATS_CMD = 29;
 	
 	public static final int BANNER_SLIDE_SIZE = 8;
 	public static final double BANNER_MIN_CLICKRATE = 0.0002;
@@ -95,6 +96,7 @@ public class BannerServer {
 	private static final int VIEW_WINDOWS = 5;
 	public static final String RELOAD_COEFFICIENTS = "RELOAD_COEFFICIENTS";
 	public static final String COLLECT_GARBAGE = "GC";
+	public static final String MEMORY_STATS = "MEMSTAT";
 	
 	private I_Policy policy;
 	
@@ -493,6 +495,8 @@ public class BannerServer {
 			cmd = RELOAD_COEFFICIENTS_CMD;
 		} else if (command.toUpperCase().equals(COLLECT_GARBAGE)) {
 			cmd = COLLECT_GARBAGE_CMD;
+		} else if (command.toUpperCase().equals(MEMORY_STATS)) {
+			cmd = MEMORY_STATS_CMD;
 		} else {
 			cmd = BLANK;
 			System.out.println("'" + command + "'" + " not found.");
@@ -890,6 +894,19 @@ public class BannerServer {
 			System.gc();
 			bannerDebug("Garbarge collection complete.");
 			break;
+		case MEMORY_STATS_CMD:
+			String stats = "User Frequency Capping (viewMap): " + viewMap.memory_usage() + " bytes\n";
+			int typestatBytes = 0;
+			for (Integer i: viewstats.keySet()) {
+				typestatBytes += viewstats.get(i).memory_usage();
+			}
+			for (Integer i: clickstats.keySet()) {
+				typestatBytes += clickstats.get(i).memory_usage();
+			}
+			stats += "TypeStat memory usage: " + typestatBytes + " bytes\n";
+			stats += "BannerStat memory usage: " + campaignstats.size()*BannerStat.MEMORY_USAGE + " bytes\n";
+			stats += "HourlyStat memory usage: " + hourlystats.size()*HourlyStat.MEMORY_USAGE + " bytes\n";
+			return stats;
 		default:
 			System.out.println("Unknown command: '" + cmd + "' Params: '" + Arrays.toString(params) + "'");
 			//throw new UnsupportedOperationException("Command:" + cmd + " : Params: " + Arrays.toString(params));			

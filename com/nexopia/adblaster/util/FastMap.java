@@ -4,6 +4,7 @@
 package com.nexopia.adblaster.util;
 
 import java.util.HashMap;
+import java.util.Set;
 
 public class FastMap <K, V> {
 	private HashMap <K,V>map;
@@ -41,6 +42,14 @@ public class FastMap <K, V> {
 	}
 	public V get(K k){
 		return map.get(k);
+	}
+
+	public int size() {
+		return map.size();
+	}
+	
+	public Set<K> keySet() {
+		return map.keySet();
 	}
 	
 }

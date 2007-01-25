@@ -11,6 +11,8 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.zip.GZIPOutputStream;
 
+import com.nexopia.adblaster.util.IntIntHashMap;
+import com.nexopia.adblaster.util.IntObjectHashMap;
 import com.nexopia.adblaster.util.Integer;
 import com.nexopia.adblaster.util.Interests;
 import com.thoughtworks.xstream.XStream;
@@ -52,7 +54,7 @@ public class TypeStat {
 	public int total;
 	private int[][] agesex;
 	private int[] loc;
-	private int[] interests;
+	private IntIntHashMap interests;
 	private int[][] hittimes;
 	private HashMap<String, Integer> pages;
 	
@@ -60,7 +62,7 @@ public class TypeStat {
 		total = 0;
 		starttime = (int)(System.currentTimeMillis()/1000);
 		loc = new int[INITIAL_ARRAY_SIZE];
-		interests = new int[INITIAL_ARRAY_SIZE];
+		interests = new IntIntHashMap();
 		agesex = new int[INITIAL_ARRAY_SIZE][3];
 		hittimes = new int[7][24];
 		pages = new HashMap<String, Integer>();
@@ -77,8 +79,7 @@ public class TypeStat {
 		this.loc = expandArray(this.loc, loc);
 		this.loc[loc]++;
 		for(int i=interests.getChecked().nextSetBit(0); i>=0; i=interests.getChecked().nextSetBit(i+1)) { 
-			this.interests = expandArray(this.interests, i);
-			this.interests[i]++;
+			this.interests.put(i, this.interests.get(i)+1);
 		}
 		Integer pageviews = pages.get(page);
 		if (pageviews == null) {
@@ -104,5 +105,18 @@ public class TypeStat {
 			}
 			return new_array;
 		}
+	}
+
+	public int memory_usage() {
+		int bytes = 0;
+		for (int[] sex: agesex) {
+			bytes += sex.length*4;
+		}
+		bytes += interests.size()*5;//guestimate that we are about 80% efficient with our hash
+		for (int[] times: hittimes) {
+			bytes += times.length*4;
+		}
+		bytes += pages.size()*5;
+		return bytes;
 	}
 }

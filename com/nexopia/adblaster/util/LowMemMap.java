@@ -72,5 +72,13 @@ public class LowMemMap {
 		return new LowMemArray(index);
 		
 	}
+	
+	public int memory_usage() {
+		int bytes = data.length*4;
+		bytes += indices.size()*5;
+		return bytes;
+	}
+	
+	
 }
 
