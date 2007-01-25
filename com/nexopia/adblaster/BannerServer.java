@@ -628,6 +628,7 @@ public class BannerServer {
 		int t_sec = (int)(System.currentTimeMillis() / 1000);
 		int statstime = (t_sec % STATS_WINDOW);
 		slidingstats[statstime].connect++;
+		stats.connect++;
 	}
 	
 	public String receive(int cmd, String[] params) throws IOException{
