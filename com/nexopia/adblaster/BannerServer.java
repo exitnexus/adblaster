@@ -889,6 +889,7 @@ public class BannerServer {
 			bannerDebug("Performing garbage collection...");
 			System.gc();
 			bannerDebug("Garbarge collection complete.");
+			break;
 		default:
 			System.out.println("Unknown command: '" + cmd + "' Params: '" + Arrays.toString(params) + "'");
 			//throw new UnsupportedOperationException("Command:" + cmd + " : Params: " + Arrays.toString(params));			
