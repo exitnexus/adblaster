@@ -34,6 +34,7 @@ import com.nexopia.adblaster.util.LowMemMultiMap;
 import com.nexopia.adblaster.util.StringArrayPageValidator;
 import com.nexopia.adblaster.util.Utilities;
 import com.nexopia.adblaster.util.LowMemMap.LowMemArray;
+import com.vladium.utils.ObjectProfiler;
 
 public class BannerServer {
 	private static final int LOG_PORT = 5556;
@@ -895,17 +896,15 @@ public class BannerServer {
 			bannerDebug("Garbarge collection complete.");
 			break;
 		case MEMORY_STATS_CMD:
-			String stats = "User Frequency Capping (viewMap): " + viewMap.memory_usage() + " bytes\n";
-			int typestatBytes = 0;
-			for (Integer i: viewstats.keySet()) {
-				typestatBytes += viewstats.get(i).memory_usage();
-			}
-			for (Integer i: clickstats.keySet()) {
-				typestatBytes += clickstats.get(i).memory_usage();
-			}
-			stats += "TypeStat memory usage: " + typestatBytes + " bytes\n";
-			stats += "BannerStat memory usage: " + campaignstats.size()*BannerStat.MEMORY_USAGE + " bytes\n";
-			stats += "HourlyStat memory usage: " + hourlystats.size()*HourlyStat.MEMORY_USAGE + " bytes\n";
+			String stats = "banners: " + ObjectProfiler.sizeof(banners) + " bytes\n";
+			stats += "bannerstats: " + ObjectProfiler.sizeof(bannerstats) + " bytes\n";
+			stats += "campaignstats: " + ObjectProfiler.sizeof(campaignstats) + " bytes\n";
+			stats += "viewstats: " + ObjectProfiler.sizeof(viewstats) + " bytes\n";
+			stats += "clickstats: " + ObjectProfiler.sizeof(clickstats) + " bytes\n";
+			stats += "hourlystats: " + ObjectProfiler.sizeof(hourlystats) + " bytes\n";
+			stats += "viewMap: " + ObjectProfiler.sizeof(viewMap) + " bytes\n";
+			stats += "pageIDDominance: " + ObjectProfiler.sizeof(pageIDDominance) + " bytes\n";
+			stats += "sqlQueue: " + ObjectProfiler.sizeof(JDBCConfig.getSQLQueue()) + " bytes\n";
 			return stats;
 		default:
 			System.out.println("Unknown command: '" + cmd + "' Params: '" + Arrays.toString(params) + "'");

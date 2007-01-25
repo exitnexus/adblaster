@@ -86,4 +86,8 @@ public class JDBCConfig {
 	public static PreparedStatement prepareStatement(String sql) throws SQLException {
 		return con.prepareStatement(sql);
 	}
+
+	public static SQLQueue getSQLQueue() {
+		return sqlQueue;
+	}
 }
