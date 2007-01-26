@@ -170,13 +170,13 @@ public class NIOServer {
 					lastMinute = now.get(Calendar.MINUTE);
 					banners.minutely(BannerServer.debug.get("timeupdates").booleanValue());
 				}
-				if (lastHour != now.get(Calendar.HOUR_OF_DAY) && now.get(Calendar.SECOND) > HOURLY_SECONDS_OFFSET) {
+				if (lastHour != now.get(Calendar.HOUR_OF_DAY) && now.get(Calendar.SECOND) >= HOURLY_SECONDS_OFFSET) {
 					lastHour = now.get(Calendar.HOUR_OF_DAY);
 					banners.hourly(BannerServer.debug.get("timeupdates").booleanValue());
 				}
 				if (lastDay != now.get(Calendar.DAY_OF_YEAR) &&
-						now.get(Calendar.HOUR_OF_DAY) > DAILY_HOURS_OFFSET &&
-						now.get(Calendar.SECOND) > DAILY_SECONDS_OFFSET) {
+						now.get(Calendar.HOUR_OF_DAY) >= DAILY_HOURS_OFFSET &&
+						now.get(Calendar.SECOND) >= DAILY_SECONDS_OFFSET) {
 					lastDay = now.get(Calendar.DAY_OF_YEAR);
 					banners.daily(BannerServer.debug.get("timeupdates").booleanValue());
 					if (BannerServer.debug.get("dailyrestart").booleanValue()) {
