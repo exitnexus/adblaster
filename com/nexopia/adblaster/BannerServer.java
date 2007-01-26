@@ -94,7 +94,7 @@ public class BannerServer {
 	public static final double BANNER_MAX_CLICKRATE = 0.005;
 	public static final int STATS_WINDOW = 60;
 	private static final int NO_BANNER = 0;
-	private static final int VIEW_WINDOWS = 5;
+	private static final int VIEW_WINDOWS = 10;
 	public static final String RELOAD_COEFFICIENTS = "RELOAD_COEFFICIENTS";
 	public static final String COLLECT_GARBAGE = "GC";
 	public static final String MEMORY_STATS = "MEMSTAT";
