@@ -440,11 +440,7 @@ public class BannerServer {
 	}
 	
 	static Vector<HashMap<Integer, Vector<Integer>>> recentviews = new Vector<HashMap<Integer, Vector<Integer>>>(VIEW_WINDOWS);
-	{
-		for (int i=0; i<VIEW_WINDOWS; i++) {
-			recentviews.add(new HashMap<Integer, Vector<Integer>>());
-		}
-	}
+	
 	private int parseCommand(String command) {
 		int cmd;
 		if (command.toUpperCase().equals("GET")) {
@@ -917,6 +913,8 @@ public class BannerServer {
 			stats += "viewMap: " + ObjectProfiler.sizeof(viewMap) + " bytes\n";
 			stats += "pageIDDominance: " + ObjectProfiler.sizeof(pageIDDominance) + " bytes\n";
 			stats += "sqlQueue: " + ObjectProfiler.sizeof(JDBCConfig.getSQLQueue()) + " bytes\n";
+			stats += "recentviews: " + ObjectProfiler.sizeof(recentviews) + " bytes\n";
+			stats += "slidingstats: " + ObjectProfiler.sizeof(slidingstats) + " bytes\n";
 			return stats;
 		default:
 			System.out.println("Unknown command: '" + cmd + "' Params: '" + Arrays.toString(params) + "'");
