@@ -4,6 +4,8 @@ import java.util.Stack;
 
 import java.io.*;
 
+import com.vladium.utils.ObjectProfiler;
+
 public class Integer {
 	//static portion
 	private static Stack<Integer> pool = new Stack<Integer>();
@@ -33,6 +35,10 @@ public class Integer {
 	*/
 	public static int parseInt(String s) {
 		return java.lang.Integer.parseInt(s);
+	}
+	
+	public static int poolSize() {
+		return ObjectProfiler.sizeof(pool);
 	}
 	
 	static Integer[] cache = new Integer[500];

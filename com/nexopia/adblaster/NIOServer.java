@@ -18,6 +18,7 @@ import com.nexopia.adblaster.struct.Campaign.CampaignDB;
 import com.nexopia.adblaster.util.StringArrayPageValidator;
 import com.nexopia.adblaster.util.FlatFilePageValidator;
 import com.nexopia.adblaster.util.PageValidatorFactory;
+import com.nexopia.adblaster.util.Integer;
 import com.vladium.utils.ObjectProfiler;
 
 //Listen on a port for connections and write back the current time.
@@ -289,6 +290,7 @@ public class NIOServer {
 						}
 					} else if (strbuf.toString().toUpperCase().startsWith(BannerServer.MEMORY_STATS)){
 						result = "NIOServer size: " + ObjectProfiler.sizeof(this) + " bytes\n";
+						result += "Integer Pool size: " + ObjectProfiler.sizeof(Integer.poolSize()) + " bytes\n";
 						result += "BannerServer size: " + ObjectProfiler.sizeof(banners) + " bytes\n";
 						result += "socketMap size: " + ObjectProfiler.sizeof(socketMap) + " bytes\n";
 						result += banners.receive(strbuf.toString());
