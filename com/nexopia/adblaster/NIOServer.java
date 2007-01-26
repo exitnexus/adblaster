@@ -26,7 +26,7 @@ public class NIOServer {
 	static ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
 
 	static Charset charset=Charset.forName("ISO-8859-1");
-	static HashMap <SocketChannel, BufferedSocketChannel>socketMap;
+	static HashMap <SocketChannel, BufferedSocketChannel> socketMap;
 	private static ConfigFile config;
 	public static final long SELECTOR_TIMEOUT = 5; //ms
 	
@@ -43,6 +43,7 @@ public class NIOServer {
 			this.sc.register(selector, ops);
 		}
 		public void close() throws IOException {
+			socketMap.remove(sc);
 			this.sc.close();
 		}
 		public int write(ByteBuffer output) throws IOException {
