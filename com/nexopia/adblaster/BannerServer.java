@@ -535,11 +535,10 @@ public class BannerServer {
 		slidingstats[statstime] = new ServerStat();
 		
 		currentwindow = (currentwindow+1)%VIEW_WINDOWS;
-		if (recentviews.size() < currentwindow+1) {
+		while (recentviews.size() < VIEW_WINDOWS) {
 			recentviews.add(new HashMap<Integer, Vector<Integer>>());
-		} else {
-			recentviews.set(currentwindow, new HashMap<Integer, Vector<Integer>>());
 		}
+		recentviews.set(currentwindow, new HashMap<Integer, Vector<Integer>>());
 	}
 
 	@SuppressWarnings("unchecked")
