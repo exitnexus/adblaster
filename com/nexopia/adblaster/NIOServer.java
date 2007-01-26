@@ -22,15 +22,15 @@ import com.vladium.utils.ObjectProfiler;
 
 //Listen on a port for connections and write back the current time.
 public class NIOServer {
-	static int BUFFER_SIZE = 1024;
-	static ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
+	private static final int BUFFER_SIZE = 1024;
+	ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
 
-	static Charset charset=Charset.forName("ISO-8859-1");
-	static HashMap <SocketChannel, BufferedSocketChannel> socketMap;
+	Charset charset=Charset.forName("ISO-8859-1");
+	HashMap <SocketChannel, BufferedSocketChannel> socketMap;
 	private static ConfigFile config;
 	public static final long SELECTOR_TIMEOUT = 5; //ms
 	
-	static class BufferedSocketChannel{
+	class BufferedSocketChannel{
 		String previous_str = "";
 		SocketChannel sc;
 		BufferedSocketChannel(SocketChannel chan){
@@ -92,12 +92,15 @@ public class NIOServer {
 	private static final int DAILY_HOURS_OFFSET = 6; //hours
 	private static final int NUM_SERVERS = 56;
 	
-	private static CampaignDB cdb;
-	private static BannerDatabase bdb;
-	private static BannerServer banners;
-	private static PageValidatorFactory factory;
+	private CampaignDB cdb;
+	private BannerDatabase bdb;
+	private BannerServer banners;
+	private PageValidatorFactory factory;
+	private Selector accepter;
+	private Selector readerWriter;
+	private ServerSocketChannel server;
 	
-	public static void main (String args[]) throws IOException {
+	public NIOServer(String args[]) {
 		if (args.length > 0){
 			config = new ConfigFile(new File(args[0]));
 		} else {
@@ -116,9 +119,9 @@ public class NIOServer {
 		banners = new BannerServer(bdb, cdb, NUM_SERVERS);
 		
 		//Create the server socket channel
-		ServerSocketChannel server = null;
-		Selector accepter = null;
-		Selector readerWriter = null;
+		server = null;
+		accepter = null;
+		readerWriter = null;
 		
 		int banner_server_port = config.getInt("port");
 		
@@ -141,8 +144,10 @@ public class NIOServer {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		//ByteBuffer lastbuffer = null;
 		
+	}
+	
+	public void run() throws IOException {
 //		Infinite server loop
 		long time = System.currentTimeMillis();
 		int lastMinute = Calendar.getInstance().get(Calendar.MINUTE);
@@ -240,8 +245,13 @@ public class NIOServer {
 			}
 		}
 	}
+	
+	public static void main (String args[]) throws IOException {
+		NIOServer nio = new NIOServer(args);
+		nio.run();
+	}
 
-	private static void handleConnectable(SelectionKey key) throws IOException {
+	private void handleConnectable(SelectionKey key) throws IOException {
 		//System.out.println("Close.");
 		BannerServer.bannerDebug("Client closed");
 		banners.connectionClosed();
@@ -249,7 +259,7 @@ public class NIOServer {
 		client.close();
 	}
 	
-	private static void handleReadableWritable(SelectionKey key) throws IOException {
+	private void handleReadableWritable(SelectionKey key) throws IOException {
 //		System.out.println("In the block.");
 		BufferedSocketChannel client = socketMap.get( key.channel() );
 		client.sc = (SocketChannel)key.channel();
@@ -278,7 +288,8 @@ public class NIOServer {
 							BannerServer.bannerDebug("Reinitialized the banner server.");
 						}
 					} else if (strbuf.toString().toUpperCase().startsWith(BannerServer.MEMORY_STATS)){
-						result = "BannerServer size: " + ObjectProfiler.sizeof(banners) + " bytes\n";
+						result = "NIOServer size: " + ObjectProfiler.sizeof(this) + " bytes\n";
+						result += "BannerServer size: " + ObjectProfiler.sizeof(banners) + " bytes\n";
 						result += "socketMap size: " + ObjectProfiler.sizeof(socketMap) + " bytes\n";
 						result += banners.receive(strbuf.toString());
 					} else {
@@ -323,7 +334,7 @@ public class NIOServer {
 	 * @return -1 if stream closed, 0 if not ready, 1 if ready
 	 * @throws IOException
 	 */
-	public static int getString(BufferedSocketChannel client, StringBuffer s) throws IOException{
+	public int getString(BufferedSocketChannel client, StringBuffer s) throws IOException{
 		// Read byte coming from the client
 		int i = client.read(s);
 		//System.out.println(s);
