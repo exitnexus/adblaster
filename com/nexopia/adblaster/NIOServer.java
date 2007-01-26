@@ -92,7 +92,7 @@ public class NIOServer {
 	private static final int DAILY_SECONDS_OFFSET = 40; //seconds
 	private static final int DAILY_MINUTES_OFFSET = 0; //hours
 	private static final int DAILY_HOURS_OFFSET = 6; //hours
-	private static final int NUM_SERVERS = 56;
+	private static int NUM_SERVERS=1;
 	
 	private CampaignDB cdb;
 	private BannerDatabase bdb;
@@ -108,6 +108,8 @@ public class NIOServer {
 		} else {
 			config = new ConfigFile(new File("banner.config"));
 		}
+		
+		NUM_SERVERS = config.getInt("numservers", NUM_SERVERS);
 		
 		JDBCConfig.initDBConnection(config);
 		

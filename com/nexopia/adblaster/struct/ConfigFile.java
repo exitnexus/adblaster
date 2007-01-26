@@ -18,7 +18,9 @@ public class ConfigFile {
 			String s;
 			while ((s = br.readLine()) != null){
 				String kv[] = s.split("=");
-				options.put(kv[0].trim().toLowerCase(), kv[1].trim()); 
+				if (kv.length == 2) {
+					options.put(kv[0].trim().toLowerCase(), kv[1].trim()); 
+				}
 			}
 		} catch (FileNotFoundException e1) {
 			System.out.println("'banner.config' file must be created in " + System.getProperty("user.dir"));
@@ -27,6 +29,7 @@ public class ConfigFile {
 			System.out.println("db_user=...");
 			System.out.println("db_pass=...");
 			System.out.println("port=...");
+			System.out.println("numservers=...");
 			e1.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -35,6 +38,14 @@ public class ConfigFile {
 	
 	public int getInt(String key){
 		return Integer.valueOf(options.get(key.toLowerCase())).intValue();
+	}
+	
+	public int getInt(String key, int defaultInt){
+		try  {
+			return getInt(key);
+		} catch (NumberFormatException e) {
+			return defaultInt;
+		}
 	}
 	
 	public String getString(String key){
