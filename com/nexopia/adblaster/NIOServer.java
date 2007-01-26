@@ -90,7 +90,7 @@ public class NIOServer {
 	private static final int HOURLY_SECONDS_OFFSET = 20; //seconds
 	private static final int DAILY_SECONDS_OFFSET = 40; //seconds
 	private static final int DAILY_HOURS_OFFSET = 6; //hours
-	private static final int NUM_SERVERS = 1;
+	private static final int NUM_SERVERS = 56;
 	
 	private static CampaignDB cdb;
 	private static BannerDatabase bdb;
