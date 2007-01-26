@@ -90,6 +90,7 @@ public class NIOServer {
 	
 	private static final int HOURLY_SECONDS_OFFSET = 20; //seconds
 	private static final int DAILY_SECONDS_OFFSET = 40; //seconds
+	private static final int DAILY_MINUTES_OFFSET = 0; //hours
 	private static final int DAILY_HOURS_OFFSET = 6; //hours
 	private static final int NUM_SERVERS = 56;
 	
@@ -154,9 +155,9 @@ public class NIOServer {
 		int lastMinute = Calendar.getInstance().get(Calendar.MINUTE);
 		int lastHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
 		int lastDay = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
-		if (lastHour < DAILY_HOURS_OFFSET) {
+		if (lastHour <= DAILY_HOURS_OFFSET) {
 			lastDay--;
-		}
+		} 
 		
 		while (true) {
 			if (System.currentTimeMillis()-time > 1000) {
@@ -170,13 +171,14 @@ public class NIOServer {
 					lastMinute = now.get(Calendar.MINUTE);
 					banners.minutely(BannerServer.debug.get("timeupdates").booleanValue());
 				}
-				if (lastHour != now.get(Calendar.HOUR_OF_DAY) && now.get(Calendar.SECOND) >= HOURLY_SECONDS_OFFSET) {
+				if (lastHour != now.get(Calendar.HOUR_OF_DAY) && now.get(Calendar.SECOND) > HOURLY_SECONDS_OFFSET) {
 					lastHour = now.get(Calendar.HOUR_OF_DAY);
 					banners.hourly(BannerServer.debug.get("timeupdates").booleanValue());
 				}
 				if (lastDay != now.get(Calendar.DAY_OF_YEAR) &&
-						now.get(Calendar.HOUR_OF_DAY) >= DAILY_HOURS_OFFSET &&
-						now.get(Calendar.SECOND) >= DAILY_SECONDS_OFFSET) {
+						now.get(Calendar.MINUTE) == DAILY_MINUTES_OFFSET &&
+						now.get(Calendar.HOUR_OF_DAY) == DAILY_HOURS_OFFSET &&
+						now.get(Calendar.SECOND) == DAILY_SECONDS_OFFSET) {
 					lastDay = now.get(Calendar.DAY_OF_YEAR);
 					banners.daily(BannerServer.debug.get("timeupdates").booleanValue());
 					if (BannerServer.debug.get("dailyrestart").booleanValue()) {
