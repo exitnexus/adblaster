@@ -160,6 +160,9 @@ public class BannerServer {
 	private int currentConnected=0;
 
 	public BannerServer(BannerDatabase db, CampaignDB cdb, int numservers) {
+		while (recentviews.size() < VIEW_WINDOWS) {
+			recentviews.add(new HashMap<Integer, Vector<Integer>>());
+		}
 		this.policy = new OldPolicy(cdb);
 		//this.policy = new AdBlasterPolicy(db.getBanners());
 		this.db = db;
@@ -535,9 +538,6 @@ public class BannerServer {
 		slidingstats[statstime] = new ServerStat();
 		
 		currentwindow = (currentwindow+1)%VIEW_WINDOWS;
-		while (recentviews.size() < VIEW_WINDOWS) {
-			recentviews.add(new HashMap<Integer, Vector<Integer>>());
-		}
 		recentviews.set(currentwindow, new HashMap<Integer, Vector<Integer>>());
 	}
 
