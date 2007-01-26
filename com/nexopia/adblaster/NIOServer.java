@@ -243,6 +243,7 @@ public class NIOServer {
 	private static void handleConnectable(SelectionKey key) throws IOException {
 		//System.out.println("Close.");
 		BannerServer.bannerDebug("Client closed");
+		banners.connectionClosed();
 		BufferedSocketChannel client = socketMap.get( key.channel() );
 		client.close();
 	}
@@ -264,6 +265,7 @@ public class NIOServer {
 					if (strbuf.toString().toUpperCase().startsWith("QUIT")) {
 						client.sc.close();
 						client.close();
+						banners.connectionClosed();
 						return;
 					} else if (strbuf.toString().equals("reset")) {
 						System.out.println("Resetting...");
@@ -302,12 +304,14 @@ public class NIOServer {
 				if (strbuf.length() > 0)
 					BannerServer.bannerDebug("Error! " + strbuf.toString());
 				client.close();
+				banners.connectionClosed();
 			}
 		} catch (IOException e){
 			System.out.println("The following error was detected but the server will continue:");
 			System.out.println(e);
 			e.printStackTrace();
 			client.close();
+			banners.connectionClosed();
 		}
 	}
 	
