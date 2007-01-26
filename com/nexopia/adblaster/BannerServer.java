@@ -619,6 +619,11 @@ public class BannerServer {
 	}
 	
 	public void daily(Banner b, boolean debug) {
+		BannerStat stats = bannerstats.get(b);
+		if (stats == null) {
+			stats = new BannerStat();
+			bannerstats.put(b, stats);
+		}
 		bannerstats.get(b).dailyclicks = 0;
 		bannerstats.get(b).dailyviews = 0;
 	}

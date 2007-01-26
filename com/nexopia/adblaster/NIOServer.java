@@ -18,6 +18,7 @@ import com.nexopia.adblaster.struct.Campaign.CampaignDB;
 import com.nexopia.adblaster.util.StringArrayPageValidator;
 import com.nexopia.adblaster.util.FlatFilePageValidator;
 import com.nexopia.adblaster.util.PageValidatorFactory;
+import com.vladium.utils.ObjectProfiler;
 
 //Listen on a port for connections and write back the current time.
 public class NIOServer {
@@ -27,7 +28,7 @@ public class NIOServer {
 	static Charset charset=Charset.forName("ISO-8859-1");
 	static HashMap <SocketChannel, BufferedSocketChannel>socketMap;
 	private static ConfigFile config;
-	public static final long SELECTOR_TIMEOUT = 500; //ms
+	public static final long SELECTOR_TIMEOUT = 5; //ms
 	
 	static class BufferedSocketChannel{
 		String previous_str = "";
@@ -38,8 +39,8 @@ public class NIOServer {
 		public void configureBlocking(boolean b) throws IOException{
 			this.sc.configureBlocking(b);
 		}
-		public void register(Selector selector, int i) throws ClosedChannelException {
-			this.sc.register(selector, i);
+		public void register(Selector selector, int ops) throws ClosedChannelException {
+			this.sc.register(selector, ops);
 		}
 		public void close() throws IOException {
 			this.sc.close();
@@ -90,6 +91,11 @@ public class NIOServer {
 	private static final int DAILY_HOURS_OFFSET = 6; //hours
 	private static final int NUM_SERVERS = 1;
 	
+	private static CampaignDB cdb;
+	private static BannerDatabase bdb;
+	private static BannerServer banners;
+	private static PageValidatorFactory factory;
+	
 	public static void main (String args[]) throws IOException {
 		if (args.length > 0){
 			config = new ConfigFile(new File(args[0]));
@@ -102,16 +108,16 @@ public class NIOServer {
 		socketMap = new HashMap<SocketChannel, BufferedSocketChannel>();
 		Object args1[] = {};
 
-		PageValidatorFactory factory = 
-			new PageValidatorFactory(StringArrayPageValidator.class,args1);
+		factory = new PageValidatorFactory(StringArrayPageValidator.class,args1);
 		
-		CampaignDB cdb = new CampaignDB(factory);
-		BannerDatabase bdb = new BannerDatabase(cdb, factory);
-		BannerServer banners = new BannerServer(bdb, cdb, NUM_SERVERS);
+		cdb = new CampaignDB(factory);
+		bdb = new BannerDatabase(cdb, factory);
+		banners = new BannerServer(bdb, cdb, NUM_SERVERS);
 		
 		//Create the server socket channel
 		ServerSocketChannel server = null;
-		Selector selector = null;
+		Selector accepter = null;
+		Selector readerWriter = null;
 		
 		int banner_server_port = config.getInt("port");
 		
@@ -126,10 +132,11 @@ public class NIOServer {
 			
 			BannerServer.bannerDebug("Server listening on port " + banner_server_port);
 			//Create the selector
-			selector = Selector.open();
+			accepter = Selector.open();
+			readerWriter = Selector.open();
 			
 			//Recording server to selector (type OP_ACCEPT)
-			server.register(selector,SelectionKey.OP_ACCEPT);
+			server.register(accepter,SelectionKey.OP_ACCEPT);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -171,10 +178,10 @@ public class NIOServer {
 				}
 			}
 			
-			selector.select(SELECTOR_TIMEOUT);
+			accepter.select(SELECTOR_TIMEOUT);
 				
 			// Get keys
-			Set keys = selector.selectedKeys();
+			Set keys = accepter.selectedKeys();
 			Iterator i = keys.iterator();
 			
 			// For each keys...
@@ -184,7 +191,7 @@ public class NIOServer {
 				// Remove the current key
 				i.remove();
 				
-				// if isAccetable = true
+				// if isAcceptable = true
 				// then a client required a connection
 				if (key.isAcceptable()) {
 					// get client socket channel
@@ -201,83 +208,109 @@ public class NIOServer {
 						// Non Blocking I/O
 						client.configureBlocking(false);
 						//recording to the selector (reading)
-						client.register(selector, SelectionKey.OP_READ|SelectionKey.OP_WRITE|SelectionKey.OP_CONNECT);
+						client.register(readerWriter, SelectionKey.OP_READ|SelectionKey.OP_WRITE|SelectionKey.OP_CONNECT);
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					continue;
 				}
-				
+			}
+
+
+
+			readerWriter.select(SELECTOR_TIMEOUT);
+
+			// Get keys
+			keys = readerWriter.selectedKeys();
+			i = keys.iterator();
+
+			// For each keys...
+			while(i.hasNext()) {
+				SelectionKey key = (SelectionKey) i.next();
+
+				// Remove the current key
+				i.remove();
 				if (key.isConnectable()) {
-					//System.out.println("Close.");
-					BannerServer.bannerDebug("Client closed");
-					BufferedSocketChannel client = socketMap.get( key.channel() );
-					client.close();
-					continue;
-				}
-				
-				// if isReadable = true
-				// then the server is ready to read 
-				if (key.isReadable() && key.isWritable()) {
-					//System.out.println("In the block.");
-					BufferedSocketChannel client = socketMap.get( key.channel() );
-					client.sc = (SocketChannel)key.channel();
-					
-					StringBuffer strbuf = new StringBuffer("");
-					int len = 0;
-					try {
-						while ((len = getString(client, strbuf)) == 1) {
-							String result = null;
-							try {
-								if (BannerServer.debug.get("development").booleanValue()) {
-									BannerServer.bannerDebug(strbuf.toString());
-								}
-								if (strbuf.toString().equals("reset")) {
-									System.out.println("Resetting...");
-									cdb = new CampaignDB(factory);
-									bdb = new BannerDatabase(cdb, new PageValidatorFactory(StringArrayPageValidator.class, args1));
-									banners = new BannerServer(bdb, cdb, 1);
-									if (BannerServer.debug.get("development").booleanValue()) {
-										BannerServer.bannerDebug("Reinitialized the banner server.");
-									}
-								} else {
-									//The banner server deals with any commands except a server reset.
-									result = banners.receive(strbuf.toString());
-								}
-							} catch (Exception e) {
-								BannerServer.bannerDebug("Unexpected exception when attempting to handle input '" + strbuf.toString() + "'");
-								e.printStackTrace();
-							}
-							try {
-								ByteBuffer output = charset.encode(result+'\n');
-								//System.out.println(output.toString());
-								client.write(output);
-							} catch (Exception e) {
-								//This happens often, it's not a problem condition.  It just means that the client
-								//didn't care about the result, for example they triggered a command for which there
-								//is no result.
-							}
-							strbuf.setLength(0);
-						}
-						if (len == -1){
-							//nothing readable
-							if (strbuf.length() > 0)
-								BannerServer.bannerDebug("Error! " + strbuf.toString());
-							client.close();
-							continue;
-						}
-					} catch (IOException e){
-						System.out.println("The following error was detected but the server will continue:");
-						System.out.println(e);
-						e.printStackTrace();
-						client.close();
-					}
+					handleConnectable(key);
+				} else if (key.isReadable() && key.isWritable()) {
+					handleReadableWritable(key);
 				}
 			}
 		}
 	}
 
+	private static void handleConnectable(SelectionKey key) throws IOException {
+		//System.out.println("Close.");
+		BannerServer.bannerDebug("Client closed");
+		BufferedSocketChannel client = socketMap.get( key.channel() );
+		client.close();
+	}
+	
+	private static void handleReadableWritable(SelectionKey key) throws IOException {
+//		System.out.println("In the block.");
+		BufferedSocketChannel client = socketMap.get( key.channel() );
+		client.sc = (SocketChannel)key.channel();
+		
+		StringBuffer strbuf = new StringBuffer("");
+		int len = 0;
+		try {
+			while ((len = getString(client, strbuf)) == 1) {
+				String result = null;
+				try {
+					if (BannerServer.debug.get("development").booleanValue()) {
+						BannerServer.bannerDebug(strbuf.toString());
+					}
+					if (strbuf.toString().toUpperCase().startsWith("QUIT")) {
+						client.sc.close();
+						client.close();
+						return;
+					} else if (strbuf.toString().equals("reset")) {
+						System.out.println("Resetting...");
+						cdb = new CampaignDB(factory);
+						Object args1[] = {};
+						bdb = new BannerDatabase(cdb, new PageValidatorFactory(StringArrayPageValidator.class, args1));
+						banners = new BannerServer(bdb, cdb, 1);
+						if (BannerServer.debug.get("development").booleanValue()) {
+							BannerServer.bannerDebug("Reinitialized the banner server.");
+						}
+					} else if (strbuf.toString().toUpperCase().startsWith(BannerServer.MEMORY_STATS)){
+						result = "BannerServer size: " + ObjectProfiler.sizeof(banners) + " bytes\n";
+						result += "socketMap size: " + ObjectProfiler.sizeof(socketMap) + " bytes\n";
+						result += banners.receive(strbuf.toString());
+					} else {
+						//The banner server deals with any commands except a server reset.
+						result = banners.receive(strbuf.toString());
+					}
+				} catch (Exception e) {
+					BannerServer.bannerDebug("Unexpected exception when attempting to handle input '" + strbuf.toString() + "'");
+					e.printStackTrace();
+				}
+				try {
+					ByteBuffer output = charset.encode(result+'\n');
+					//System.out.println(output.toString());
+					client.write(output);
+				} catch (Exception e) {
+					//This happens often, it's not a problem condition.  It just means that the client
+					//didn't care about the result, for example they triggered a command for which there
+					//is no result.
+				}
+				strbuf.setLength(0);
+			}
+			if (len == -1){
+				//nothing readable
+				if (strbuf.length() > 0)
+					BannerServer.bannerDebug("Error! " + strbuf.toString());
+				client.close();
+			}
+		} catch (IOException e){
+			System.out.println("The following error was detected but the server will continue:");
+			System.out.println(e);
+			e.printStackTrace();
+			client.close();
+		}
+	}
+	
 	/**
 	 * 
 	 * @param client
