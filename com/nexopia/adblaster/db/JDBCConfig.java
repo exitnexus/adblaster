@@ -11,15 +11,18 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import com.mysql.jdbc.ResultSet;
 import com.nexopia.adblaster.SQLQueue;
 import com.nexopia.adblaster.struct.ConfigFile;
+import com.vladium.utils.ObjectProfiler;
 
 public class JDBCConfig {
 	public static final String BANNERSTAT_TABLE = "bannerstats";	
 	public static final String BANNERTYPESTAT_TABLE = "bannertypestats";
 	public static final String BANNER_TABLE = "banners";
 	public static final String CAMPAIGN_TABLE = "bannercampaigns";
-
+	public static String connectionLock = "CONNECTION LOCK";
+	
 	private static Connection con; 
 	private static SQLQueue sqlQueue;
 	
@@ -43,21 +46,27 @@ public class JDBCConfig {
 		url = config.getString("db_url");
 		user = config.getString("db_user");
 		pass = config.getString("db_pass");
-		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			
-			con = DriverManager.getConnection(url, user, pass);
-		} catch (ClassNotFoundException e) {
-			System.err.println("Unable to load JDBC driver.");
-			e.printStackTrace();
-			System.exit(-1);
-		} catch (SQLException e) {
-			System.err.println("Unable to establish connection to banner database.");
-			if (inputString("Display stack trace? (y)").equals("y"))
+		
+		synchronized (connectionLock) {
+			try {
+				Class.forName("com.mysql.jdbc.Driver");
+				if (con != null) {
+					con.close();
+				}
+				con = DriverManager.getConnection(url, user, pass);
+				
+			} catch (ClassNotFoundException e) {
+				System.err.println("Unable to load JDBC driver.");
 				e.printStackTrace();
-			System.err.println("Run the following command (or something similar): ");
-			System.err.println("ssh -nNT -R 3306:192.168.0.50:3306 root@192.168.0.50 -p 3022.");
-			System.exit(-1);
+				System.exit(-1);
+			} catch (SQLException e) {
+				System.err.println("Unable to establish connection to banner database.");
+				if (inputString("Display stack trace? (y)").equals("y"))
+					e.printStackTrace();
+				System.err.println("Run the following command (or something similar): ");
+				System.err.println("ssh -nNT -R 3306:192.168.0.50:3306 root@192.168.0.50 -p 3022.");
+				System.exit(-1);
+			}
 		}
 	}
 	
@@ -66,7 +75,9 @@ public class JDBCConfig {
 	}
 
 	public static Statement createStatement() throws SQLException {
-		return con.createStatement();
+		synchronized(connectionLock) {
+			return con.createStatement();
+		}
 	}
 	
 	public static void queueQuery(String query) {
@@ -84,10 +95,18 @@ public class JDBCConfig {
 	}
 
 	public static PreparedStatement prepareStatement(String sql) throws SQLException {
-		return con.prepareStatement(sql);
+		synchronized(connectionLock) {
+			return con.prepareStatement(sql);
+		}
 	}
 
 	public static SQLQueue getSQLQueue() {
 		return sqlQueue;
+	}
+	
+	public static int sizeofCon() {
+		synchronized(connectionLock) {
+			return ObjectProfiler.sizeof(con);
+		}
 	}
 }

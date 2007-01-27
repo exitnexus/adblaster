@@ -18,11 +18,11 @@ import com.nexopia.adblaster.util.Interests;
 import com.thoughtworks.xstream.XStream;
 
 public class TypeStat {
-	private static XStream xstream = new XStream();
 	private static final boolean COMPRESS = true; 
 	private static final String GZIP_ENCODING = "ISO8859_1";
 	
 	public byte[] toXML() {
+		XStream xstream = new XStream();
 		xstream.alias("typestat", TypeStat.class);
 		xstream.alias("integer", Integer.class);
 		if (!COMPRESS) {

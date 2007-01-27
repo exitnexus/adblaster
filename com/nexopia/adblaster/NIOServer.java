@@ -12,9 +12,9 @@ import java.util.Iterator;
 import java.util.Set;
 
 import com.nexopia.adblaster.db.BannerDatabase;
+import com.nexopia.adblaster.db.CampaignDB;
 import com.nexopia.adblaster.db.JDBCConfig;
 import com.nexopia.adblaster.struct.ConfigFile;
-import com.nexopia.adblaster.struct.Campaign.CampaignDB;
 import com.nexopia.adblaster.util.StringArrayPageValidator;
 import com.nexopia.adblaster.util.FlatFilePageValidator;
 import com.nexopia.adblaster.util.PageValidatorFactory;
@@ -170,6 +170,7 @@ public class NIOServer {
 				time = System.currentTimeMillis();
 				banners.secondly();
 				if (lastMinute != now.get(Calendar.MINUTE)) {
+					JDBCConfig.initDBConnection(config);
 					lastMinute = now.get(Calendar.MINUTE);
 					banners.minutely(BannerServer.debug.get("timeupdates").booleanValue());
 				}

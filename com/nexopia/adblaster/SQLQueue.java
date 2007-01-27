@@ -28,8 +28,8 @@ public class SQLQueue
 {
 	private final int nThreads;
 	private final SQLWorker[] threads;
-	private final LinkedList<QueryWrapper> queue;
-	private int workingCount;
+	final LinkedList<QueryWrapper> queue;
+	int workingCount;
 	
 	public SQLQueue(int nThreads)
 	{
@@ -39,7 +39,7 @@ public class SQLQueue
 		threads = new SQLWorker[nThreads];
 		
 		for (int i=0; i<this.nThreads; i++) {
-			threads[i] = new SQLWorker();
+			threads[i] = new SQLWorker(this);
 			threads[i].start();
 		}
 	}
@@ -61,46 +61,52 @@ public class SQLQueue
 	public boolean isEmpty() {
 		return (queue.isEmpty() && workingCount == 0);
 	}
-	
-	private class SQLWorker extends Thread {
-		public void run() {
-			QueryWrapper query;
+}
+
+class SQLWorker extends Thread {
+	private SQLQueue sqlQueue;
+	public SQLWorker(SQLQueue sqlQueue) {
+		this.sqlQueue = sqlQueue;
+	}
+	public void run() {
+		QueryWrapper query;
+		
+		while (true) {
+			synchronized(sqlQueue.queue) {
+				while (sqlQueue.queue.isEmpty()) {
+					try
+					{
+						sqlQueue.queue.wait();
+					}
+					catch (InterruptedException ignored)
+					{
+					}
+				}
+				query =  sqlQueue.queue.removeFirst();
+				sqlQueue.workingCount++;
+			}
 			
-			while (true) {
-				synchronized(queue) {
-					while (queue.isEmpty()) {
-						try
-						{
-							queue.wait();
-						}
-						catch (InterruptedException ignored)
-						{
-						}
-					}
-					query =  queue.removeFirst();
-					workingCount++;
+			try {
+				PreparedStatement st = JDBCConfig.prepareStatement(query.query);
+				if (query.a != null && query.b != null) {
+					st.setBytes(1,query.a);
+					st.setBytes(2,query.b);
 				}
+				st.execute();
+				st = null;
 				
-				try {
-					PreparedStatement st = JDBCConfig.prepareStatement(query.query);
-					if (query.a != null && query.b != null) {
-						st.setBytes(1,query.a);
-						st.setBytes(2,query.b);
-					}
-					st.execute();
-					
-				}
-				catch (RuntimeException e) {
-					// If we don't catch RuntimeException, 
-					// the pool could leak threads
-					System.err.println("Runtime exception while executing query '" + query + "'.");
-				} catch (SQLException e) {
-					System.err.println("Error executing query '" + query + "'.");
-					e.printStackTrace();
-				} finally {
-					synchronized(queue) {
-						workingCount--;
-					}
+			}
+			catch (RuntimeException e) {
+				// If we don't catch RuntimeException, 
+				// the pool could leak threads
+				System.err.println("Runtime exception while executing query '" + query + "'.");
+			} catch (SQLException e) {
+				System.err.println("Error executing query '" + query + "'.");
+				e.printStackTrace();
+			} finally {
+				synchronized(sqlQueue.queue) {
+					query = null;
+					sqlQueue.workingCount--;
 				}
 			}
 		}

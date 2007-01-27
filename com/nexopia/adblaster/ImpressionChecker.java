@@ -16,6 +16,7 @@ import java.util.Calendar;
 
 import com.nexopia.adblaster.db.BannerDatabase;
 import com.nexopia.adblaster.db.BannerViewFlatFileReader;
+import com.nexopia.adblaster.db.CampaignDB;
 import com.nexopia.adblaster.db.FlatFileConfig;
 import com.nexopia.adblaster.db.JDBCConfig;
 import com.nexopia.adblaster.db.PageFlatFileDatabase;
@@ -24,7 +25,6 @@ import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.BannerView;
 import com.nexopia.adblaster.struct.ConfigFile;
 import com.nexopia.adblaster.struct.User;
-import com.nexopia.adblaster.struct.Campaign.CampaignDB;
 import com.nexopia.adblaster.util.FlatFilePageValidator;
 import com.nexopia.adblaster.util.IntObjectHashMap;
 import com.nexopia.adblaster.util.PageValidatorFactory;

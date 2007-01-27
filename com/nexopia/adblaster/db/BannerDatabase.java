@@ -13,9 +13,7 @@ import java.util.HashMap;
 import java.util.Vector;
 
 import com.nexopia.adblaster.struct.Banner;
-import com.nexopia.adblaster.struct.Campaign;
 import com.nexopia.adblaster.struct.ServablePropertyHolder;
-import com.nexopia.adblaster.struct.Campaign.CampaignDB;
 import com.nexopia.adblaster.util.IntObjectHashMap;
 import com.nexopia.adblaster.util.Integer;
 import com.nexopia.adblaster.util.PageValidator;
@@ -68,16 +66,16 @@ public class BannerDatabase {
 	private Vector<Banner> bannerList;
 	CampaignDB cdb;
 	
-	public BannerDatabase(Campaign.CampaignDB cdb, PageValidatorFactory pvfactory, boolean precheck) {
+	public BannerDatabase(CampaignDB cdb, PageValidatorFactory pvfactory, boolean precheck) {
 		init(cdb, pvfactory, precheck);
 	}
 	
-	public BannerDatabase(Campaign.CampaignDB cdb, PageValidatorFactory pvfactory) {
+	public BannerDatabase(CampaignDB cdb, PageValidatorFactory pvfactory) {
 		init(cdb, pvfactory, true);
 	}
 	
 	
-	private void init(Campaign.CampaignDB cdb, PageValidatorFactory pvfactory, boolean precheck) {
+	private void init(CampaignDB cdb, PageValidatorFactory pvfactory, boolean precheck) {
 		this.cdb = cdb;
 		banners = new IntObjectHashMap<Banner>();
 		bannerList = new Vector<Banner>();

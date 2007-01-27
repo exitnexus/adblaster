@@ -15,6 +15,7 @@ import java.util.Vector;
 
 
 import com.nexopia.adblaster.db.BannerDatabase;
+import com.nexopia.adblaster.db.CampaignDB;
 import com.nexopia.adblaster.db.JDBCConfig;
 import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.BannerStat;
@@ -24,7 +25,6 @@ import com.nexopia.adblaster.struct.I_Policy;
 import com.nexopia.adblaster.struct.ServablePropertyHolder;
 import com.nexopia.adblaster.struct.ServerStat;
 import com.nexopia.adblaster.struct.TypeStat;
-import com.nexopia.adblaster.struct.Campaign.CampaignDB;
 import com.nexopia.adblaster.util.EasyDatagramSocket;
 import com.nexopia.adblaster.util.FastMap;
 import com.nexopia.adblaster.util.IntObjectHashMap;
@@ -608,6 +608,8 @@ public class BannerServer {
 		for (Integer size: sizes_array) {
 			TypeStat views = viewstats.get(size);
 			TypeStat clicks = clickstats.get(size);
+			//views.toXML();
+			//clicks.toXML();
 			JDBCConfig.queueQuery("INSERT INTO " + JDBCConfig.BANNERTYPESTAT_TABLE + " SET size = "+size+", time = "+time+", views = "+views.total+", clicks = "+clicks.total+", viewsdump = ?, clicksdump = ?", views.toXML(), clicks.toXML());
 			//System.err.println("****" + "INSERT INTO " + JDBCConfig.BANNERTYPESTAT_TABLE + " SET size = "+size+", time = "+time+", views = "+views.total+", clicks = "+clicks.total+", viewsdump = '"+views.toXML()+"', clicksdump = '"+clicks.toXML()+"'" + "****");
 		}
@@ -912,6 +914,7 @@ public class BannerServer {
 			stats += "viewMap: " + ObjectProfiler.sizeof(viewMap) + " bytes\n";
 			stats += "pageIDDominance: " + ObjectProfiler.sizeof(pageIDDominance) + " bytes\n";
 			stats += "sqlQueue: " + ObjectProfiler.sizeof(JDBCConfig.getSQLQueue()) + " bytes\n";
+			stats += "Database connection: " + JDBCConfig.sizeofCon() + " bytes\n";
 			stats += "recentviews: " + ObjectProfiler.sizeof(recentviews) + " bytes\n";
 			stats += "slidingstats: " + ObjectProfiler.sizeof(slidingstats) + " bytes\n";
 			return stats;

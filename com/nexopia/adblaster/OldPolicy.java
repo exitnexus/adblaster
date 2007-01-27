@@ -2,11 +2,11 @@ package com.nexopia.adblaster;
 
 import java.util.Vector;
 
+import com.nexopia.adblaster.db.CampaignDB;
 import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.BannerView;
 import com.nexopia.adblaster.struct.I_Policy;
 import com.nexopia.adblaster.struct.ServablePropertyHolder;
-import com.nexopia.adblaster.struct.Campaign.CampaignDB;
 import com.nexopia.adblaster.util.LowMemMap.LowMemArray;
 
 public class OldPolicy implements I_Policy {

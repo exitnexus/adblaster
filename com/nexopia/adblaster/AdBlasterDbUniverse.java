@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Vector;
 
 import com.nexopia.adblaster.db.BannerDatabase;
+import com.nexopia.adblaster.db.CampaignDB;
 import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.Campaign;
 import com.nexopia.adblaster.util.PageValidatorFactory;
@@ -12,7 +13,7 @@ import com.nexopia.adblaster.util.PageValidatorFactory;
 public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 	private BannerDatabase bannerDB;
 
-	public Campaign.CampaignDB campaignDB;
+	public CampaignDB campaignDB;
 
 	public Campaign getCampaignByIndex(int i) {
 		return campaignDB.getByIndex(i);
@@ -22,7 +23,7 @@ public class AdBlasterDbUniverse extends AbstractAdBlasterUniverse {
 	}
 
 	public AdBlasterDbUniverse(PageValidatorFactory factory){
-		campaignDB = new Campaign.CampaignDB(factory);
+		campaignDB = new CampaignDB(factory);
 		bannerDB = new BannerDatabase(campaignDB, factory);
 	}
 

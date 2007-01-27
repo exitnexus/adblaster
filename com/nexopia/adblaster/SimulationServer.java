@@ -10,10 +10,9 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import com.nexopia.adblaster.db.BannerDatabase;
+import com.nexopia.adblaster.db.CampaignDB;
 import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.BannerView;
-import com.nexopia.adblaster.struct.Campaign;
-import com.nexopia.adblaster.struct.Campaign.CampaignDB;
 import com.nexopia.adblaster.util.Integer;
 import com.nexopia.adblaster.util.StringArrayPageValidator;
 import com.nexopia.adblaster.util.FlatFilePageValidator;
@@ -26,7 +25,7 @@ public class SimulationServer {
 		Object arg[] = {};
 		PageValidatorFactory factory = 
 			new PageValidatorFactory(StringArrayPageValidator.class,arg);
-		CampaignDB campaignDB = new Campaign.CampaignDB(factory);
+		CampaignDB campaignDB = new CampaignDB(factory);
 		BannerDatabase bannerDB = new BannerDatabase(campaignDB, factory);
 		float profit = 0;
 		

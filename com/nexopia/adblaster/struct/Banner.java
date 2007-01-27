@@ -13,8 +13,8 @@ import java.util.HashMap;
 import java.util.Vector;
 
 import com.nexopia.adblaster.AbstractAdBlasterInstance;
+import com.nexopia.adblaster.db.CampaignDB;
 import com.nexopia.adblaster.db.JDBCConfig;
-import com.nexopia.adblaster.struct.Campaign.CampaignDB;
 import com.nexopia.adblaster.util.Integer;
 import com.nexopia.adblaster.util.Interests;
 import com.nexopia.adblaster.util.PageValidator;
