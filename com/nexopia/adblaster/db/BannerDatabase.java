@@ -225,6 +225,7 @@ public class BannerDatabase {
 					}
 				}
 			}
+			stmt.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -239,12 +240,15 @@ public class BannerDatabase {
 				Statement stmt = JDBCConfig.createStatement();
 				ResultSet rs = stmt.executeQuery(sql);
 				if (rs.next()) {
-					return b.update(rs, cdb);
+					ServablePropertyHolder retval = b.update(rs, cdb);
+					stmt.close();
+					return retval;
 				} else {
 					if (banners.containsKey(bannerID)){
 						bannerList.remove(banners.get(bannerID));
 					}
 					banners.remove(bannerID);
+					stmt.close();
 					return null;
 				}
 			} catch (SQLException e) {

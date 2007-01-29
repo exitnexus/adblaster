@@ -744,7 +744,7 @@ public class BannerServer {
 		case UPDATE: // "update id"
 			//updateBannerD(params);
 			id = Integer.parseInt(params[0]);
-			db.add(id, new StringArrayPageValidator()); 
+			db.update(id, new StringArrayPageValidator()); 
 			bannerDebug("update " + Arrays.toString(params));
 			break;
 			
@@ -774,13 +774,13 @@ public class BannerServer {
 			
 		case UPDATECAMPAIGN: // "updatecampaign id"
 			id = Integer.parseInt(params[0]);
-			cdb.add(id);
+			cdb.update(id);
 			try {
 				Statement st = JDBCConfig.createStatement();
 				ResultSet rs = st.executeQuery("SELECT id FROM banners WHERE campaignid = " + id);
 				while (rs.next()) {
 					int bannerid = rs.getInt("id");
-					db.add(bannerid, new StringArrayPageValidator());
+					db.update(bannerid, new StringArrayPageValidator());
 				}
 				st.close();
 			} catch (SQLException e) {
