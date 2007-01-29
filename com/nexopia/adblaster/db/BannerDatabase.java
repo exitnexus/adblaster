@@ -220,7 +220,7 @@ public class BannerDatabase {
 						bannerList.add(b);
 						return b;
 					} catch (SQLException e){
-						System.out.println("This probably indicates a bad campaign. Continue if you know what you're doing.");
+						System.err.println("This probably indicates a bad campaign. Continue if you know what you're doing.");
 						e.printStackTrace();
 					}
 				}
