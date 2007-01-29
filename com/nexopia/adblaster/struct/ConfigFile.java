@@ -59,4 +59,12 @@ public class ConfigFile {
 				options.get(key.toLowerCase()).equals("true") ||
 				options.get(key.toLowerCase()).equals("1"));
 	}
+	
+	public Boolean getBoolean(String key) {
+		if (getBool(key)) {
+			return Boolean.TRUE;
+		} else {
+			return Boolean.FALSE;
+		}
+	}
 }

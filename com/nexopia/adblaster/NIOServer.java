@@ -120,7 +120,7 @@ public class NIOServer {
 		
 		cdb = new CampaignDB(factory);
 		bdb = new BannerDatabase(cdb, factory);
-		banners = new BannerServer(bdb, cdb, NUM_SERVERS);
+		banners = new BannerServer(bdb, cdb, NUM_SERVERS, config);
 		
 		//Create the server socket channel
 		server = null;
@@ -288,7 +288,7 @@ public class NIOServer {
 						cdb = new CampaignDB(factory);
 						Object args1[] = {};
 						bdb = new BannerDatabase(cdb, new PageValidatorFactory(StringArrayPageValidator.class, args1));
-						banners = new BannerServer(bdb, cdb, 1);
+						banners = new BannerServer(bdb, cdb, NUM_SERVERS, config);
 						if (BannerServer.debug.get("development").booleanValue()) {
 							BannerServer.bannerDebug("Reinitialized the banner server.");
 						}

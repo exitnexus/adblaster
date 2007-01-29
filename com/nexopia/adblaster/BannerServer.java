@@ -20,6 +20,7 @@ import com.nexopia.adblaster.db.JDBCConfig;
 import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.BannerStat;
 import com.nexopia.adblaster.struct.Campaign;
+import com.nexopia.adblaster.struct.ConfigFile;
 import com.nexopia.adblaster.struct.HourlyStat;
 import com.nexopia.adblaster.struct.I_Policy;
 import com.nexopia.adblaster.struct.ServablePropertyHolder;
@@ -37,11 +38,10 @@ import com.nexopia.adblaster.util.LowMemMap.LowMemArray;
 import com.vladium.utils.ObjectProfiler;
 
 public class BannerServer {
-	private static final int LOG_PORT = 5556;
-	private static final int HIT_LOG_PORT = 6666;
-	private static final String LOG_HOST = "localhost";
-//	private static final String HIT_LOG_HOST = "10.0.0.85";
-	private static final String HIT_LOG_HOST = "localhost";
+	private static int LOG_PORT = 5556;
+	private static int HIT_LOG_PORT = 6666;
+	private static String LOG_HOST = "localhost";
+	private static String HIT_LOG_HOST = "localhost";
 	
 	
 	public static final String CURRENT_VERSION = "0.0";
@@ -102,18 +102,6 @@ public class BannerServer {
 	private I_Policy policy;
 	
 	public static HashMap<String, Boolean> debug=new HashMap<String,Boolean>();
-	{
-		debug.put("tick", Boolean.FALSE);
-		debug.put("connect", Boolean.FALSE);
-		debug.put("get", Boolean.FALSE);
-		debug.put("getlog", Boolean.TRUE);
-		debug.put("getfail", Boolean.FALSE);
-		debug.put("click", Boolean.TRUE);
-		debug.put("timeupdates", Boolean.TRUE);
-		debug.put("dailyrestart", Boolean.TRUE);
-		debug.put("passback", Boolean.TRUE);
-		debug.put("development", Boolean.FALSE);
-	}
 	
 	static ServerStat stats = new ServerStat();
 	static ServerStat slidingstats[] = new ServerStat[STATS_WINDOW];
@@ -159,7 +147,23 @@ public class BannerServer {
 	private String hitlogserver;
 	private int currentConnected=0;
 
-	public BannerServer(BannerDatabase db, CampaignDB cdb, int numservers) {
+	public BannerServer(BannerDatabase db, CampaignDB cdb, int numservers, ConfigFile config) {
+		debug.put("tick", config.getBoolean("tick"));
+		debug.put("connect", config.getBoolean("connect"));
+		debug.put("get", config.getBoolean("get"));
+		debug.put("getlog", config.getBoolean("getlog"));
+		debug.put("getfail", config.getBoolean("getfail"));
+		debug.put("click", config.getBoolean("click"));
+		debug.put("timeupdates", config.getBoolean("timeupdates"));
+		debug.put("dailyrestart", config.getBoolean("dailyrestart"));
+		debug.put("passback", config.getBoolean("passback"));
+		debug.put("development", config.getBoolean("development"));
+		
+		LOG_PORT = config.getInt("log_port");
+		HIT_LOG_PORT = config.getInt("hit_log_port");
+		LOG_HOST = config.getString("log_host");
+		HIT_LOG_HOST = config.getString("hit_log_host");
+		
 		while (recentviews.size() < VIEW_WINDOWS) {
 			recentviews.add(new HashMap<Integer, Vector<Integer>>());
 		}
