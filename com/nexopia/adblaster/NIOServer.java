@@ -170,7 +170,6 @@ public class NIOServer {
 				time = System.currentTimeMillis();
 				banners.secondly();
 				if (lastMinute != now.get(Calendar.MINUTE)) {
-					JDBCConfig.initDBConnection(config);
 					lastMinute = now.get(Calendar.MINUTE);
 					banners.minutely(BannerServer.debug.get("timeupdates").booleanValue());
 				}

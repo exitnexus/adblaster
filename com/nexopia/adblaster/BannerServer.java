@@ -765,6 +765,7 @@ public class BannerServer {
 					int bannerid = rs.getInt("id");
 					db.add(bannerid, new StringArrayPageValidator());
 				}
+				st.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -781,6 +782,7 @@ public class BannerServer {
 					int bannerid = rs.getInt("id");
 					db.add(bannerid, new StringArrayPageValidator());
 				}
+				st.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}

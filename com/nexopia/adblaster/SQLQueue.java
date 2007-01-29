@@ -93,6 +93,7 @@ class SQLWorker extends Thread {
 					st.setBytes(2,query.b);
 				}
 				st.execute();
+				st.close();
 				st = null;
 				
 			}

@@ -46,28 +46,27 @@ public class JDBCConfig {
 		url = config.getString("db_url");
 		user = config.getString("db_user");
 		pass = config.getString("db_pass");
-		
-		synchronized (connectionLock) {
-			try {
-				Class.forName("com.mysql.jdbc.Driver");
-				if (con != null) {
-					con.close();
-				}
-				con = DriverManager.getConnection(url, user, pass);
-				
-			} catch (ClassNotFoundException e) {
-				System.err.println("Unable to load JDBC driver.");
-				e.printStackTrace();
-				System.exit(-1);
-			} catch (SQLException e) {
-				System.err.println("Unable to establish connection to banner database.");
-				if (inputString("Display stack trace? (y)").equals("y"))
-					e.printStackTrace();
-				System.err.println("Run the following command (or something similar): ");
-				System.err.println("ssh -nNT -R 3306:192.168.0.50:3306 root@192.168.0.50 -p 3022.");
-				System.exit(-1);
+
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			if (con != null) {
+				con.close();
 			}
+			con = DriverManager.getConnection(url, user, pass);
+
+		} catch (ClassNotFoundException e) {
+			System.err.println("Unable to load JDBC driver.");
+			e.printStackTrace();
+			System.exit(-1);
+		} catch (SQLException e) {
+			System.err.println("Unable to establish connection to banner database.");
+			if (inputString("Display stack trace? (y)").equals("y"))
+				e.printStackTrace();
+			System.err.println("Run the following command (or something similar): ");
+			System.err.println("ssh -nNT -R 3306:192.168.0.50:3306 root@192.168.0.50 -p 3022.");
+			System.exit(-1);
 		}
+
 	}
 	
 	public static void initThreadedSQLQueue() {
@@ -75,9 +74,7 @@ public class JDBCConfig {
 	}
 
 	public static Statement createStatement() throws SQLException {
-		synchronized(connectionLock) {
-			return con.createStatement();
-		}
+		return con.createStatement();
 	}
 	
 	public static void queueQuery(String query) {
@@ -95,9 +92,7 @@ public class JDBCConfig {
 	}
 
 	public static PreparedStatement prepareStatement(String sql) throws SQLException {
-		synchronized(connectionLock) {
-			return con.prepareStatement(sql);
-		}
+		return con.prepareStatement(sql);
 	}
 
 	public static SQLQueue getSQLQueue() {
@@ -105,8 +100,6 @@ public class JDBCConfig {
 	}
 	
 	public static int sizeofCon() {
-		synchronized(connectionLock) {
 			return ObjectProfiler.sizeof(con);
-		}
 	}
 }
