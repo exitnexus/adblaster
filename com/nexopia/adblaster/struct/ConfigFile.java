@@ -17,8 +17,13 @@ public class ConfigFile {
 			BufferedReader br = new BufferedReader(fr);
 			String s;
 			while ((s = br.readLine()) != null){
+				int commentIndex = s.indexOf("#");
+				if (commentIndex >= 0) {
+					s = s.substring(0, s.indexOf("#"));
+				}
 				String kv[] = s.split("=");
 				if (kv.length == 2) {
+					System.out.println(kv[0].trim().toLowerCase() + ":" + kv[1].trim());
 					options.put(kv[0].trim().toLowerCase(), kv[1].trim()); 
 				}
 			}
@@ -53,11 +58,15 @@ public class ConfigFile {
 	}
 	
 	public boolean getBool(String key){
-		return (options.get(key.toLowerCase()).equals("y") ||
+		try {
+			return (options.get(key.toLowerCase()).equals("y") ||
 				options.get(key.toLowerCase()).equals("yes") ||
 				options.get(key.toLowerCase()).equals("t") ||
 				options.get(key.toLowerCase()).equals("true") ||
 				options.get(key.toLowerCase()).equals("1"));
+		} catch (NullPointerException e) {
+			return false;
+		}
 	}
 	
 	public Boolean getBoolean(String key) {
