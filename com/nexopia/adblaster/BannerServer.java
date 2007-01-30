@@ -744,20 +744,20 @@ public class BannerServer {
 			id = Integer.parseInt(params[0]);
 			db.add(id, new StringArrayPageValidator()); //addBannerD(params);
 			bannerDebug("add " + Arrays.toString(params));
-			break;
+			return "Banner " + id + " added.";
 		case UPDATE: // "update id"
 			//updateBannerD(params);
 			id = Integer.parseInt(params[0]);
 			db.update(id, new StringArrayPageValidator()); 
 			bannerDebug("update " + Arrays.toString(params));
-			break;
+			return "Banner " + id + " updated.";
 			
 		case DEL: // "del id"
 			//deleteBannerD(params);
 			id = Integer.parseInt(params[0]);
 			db.delete(id);
 			bannerDebug("delete " + Arrays.toString(params));
-			break;
+			return "Banner " + id + " deleted.";
 			
 		case ADDCAMPAIGN: // "addcampaign id"
 			id = Integer.parseInt(params[0]);
@@ -772,9 +772,10 @@ public class BannerServer {
 				st.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
+				return "Campaign " + id + " failed.";
 			}
 			bannerDebug("addcampaign " + Arrays.toString(params));
-			break;
+			return "Campaign " + id + " added.";
 			
 		case UPDATECAMPAIGN: // "updatecampaign id"
 			id = Integer.parseInt(params[0]);
@@ -791,8 +792,7 @@ public class BannerServer {
 				e.printStackTrace();
 			}
 			bannerDebug("updatecampaign " + Arrays.toString(params));
-			break;
-			
+			return "Campaign " + id + " updated.";
 		case DELCAMPAIGN: // "delcampaign id"
 			id = Integer.parseInt(params[0]);
 			for (Banner b: cdb.get(id).getBanners()) {
@@ -800,12 +800,10 @@ public class BannerServer {
 			}
 			cdb.delete(id);
 			bannerDebug("deletecampaign "+ Arrays.toString(params));
-			break;
-			
+			return "Campaign " + id + " deleted.";
 		case QUIT: 
 			//Nothing needs to be done to cleanup a given connection right now, the client simply needs to drop connection.
-			break;
-			
+			return "Disconnecting...";
 		case STATS:
 			/*
 			$total = array();
@@ -842,19 +840,17 @@ public class BannerServer {
 		case SHOW:
 			if (debug.get(params[0]) != null) {
 				debug.put(params[0], Boolean.TRUE);
+				return params[0] + " is now " + debug.get(params[0]);
 			} else {
 				return params[0] + " is not a valid debug option.\n";
 			}
-			break;
-			
 		case HIDE:
 			if (debug.get(params[0]) != null) {
 				debug.put(params[0], Boolean.FALSE);
+				return params[0] + " is now " + debug.get(params[0]);
 			} else {
 				return params[0] + " is not a valid debug option.\n";
 			}
-			break;
-			
 		case SHUTDOWN: //dump stats, clean up most memory, and quit. Good for upgrading the server early :p
 			//socket_write(sock, "shutting down\n");
 			bannerDebug("shutting down");
@@ -870,7 +866,6 @@ public class BannerServer {
 				logserver = params[0];
 				logserver_port = Integer.parseInt(params[1]);
 			}
-			
 			logsock.connect(new InetSocketAddress(logserver, logserver_port));
 			logsock.setSoTimeout(20);
 			hitlogsock.connect(new InetSocketAddress(hitlogserver, hitlogserver_port));
@@ -880,13 +875,13 @@ public class BannerServer {
 			return (logsock.isConnected() ? "connected" : "not") + ": " + logserver + "," + logserver_port + "\n";
 		case MINUTELY:
 			minutely(BannerServer.debug.get("timeupdates").booleanValue());
-			break;
+			return "Running minutely.";
 		case HOURLY:
 			hourly(BannerServer.debug.get("timeupdates").booleanValue());
-			break;
+			return "Running hourly.";
 		case DAILY:
 			daily(BannerServer.debug.get("timeupdates").booleanValue());
-			break;
+			return "Running daily.";
 		case CLICK:
 			if (debug.get("click").booleanValue()) {
 				bannerDebug("click " + Arrays.toString(params));
@@ -901,7 +896,7 @@ public class BannerServer {
 			stats.click++;
 			slidingstats[statstime%STATS_WINDOW].click++;
 			hitlogsock.send("c");
-			break;
+			return "Clicked " + bannerid;
 		case RELOAD_COEFFICIENTS_CMD:
 			this.policy = new AdBlasterPolicy(db.getBanners());
 			return "Coefficients reloaded.";
@@ -909,7 +904,7 @@ public class BannerServer {
 			bannerDebug("Performing garbage collection...");
 			System.gc();
 			bannerDebug("Garbarge collection complete.");
-			break;
+			return "Garbage collected.";
 		case MEMORY_STATS_CMD:
 			String stats = "banners: " + ObjectProfiler.sizeof(banners) + " bytes\n";
 			stats += "bannerstats: " + ObjectProfiler.sizeof(bannerstats) + " bytes\n";
@@ -928,7 +923,7 @@ public class BannerServer {
 			System.out.println("Unknown command: '" + cmd + "' Params: '" + Arrays.toString(params) + "'");
 			//throw new UnsupportedOperationException("Command:" + cmd + " : Params: " + Arrays.toString(params));			
 		}
-		return null;
+		return "Command not found.";
 	}
 
 	private String format(String[] params) {
