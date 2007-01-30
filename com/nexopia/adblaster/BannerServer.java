@@ -285,8 +285,8 @@ public class BannerServer {
 	 * @return
 	 */
 	
-	boolean hasReachedMaxViews(Banner b, int pageDominance) {
-		if (pageDominance < 0 && (b.getViews() + this.bannerstats.getOrCreate(b, BannerStat.class).dailyviews) >= b.getIntegerMaxViews())
+	boolean hasReachedMaxViews(Banner b) {
+		if ((b.getViews() + this.bannerstats.getOrCreate(b, BannerStat.class).dailyviews) >= b.getIntegerMaxViews())
 			return true;
 		if ((b.getCampaign().getViews() + this.campaignstats.getOrCreate(b.getCampaign(), BannerStat.class).dailyviews) >= b.getCampaign().getIntegerMaxViews())
 			return true;
@@ -343,14 +343,14 @@ public class BannerServer {
 			boolean b1 = banner_i.isValidForUser(userid, usertime, debug, this);
 			boolean b2 = banner_i.getCampaign().isValidForUser(userid, usertime,
 					debug, this);
-			boolean b3 = !hasReachedViewsPerDay(banner_i, pageDominance);
-			boolean b4 = !hasReachedClicksPerDay(banner_i, pageDominance);
-			boolean b5 = !hasReachedMaxViews(banner_i, pageDominance);
-			
+			boolean b3 = !hasReachedViewsPerDay(banner_i);
+			boolean b4 = !hasReachedClicksPerDay(banner_i);
+			boolean b5 = !hasReachedMaxViews(banner_i);
+			boolean b6 = pageDominance > 0;
 			if (debug)
 				System.out.println("" + banner_i.getID() + ":" + b1 + ":" + b2 + ":"
 						+ b3 + ":" + b4);
-			if (b1 && b2 && b3 && b4 && b5) {
+			if (b1 && b2 && ((b3 && b4 && b5) || b6)) {
 				validBanners.add(banner_i);
 			}
 		}
@@ -387,9 +387,8 @@ public class BannerServer {
 	}
 
 
-	boolean hasReachedViewsPerDay(Banner b, int pageDominance) {
-
-		if (pageDominance < 0 && this.bannerstats.getOrCreate(b, BannerStat.class).dailyviews >= b.getIntegerMaxViewsPerDay()/numservers)
+	boolean hasReachedViewsPerDay(Banner b) {
+		if (this.bannerstats.getOrCreate(b, BannerStat.class).dailyviews >= b.getIntegerMaxViewsPerDay()/numservers)
 			return true;
 		if (this.campaignstats.getOrCreate(b.getCampaign(), BannerStat.class).dailyviews >= b.getCampaign().getIntegerMaxViewsPerDay()/numservers)
 			return true;
@@ -398,11 +397,11 @@ public class BannerServer {
 		return false;
 	}
 	
-	boolean hasReachedClicksPerDay(Banner b, int pageDominance) {
+	boolean hasReachedClicksPerDay(Banner b) {
 		if (this.bannerstats.get(b) == null){
 			this.bannerstats.put(b, new BannerStat());
 		}
-		if (pageDominance < 0 && this.bannerstats.get(b).getDailyClicks() >= b.getIntegerMaxClicksperday()/numservers) {
+		if (this.bannerstats.get(b).getDailyClicks() >= b.getIntegerMaxClicksperday()/numservers) {
 			return true;
 		}
 		
