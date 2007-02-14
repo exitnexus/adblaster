@@ -46,7 +46,6 @@ public class JDBCConfig {
 		url = config.getString("db_url");
 		user = config.getString("db_user");
 		pass = config.getString("db_pass");
-
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			if (con != null) {
