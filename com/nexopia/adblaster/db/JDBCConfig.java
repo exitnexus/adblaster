@@ -52,7 +52,6 @@ public class JDBCConfig {
 				con.close();
 			}
 			con = DriverManager.getConnection(url, user, pass);
-
 		} catch (ClassNotFoundException e) {
 			System.err.println("Unable to load JDBC driver.");
 			e.printStackTrace();

@@ -22,6 +22,7 @@ import com.nexopia.adblaster.db.PageFlatFileDatabase;
 import com.nexopia.adblaster.db.UserFlatFileReader;
 import com.nexopia.adblaster.struct.Banner;
 import com.nexopia.adblaster.struct.BannerView;
+import com.nexopia.adblaster.struct.ConfigFile;
 import com.nexopia.adblaster.struct.User;
 import com.nexopia.adblaster.util.FlatFilePageValidator;
 import com.nexopia.adblaster.util.IntObjectHashMap;
@@ -153,6 +154,8 @@ public class PotentialChecker {
 	
 	
 	public static void main(String args[]) {
+		ConfigFile config = new ConfigFile(new File("banner.config"));
+		JDBCConfig.initDBConnection(config);
 		if (args.length < 1) {
 			System.err.println("Run this file with 2 arguments:");
 			System.err.println("\targ1: The id of the banner to check potential for.");

@@ -7,11 +7,13 @@ public class FlatFileConfig {
 	public static final int FILE_COUNT = 100;
 	
 	public static File getDefaultDirectory() {
-		int day = dayBefore(Calendar.DAY_OF_YEAR); 
+		Calendar c = Calendar.getInstance();
+		int day = dayBefore(c.get(Calendar.DAY_OF_YEAR)); 
 		File directory = null;
 		
-		while ((directory != null || !directory.canRead()) && day != Calendar.DAY_OF_YEAR) {
+		while ((directory == null || !directory.canRead()) && day != c.get(Calendar.DAY_OF_YEAR)) {
 			directory = new File("DB_" + day);
+			day = dayBefore(day);
 		}
 		
 		if (!directory.canRead()) {
