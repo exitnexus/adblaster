@@ -136,7 +136,7 @@ public class PotentialChecker {
 			Statement statement = JDBCConfig.createStatement();
 			String sql = "REPLACE INTO `potentialviews` SET " +
 					"`bannerid` = " + this.bannerID + ", " +
-					"`day` = " + Calendar.DAY_OF_YEAR + ", " +
+					"`day` = " + FlatFileConfig.defaultDay + ", " +
 					"`percentcomplete` = " + completeEstimate*100 + ", " +
 					"`potentialviews` = " + resultEstimate + ";";
 			System.out.println("Executing: " + sql);
