@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map.Entry;
 
 import com.nexopia.adblaster.db.BannerDatabase;
 import com.nexopia.adblaster.db.BannerViewFlatFileReader;
@@ -77,6 +79,8 @@ public class PotentialChecker {
 		int lastSecond = getSecond();
 		int viewCount = 0;
 		int totalViewCount = 0;
+		HashMap<Integer, Integer> bannersViewed = new HashMap<Integer, Integer>();
+		
 		for (int i=0; i<FlatFileConfig.FILE_COUNT; i++) {
 			IntObjectHashMap<int[]> userViewMap = new IntObjectHashMap<int[]>();
 			try {
@@ -91,6 +95,7 @@ public class PotentialChecker {
 					if (second > lastSecond + 5) {
 						lastSecond = second;
 						updateProgress(i, totalViewCount, viewCount);
+						printBannerViewsHash(bannersViewed);
 					}
 					User u = userReader.getUser(bv.getUserID());
 					if (u != null) {
@@ -101,6 +106,12 @@ public class PotentialChecker {
 						}
 						if (banner.validUser(u) && banner.getSize() == bv.getSize()) {
 							if  (skipFrequency || banner.getViewsPerUser() == 0 || views[0] < bv.getTime()-banner.getLimitByPeriod()) {
+								Integer bid = Integer.valueOf(bv.getBannerId());
+								if (bannersViewed.get(bid) != null) {
+									bannersViewed.put(bid,Integer.valueOf(bannersViewed.get(bid).intValue() + 1));
+								} else {
+									bannersViewed.put(bid,1);
+								}
 								viewCount++;
 								if (banner.getViewsPerUser() > 0){
 									for (int j=1; j<banner.getViewsPerUser(); j++) {
@@ -150,6 +161,13 @@ public class PotentialChecker {
 	
 	private void insertResult(int viewCount) {
 		updateProgress(FlatFileConfig.FILE_COUNT, this.countEstimate, viewCount);
+	}
+	
+	private void printBannerViewsHash(HashMap<Integer,Integer> bannerViews) {
+		System.out.println("Banners that were actually viewed: ");
+		for (Entry<Integer,Integer> e: bannerViews.entrySet()) {
+			System.out.println("Banner " + e.getKey() + ": " + e.getValue());
+		}
 	}
 	
 	
