@@ -88,6 +88,7 @@ public class BannerServer {
 	private static final int RELOAD_COEFFICIENTS_CMD = 27;
 	private static final int COLLECT_GARBAGE_CMD = 28;
 	private static final int MEMORY_STATS_CMD = 29;
+	private static final int BANNER_INFO_CMD = 30;
 	
 	public static final int BANNER_SLIDE_SIZE = 8;
 	public static final double BANNER_MIN_CLICKRATE = 0.0002;
@@ -98,6 +99,7 @@ public class BannerServer {
 	public static final String RELOAD_COEFFICIENTS = "RELOAD_COEFFICIENTS";
 	public static final String COLLECT_GARBAGE = "GC";
 	public static final String MEMORY_STATS = "MEMSTAT";
+	public static final String BANNER_INFO = "BANNER_INFO";
 	
 	private I_Policy policy;
 	
@@ -502,6 +504,8 @@ public class BannerServer {
 			cmd = COLLECT_GARBAGE_CMD;
 		} else if (command.toUpperCase().equals(MEMORY_STATS)) {
 			cmd = MEMORY_STATS_CMD;
+		} else if (command.toUpperCase().equals(BANNER_INFO)) {
+			cmd = BANNER_INFO_CMD;
 		} else {
 			cmd = BLANK;
 			System.out.println("'" + command + "'" + " not found.");
@@ -647,6 +651,8 @@ public class BannerServer {
 		int id;
 		int t_sec = (int)(System.currentTimeMillis() / 1000);
 		int statstime = (t_sec % STATS_WINDOW);
+		Banner b;
+		int bannerid;
 		
 		switch(cmd){
 		case GET:
@@ -766,7 +772,7 @@ public class BannerServer {
 				Statement st = JDBCConfig.createStatement();
 				ResultSet rs = st.executeQuery("SELECT id FROM banners WHERE campaignid = " + id);
 				while (rs.next()) {
-					int bannerid = rs.getInt("id");
+					bannerid = rs.getInt("id");
 					db.add(bannerid, new StringArrayPageValidator());
 				}
 				st.close();
@@ -784,7 +790,7 @@ public class BannerServer {
 				Statement st = JDBCConfig.createStatement();
 				ResultSet rs = st.executeQuery("SELECT id FROM banners WHERE campaignid = " + id);
 				while (rs.next()) {
-					int bannerid = rs.getInt("id");
+					bannerid = rs.getInt("id");
 					db.update(bannerid, new StringArrayPageValidator());
 				}
 				st.close();
@@ -795,8 +801,8 @@ public class BannerServer {
 			return "Campaign " + id + " updated.";
 		case DELCAMPAIGN: // "delcampaign id"
 			id = Integer.parseInt(params[0]);
-			for (Banner b: cdb.get(id).getBanners()) {
-				db.delete(b.getID());
+			for (Banner delete_banner: cdb.get(id).getBanners()) {
+				db.delete(delete_banner.getID());
 			}
 			cdb.delete(id);
 			bannerDebug("deletecampaign "+ Arrays.toString(params));
@@ -887,8 +893,8 @@ public class BannerServer {
 				bannerDebug("click " + Arrays.toString(params));
 			}
 			
-			int bannerid=Integer.parseInt(params[0]);
-			Banner b = db.getBannerByID(bannerid);
+			bannerid=Integer.parseInt(params[0]);
+			b = db.getBannerByID(bannerid);
 			
 			this.bannerstats.getOrCreate(b, BannerStat.class).click();
 			this.campaignstats.getOrCreate(b.getCampaign(), BannerStat.class).click();
@@ -919,6 +925,27 @@ public class BannerServer {
 			stats += "recentviews: " + ObjectProfiler.sizeof(recentviews) + " bytes\n";
 			stats += "slidingstats: " + ObjectProfiler.sizeof(slidingstats) + " bytes\n";
 			return stats;
+		case BANNER_INFO_CMD:
+			bannerid=Integer.parseInt(params[0]);
+			b = db.getBannerByID(bannerid);
+			if (b != null) {
+				String bannerInfo = "Banner ID: " + b.getID() + "\n";
+				bannerInfo += "Campaign ID: " + b.getCampaign().getID() + "\n";
+				bannerInfo += "Size: " + b.getSize() + "\n";
+				bannerInfo += "Interests: " + b.getInterests() + "\n";
+				bannerInfo += "Locations: " + b.getLocations() + "\n";
+				bannerInfo += "Ages: " + b.getAges() + "\n";
+				bannerInfo += "Sexes: " + b.getSexes() + "\n";
+				bannerInfo += "Min Views Per Day: " + b.getMinViewsPerDay() + "\n";
+				bannerInfo += "Max Views Per Day: " + b.getIntegerMaxViewsPerDay() + "\n";
+				bannerInfo += "Max Views: " + b.getIntegerMaxViews() + "\n";
+				bannerInfo += "Views Per User: " + b.getIntegerMaxViewsPerUser() + "/" + b.getLimitByPeriod() + " seconds\n";
+				bannerInfo += "Pay Rate: " + b.getRealPayrate() + "\n";
+				bannerInfo += "Pay Type: " + b.getPayType() + "\n";
+				return bannerInfo;
+			} else {
+				return "Banner " + bannerid + " doesn't exist.";
+			}
 		default:
 			System.out.println("Unknown command: '" + cmd + "' Params: '" + Arrays.toString(params) + "'");
 			//throw new UnsupportedOperationException("Command:" + cmd + " : Params: " + Arrays.toString(params));			
