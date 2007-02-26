@@ -89,6 +89,7 @@ public class BannerServer {
 	private static final int COLLECT_GARBAGE_CMD = 28;
 	private static final int MEMORY_STATS_CMD = 29;
 	private static final int BANNER_INFO_CMD = 30;
+	private static final int RECONNECT_DB_CMD = 31;
 	
 	public static final int BANNER_SLIDE_SIZE = 8;
 	public static final double BANNER_MIN_CLICKRATE = 0.0002;
@@ -100,6 +101,7 @@ public class BannerServer {
 	public static final String COLLECT_GARBAGE = "GC";
 	public static final String MEMORY_STATS = "MEMSTAT";
 	public static final String BANNER_INFO = "BANNER_INFO";
+	public static final String RECONNECT_DB = "RECONNECT_DB";
 	
 	private I_Policy policy;
 	
@@ -148,6 +150,7 @@ public class BannerServer {
 	private String logserver;
 	private String hitlogserver;
 	private int currentConnected=0;
+	private ConfigFile configFile;
 
 	public BannerServer(BannerDatabase db, CampaignDB cdb, int numservers, ConfigFile config) {
 		debug.put("tick", config.getBoolean("tick"));
@@ -160,6 +163,8 @@ public class BannerServer {
 		debug.put("dailyrestart", config.getBoolean("dailyrestart"));
 		debug.put("passback", config.getBoolean("passback"));
 		debug.put("development", config.getBoolean("development"));
+		
+		configFile = config;
 		
 		LOG_PORT = config.getInt("log_port");
 		HIT_LOG_PORT = config.getInt("hit_log_port");
@@ -506,6 +511,8 @@ public class BannerServer {
 			cmd = MEMORY_STATS_CMD;
 		} else if (command.toUpperCase().equals(BANNER_INFO)) {
 			cmd = BANNER_INFO_CMD;
+		} else if (command.toUpperCase().equals(RECONNECT_DB)) {
+			cmd = RECONNECT_DB_CMD;
 		} else {
 			cmd = BLANK;
 			System.out.println("'" + command + "'" + " not found.");
@@ -945,6 +952,12 @@ public class BannerServer {
 				return bannerInfo;
 			} else {
 				return "Banner " + bannerid + " doesn't exist.";
+			}
+		case RECONNECT_DB_CMD:
+			if (JDBCConfig.initDBConnection(configFile)) {
+				return "Successfully reconnected to database.";
+			} else {
+				return "Failed to reconnect to database.";
 			}
 		default:
 			System.out.println("Unknown command: '" + cmd + "' Params: '" + Arrays.toString(params) + "'");

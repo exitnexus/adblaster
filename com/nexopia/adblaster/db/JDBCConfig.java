@@ -25,6 +25,7 @@ public class JDBCConfig {
 	
 	private static Connection con; 
 	private static SQLQueue sqlQueue;
+	private static ConfigFile configFile;
 	
 	public static String inputString(String s) {
 		BufferedReader input = new BufferedReader(new InputStreamReader(
@@ -39,10 +40,11 @@ public class JDBCConfig {
 	}
 	
 	/* null means to use the default user directory for the config file. */
-	public static void initDBConnection(ConfigFile config){
+	public static boolean initDBConnection(ConfigFile config){
 		String url = "blank";
 		String user = "blank";
 		String pass = "blank";
+		configFile = config;
 		url = config.getString("db_url");
 		user = config.getString("db_user");
 		pass = config.getString("db_pass");
@@ -58,13 +60,20 @@ public class JDBCConfig {
 			System.exit(-1);
 		} catch (SQLException e) {
 			System.err.println("Unable to establish connection to banner database.");
-			if (inputString("Display stack trace? (y)").equals("y"))
-				e.printStackTrace();
-			System.err.println("Run the following command (or something similar): ");
+			//if (inputString("Display stack trace? (y)").equals("y"))
+			e.printStackTrace();
+			System.err.println("Run the following command (or something similar) if this is on the adblaster dev machine: ");
 			System.err.println("ssh -nNT -R 3306:192.168.0.50:3306 root@192.168.0.50 -p 3022.");
-			System.exit(-1);
+			//System.exit(-1);
+			return false;
 		}
-
+		return true;
+	}
+	
+	private static void ensureConnectionOpen() throws SQLException {
+		if (con.isClosed()) {
+			initDBConnection(configFile);
+		}
 	}
 	
 	public static void initThreadedSQLQueue() {
@@ -72,6 +81,7 @@ public class JDBCConfig {
 	}
 
 	public static Statement createStatement() throws SQLException {
+		ensureConnectionOpen();
 		return con.createStatement();
 	}
 	
@@ -90,6 +100,7 @@ public class JDBCConfig {
 	}
 
 	public static PreparedStatement prepareStatement(String sql) throws SQLException {
+		ensureConnectionOpen();
 		return con.prepareStatement(sql);
 	}
 
@@ -98,6 +109,6 @@ public class JDBCConfig {
 	}
 	
 	public static int sizeofCon() {
-			return ObjectProfiler.sizeof(con);
+		return ObjectProfiler.sizeof(con);
 	}
 }
