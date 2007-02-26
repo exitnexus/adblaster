@@ -296,7 +296,13 @@ public class NIOServer {
 						result = "NIOServer size: " + ObjectProfiler.sizeof(this) + " bytes\n";
 						result += "Integer Pool size: " + ObjectProfiler.sizeof(Integer.poolSize()) + " bytes\n";
 						result += "BannerServer size: " + ObjectProfiler.sizeof(banners) + " bytes\n";
-						result += "socketMap size: " + ObjectProfiler.sizeof(socketMap) + " bytes\n";
+						result += "socketMap size: " + (ObjectProfiler.sizeof(socketMap)-
+														ObjectProfiler.sizeof(banners)-
+														ObjectProfiler.sizeof(buffer)-
+														ObjectProfiler.sizeof(accepter)-
+														ObjectProfiler.sizeof(readerWriter)-
+														ObjectProfiler.sizeof(server)) 
+														+ " bytes\n";
 						result += banners.receive(strbuf.toString());
 					} else {
 						//The banner server deals with any commands except a server reset.
