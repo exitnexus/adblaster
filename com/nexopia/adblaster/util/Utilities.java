@@ -78,6 +78,7 @@ public class Utilities {
 	
 	public static void bannerDebug(String debugLog) {
 		stream.println(debugLog);
+		stream.flush();
 		
 	}
 	
