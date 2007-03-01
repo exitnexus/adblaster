@@ -1,6 +1,9 @@
 package com.nexopia.adblaster;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.sql.ResultSet;
@@ -90,6 +93,7 @@ public class BannerServer {
 	private static final int MEMORY_STATS_CMD = 29;
 	private static final int BANNER_INFO_CMD = 30;
 	private static final int RECONNECT_DB_CMD = 31;
+	private static final int SIMULATE_GET_CMD = 32;
 	
 	public static final int BANNER_SLIDE_SIZE = 8;
 	public static final double BANNER_MIN_CLICKRATE = 0.0002;
@@ -102,7 +106,7 @@ public class BannerServer {
 	public static final String MEMORY_STATS = "MEMSTAT";
 	public static final String BANNER_INFO = "BANNER_INFO";
 	public static final String RECONNECT_DB = "RECONNECT_DB";
-	
+	public static final String SIMULATE_GET = "SIMULATE_GET";
 	private I_Policy policy;
 	
 	public static HashMap<String, Boolean> debug=new HashMap<String,Boolean>();
@@ -302,7 +306,10 @@ public class BannerServer {
 			
 	}
 
-	private Banner weightedChoice(Vector<Banner> validBanners, int uid, int time) {
+	private Banner weightedChoice(Vector<Banner> validBanners, int uid, int time, boolean debug) {
+		if (debug)
+			Utilities.bannerDebug("Weighted choice:\n");
+
 		double total = 0;
 		double[] priorities = new double[validBanners.size()];
 		for (int i=0; i<validBanners.size(); i++) {
@@ -310,8 +317,13 @@ public class BannerServer {
 			double priority = policy.getPriority(b, uid, time, this);
 			priorities[i] = priority;
 			total += priority;
+			if (debug)
+				Utilities.bannerDebug("Banner " + b.getID() + " : " + priority);
+
 		}
 		double pick = rand.nextDouble()*total;
+		if (debug)
+			Utilities.bannerDebug("Picked number: " + pick + " \n");
 		
 		double currentWeight = 0;
 		for (int i=0;i<priorities.length;i++) {
@@ -338,15 +350,23 @@ public class BannerServer {
 			pageDominance = PAGE_DOMINANCE_POSSIBLE;
 		}
 		
+		if (debug) Utilities.bannerDebug("Phase one.\n");
+		
 		for (Campaign campaign : cdb.getCampaigns()) {
+			if (debug)
+				Utilities.bannerDebug("Checking campaign " + campaign.getID() + "\n");
+
 			banners.addAll(campaign.getBanners(usertime, size, userid, age,
 					sex, location, interests, page, pageDominance, debug));
 		}
 		
+		if (debug) Utilities.bannerDebug("Phase two.\n");
 		Vector<Banner> validBanners = new Vector<Banner>();
 
 		for (int i = 0; i < banners.size(); i++) {
 			Banner banner_i = banners.get(i);
+			if (debug) Utilities.bannerDebug("Checking banner " + banner_i.getID());
+			
 			boolean b1 = banner_i.isValidForUser(userid, usertime, debug, this);
 			boolean b2 = banner_i.getCampaign().isValidForUser(userid, usertime,
 					debug, this);
@@ -354,15 +374,23 @@ public class BannerServer {
 			boolean b4 = !hasReachedClicksPerDay(banner_i);
 			boolean b5 = !hasReachedMaxViews(banner_i);
 			boolean b6 = pageDominance > 0;
-			if (debug)
-				System.out.println("" + banner_i.getID() + ":" + b1 + ":" + b2 + ":"
-						+ b3 + ":" + b4);
+			if (debug){
+				Utilities.bannerDebug("Banner/User: " + b1);
+				Utilities.bannerDebug("Campaign/User: " + b2);
+				Utilities.bannerDebug("ViewDaily: "	+ b3);
+				Utilities.bannerDebug("ClicksPerDay: " + b4);
+				Utilities.bannerDebug("MaxViews: " + b5);
+				Utilities.bannerDebug("PageDominance: " + b6);
+			}
+			
 			if (b1 && b2 && ((b3 && b4 && b5) || b6)) {
 				validBanners.add(banner_i);
 			}
 		}
 
-		Banner chosen = weightedChoice(validBanners, userid, usertime);
+		if (debug) Utilities.bannerDebug("Phase three.\n");
+		
+		Banner chosen = weightedChoice(validBanners, userid, usertime, debug);
 		if (chosen != null) {
 			if (pageDominance == PAGE_DOMINANCE_POSSIBLE) {
 				if (chosen.getCampaign().getPageDominance()) {
@@ -387,7 +415,7 @@ public class BannerServer {
 			return chosen.getID();
 		}
 		if (debug)
-			System.out.println("Number of valid banners:" + validBanners.size());
+			Utilities.bannerDebug("Number of valid banners:" + validBanners.size());
 
 		return 0;
 
@@ -513,6 +541,8 @@ public class BannerServer {
 			cmd = BANNER_INFO_CMD;
 		} else if (command.toUpperCase().equals(RECONNECT_DB)) {
 			cmd = RECONNECT_DB_CMD;
+		} else if (command.toUpperCase().equals(SIMULATE_GET)) {
+			cmd = SIMULATE_GET_CMD;
 		} else {
 			cmd = BLANK;
 			System.out.println("'" + command + "'" + " not found.");
@@ -959,6 +989,33 @@ public class BannerServer {
 			} else {
 				return "Failed to reconnect to database.";
 			}
+		case SIMULATE_GET_CMD:
+		{
+			//BannerServer.stats.get++;
+			//slidingstats[statstime].get++;
+			
+			int usertime=Integer.parseInt(params[0]);
+			int size=Integer.parseInt(params[1]); 
+			int userid=Integer.parseInt(params[2]); 
+			byte age=Byte.parseByte(params[3]); 
+			byte sex=Byte.parseByte(params[4]); 
+			short loc=Short.parseShort(params[5]); 
+			String interestsStr=params[6]; 
+			String page=params[7]; 
+			int passback=Integer.parseInt(params[8]);
+			boolean debugGet=Boolean.parseBoolean(params[9]);
+			int pageid=Integer.parseInt(params[10]);
+
+			Interests interests = new Interests(interestsStr, false);
+			
+			if(passback != 0)
+				passbackBanner(passback, userid);
+			
+			OutputStream str = new ByteArrayOutputStream();
+			Utilities.setDebugLog(str);
+			getBestBanner(usertime, size, userid, age, sex, loc, interests, page, pageid, true);
+			return str.toString();
+		}
 		default:
 			System.out.println("Unknown command: '" + cmd + "' Params: '" + Arrays.toString(params) + "'");
 			//throw new UnsupportedOperationException("Command:" + cmd + " : Params: " + Arrays.toString(params));			

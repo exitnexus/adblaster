@@ -7,6 +7,8 @@
 package com.nexopia.adblaster.util;
 
 import java.io.File;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
@@ -72,8 +74,14 @@ public class Utilities {
 		return null;
 	}
 
+	static PrintStream stream = System.out;
+	
 	public static void bannerDebug(String debugLog) {
-		System.out.println(debugLog);
+		stream.println(debugLog);
 		
+	}
+	
+	public static void setDebugLog(OutputStream stream){
+		Utilities.stream = new PrintStream(stream); 
 	}
 }

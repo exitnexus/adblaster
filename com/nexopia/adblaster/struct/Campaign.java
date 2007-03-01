@@ -121,22 +121,38 @@ public class Campaign extends ServablePropertyHolder{
 	}
 
 	
-	public Set<Banner> getBanners(int usertime, int size, int userid, byte age, byte sex, short location, Interests interests, String page, int pageDominance, boolean debug) {
+	public Set<Banner> getBanners(int usertime, int size, int userid, byte age, 
+			byte sex, short location, Interests interests, String page, 
+			int pageDominance, 
+			boolean debug) {
+		
 		HashSet<Banner> hs = new HashSet<Banner>();
 		boolean b1 = this.banners.isEmpty();
-		boolean b2 = !this.valid(usertime, size, userid, age, sex, location, interests, page, pageDominance, debug);		
-		if (b1 || b2) {
+		boolean b2 = !this.valid(usertime, size, userid, age, sex, location, 
+				interests, page, pageDominance, debug);		
+		
+		if (b1) {
 			if (BannerServer.debug.get("development").booleanValue())
 				System.out.println("Campaign " + this.toString() + " is: " + (b1?"empty":"non-empty") + ":" + (b2?"invalid":"valid"));
-			return hs;
-		} else {
-			for (Banner b : this.banners) {
-				if (b.valid(usertime, size, userid, age, sex, location, interests, page, pageDominance, debug)) {
-					hs.add(b);
-				}
-			}
+			if (debug)
+				Utilities.bannerDebug("Bannerset is empty.");
 			return hs;
 		}
+		
+		if (b2){
+			if (BannerServer.debug.get("development").booleanValue())
+				System.out.println("Campaign " + this.toString() + " is: " + (b1?"empty":"non-empty") + ":" + (b2?"invalid":"valid"));
+			if (debug)
+				Utilities.bannerDebug("Campaign doesn't match parameters.");
+			return hs;
+		}
+		
+		for (Banner b : this.banners) {
+			if (b.valid(usertime, size, userid, age, sex, location, interests, page, pageDominance, debug)) {
+				hs.add(b);
+			}
+		}
+		return hs;
 	}
 
 	public void addBanner(Banner banner) {
@@ -171,11 +187,13 @@ public class Campaign extends ServablePropertyHolder{
 		if (debug) debugLog += "Checking campaign " + this.toString() + ": ";
 		if(!this.enabled)
 			return false;
+		
 		//date
+		if (debug) debugLog += " Date";
 		if(this.startdate >= usertime || (this.enddate != 0 && this.enddate <= usertime))
 			return false;
 	
-		if (debug) debugLog += " 0";
+		if (debug) debugLog += " Age";
 		//targetting
 		//age
 		if (!this.validAge(age)) {
@@ -183,7 +201,7 @@ public class Campaign extends ServablePropertyHolder{
 			return false;
 		}
 		
-		if (debug) debugLog += " 1";
+		if (debug) debugLog += " Sex";
 		//sex
 		if(!this.validSex(sex)) {
 			if (debug) Utilities.bannerDebug(debugLog);
@@ -197,32 +215,33 @@ public class Campaign extends ServablePropertyHolder{
 		}
 		
 		//location
+		if (debug) debugLog += " Location";
 		if(!this.validLocation(location)){ //default true
 			if (debug) Utilities.bannerDebug(debugLog);
 			return false;
 		}
 		
-		if (debug) debugLog += " 2";
+		if (debug) debugLog += " Page";
 		//page
 		if(!this.validPage(page)){ //default true
 			if (debug) Utilities.bannerDebug(debugLog);
 			return false;
 		}
 		
-		if (debug) debugLog += " 3";
+		if (debug) debugLog += " Interests";
 		//interests
 		if(!this.validInterests(interests2)){
 			if (debug) Utilities.bannerDebug(debugLog);
 			return false;
 		}
 		
-		if (debug) debugLog += " 4";
+		if (debug) debugLog += " Time";
 		if (!this.validTime((long)usertime*1000)) {
 			if (debug) Utilities.bannerDebug(debugLog);
 			return false;
 		}
 		
-		if (debug) debugLog += " 5";
+		if (debug) debugLog += " Done";
 		//Utilities.bannerDebug("Campaign valid: this.id");
 		if (debug) Utilities.bannerDebug(debugLog);
 		return true;
