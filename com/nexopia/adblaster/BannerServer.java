@@ -909,6 +909,8 @@ public class BannerServer {
 				logserver = params[0];
 				logserver_port = Integer.parseInt(params[1]);
 			}
+			if (logsock == null)
+				logsock = new EasyDatagramSocket();
 			logsock.connect(new InetSocketAddress(logserver, logserver_port));
 			logsock.setSoTimeout(20);
 			hitlogsock.connect(new InetSocketAddress(hitlogserver, hitlogserver_port));
