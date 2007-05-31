@@ -145,7 +145,7 @@ public class BannerServer {
 	private FastMap<Integer, TypeStat> clickstats = new FastMap<Integer,TypeStat>();
 	private FastMap<Campaign, BannerStat> campaignstats = new FastMap<Campaign,BannerStat>();
 	private FastMap<Banner, HourlyStat> hourlystats = new FastMap<Banner,HourlyStat>();
-	private IntObjectHashMap<int[]> pageIDDominance = new IntObjectHashMap<int[]>();
+	private IntObjectHashMap<IntObjectHashMap<int[]>> pageIDDominance = new IntObjectHashMap<IntObjectHashMap<int[]>>();
 	
 	private EasyDatagramSocket logsock;
 	private EasyDatagramSocket hitlogsock;
@@ -342,8 +342,8 @@ public class BannerServer {
 		
 		int pageDominance;
 		
-		if (pageIDDominance.get(pageid) != null) {
-			pageDominance = pageIDDominance.get(pageid)[PAGE_DOMINANCE_TYPE];
+		if (pageIDDominance.get(userid) != null && pageIDDominance.get(userid).get(pageid) != null) {
+			pageDominance = pageIDDominance.get(userid).get(pageid)[PAGE_DOMINANCE_TYPE];
 		} else if (pageid == PAGE_DOMINANCE_NO_PAGE_ID) {
 			pageDominance = PAGE_DOMINANCE_OFF;
 		} else {
@@ -397,15 +397,21 @@ public class BannerServer {
 					int[] idTimePair = new int[2];
 					idTimePair[PAGE_DOMINANCE_TYPE] = chosen.getCampaign().getID();
 					idTimePair[PAGE_DOMINANCE_TIME] = (int)System.currentTimeMillis()/1000;
-					pageIDDominance.put(pageid, idTimePair);
+					if (pageIDDominance.get(userid) == null) {
+						pageIDDominance.put(userid, new IntObjectHashMap<int[]>());
+					}
+					pageIDDominance.get(userid).put(pageid, idTimePair);
 				} else {
 					int[] idTimePair = new int[2];
 					idTimePair[PAGE_DOMINANCE_TYPE] = PAGE_DOMINANCE_OFF;
 					idTimePair[PAGE_DOMINANCE_TIME] = (int)System.currentTimeMillis()/1000;
-					pageIDDominance.put(pageid, idTimePair);
+					if (pageIDDominance.get(userid) == null) {
+						pageIDDominance.put(userid, new IntObjectHashMap<int[]>());
+					}
+					pageIDDominance.get(userid).put(pageid, idTimePair);
 				}
 			} else if (pageDominance != PAGE_DOMINANCE_OFF) {
-				int[] idTimePair = pageIDDominance.get(pageid);
+				int[] idTimePair = pageIDDominance.get(userid).get(pageid);
 				idTimePair[PAGE_DOMINANCE_TIME] = (int)System.currentTimeMillis()/1000;
 			}
 			markBannerUsed(age, sex, location, interests, page,
@@ -612,12 +618,20 @@ public class BannerServer {
 	}
 	
 	private void prunePageIDs() {
-		int[] keys = pageIDDominance.getKeyArray();
+		int[] userids = pageIDDominance.getKeyArray();
 		int time = (int)System.currentTimeMillis()/1000 - PAGE_DOMINANCE_RETENTION_TIME;
-		for (int key: keys) {
-			if (key != 0) { //Weirdness from IntObjectHashMap, 0 points to every unassigned bucket in the hash.
-				if (pageIDDominance.get(key) == null || pageIDDominance.get(key)[PAGE_DOMINANCE_TIME] < time) {
-					pageIDDominance.remove(key);
+		for (int userid: userids) {
+			if (userid != 0) { //Weirdness from IntObjectHashMap, 0 points to every unassigned bucket in the hash.
+				IntObjectHashMap<int[]> pageIDMap = pageIDDominance.get(userid);
+				if (pageIDMap != null) {
+					int[] pageids = pageIDMap.getKeyArray();
+					for (int pageid: pageids) {
+						if (pageid != 0) {
+							if (pageIDMap.get(pageid) == null || pageIDMap.get(pageid)[PAGE_DOMINANCE_TIME] < time) {
+								pageIDMap.remove(pageid);
+							}
+						}
+					}
 				}
 			}
 		}
