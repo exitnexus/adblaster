@@ -45,20 +45,11 @@ public class Campaign extends ServablePropertyHolder{
 		int totalClicks = 0;
 		try {
 			Statement s = JDBCConfig.createStatement();
-			ResultSet rs = s.executeQuery("SELECT id FROM " + JDBCConfig.BANNER_TABLE + " WHERE campaignid = " + campaignID);
-			int i = 0;
+			ResultSet rs = s.executeQuery("SELECT views,clicks FROM " + JDBCConfig.BANNER_TABLE + " WHERE campaignid = " + campaignID);
 			while (rs.next()) {
-				int id = rs.getInt("ID");
-				Statement s2 = JDBCConfig.createStatement();
-				ResultSet rs2 = s2.executeQuery("SELECT views, clicks FROM " + JDBCConfig.BANNERSTAT_TABLE + " WHERE id = " + id);
-				while (rs2.next()) {
-					if (rs2.first()){
-						totalViews += rs2.getInt("VIEWS");
-						totalClicks += rs2.getInt("CLICKS");
-					}
-				}
+				totalViews += rs.getInt("VIEWS");
+				totalClicks += rs.getInt("CLICKS");
 				
-				i++;
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
