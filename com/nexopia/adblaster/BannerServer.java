@@ -45,10 +45,6 @@ public class BannerServer {
 	
 	private static Random rand = new Random();
 	
-	public static Integer sizes_array[] = {BANNER_BANNER, BANNER_LEADERBOARD,
-			BANNER_BIGBOX, BANNER_SKY120, BANNER_SKY160,
-			BANNER_BUTTON60, BANNER_VULCAN, BANNER_LINK};
-	
 	public static final String CURRENT_VERSION = "0.0";
 	public static final Integer BANNER_BANNER = new Integer(1);
 	public static final Integer BANNER_LEADERBOARD = new Integer(2);
@@ -58,6 +54,10 @@ public class BannerServer {
 	public static final Integer BANNER_BUTTON60 = new Integer(6);
 	public static final Integer BANNER_VULCAN = new Integer(7);
 	public static final Integer BANNER_LINK = new Integer(8);
+
+	public static Integer sizes_array[] = {BANNER_BANNER, BANNER_LEADERBOARD,
+			BANNER_BIGBOX, BANNER_SKY120, BANNER_SKY160,
+			BANNER_BUTTON60, BANNER_VULCAN, BANNER_LINK};
 	
 	public static final int PAGE_DOMINANCE_OFF = Integer.MIN_VALUE;
 	public static final int PAGE_DOMINANCE_POSSIBLE = Integer.MIN_VALUE+1;
@@ -160,6 +160,15 @@ public class BannerServer {
 		debug.put("development", config.getBoolean("development"));
 		
 		configFile = config;
+		
+		viewMap = new LowMemMultiMap();
+		banners = new Vector<Banner>();
+		viewstats = new FastMap<Integer,TypeStat>();
+		clickstats = new FastMap<Integer,TypeStat>();
+		campaignstats = new FastMap<Campaign,BannerStat>();
+		hourlystats = new FastMap<Banner,HourlyStat>();
+		pageIDDominance = new IntObjectHashMap<IntObjectHashMap<int[]>>();
+		
 		while (recentviews.size() < VIEW_WINDOWS) {
 			recentviews.add(new HashMap<Integer, Vector<Integer>>());
 		}
@@ -181,14 +190,6 @@ public class BannerServer {
 		for (int i = 0; i < slidingstats.length; i++){
 			slidingstats[i] = new ServerStat();
 		}
-		
-		viewMap = new LowMemMultiMap();
-		banners = new Vector<Banner>();
-		viewstats = new FastMap<Integer,TypeStat>();
-		clickstats = new FastMap<Integer,TypeStat>();
-		campaignstats = new FastMap<Campaign,BannerStat>();
-		hourlystats = new FastMap<Banner,HourlyStat>();
-		pageIDDominance = new IntObjectHashMap<IntObjectHashMap<int[]>>();
 		
 		try {
 			
