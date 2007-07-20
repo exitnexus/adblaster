@@ -41,10 +41,13 @@ import com.nexopia.adblaster.util.LowMemMap.LowMemArray;
 import com.vladium.utils.ObjectProfiler;
 
 public class BannerServer {
-	private int LOG_PORT;
-	private int HIT_LOG_PORT;
-	private String LOG_HOST;
-	private String HIT_LOG_HOST;
+	///////////////////////////static members////////////////////////////
+	
+	private static Random rand = new Random();
+	
+	public static Integer sizes_array[] = {BANNER_BANNER, BANNER_LEADERBOARD,
+			BANNER_BIGBOX, BANNER_SKY120, BANNER_SKY160,
+			BANNER_BUTTON60, BANNER_VULCAN, BANNER_LINK};
 	
 	public static final String CURRENT_VERSION = "0.0";
 	public static final Integer BANNER_BANNER = new Integer(1);
@@ -109,9 +112,11 @@ public class BannerServer {
 	public static final String SIMULATE_GET = "SIMULATE_GET";
 	public static final String RELOAD_FROM_DB = "RELOAD";
 	
-	private I_Policy policy;
-	
 	public static HashMap<String, Boolean> debug=new HashMap<String,Boolean>();
+	
+	//////////////////////////instance members/////////////////////////////
+	
+	private I_Policy policy;
 	
 	private ServerStat stats;
 	private ServerStat[] slidingstats;
@@ -121,27 +126,17 @@ public class BannerServer {
 	private BannerDatabase db;
 	private CampaignDB cdb;
 	private long creationTime;
-	public static Integer sizes_array[] = {BANNER_BANNER, BANNER_LEADERBOARD,
-			BANNER_BIGBOX, BANNER_SKY120, BANNER_SKY160,
-			BANNER_BUTTON60, BANNER_VULCAN, BANNER_LINK};
 	
 	private int numservers;
-	private static Random rand = new Random();
-	//public banners;
-	//public bannerids;
-	//public bannersizes;
-	//public HashMap<Integer, Campaign> bannercampaigns;
-	//public HashMap<Integer, Integer> campaignids; // array( bannerid => campaignid );
 	
-	//public int time;
-	private LowMemMultiMap viewMap = new LowMemMultiMap();
-	private Vector<Banner> banners = new Vector<Banner>();
+	private LowMemMultiMap viewMap;// = new LowMemMultiMap();
+	private Vector<Banner> banners;// = new Vector<Banner>();
 	private FastMap<Banner, BannerStat> bannerstats;
-	private FastMap<Integer, TypeStat> viewstats = new FastMap<Integer,TypeStat>();
-	private FastMap<Integer, TypeStat> clickstats = new FastMap<Integer,TypeStat>();
-	private FastMap<Campaign, BannerStat> campaignstats = new FastMap<Campaign,BannerStat>();
-	private FastMap<Banner, HourlyStat> hourlystats = new FastMap<Banner,HourlyStat>();
-	private IntObjectHashMap<IntObjectHashMap<int[]>> pageIDDominance = new IntObjectHashMap<IntObjectHashMap<int[]>>();
+	private FastMap<Integer, TypeStat> viewstats;// = new FastMap<Integer,TypeStat>();
+	private FastMap<Integer, TypeStat> clickstats;// = new FastMap<Integer,TypeStat>();
+	private FastMap<Campaign, BannerStat> campaignstats;// = new FastMap<Campaign,BannerStat>();
+	private FastMap<Banner, HourlyStat> hourlystats;// = new FastMap<Banner,HourlyStat>();
+	private IntObjectHashMap<IntObjectHashMap<int[]>> pageIDDominance;// = new IntObjectHashMap<IntObjectHashMap<int[]>>();
 	
 	private EasyDatagramSocket logsock;
 	private EasyDatagramSocket hitlogsock;
@@ -186,7 +181,17 @@ public class BannerServer {
 		for (int i = 0; i < slidingstats.length; i++){
 			slidingstats[i] = new ServerStat();
 		}
+		
+		viewMap = new LowMemMultiMap();
+		banners = new Vector<Banner>();
+		viewstats = new FastMap<Integer,TypeStat>();
+		clickstats = new FastMap<Integer,TypeStat>();
+		campaignstats = new FastMap<Campaign,BannerStat>();
+		hourlystats = new FastMap<Banner,HourlyStat>();
+		pageIDDominance = new IntObjectHashMap<IntObjectHashMap<int[]>>();
+		
 		try {
+			
 			logsock = new EasyDatagramSocket();
 			hitlogsock = new EasyDatagramSocket();
 			
