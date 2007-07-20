@@ -41,11 +41,10 @@ import com.nexopia.adblaster.util.LowMemMap.LowMemArray;
 import com.vladium.utils.ObjectProfiler;
 
 public class BannerServer {
-	private static int LOG_PORT = 5556;
-	private static int HIT_LOG_PORT = 6666;
-	private static String LOG_HOST = "localhost";
-	private static String HIT_LOG_HOST = "localhost";
-	
+	private int LOG_PORT;
+	private int HIT_LOG_PORT;
+	private String LOG_HOST;
+	private String HIT_LOG_HOST;
 	
 	public static final String CURRENT_VERSION = "0.0";
 	public static final Integer BANNER_BANNER = new Integer(1);
@@ -80,20 +79,21 @@ public class BannerServer {
 	private static final int VERSION = 16;
 	private static final int RECONNECT = 17;
 	private static final int LOGSTAT = 18;
-	static final int GET = 19;
-	static final int PASSBACK = 20;
-	static final int GETFAIL = 21;
-	static final int GETLOG = 22;
-	static final int MINUTELY = 23;
-	static final int HOURLY = 24;
-	static final int DAILY = 25;
-	static final int CLICK = 26;
+	public static final int GET = 19;
+	public static final int PASSBACK = 20;
+	public static final int GETFAIL = 21;
+	public static final int GETLOG = 22;
+	public static final int MINUTELY = 23;
+	public static final int HOURLY = 24;
+	public static final int DAILY = 25;
+	public static final int CLICK = 26;
 	private static final int RELOAD_COEFFICIENTS_CMD = 27;
 	private static final int COLLECT_GARBAGE_CMD = 28;
 	private static final int MEMORY_STATS_CMD = 29;
 	private static final int BANNER_INFO_CMD = 30;
 	private static final int RECONNECT_DB_CMD = 31;
 	private static final int SIMULATE_GET_CMD = 32;
+	private static final int RELOAD_FROM_DB_CMD = 33;
 	
 	public static final int BANNER_SLIDE_SIZE = 8;
 	public static final double BANNER_MIN_CLICKRATE = 0.0002;
@@ -107,29 +107,25 @@ public class BannerServer {
 	public static final String BANNER_INFO = "BANNER_INFO";
 	public static final String RECONNECT_DB = "RECONNECT_DB";
 	public static final String SIMULATE_GET = "SIMULATE_GET";
+	public static final String RELOAD_FROM_DB = "RELOAD";
+	
 	private I_Policy policy;
 	
 	public static HashMap<String, Boolean> debug=new HashMap<String,Boolean>();
 	
-	static ServerStat stats = new ServerStat();
-	static ServerStat slidingstats[] = new ServerStat[STATS_WINDOW];
-	static {
-		for (int i = 0; i < slidingstats.length; i++){
-			slidingstats[i] = new ServerStat();
-		}
-	}
+	private ServerStat stats;
+	private ServerStat[] slidingstats;
 	
-	static int currentwindow = 0;
+	private int currentwindow;
 	
-	public BannerDatabase db;
-	public CampaignDB cdb;
+	private BannerDatabase db;
+	private CampaignDB cdb;
 	private long creationTime;
-	public HashMap<String,Integer> sizes;
-	Integer sizes_array[] = {BANNER_BANNER, BANNER_LEADERBOARD,
+	public static Integer sizes_array[] = {BANNER_BANNER, BANNER_LEADERBOARD,
 			BANNER_BIGBOX, BANNER_SKY120, BANNER_SKY160,
 			BANNER_BUTTON60, BANNER_VULCAN, BANNER_LINK};
 	
-	static int numservers;
+	private int numservers;
 	private static Random rand = new Random();
 	//public banners;
 	//public bannerids;
@@ -139,8 +135,8 @@ public class BannerServer {
 	
 	//public int time;
 	private LowMemMultiMap viewMap = new LowMemMultiMap();
-	Vector<Banner> banners = new Vector<Banner>();
-	FastMap<Banner, BannerStat> bannerstats;
+	private Vector<Banner> banners = new Vector<Banner>();
+	private FastMap<Banner, BannerStat> bannerstats;
 	private FastMap<Integer, TypeStat> viewstats = new FastMap<Integer,TypeStat>();
 	private FastMap<Integer, TypeStat> clickstats = new FastMap<Integer,TypeStat>();
 	private FastMap<Campaign, BannerStat> campaignstats = new FastMap<Campaign,BannerStat>();
@@ -169,38 +165,35 @@ public class BannerServer {
 		debug.put("development", config.getBoolean("development"));
 		
 		configFile = config;
-		
-		LOG_PORT = config.getInt("log_port");
-		HIT_LOG_PORT = config.getInt("hit_log_port");
-		LOG_HOST = config.getString("log_host");
-		HIT_LOG_HOST = config.getString("hit_log_host");
-		
 		while (recentviews.size() < VIEW_WINDOWS) {
 			recentviews.add(new HashMap<Integer, Vector<Integer>>());
 		}
+		this.currentwindow = 0;
 		this.policy = new OldPolicy(cdb);
 		//this.policy = new AdBlasterPolicy(db.getBanners());
 		this.db = db;
 		this.cdb = cdb;
 		JDBCConfig.initThreadedSQLQueue();
-		BannerServer.numservers = numservers;
-		Integer sizes[] = {BANNER_BANNER, BANNER_LEADERBOARD,
-				BANNER_BIGBOX, BANNER_SKY120, BANNER_SKY160,
-				BANNER_BUTTON60, BANNER_VULCAN, BANNER_LINK};
+		this.numservers = numservers;
 		this.bannerstats = new FastMap<Banner, BannerStat>();
-		for(int i = 0; i < sizes.length; i++) {
-			Integer size = sizes[i];
+		for(int i = 0; i < sizes_array.length; i++) {
+			Integer size = BannerServer.sizes_array[i];
 			this.viewstats.put(size, new TypeStat());
 			this.clickstats.put(size, new TypeStat());
 		}
-		
-		 try {
+		stats = new ServerStat();
+		slidingstats = new ServerStat[STATS_WINDOW];
+		for (int i = 0; i < slidingstats.length; i++){
+			slidingstats[i] = new ServerStat();
+		}
+		try {
 			logsock = new EasyDatagramSocket();
 			hitlogsock = new EasyDatagramSocket();
-			logserver = LOG_HOST;
-			hitlogserver = HIT_LOG_HOST;
-			logserver_port = LOG_PORT;
-			hitlogserver_port = HIT_LOG_PORT;
+			
+			logserver = config.getString("log_host");
+			hitlogserver = config.getString("hit_log_host");
+			logserver_port = config.getInt("log_port");
+			hitlogserver_port = config.getInt("hit_log_port");
 			logsock.connect(new InetSocketAddress(logserver, logserver_port));
 			hitlogsock.connect(new InetSocketAddress(hitlogserver, hitlogserver_port));
 			logsock.setSoTimeout(20);
