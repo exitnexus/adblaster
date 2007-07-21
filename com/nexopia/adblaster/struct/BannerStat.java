@@ -4,12 +4,14 @@
 package com.nexopia.adblaster.struct;
 
 public class BannerStat{
-	public static final int MEMORY_USAGE = 46;
-	public int dailyviews;
-	public int dailyclicks;
-	public int passbacks;
-	int current_views;
-	int current_clicks;
+	//daily == so far today
+	private int dailyviews; 
+	private int dailyclicks;
+	
+	//so far this minute
+	private int passbacks;
+	private int current_views;
+	private int current_clicks;
 	
 	public BannerStat(){
 	}
@@ -27,6 +29,10 @@ public class BannerStat{
 		dailyclicks++;
 		current_clicks++;
 	}
+	
+	public void passback() {
+		passbacks++;
+	}
 
 	public int getDailyClicks() {
 		return this.dailyclicks;
@@ -36,15 +42,27 @@ public class BannerStat{
 		return current_clicks;
 	}
 
-	public void setCurrentClicks(int i) {
-		current_clicks = i;
-	}
-
-	public void SetCurrentViews(int i) {
-		current_views = i;
-	}
-
+	
 	public int getCurrentViews() {
 		return this.current_views;
+	}
+	
+	public int getDailyViews() {
+		return this.dailyviews;
+	}
+	
+	public int getPassbacks() {
+		return this.passbacks;
+	}
+	
+	public void clearCurrent() {
+		this.current_clicks = 0;
+		this.current_views = 0;
+		this.passbacks = 0;
+	}
+	
+	public void clearDaily() {
+		this.dailyclicks = 0;
+		this.dailyviews = 0;
 	}
 }

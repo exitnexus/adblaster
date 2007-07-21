@@ -42,21 +42,13 @@ public class OldPolicy implements I_Policy {
 			viewsperuser = Math.max(b.getViewsPerUser(), b.getCampaign()
 					.getViewsPerUser());
 
-		double viewsperday = Math.min(b.getViewsPerDay(), b.getCampaign()
-				.getViewsPerDay())
-				/ server.numservers;
+		double viewsperday = Math.min(b.getViewsPerDay(), b.getCampaign().getViewsPerDay())/server.numservers();
 		if (viewsperday == 0)
-			viewsperday = Math.max(b.getViewsPerDay(), b.getCampaign()
-					.getViewsPerDay())
-					/ server.numservers;
+			viewsperday = Math.max(b.getViewsPerDay(), b.getCampaign().getViewsPerDay())/server.numservers();
 
-		double clicksperday = Math.min(b.getClicksperday(), b.getCampaign()
-				.getClicksperday())
-				/ server.numservers;
+		double clicksperday = Math.min(b.getClicksperday(), b.getCampaign().getClicksperday())/server.numservers();
 		if (clicksperday == 0)
-			clicksperday = Math.max(b.getClicksperday(), b.getCampaign()
-					.getClicksperday())
-					/ server.numservers;
+			clicksperday = Math.max(b.getClicksperday(), b.getCampaign().getClicksperday())/server.numservers();
 
 		if (viewsperuser != 0) {
 			LowMemArray viewTimes = server.getViewsForUser(uid, b);
@@ -71,11 +63,11 @@ public class OldPolicy implements I_Policy {
 		}
 
 		if (viewsperday != 0) {
-			priority *= (3 - server.bannerstats.get(b).dailyviews / viewsperday);
+			priority *= (3 - server.getBannerStat(b).getDailyViews() / viewsperday);
 		}
 
 		if (clicksperday != 0) {
-			priority *= (3 - server.bannerstats.get(b).dailyviews / clicksperday);
+			priority *= (3 - server.getBannerStat(b).getDailyViews() / clicksperday);
 		}
 
 		return priority;

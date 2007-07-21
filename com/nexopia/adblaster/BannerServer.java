@@ -42,7 +42,6 @@ import com.vladium.utils.ObjectProfiler;
 
 public class BannerServer {
 	///////////////////////////static members////////////////////////////
-	
 	private static Random rand = new Random();
 	
 	public static final String CURRENT_VERSION = "0.0";
@@ -129,14 +128,14 @@ public class BannerServer {
 	
 	private int numservers;
 	
-	private LowMemMultiMap viewMap;// = new LowMemMultiMap();
-	private Vector<Banner> banners;// = new Vector<Banner>();
+	private LowMemMultiMap viewMap;
+	private Vector<Banner> banners;
 	private FastMap<Banner, BannerStat> bannerstats;
-	private FastMap<Integer, TypeStat> viewstats;// = new FastMap<Integer,TypeStat>();
-	private FastMap<Integer, TypeStat> clickstats;// = new FastMap<Integer,TypeStat>();
-	private FastMap<Campaign, BannerStat> campaignstats;// = new FastMap<Campaign,BannerStat>();
-	private FastMap<Banner, HourlyStat> hourlystats;// = new FastMap<Banner,HourlyStat>();
-	private IntObjectHashMap<IntObjectHashMap<int[]>> pageIDDominance;// = new IntObjectHashMap<IntObjectHashMap<int[]>>();
+	private FastMap<Integer, TypeStat> viewstats;
+	private FastMap<Integer, TypeStat> clickstats;
+	private FastMap<Campaign, BannerStat> campaignstats;
+	private FastMap<Banner, HourlyStat> hourlystats;
+	private IntObjectHashMap<IntObjectHashMap<int[]>> pageIDDominance;
 	
 	private EasyDatagramSocket logsock;
 	private EasyDatagramSocket hitlogsock;
@@ -144,7 +143,7 @@ public class BannerServer {
 	private int hitlogserver_port;
 	private String logserver;
 	private String hitlogserver;
-	private int currentConnected=0;
+	private int currentConnected;
 	private ConfigFile configFile;
 
 	public BannerServer(BannerDatabase db, CampaignDB cdb, int numservers, ConfigFile config) {
@@ -161,13 +160,14 @@ public class BannerServer {
 		
 		configFile = config;
 		
-		viewMap = new LowMemMultiMap();
-		banners = new Vector<Banner>();
-		viewstats = new FastMap<Integer,TypeStat>();
-		clickstats = new FastMap<Integer,TypeStat>();
-		campaignstats = new FastMap<Campaign,BannerStat>();
-		hourlystats = new FastMap<Banner,HourlyStat>();
-		pageIDDominance = new IntObjectHashMap<IntObjectHashMap<int[]>>();
+		this.currentConnected = 0;
+		this.viewMap = new LowMemMultiMap();
+		this.banners = new Vector<Banner>();
+		this.viewstats = new FastMap<Integer,TypeStat>();
+		this.clickstats = new FastMap<Integer,TypeStat>();
+		this.campaignstats = new FastMap<Campaign,BannerStat>();
+		this.hourlystats = new FastMap<Banner,HourlyStat>();
+		this.pageIDDominance = new IntObjectHashMap<IntObjectHashMap<int[]>>();
 		
 		while (recentviews.size() < VIEW_WINDOWS) {
 			recentviews.add(new HashMap<Integer, Vector<Integer>>());
@@ -209,6 +209,11 @@ public class BannerServer {
 		}
 		 
 		 this.creationTime = System.currentTimeMillis();
+	}
+	
+	//reinitialize everything that is database backed
+	public void reset() {
+		
 	}
 	
 	public boolean addCampaign(int id){
@@ -296,11 +301,11 @@ public class BannerServer {
 	 */
 	
 	boolean hasReachedMaxViews(Banner b) {
-		if ((b.getViews() + this.bannerstats.getOrCreate(b, BannerStat.class).dailyviews) >= b.getIntegerMaxViews())
+		if ((b.getViews() + this.bannerstats.getOrCreate(b, BannerStat.class).getDailyViews()) >= b.getIntegerMaxViews())
 			return true;
-		if ((b.getCampaign().getViews() + this.campaignstats.getOrCreate(b.getCampaign(), BannerStat.class).dailyviews) >= b.getCampaign().getIntegerMaxViews())
+		if ((b.getCampaign().getViews() + this.campaignstats.getOrCreate(b.getCampaign(), BannerStat.class).getDailyViews()) >= b.getCampaign().getIntegerMaxViews())
 			return true;
-		if (debug.get("development").booleanValue()) System.out.println("" + b.getCampaign().getViews() + " + " + this.campaignstats.getOrCreate(b.getCampaign(), BannerStat.class).dailyviews + " < " + b.getCampaign().getIntegerMaxViews()); 
+		if (debug.get("development").booleanValue()) System.out.println("" + b.getCampaign().getViews() + " + " + this.campaignstats.getOrCreate(b.getCampaign(), BannerStat.class).getDailyViews() + " < " + b.getCampaign().getIntegerMaxViews()); 
 		return false;
 			
 	}
@@ -428,12 +433,12 @@ public class BannerServer {
 
 
 	boolean hasReachedViewsPerDay(Banner b) {
-		if (this.bannerstats.getOrCreate(b, BannerStat.class).dailyviews >= b.getIntegerMaxViewsPerDay()/numservers)
+		if (this.bannerstats.getOrCreate(b, BannerStat.class).getDailyViews() >= b.getIntegerMaxViewsPerDay()/numservers)
 			return true;
-		if (this.campaignstats.getOrCreate(b.getCampaign(), BannerStat.class).dailyviews >= b.getCampaign().getIntegerMaxViewsPerDay()/numservers)
+		if (this.campaignstats.getOrCreate(b.getCampaign(), BannerStat.class).getDailyViews() >= b.getCampaign().getIntegerMaxViewsPerDay()/numservers)
 			return true;
-		if (debug.get("development").booleanValue()) System.out.println("Banner Views: " + this.bannerstats.getOrCreate(b, BannerStat.class).dailyviews + ":" + b.getIntegerMaxViewsPerDay()/numservers);
-		if (debug.get("development").booleanValue()) System.out.println("Campaign Views: " + this.campaignstats.getOrCreate(b.getCampaign(), BannerStat.class).dailyviews + ":" + b.getCampaign().getIntegerMaxViewsPerDay()/numservers);
+		if (debug.get("development").booleanValue()) System.out.println("Banner Views: " + this.bannerstats.getOrCreate(b, BannerStat.class).getDailyViews() + ":" + b.getIntegerMaxViewsPerDay()/numservers);
+		if (debug.get("development").booleanValue()) System.out.println("Campaign Views: " + this.campaignstats.getOrCreate(b.getCampaign(), BannerStat.class).getDailyViews() + ":" + b.getCampaign().getIntegerMaxViewsPerDay()/numservers);
 		return false;
 	}
 	
@@ -604,15 +609,13 @@ public class BannerServer {
 		BannerStat bannerstat = this.bannerstats.getOrCreate(b, BannerStat.class);
 		
 		if (debug) {
-			Utilities.bannerDebug("minutely " + b.getID() + " " + bannerstat.dailyviews + 
-					" " + bannerstat.getDailyClicks() + " " + bannerstat.passbacks);
+			Utilities.bannerDebug("minutely " + b.getID() + " " + bannerstat.getDailyViews() + 
+					" " + bannerstat.getDailyClicks() + " " + bannerstat.getPassbacks());
 		}
 		
 		if(bannerstat.hasChanged()) {
-			JDBCConfig.queueQuery("UPDATE " + JDBCConfig.BANNER_TABLE + " SET lastupdatetime = "+time+", views = views + "+bannerstat.getCurrentViews()+", clicks = clicks + "+bannerstat.getCurrentClicks()+", passbacks = passbacks + "+bannerstat.passbacks+" WHERE id = " + b.getID());
-			bannerstat.SetCurrentViews(0);
-			bannerstat.setCurrentClicks(0);
-			bannerstat.passbacks = 0;
+			JDBCConfig.queueQuery("UPDATE " + JDBCConfig.BANNER_TABLE + " SET lastupdatetime = "+time+", views = views + "+bannerstat.getCurrentViews()+", clicks = clicks + "+bannerstat.getCurrentClicks()+", passbacks = passbacks + "+bannerstat.getPassbacks()+" WHERE id = " + b.getID());
+			bannerstat.clearCurrent();
 		}
 	}
 	
@@ -680,8 +683,7 @@ public class BannerServer {
 			stats = new BannerStat();
 			bannerstats.put(b, stats);
 		}
-		bannerstats.get(b).dailyclicks = 0;
-		bannerstats.get(b).dailyviews = 0;
+		stats.clearDaily();
 	}
 	
 	//records statistics, indicates a new connection was made.
@@ -1052,7 +1054,7 @@ public class BannerServer {
 	private void passbackBanner(int passback, int userid) {
 		Banner b = db.getBannerByID(passback);
 		if (b != null) {
-			bannerstats.getOrCreate(b, BannerStat.class).passbacks++;
+			bannerstats.getOrCreate(b, BannerStat.class).passback();
 			LowMemArray userviews = getViewsForUser(userid, b);
 			for (int i=0; i<userviews.size(); i++) {
 				userviews.set(i, (int)(System.currentTimeMillis()/1000));
@@ -1062,6 +1064,14 @@ public class BannerServer {
 				bannerDebug("Attempted to passback banner " +passback+ ", which doesn't exist.");
 			}
 		}
+	}
+	
+	public int numservers() {
+		return this.numservers;
+	}
+	
+	public BannerStat getBannerStat(Banner b) {
+		return this.bannerstats.get(b);
 	}
 
 }
