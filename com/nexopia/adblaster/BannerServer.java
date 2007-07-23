@@ -15,7 +15,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Vector;
-
+import java.lang.reflect.Method;
 
 import com.nexopia.adblaster.db.BannerDatabase;
 import com.nexopia.adblaster.db.CampaignDB;
@@ -112,9 +112,60 @@ public class BannerServer {
 	public static final String SIMULATE_GET = "SIMULATE_GET";
 	public static final String RELOAD_FROM_DB = "RELOAD";
 	
-	public static HashMap<String, Boolean> debug=new HashMap<String,Boolean>();
+	private static HashMap<String, Method> commands = new HashMap<String,Method>();
+	private static void registerCommand(String command, String methodName) {
+		Class[] parameters = {String[].class};
+		try {
+			BannerServer.commands.put(command, BannerServer.class.getMethod(methodName, parameters));
+		} catch (NoSuchMethodException e) {
+			System.err.println("Registered BannerServer method not found for command " + command + ".");
+			e.printStackTrace();
+			try {
+				BannerServer.commands.put(command, BannerServer.class.getMethod("cmdDefault", parameters));
+			} catch (NoSuchMethodException e2) {
+				System.err.println("No default method for banner server commands found.");
+				e2.printStackTrace();
+			}
+		}
+	}
+	static {
+		BannerServer.registerCommand("GET", "cmdGet");
+		BannerServer.registerCommand("GET", "cmdGet");
+		BannerServer.registerCommand("PASSBACK", "cmdPassback");
+		BannerServer.registerCommand("ADD", "cmdAdd");
+		BannerServer.registerCommand("DELETE", "cmdDelete");
+		BannerServer.registerCommand("UPDATE", "cmdUpdate");
+		BannerServer.registerCommand("ADDCAMPAIGN", "cmdAddCampaign");
+		BannerServer.registerCommand("DELCAMPAIGN", "cmdDelCampaign");
+		BannerServer.registerCommand("UPDATECAMPAIGN", "cmdUpdateCampaign");
+		BannerServer.registerCommand("QUIT", "cmdQuit");
+		BannerServer.registerCommand("STATS", "cmdStats");
+		BannerServer.registerCommand("UPTIME", "cmdUptime");
+		BannerServer.registerCommand("SHOW", "cmdShow");
+		BannerServer.registerCommand("HIDE", "cmdHide");
+		BannerServer.registerCommand("SHUTDOWN", "cmdShutdown");
+		BannerServer.registerCommand("VERSION", "cmdVersion");
+		BannerServer.registerCommand("RECONNECT", "cmdReconnect");
+		BannerServer.registerCommand("LOGSTAT", "cmdLogStat");
+		BannerServer.registerCommand("GETFAIL", "cmdGetFail");
+		BannerServer.registerCommand("MINUTELY", "cmdMinutely");
+		BannerServer.registerCommand("HOURLY", "cmdHourly");
+		BannerServer.registerCommand("DAILY", "cmdDaily");
+		BannerServer.registerCommand("CLICK", "cmdClick");
+		BannerServer.registerCommand(RELOAD_COEFFICIENTS, "cmdReloadCoeffecients");
+		BannerServer.registerCommand(COLLECT_GARBAGE, "cmdCollectGarbage");
+		BannerServer.registerCommand(MEMORY_STATS, "cmdMemoryStats");
+		BannerServer.registerCommand(BANNER_INFO, "cmdBannerInfo");
+		BannerServer.registerCommand(RECONNECT_DB, "cmdReconnectDB");
+		BannerServer.registerCommand(SIMULATE_GET, "cmdSimulateGet");
+		BannerServer.registerCommand(RELOAD_FROM_DB, "cmdReloadFromDB");
+	}
+	
+	
 	
 	//////////////////////////instance members/////////////////////////////
+	
+	public HashMap<String, Boolean> debug=new HashMap<String,Boolean>();
 	
 	private I_Policy policy;
 	
@@ -561,8 +612,8 @@ public class BannerServer {
 			cmd = RECONNECT_DB_CMD;
 		} else if (command.toUpperCase().equals(SIMULATE_GET)) {
 			cmd = SIMULATE_GET_CMD;
-		} else if (command.toUpperCase().equals(SIMULATE_GET)) {
-			cmd = SIMULATE_GET_CMD;
+		} else if (command.toUpperCase().equals(RELOAD_FROM_DB)) {
+			cmd = RELOAD_FROM_DB_CMD;
 		} else {
 			cmd = BLANK;
 			System.out.println("'" + command + "'" + " not found.");
@@ -944,13 +995,13 @@ public class BannerServer {
 		case LOGSTAT:
 			return (logsock.isConnected() ? "connected" : "not") + ": " + logserver + "," + logserver_port + "\n";
 		case MINUTELY:
-			minutely(BannerServer.debug.get("timeupdates").booleanValue());
+			minutely(this.debug.get("timeupdates").booleanValue());
 			return "Running minutely.";
 		case HOURLY:
-			hourly(BannerServer.debug.get("timeupdates").booleanValue());
+			hourly(this.debug.get("timeupdates").booleanValue());
 			return "Running hourly.";
 		case DAILY:
-			daily(BannerServer.debug.get("timeupdates").booleanValue());
+			daily(this.debug.get("timeupdates").booleanValue());
 			return "Running daily.";
 		case CLICK:
 			if (debug.get("click").booleanValue()) {
@@ -1050,6 +1101,42 @@ public class BannerServer {
 		return "Command not found.";
 	}
 
+	
+	//banner server command functions
+/*			BannerServer.registerCommand("GET", "cmdGet");
+			BannerServer.registerCommand("PASSBACK", "cmdPassback");
+			BannerServer.registerCommand("ADD", "cmdAdd");
+			BannerServer.registerCommand("DELETE", "cmdDelete");
+			BannerServer.registerCommand("UPDATE", "cmdUpdate");
+			BannerServer.registerCommand("ADDCAMPAIGN", "cmdAddCampaign");
+			BannerServer.registerCommand("DELCAMPAIGN", "cmdDelCampaign");
+			BannerServer.registerCommand("UPDATECAMPAIGN", "cmdUpdateCampaign");
+			BannerServer.registerCommand("QUIT", "cmdQuit");
+			BannerServer.registerCommand("STATS", "cmdStats");
+			BannerServer.registerCommand("UPTIME", "cmdUptime");
+			BannerServer.registerCommand("SHOW", "cmdShow");
+			BannerServer.registerCommand("HIDE", "cmdHide");
+			BannerServer.registerCommand("SHUTDOWN", "cmdShutdown");
+			BannerServer.registerCommand("VERSION", "cmdVersion");
+			BannerServer.registerCommand("RECONNECT", "cmdReconnect");
+			BannerServer.registerCommand("LOGSTAT", "cmdLogStat");
+			BannerServer.registerCommand("GETFAIL", "cmdGetFail");
+			BannerServer.registerCommand("MINUTELY", "cmdMinutely");
+			BannerServer.registerCommand("HOURLY", "cmdHourly");
+			BannerServer.registerCommand("DAILY", "cmdDaily");
+			BannerServer.registerCommand("CLICK", "cmdClick");
+			BannerServer.commands.put(RELOAD_COEFFICIENTS, BannerServer.class.getMethod("cmdReloadCoeffecients", parameters));
+			BannerServer.commands.put(COLLECT_GARBAGE, BannerServer.class.getMethod("cmdCollectGarbage", parameters));
+			BannerServer.commands.put(MEMORY_STATS, BannerServer.class.getMethod("cmdMemoryStats", parameters));
+			BannerServer.commands.put(BANNER_INFO, BannerServer.class.getMethod("cmdBannerInfo", parameters));
+			BannerServer.commands.put(RECONNECT_DB, BannerServer.class.getMethod("cmdReconnectDB", parameters));
+			BannerServer.commands.put(SIMULATE_GET, BannerServer.class.getMethod("cmdSimulateGet", parameters));
+			BannerServer.commands.put(RELOAD_FROM_DB, BannerServer.class.getMethod("cmdReloadFromDB", parameters));
+*/
+	private String cmdDefault(String[] params) {
+		return "Command not found.";
+	}
+	
 	private String format(String[] params) {
 		StringBuffer str = new StringBuffer("");
 		for (int i = 0; i < params.length; i++){

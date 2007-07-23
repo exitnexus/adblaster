@@ -155,7 +155,7 @@ public class NIOServer {
 		
 		while (true) {
 			if (System.currentTimeMillis()-time > 1000) {
-				if (BannerServer.debug.get("tick").booleanValue()) {
+				if (banners.debug.get("tick").booleanValue()) {
 					BannerServer.bannerDebug("Tick");
 				}
 				Calendar now = Calendar.getInstance();
@@ -163,19 +163,19 @@ public class NIOServer {
 				banners.secondly();
 				if (lastMinute != now.get(Calendar.MINUTE)) {
 					lastMinute = now.get(Calendar.MINUTE);
-					banners.minutely(BannerServer.debug.get("timeupdates").booleanValue());
+					banners.minutely(banners.debug.get("timeupdates").booleanValue());
 				}
 				if (lastHour != now.get(Calendar.HOUR_OF_DAY) && now.get(Calendar.SECOND) > HOURLY_SECONDS_OFFSET) {
 					lastHour = now.get(Calendar.HOUR_OF_DAY);
-					banners.hourly(BannerServer.debug.get("timeupdates").booleanValue());
+					banners.hourly(banners.debug.get("timeupdates").booleanValue());
 				}
 				if (lastDay != now.get(Calendar.DAY_OF_YEAR) &&
 						now.get(Calendar.MINUTE) == DAILY_MINUTES_OFFSET &&
 						now.get(Calendar.HOUR_OF_DAY) == DAILY_HOURS_OFFSET &&
 						now.get(Calendar.SECOND) == DAILY_SECONDS_OFFSET) {
 					lastDay = now.get(Calendar.DAY_OF_YEAR);
-					banners.daily(BannerServer.debug.get("timeupdates").booleanValue());
-					if (BannerServer.debug.get("dailyrestart").booleanValue()) {
+					banners.daily(banners.debug.get("timeupdates").booleanValue());
+					if (banners.debug.get("dailyrestart").booleanValue()) {
 						System.exit(0);
 					}
 				}
@@ -203,7 +203,7 @@ public class NIOServer {
 						//System.out.println("Accepting connection.");
 						SocketChannel original = server.accept();
 						client = new BufferedSocketChannel(original);
-						if (BannerServer.debug.get("connect").booleanValue()) {
+						if (banners.debug.get("connect").booleanValue()) {
 							BannerServer.bannerDebug("[connection]: " + original.socket().getInetAddress());
 						}
 						banners.connection();
@@ -267,7 +267,7 @@ public class NIOServer {
 			while ((len = getString(client, strbuf)) == 1) {
 				String result = null;
 				try {
-					if (BannerServer.debug.get("development").booleanValue()) {
+					if (banners.debug.get("development").booleanValue()) {
 						BannerServer.bannerDebug(strbuf.toString());
 					}
 					if (strbuf.toString().toUpperCase().startsWith("QUIT")) {
