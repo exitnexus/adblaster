@@ -94,10 +94,7 @@ public class NIOServer {
 	private static final int DAILY_HOURS_OFFSET = 6; //hours
 	private static int NUM_SERVERS=1;
 	
-	private CampaignDB cdb;
-	private BannerDatabase bdb;
 	private BannerServer banners;
-	private PageValidatorFactory factory;
 	private Selector accepter;
 	private Selector readerWriter;
 	private ServerSocketChannel server;
@@ -114,13 +111,8 @@ public class NIOServer {
 		JDBCConfig.initDBConnection(config);
 		
 		socketMap = new HashMap<SocketChannel, BufferedSocketChannel>();
-		Object args1[] = {};
-
-		factory = new PageValidatorFactory(StringArrayPageValidator.class,args1);
 		
-		cdb = new CampaignDB(factory);
-		bdb = new BannerDatabase(cdb, factory);
-		banners = new BannerServer(bdb, cdb, NUM_SERVERS, config);
+		this.banners = new BannerServer(NUM_SERVERS, config);
 		
 		//Create the server socket channel
 		server = null;
@@ -283,15 +275,6 @@ public class NIOServer {
 						client.close();
 						banners.connectionClosed();
 						return;
-					} else if (strbuf.toString().equals("reset")) {
-						System.out.println("Resetting...");
-						cdb = new CampaignDB(factory);
-						Object args1[] = {};
-						bdb = new BannerDatabase(cdb, new PageValidatorFactory(StringArrayPageValidator.class, args1));
-						banners = new BannerServer(bdb, cdb, NUM_SERVERS, config);
-						if (BannerServer.debug.get("development").booleanValue()) {
-							BannerServer.bannerDebug("Reinitialized the banner server.");
-						}
 					} else if (strbuf.toString().toUpperCase().startsWith(BannerServer.MEMORY_STATS)){
 						result = "NIOServer size: " + ObjectProfiler.sizeof(this) + " bytes\n";
 						result += "Integer Pool size: " + ObjectProfiler.sizeof(Integer.poolSize()) + " bytes\n";

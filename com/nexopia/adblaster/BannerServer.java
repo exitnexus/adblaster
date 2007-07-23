@@ -36,6 +36,7 @@ import com.nexopia.adblaster.util.Integer;
 import com.nexopia.adblaster.util.Interests;
 import com.nexopia.adblaster.util.LowMemMultiMap;
 import com.nexopia.adblaster.util.StringArrayPageValidator;
+import com.nexopia.adblaster.util.PageValidatorFactory;
 import com.nexopia.adblaster.util.Utilities;
 import com.nexopia.adblaster.util.LowMemMap.LowMemArray;
 import com.vladium.utils.ObjectProfiler;
@@ -146,7 +147,7 @@ public class BannerServer {
 	private int currentConnected;
 	private ConfigFile configFile;
 
-	public BannerServer(BannerDatabase db, CampaignDB cdb, int numservers, ConfigFile config) {
+	public BannerServer(int numservers, ConfigFile config) {
 		debug.put("tick", config.getBoolean("tick"));
 		debug.put("connect", config.getBoolean("connect"));
 		debug.put("get", config.getBoolean("get"));
@@ -175,8 +176,15 @@ public class BannerServer {
 		this.currentwindow = 0;
 		this.policy = new OldPolicy(cdb);
 		//this.policy = new AdBlasterPolicy(db.getBanners());
-		this.db = db;
-		this.cdb = cdb;
+		
+		Object args1[] = {};
+
+		PageValidatorFactory factory = new PageValidatorFactory(StringArrayPageValidator.class,args1);
+		
+		this.cdb = new CampaignDB(factory);
+		this.db = new BannerDatabase(cdb, factory);
+		
+		
 		JDBCConfig.initThreadedSQLQueue();
 		this.numservers = numservers;
 		this.bannerstats = new FastMap<Banner, BannerStat>();
@@ -551,6 +559,8 @@ public class BannerServer {
 			cmd = BANNER_INFO_CMD;
 		} else if (command.toUpperCase().equals(RECONNECT_DB)) {
 			cmd = RECONNECT_DB_CMD;
+		} else if (command.toUpperCase().equals(SIMULATE_GET)) {
+			cmd = SIMULATE_GET_CMD;
 		} else if (command.toUpperCase().equals(SIMULATE_GET)) {
 			cmd = SIMULATE_GET_CMD;
 		} else {
