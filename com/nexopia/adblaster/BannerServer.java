@@ -149,12 +149,11 @@ public class BannerServer {
 	
 	private int numservers;
 	
-	private LowMemMultiMap viewMap;
-	private Vector<Banner> banners;
-	private FastMap<Banner, BannerStat> bannerstats;
-	private FastMap<Integer, TypeStat> viewstats;
-	private FastMap<Integer, TypeStat> clickstats;
-	private FastMap<Campaign, BannerStat> campaignstats;
+	private LowMemMultiMap viewMap; //maps userid to an array of recently viewed times for banners
+	private FastMap<Banner, BannerStat> bannerstats; //bannerstat objects for banners
+	private FastMap<Campaign, BannerStat> campaignstats; //bannerstat objects for campaigns
+	private FastMap<Integer, TypeStat> viewstats; //viewing stats by banner size
+	private FastMap<Integer, TypeStat> clickstats; //click stats by banner size
 	private FastMap<Banner, HourlyStat> hourlystats;
 	private IntObjectHashMap<IntObjectHashMap<int[]>> pageIDDominance;
 	
@@ -183,7 +182,6 @@ public class BannerServer {
 		
 		this.currentConnected = 0;
 		this.viewMap = new LowMemMultiMap();
-		this.banners = new Vector<Banner>();
 		this.viewstats = new FastMap<Integer,TypeStat>();
 		this.clickstats = new FastMap<Integer,TypeStat>();
 		this.campaignstats = new FastMap<Campaign,BannerStat>();
@@ -970,7 +968,7 @@ public class BannerServer {
 	}
 	
 	private String cmdMemoryStats(String[] params) {
-		String stats = "banners: " + ObjectProfiler.sizeof(banners) + " bytes\n";
+		String stats = "";
 		stats += "bannerstats: " + ObjectProfiler.sizeof(bannerstats) + " bytes\n";
 		stats += "campaignstats: " + ObjectProfiler.sizeof(campaignstats) + " bytes\n";
 		stats += "viewstats: " + ObjectProfiler.sizeof(viewstats) + " bytes\n";
@@ -1041,79 +1039,28 @@ public class BannerServer {
 	}
 	
 	private String cmdReloadFromDB(String params[]) {
-		/*
-		 *debug.put("tick", config.getBoolean("tick"));
-		debug.put("connect", config.getBoolean("connect"));
-		debug.put("get", config.getBoolean("get"));
-		debug.put("getlog", config.getBoolean("getlog"));
-		debug.put("getfail", config.getBoolean("getfail"));
-		debug.put("click", config.getBoolean("click"));
-		debug.put("timeupdates", config.getBoolean("timeupdates"));
-		debug.put("dailyrestart", config.getBoolean("dailyrestart"));
-		debug.put("passback", config.getBoolean("passback"));
-		debug.put("development", config.getBoolean("development"));
+		minutely(true);
+		hourly(true);
+		daily(true);
 		
-		configFile = config;
-		
-		this.currentConnected = 0;
-		this.viewMap = new LowMemMultiMap();
-		this.banners = new Vector<Banner>();
 		this.viewstats = new FastMap<Integer,TypeStat>();
 		this.clickstats = new FastMap<Integer,TypeStat>();
 		this.campaignstats = new FastMap<Campaign,BannerStat>();
 		this.hourlystats = new FastMap<Banner,HourlyStat>();
-		this.pageIDDominance = new IntObjectHashMap<IntObjectHashMap<int[]>>();
-		
-		while (recentviews.size() < VIEW_WINDOWS) {
-			recentviews.add(new HashMap<Integer, Vector<Integer>>());
-		}
-		this.currentwindow = 0;
-		this.policy = new OldPolicy(cdb);
-		//this.policy = new AdBlasterPolicy(db.getBanners());
+		this.bannerstats = new FastMap<Banner, BannerStat>();
 		
 		Object args1[] = {};
-
 		PageValidatorFactory factory = new PageValidatorFactory(StringArrayPageValidator.class,args1);
-		
 		this.cdb = new CampaignDB(factory);
 		this.db = new BannerDatabase(cdb, factory);
 		
-		
-		JDBCConfig.initThreadedSQLQueue();
-		this.numservers = numservers;
-		this.bannerstats = new FastMap<Banner, BannerStat>();
 		for(int i = 0; i < sizes_array.length; i++) {
 			Integer size = BannerServer.sizes_array[i];
 			this.viewstats.put(size, new TypeStat());
 			this.clickstats.put(size, new TypeStat());
 		}
-		stats = new ServerStat();
-		slidingstats = new ServerStat[STATS_WINDOW];
-		for (int i = 0; i < slidingstats.length; i++){
-			slidingstats[i] = new ServerStat();
-		}
 		
-		try {
-			
-			logsock = new EasyDatagramSocket();
-			hitlogsock = new EasyDatagramSocket();
-			
-			logserver = config.getString("log_host");
-			hitlogserver = config.getString("hit_log_host");
-			logserver_port = config.getInt("log_port");
-			hitlogserver_port = config.getInt("hit_log_port");
-			logsock.connect(new InetSocketAddress(logserver, logserver_port));
-			hitlogsock.connect(new InetSocketAddress(hitlogserver, hitlogserver_port));
-			logsock.setSoTimeout(20);
-			hitlogsock.setSoTimeout(20);
-		} catch (SocketException e) {
-			e.printStackTrace();
-		}
-		 
-		 this.creationTime = System.currentTimeMillis();*/
-		//TODO:
-		System.err.println("W00T!");
-		return "Implement this.";
+		return "Banner and campaign data reloaded from the database.";
 	}
 	
 	private String format(String[] params) {
