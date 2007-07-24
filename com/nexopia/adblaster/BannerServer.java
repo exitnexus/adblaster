@@ -66,44 +66,13 @@ public class BannerServer {
 	public static final int PAGE_DOMINANCE_RETENTION_TIME = 60; //seconds to keep page ids around
 	public static final int PAGE_DOMINANCE_NO_PAGE_ID = -1; //page id passed if no page id exists
 	
-	private static final int BLANK = 0;
-	private static final int ADD = 1;
-	private static final int UPDATE = 2;
-	private static final int ADDCAMPAIGN = 3;
-	private static final int QUIT = 4;
-	private static final int DELCAMPAIGN = 5;
-	private static final int UPDATECAMPAIGN = 6;
-	private static final int DEL = 7;
-	private static final int STATS = 11;
-	private static final int UPTIME = 12;
-	private static final int SHOW = 13;
-	private static final int HIDE = 14;
-	private static final int SHUTDOWN = 15;
-	private static final int VERSION = 16;
-	private static final int RECONNECT = 17;
-	private static final int LOGSTAT = 18;
-	public static final int GET = 19;
-	public static final int PASSBACK = 20;
-	public static final int GETFAIL = 21;
-	public static final int GETLOG = 22;
-	public static final int MINUTELY = 23;
-	public static final int HOURLY = 24;
-	public static final int DAILY = 25;
-	public static final int CLICK = 26;
-	private static final int RELOAD_COEFFICIENTS_CMD = 27;
-	private static final int COLLECT_GARBAGE_CMD = 28;
-	private static final int MEMORY_STATS_CMD = 29;
-	private static final int BANNER_INFO_CMD = 30;
-	private static final int RECONNECT_DB_CMD = 31;
-	private static final int SIMULATE_GET_CMD = 32;
-	private static final int RELOAD_FROM_DB_CMD = 33;
-	
 	public static final int BANNER_SLIDE_SIZE = 8;
 	public static final double BANNER_MIN_CLICKRATE = 0.0002;
 	public static final double BANNER_MAX_CLICKRATE = 0.005;
 	public static final int STATS_WINDOW = 60;
 	private static final int NO_BANNER = 0;
 	private static final int VIEW_WINDOWS = 10;
+	
 	public static final String RELOAD_COEFFICIENTS = "RELOAD_COEFFICIENTS";
 	public static final String COLLECT_GARBAGE = "GC";
 	public static final String MEMORY_STATS = "MEMSTAT";
@@ -116,12 +85,12 @@ public class BannerServer {
 	private static void registerCommand(String command, String methodName) {
 		Class[] parameters = {String[].class};
 		try {
-			BannerServer.commands.put(command, BannerServer.class.getMethod(methodName, parameters));
+			BannerServer.commands.put(command, BannerServer.class.getDeclaredMethod(methodName, parameters));
 		} catch (NoSuchMethodException e) {
 			System.err.println("Registered BannerServer method not found for command " + command + ".");
 			e.printStackTrace();
 			try {
-				BannerServer.commands.put(command, BannerServer.class.getMethod("cmdDefault", parameters));
+				BannerServer.commands.put(command, BannerServer.class.getDeclaredMethod("cmdDefault", parameters));
 			} catch (NoSuchMethodException e2) {
 				System.err.println("No default method for banner server commands found.");
 				e2.printStackTrace();
@@ -130,8 +99,6 @@ public class BannerServer {
 	}
 	static {
 		BannerServer.registerCommand("GET", "cmdGet");
-		BannerServer.registerCommand("GET", "cmdGet");
-		BannerServer.registerCommand("PASSBACK", "cmdPassback");
 		BannerServer.registerCommand("ADD", "cmdAdd");
 		BannerServer.registerCommand("DELETE", "cmdDelete");
 		BannerServer.registerCommand("UPDATE", "cmdUpdate");
@@ -147,12 +114,11 @@ public class BannerServer {
 		BannerServer.registerCommand("VERSION", "cmdVersion");
 		BannerServer.registerCommand("RECONNECT", "cmdReconnect");
 		BannerServer.registerCommand("LOGSTAT", "cmdLogStat");
-		BannerServer.registerCommand("GETFAIL", "cmdGetFail");
 		BannerServer.registerCommand("MINUTELY", "cmdMinutely");
 		BannerServer.registerCommand("HOURLY", "cmdHourly");
 		BannerServer.registerCommand("DAILY", "cmdDaily");
 		BannerServer.registerCommand("CLICK", "cmdClick");
-		BannerServer.registerCommand(RELOAD_COEFFICIENTS, "cmdReloadCoeffecients");
+		BannerServer.registerCommand(RELOAD_COEFFICIENTS, "cmdReloadCoefficients");
 		BannerServer.registerCommand(COLLECT_GARBAGE, "cmdCollectGarbage");
 		BannerServer.registerCommand(MEMORY_STATS, "cmdMemoryStats");
 		BannerServer.registerCommand(BANNER_INFO, "cmdBannerInfo");
@@ -168,6 +134,8 @@ public class BannerServer {
 	public HashMap<String, Boolean> debug=new HashMap<String,Boolean>();
 	
 	private I_Policy policy;
+	
+	private Vector<HashMap<Integer, Vector<Integer>>> recentviews = new Vector<HashMap<Integer, Vector<Integer>>>(VIEW_WINDOWS);
 	
 	private ServerStat stats;
 	private ServerStat[] slidingstats;
@@ -550,80 +518,9 @@ public class BannerServer {
 		return "" + s;
 	}
 	
-	static Vector<HashMap<Integer, Vector<Integer>>> recentviews = new Vector<HashMap<Integer, Vector<Integer>>>(VIEW_WINDOWS);
-	
-	private int parseCommand(String command) {
-		int cmd;
-		if (command.toUpperCase().equals("GET")) {
-			cmd = GET;
-		} else if (command.toUpperCase().equals("PASSBACK")) {
-			cmd = PASSBACK;
-		} else if (command.toUpperCase().equals("ADD")) {
-			cmd = ADD;
-		} else if (command.toUpperCase().equals("UPDATE")) {
-			cmd = UPDATE;
-		} else if (command.toUpperCase().equals("ADDCAMPAIGN")) {
-			cmd = ADDCAMPAIGN;
-		} else if (command.toUpperCase().equals("QUIT")) {
-			cmd = QUIT;
-		} else if (command.toUpperCase().equals("DELCAMPAIGN")) {
-			cmd = DELCAMPAIGN;
-		} else if (command.toUpperCase().equals("UPDATECAMPAIGN")) {
-			cmd = UPDATECAMPAIGN;
-		} else if (command.toUpperCase().equals("DEL")) {
-			cmd = DEL;
-		} else if (command.toUpperCase().equals("STATS")) {
-			cmd = STATS;
-		} else if (command.toUpperCase().equals("UPTIME")) {
-			cmd = UPTIME;
-		} else if (command.toUpperCase().equals("SHOW")) {
-			cmd = SHOW;
-		} else if (command.toUpperCase().equals("HIDE")) {
-			cmd = HIDE;
-		} else if (command.toUpperCase().equals("SHUTDOWN")) {
-			cmd = SHUTDOWN;
-		} else if (command.toUpperCase().equals("VERSION")) {
-			cmd = VERSION;
-		} else if (command.toUpperCase().equals("RECONNECT")) {
-			cmd = RECONNECT;
-		} else if (command.toUpperCase().equals("LOGSTAT")) {
-			cmd = LOGSTAT;
-		} else if (command.toUpperCase().equals("GETFAIL")) {
-			cmd = GETFAIL;
-		} else if (command.toUpperCase().equals("GETLOG")) {
-			cmd = GETLOG;
-		} else if (command.toUpperCase().equals("MINUTELY")) {
-			cmd = MINUTELY;
-		} else if (command.toUpperCase().equals("HOURLY")) {
-			cmd = HOURLY;
-		} else if (command.toUpperCase().equals("DAILY")) {
-			cmd = DAILY;
-		} else if (command.toUpperCase().equals("CLICK")) {
-			cmd = CLICK;
-		} else if (command.toUpperCase().equals(RELOAD_COEFFICIENTS)) {
-			cmd = RELOAD_COEFFICIENTS_CMD;
-		} else if (command.toUpperCase().equals(COLLECT_GARBAGE)) {
-			cmd = COLLECT_GARBAGE_CMD;
-		} else if (command.toUpperCase().equals(MEMORY_STATS)) {
-			cmd = MEMORY_STATS_CMD;
-		} else if (command.toUpperCase().equals(BANNER_INFO)) {
-			cmd = BANNER_INFO_CMD;
-		} else if (command.toUpperCase().equals(RECONNECT_DB)) {
-			cmd = RECONNECT_DB_CMD;
-		} else if (command.toUpperCase().equals(SIMULATE_GET)) {
-			cmd = SIMULATE_GET_CMD;
-		} else if (command.toUpperCase().equals(RELOAD_FROM_DB)) {
-			cmd = RELOAD_FROM_DB_CMD;
-		} else {
-			cmd = BLANK;
-			System.out.println("'" + command + "'" + " not found.");
-		}
-		return cmd;
-	}
-	
 	public String receive(String command) throws IOException{
 		String[] split = command.split(" ");
-		int cmd = BLANK;
+		Method commandMethod = commands.get("DEFAULT");
 		String[] params;
 		if (split.length > 1){
 			params = new String[split.length-1];
@@ -631,7 +528,7 @@ public class BannerServer {
 			boolean first = true;
 			for (String s : split) {
 				if (first) {
-					cmd = parseCommand(s.trim());
+					commandMethod = commands.get(s.trim().toUpperCase());
 					first = false;
 				} else {
 					params[i] = s.trim();
@@ -640,12 +537,18 @@ public class BannerServer {
 			}
 		} else {
 			params = new String[0];
-			cmd = parseCommand(command.trim());
+			commandMethod = commands.get(command.trim().toUpperCase());
 		}
 		
 		//System.out.println(cmd);
 		
-		return receive(cmd, params);
+		try {
+			return (String)commandMethod.invoke(this, (Object[])params);
+		} catch (Exception e) {
+			bannerDebug("Error attempting to handle command: " + command);
+			e.printStackTrace();
+			return "Error attempting to handle command: " + command;
+		}
 	}
 	
 	public void secondly() {
@@ -760,381 +663,390 @@ public class BannerServer {
 		currentConnected--;
 	}
 	
-	public String receive(int cmd, String[] params) throws IOException{
-		int id;
+	public int statstime() {
 		int t_sec = (int)(System.currentTimeMillis() / 1000);
-		int statstime = (t_sec % STATS_WINDOW);
-		Banner b;
-		int bannerid;
+		return (t_sec % STATS_WINDOW);
+	}
+	
+	//banner server command functions
+	private String cmdDefault(String[] params) {
+		return "Command not found.";
+	}
+	
+	private String cmdGet(String[] params) {
+		stats.get++;
+		slidingstats[statstime()].get++;
 		
-		switch(cmd){
-		case GET:
-		{
-			stats.get++;
-			slidingstats[statstime].get++;
-			
-			int usertime=Integer.parseInt(params[0]);
-			int size=Integer.parseInt(params[1]); 
-			int userid=Integer.parseInt(params[2]); 
-			byte age=Byte.parseByte(params[3]); 
-			byte sex=Byte.parseByte(params[4]); 
-			short loc=Short.parseShort(params[5]); 
-			String interestsStr=params[6]; 
-			String page=params[7]; 
-			int passback=Integer.parseInt(params[8]);
-			boolean debugGet=Boolean.parseBoolean(params[9]);
-			int pageid=Integer.parseInt(params[10]);
-
-			Interests interests = new Interests(interestsStr, false);
-			
-			if(passback != 0)
-				passbackBanner(passback, userid);
-			
-			int ret = getBestBanner(usertime, size, userid, age, sex, loc, interests, page, pageid, debugGet);
-			
-			if (debug.get("passback").booleanValue()) {
-				Integer uid = Integer.valueOf(userid);
-				if (passback != 0) {
-					boolean hasSeen = false;
-					String viewsstring = "";
-					for (HashMap<Integer, Vector<Integer>> uidtoviews : recentviews) {
-						if (uidtoviews.get(uid) != null && !uidtoviews.get(uid).isEmpty()) {
-							Vector<Integer> userviews = uidtoviews.get(uid);
-							for (Integer view : userviews) {
-								viewsstring += " " + view;
-								if (passback == view.intValue()) {
-									hasSeen = true;
-								}
+		int usertime=Integer.parseInt(params[0]);
+		int size=Integer.parseInt(params[1]);
+		int userid=Integer.parseInt(params[2]);
+		byte age=Byte.parseByte(params[3]);
+		byte sex=Byte.parseByte(params[4]);
+		short loc=Short.parseShort(params[5]);
+		String interestsStr=params[6];
+		String page=params[7];
+		int passback=Integer.parseInt(params[8]);
+		boolean debugGet=Boolean.parseBoolean(params[9]);
+		int pageid=Integer.parseInt(params[10]);
+		
+		Interests interests = new Interests(interestsStr, false);
+		
+		if(passback != 0)
+			passbackBanner(passback, userid);
+		
+		int ret = getBestBanner(usertime, size, userid, age, sex, loc, interests, page, pageid, debugGet);
+		
+		if (debug.get("passback").booleanValue()) {
+			Integer uid = Integer.valueOf(userid);
+			if (passback != 0) {
+				boolean hasSeen = false;
+				String viewsstring = "";
+				for (HashMap<Integer, Vector<Integer>> uidtoviews : recentviews) {
+					if (uidtoviews.get(uid) != null && !uidtoviews.get(uid).isEmpty()) {
+						Vector<Integer> userviews = uidtoviews.get(uid);
+						for (Integer view : userviews) {
+							viewsstring += " " + view;
+							if (passback == view.intValue()) {
+								hasSeen = true;
 							}
 						}
 					}
-					if (!hasSeen) {
-						bannerDebug("Invalid Passback: " + passback + ", Recently Viewed: " + viewsstring);
-					}
 				}
-				Vector<Integer> currentUserWindow = recentviews.get(currentwindow).get(uid);
-				if (currentUserWindow == null) {
-					currentUserWindow = new Vector<Integer>();
-					recentviews.get(currentwindow).put(uid, currentUserWindow);
-				}
-				currentUserWindow.add(Integer.valueOf(ret));
-				uid.free();
-				uid=null;
-			}
-			
-			if(debug.get("get").booleanValue() || (debug.get("getfail").booleanValue() && (ret == NO_BANNER)))
-				bannerDebug("get " + format(params) + " => " + ret);
-			
-			if(debug.get("getlog").booleanValue() && (logsock != null)){
-				try {
-					logsock.send("get " + format(params) + " => " + ret + "\n");
-				} catch (IOException e) {
-					logsock.disconnect();
-					logsock = null;
-					//throw(e);
+				if (!hasSeen) {
+					bannerDebug("Invalid Passback: " + passback + ", Recently Viewed: " + viewsstring);
 				}
 			}
-			
-			if(ret == 0){
-				stats.getfail++;
-				slidingstats[statstime].getfail++;
+			Vector<Integer> currentUserWindow = recentviews.get(currentwindow).get(uid);
+			if (currentUserWindow == null) {
+				currentUserWindow = new Vector<Integer>();
+				recentviews.get(currentwindow).put(uid, currentUserWindow);
 			}
-			
-			Integer retInt = Integer.valueOf(ret);
-			String retString = retInt.toString();
-			
-			//Hit logging
-			try {
-
-				hitlogsock.send("b");
-				if (passback != 0) {
-					hitlogsock.send("p");
-				}
-				if (retInt.intValue() == 0) {
-					hitlogsock.send("f");
-				}
-			} catch (Exception ignored){}
-			
-			
-			retInt.free();
-			return retString;
+			currentUserWindow.add(Integer.valueOf(ret));
+			uid.free();
+			uid=null;
 		}
-		case ADD: // "add id"
-			id = Integer.parseInt(params[0]);
-			db.add(id, new StringArrayPageValidator()); //addBannerD(params);
-			bannerDebug("add " + Arrays.toString(params));
-			return "Banner " + id + " added.";
-		case UPDATE: // "update id"
-			//updateBannerD(params);
-			id = Integer.parseInt(params[0]);
-			db.update(id, new StringArrayPageValidator()); 
-			bannerDebug("update " + Arrays.toString(params));
-			return "Banner " + id + " updated.";
-			
-		case DEL: // "del id"
-			//deleteBannerD(params);
-			id = Integer.parseInt(params[0]);
-			db.delete(id);
-			bannerDebug("delete " + Arrays.toString(params));
-			return "Banner " + id + " deleted.";
-			
-		case ADDCAMPAIGN: // "addcampaign id"
-			id = Integer.parseInt(params[0]);
-			cdb.add(id);
+		
+		if(debug.get("get").booleanValue() || (debug.get("getfail").booleanValue() && (ret == NO_BANNER)))
+			bannerDebug("get " + format(params) + " => " + ret);
+		
+		if(debug.get("getlog").booleanValue() && (logsock != null)){
 			try {
-				Statement st = JDBCConfig.createStatement();
-				ResultSet rs = st.executeQuery("SELECT id FROM banners WHERE campaignid = " + id);
-				while (rs.next()) {
-					bannerid = rs.getInt("id");
-					db.add(bannerid, new StringArrayPageValidator());
-				}
-				st.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-				return "Campaign " + id + " failed.";
+				logsock.send("get " + format(params) + " => " + ret + "\n");
+			} catch (IOException e) {
+				logsock.disconnect();
+				logsock = null;
+				//throw(e);
 			}
-			bannerDebug("addcampaign " + Arrays.toString(params));
-			return "Campaign " + id + " added.";
+		}
+		
+		if(ret == 0){
+			stats.getfail++;
+			slidingstats[statstime()].getfail++;
+		}
+		
+		Integer retInt = Integer.valueOf(ret);
+		String retString = retInt.toString();
+		
+		//Hit logging
+		try {
 			
-		case UPDATECAMPAIGN: // "updatecampaign id"
-			id = Integer.parseInt(params[0]);
-			cdb.update(id);
-			try {
-				Statement st = JDBCConfig.createStatement();
-				ResultSet rs = st.executeQuery("SELECT id FROM banners WHERE campaignid = " + id);
-				while (rs.next()) {
-					bannerid = rs.getInt("id");
-					db.update(bannerid, new StringArrayPageValidator());
-				}
-				st.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
+			hitlogsock.send("b");
+			if (passback != 0) {
+				hitlogsock.send("p");
 			}
-			bannerDebug("updatecampaign " + Arrays.toString(params));
-			return "Campaign " + id + " updated.";
-		case DELCAMPAIGN: // "delcampaign id"
-			id = Integer.parseInt(params[0]);
-			for (Banner delete_banner: cdb.get(id).getBanners()) {
-				db.delete(delete_banner.getID());
+			if (retInt.intValue() == 0) {
+				hitlogsock.send("f");
 			}
-			cdb.delete(id);
-			bannerDebug("deletecampaign "+ Arrays.toString(params));
-			return "Campaign " + id + " deleted.";
-		case QUIT: 
-			//Nothing needs to be done to cleanup a given connection right now, the client simply needs to drop connection.
-			return "Disconnecting...";
-		case STATS:
-			/*
-			$total = array();
-			foreach($slidingstats as $i => $stat)
-				foreach($stat as $k => $v)
-					if(!isset($total[$k]))
-						$total[$k] = $v;
-					else
-						$total[$k] += $v;
-			*/
-			ServerStat totalstat = new ServerStat();
-			for (ServerStat slidingstat: slidingstats) {
-				totalstat.get += slidingstat.get;
-				totalstat.getfail += slidingstat.getfail;
-				totalstat.connect += slidingstat.connect;
-				totalstat.click += slidingstat.click;
+		} catch (Exception ignored){}
+		
+		
+		retInt.free();
+		return retString;
+	}
+	
+	private String cmdAdd(String[] params) {
+		int id = Integer.parseInt(params[0]);
+		db.add(id, new StringArrayPageValidator());
+		bannerDebug("add " + Arrays.toString(params));
+		return "Banner " + id + " added.";
+	}
+	
+	private String cmdUpdate(String[] params) {
+		int id = Integer.parseInt(params[0]);
+		db.update(id, new StringArrayPageValidator());
+		bannerDebug("update " + Arrays.toString(params));
+		return "Banner " + id + " updated.";
+	}
+	
+	private String cmdDelete(String[] params) {
+		int id = Integer.parseInt(params[0]);
+		db.delete(id);
+		bannerDebug("delete " + Arrays.toString(params));
+		return "Banner " + id + " deleted.";
+	}
+	
+	private String cmdAddCampaign(String[] params) {
+		int id = Integer.parseInt(params[0]);
+		cdb.update(id);
+		try {
+			Statement st = JDBCConfig.createStatement();
+			ResultSet rs = st.executeQuery("SELECT id FROM banners WHERE campaignid = " + id);
+			while (rs.next()) {
+				int bannerid = rs.getInt("id");
+				db.update(bannerid, new StringArrayPageValidator());
 			}
-			
-			String out  = "Uptime: " + (System.currentTimeMillis()/1000 - stats.starttime) + "\n";
-			out += "Connect:  " + str_pad(stats.connect, 9) + " " + str_pad(totalstat.connect, 7) + " " + (slidingstats[(statstime+STATS_WINDOW-1)%STATS_WINDOW].connect) + "\n";
-			out += "Get:  " + str_pad(stats.get, 9) + " " + str_pad(totalstat.get, 7) + " " +  (slidingstats[(statstime+STATS_WINDOW-1)%STATS_WINDOW].get) + "\n";
-			out += "Get Fail:  " + str_pad(stats.getfail, 9) + " " + str_pad(totalstat.getfail, 7) + " " + (slidingstats[(statstime+STATS_WINDOW-1)%STATS_WINDOW].getfail) + "\n";
-			out += "Click:  " + str_pad(stats.click, 9) + " " + str_pad(totalstat.click, 7) + " " + (slidingstats[(statstime+STATS_WINDOW-1)%STATS_WINDOW].click) + "\n";
-			out += "Connections: " + currentConnected + "\n";
-			return out;
-			
-		case UPTIME:
-			long ms = System.currentTimeMillis() - this.creationTime;
-			int hours = (int) ms/3600000;
-			int minutes = (int) (ms-(hours*3600000))/60000;
-			int seconds = (int) ((ms-hours*3600000)-(minutes*60000))/1000; 
-			return "Uptime: " + hours + ":" + minutes + ":" + seconds + "\n";  
-			
-		case SHOW:
+			st.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		bannerDebug("updatecampaign " + Arrays.toString(params));
+		return "Campaign " + id + " updated.";
+	}
+	
+	private String cmdUpdateCampaign(String[] params) {
+		int id = Integer.parseInt(params[0]);
+		cdb.update(id);
+		try {
+			Statement st = JDBCConfig.createStatement();
+			ResultSet rs = st.executeQuery("SELECT id FROM banners WHERE campaignid = " + id);
+			while (rs.next()) {
+				int bannerid = rs.getInt("id");
+				db.update(bannerid, new StringArrayPageValidator());
+			}
+			st.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		bannerDebug("updatecampaign " + Arrays.toString(params));
+		return "Campaign " + id + " updated.";
+	}
+	
+	private String cmdDelCampaign(String[] params) {
+		int id = Integer.parseInt(params[0]);
+		for (Banner delete_banner: cdb.get(id).getBanners()) {
+			db.delete(delete_banner.getID());
+		}
+		cdb.delete(id);
+		bannerDebug("deletecampaign "+ Arrays.toString(params));
+		return "Campaign " + id + " deleted.";
+	}
+	
+	private String cmdQuit(String[] params) {
+		//Nothing needs to be done to cleanup a given connection right now, the client simply needs to drop connection.
+		return "Disconnecting...";
+	}
+	
+	private String cmdStats(String[] params) {
+		ServerStat totalstat = new ServerStat();
+		for (ServerStat slidingstat: slidingstats) {
+			totalstat.get += slidingstat.get;
+			totalstat.getfail += slidingstat.getfail;
+			totalstat.connect += slidingstat.connect;
+			totalstat.click += slidingstat.click;
+		}
+		int statstime = statstime();
+		String out  = "Uptime: " + (System.currentTimeMillis()/1000 - stats.starttime) + "\n";
+		out += "Connect:  " + str_pad(stats.connect, 9) + " " + str_pad(totalstat.connect, 7) + " " + (slidingstats[(statstime+STATS_WINDOW-1)%STATS_WINDOW].connect) + "\n";
+		out += "Get:  " + str_pad(stats.get, 9) + " " + str_pad(totalstat.get, 7) + " " +  (slidingstats[(statstime+STATS_WINDOW-1)%STATS_WINDOW].get) + "\n";
+		out += "Get Fail:  " + str_pad(stats.getfail, 9) + " " + str_pad(totalstat.getfail, 7) + " " + (slidingstats[(statstime+STATS_WINDOW-1)%STATS_WINDOW].getfail) + "\n";
+		out += "Click:  " + str_pad(stats.click, 9) + " " + str_pad(totalstat.click, 7) + " " + (slidingstats[(statstime+STATS_WINDOW-1)%STATS_WINDOW].click) + "\n";
+		out += "Connections: " + currentConnected + "\n";
+		return out;
+	}
+	
+	private String cmdUptime(String[] params) {
+		long ms = System.currentTimeMillis() - this.creationTime;
+		int hours = (int) ms/3600000;
+		int minutes = (int) (ms-(hours*3600000))/60000;
+		int seconds = (int) ((ms-hours*3600000)-(minutes*60000))/1000;
+		return "Uptime: " + hours + ":" + minutes + ":" + seconds + "\n";
+	}
+	
+	private String cmdShow(String[] params) {
+		if (params.length >= 1) {
 			if (debug.get(params[0]) != null) {
 				debug.put(params[0], Boolean.TRUE);
 				return params[0] + " is now " + debug.get(params[0]);
 			} else {
 				return params[0] + " is not a valid debug option.\n";
 			}
-		case HIDE:
+		} else {
+			return "Incorrect parameters, should be: show <flag>";
+		}
+	}
+	
+	private String cmdHide(String[] params) {
+		if (params.length >= 1) {
 			if (debug.get(params[0]) != null) {
+				
 				debug.put(params[0], Boolean.FALSE);
 				return params[0] + " is now " + debug.get(params[0]);
 			} else {
 				return params[0] + " is not a valid debug option.\n";
 			}
-		case SHUTDOWN: //dump stats, clean up most memory, and quit. Good for upgrading the server early :p
-			//socket_write(sock, "shutting down\n");
-			bannerDebug("shutting down");
-			daily(true);
-			//daily(debug[TIMEUPDATES]);
-			System.exit(0);
-			
-		case VERSION:
-			return CURRENT_VERSION;
-			
-		case RECONNECT:
-			if(params != null){
-				logserver = params[0];
-				logserver_port = Integer.parseInt(params[1]);
-			}
+		} else {
+			return "Incorrect parameters, should be: hide <flag>";
+		}
+	}
+	
+	//dump stats, clean up most memory, and quit. Good for upgrading the server early :p
+	private String cmdShutdown(String[] params) {
+		bannerDebug("shutting down");
+		daily(true);
+		System.exit(0);	
+		return "System shutdown.";
+	}
+	
+	private String cmdVersion(String[] params) {
+		return CURRENT_VERSION;	
+	}
+	
+	private String cmdReconnect(String[] params) {
+		if(params.length >= 2){
+			logserver = params[0];
+			logserver_port = Integer.parseInt(params[1]);
+		}
+		try {
 			if (logsock == null)
+
 				logsock = new EasyDatagramSocket();
+
 			logsock.connect(new InetSocketAddress(logserver, logserver_port));
 			logsock.setSoTimeout(20);
 			hitlogsock.connect(new InetSocketAddress(hitlogserver, hitlogserver_port));
 			hitlogsock.setSoTimeout(20);
 			return "success: " + logserver + "," + logserver_port + "\n" + "success: " + hitlogserver + "," + hitlogserver_port + "\n";
-		case LOGSTAT:
-			return (logsock.isConnected() ? "connected" : "not") + ": " + logserver + "," + logserver_port + "\n";
-		case MINUTELY:
-			minutely(this.debug.get("timeupdates").booleanValue());
-			return "Running minutely.";
-		case HOURLY:
-			hourly(this.debug.get("timeupdates").booleanValue());
-			return "Running hourly.";
-		case DAILY:
-			daily(this.debug.get("timeupdates").booleanValue());
-			return "Running daily.";
-		case CLICK:
-			if (debug.get("click").booleanValue()) {
-				bannerDebug("click " + Arrays.toString(params));
-			}
-			
-			bannerid=Integer.parseInt(params[0]);
-			b = db.getBannerByID(bannerid);
-			
-			this.bannerstats.getOrCreate(b, BannerStat.class).click();
-			this.campaignstats.getOrCreate(b.getCampaign(), BannerStat.class).click();
-			
-			stats.click++;
-			slidingstats[statstime%STATS_WINDOW].click++;
-			hitlogsock.send("c");
-			return "Clicked " + bannerid;
-		case RELOAD_COEFFICIENTS_CMD:
-			this.policy = new AdBlasterPolicy(db.getBanners());
-			return "Coefficients reloaded.";
-		case COLLECT_GARBAGE_CMD:
-			bannerDebug("Performing garbage collection...");
-			System.gc();
-			bannerDebug("Garbarge collection complete.");
-			return "Garbage collected.";
-		case MEMORY_STATS_CMD:
-			String stats = "banners: " + ObjectProfiler.sizeof(banners) + " bytes\n";
-			stats += "bannerstats: " + ObjectProfiler.sizeof(bannerstats) + " bytes\n";
-			stats += "campaignstats: " + ObjectProfiler.sizeof(campaignstats) + " bytes\n";
-			stats += "viewstats: " + ObjectProfiler.sizeof(viewstats) + " bytes\n";
-			stats += "clickstats: " + ObjectProfiler.sizeof(clickstats) + " bytes\n";
-			stats += "hourlystats: " + ObjectProfiler.sizeof(hourlystats) + " bytes\n";
-			stats += "viewMap: " + ObjectProfiler.sizeof(viewMap) + " bytes\n";
-			stats += "pageIDDominance: " + ObjectProfiler.sizeof(pageIDDominance) + " bytes\n";
-			stats += "sqlQueue: " + ObjectProfiler.sizeof(JDBCConfig.getSQLQueue()) + " bytes\n";
-			stats += "Database connection: " + JDBCConfig.sizeofCon() + " bytes\n";
-			stats += "recentviews: " + ObjectProfiler.sizeof(recentviews) + " bytes\n";
-			stats += "slidingstats: " + ObjectProfiler.sizeof(slidingstats) + " bytes\n";
-			return stats;
-		case BANNER_INFO_CMD:
-			bannerid=Integer.parseInt(params[0]);
-			b = db.getBannerByID(bannerid);
-			if (b != null) {
-				String bannerInfo = "Banner ID: " + b.getID() + "\n";
-				bannerInfo += "Campaign ID: " + b.getCampaign().getID() + "\n";
-				bannerInfo += "Size: " + b.getSize() + "\n";
-				bannerInfo += "Interests: " + b.getInterests() + "\n";
-				bannerInfo += "Locations: " + b.getLocations() + "\n";
-				bannerInfo += "Ages: " + b.getAges() + "\n";
-				bannerInfo += "Sexes: " + b.getSexes() + "\n";
-				bannerInfo += "Min Views Per Day: " + b.getMinViewsPerDay() + "\n";
-				bannerInfo += "Max Views Per Day: " + b.getIntegerMaxViewsPerDay() + "\n";
-				bannerInfo += "Max Views: " + b.getIntegerMaxViews() + "\n";
-				bannerInfo += "Views Per User: " + b.getIntegerMaxViewsPerUser() + "/" + b.getLimitByPeriod() + " seconds\n";
-				bannerInfo += "Pay Rate: " + b.getRealPayrate() + "\n";
-				bannerInfo += "Pay Type: " + b.getPayType() + "\n";
-				return bannerInfo;
-			} else {
-				return "Banner " + bannerid + " doesn't exist.";
-			}
-		case RECONNECT_DB_CMD:
-			if (JDBCConfig.initDBConnection(configFile)) {
-				return "Successfully reconnected to database.";
-			} else {
-				return "Failed to reconnect to database.";
-			}
-		case SIMULATE_GET_CMD:
-		{
-			//BannerServer.stats.get++;
-			//slidingstats[statstime].get++;
-			
-			int usertime=Integer.parseInt(params[0]);
-			int size=Integer.parseInt(params[1]); 
-			int userid=Integer.parseInt(params[2]); 
-			byte age=Byte.parseByte(params[3]); 
-			byte sex=Byte.parseByte(params[4]); 
-			short loc=Short.parseShort(params[5]); 
-			String interestsStr=params[6]; 
-			String page=params[7]; 
-			int passback=Integer.parseInt(params[8]);
-			boolean debugGet=Boolean.parseBoolean(params[9]);
-			int pageid=Integer.parseInt(params[10]);
-
-			Interests interests = new Interests(interestsStr, false);
-			
-			if(passback != 0)
-				passbackBanner(passback, userid);
-			
-			OutputStream str = new ByteArrayOutputStream();
-			Utilities.setDebugLog(str);
-			getBestBanner(usertime, size, userid, age, sex, loc, interests, page, pageid, true);
-			return str.toString();
+		} catch (Exception e) {
+			return "Reconnect failed with exception: " + e;
 		}
-		default:
-			System.out.println("Unknown command: '" + cmd + "' Params: '" + Arrays.toString(params) + "'");
-			//throw new UnsupportedOperationException("Command:" + cmd + " : Params: " + Arrays.toString(params));			
-		}
-		return "Command not found.";
 	}
-
 	
-	//banner server command functions
-/*			BannerServer.registerCommand("GET", "cmdGet");
-			BannerServer.registerCommand("PASSBACK", "cmdPassback");
-			BannerServer.registerCommand("ADD", "cmdAdd");
-			BannerServer.registerCommand("DELETE", "cmdDelete");
-			BannerServer.registerCommand("UPDATE", "cmdUpdate");
-			BannerServer.registerCommand("ADDCAMPAIGN", "cmdAddCampaign");
-			BannerServer.registerCommand("DELCAMPAIGN", "cmdDelCampaign");
-			BannerServer.registerCommand("UPDATECAMPAIGN", "cmdUpdateCampaign");
-			BannerServer.registerCommand("QUIT", "cmdQuit");
-			BannerServer.registerCommand("STATS", "cmdStats");
-			BannerServer.registerCommand("UPTIME", "cmdUptime");
-			BannerServer.registerCommand("SHOW", "cmdShow");
-			BannerServer.registerCommand("HIDE", "cmdHide");
-			BannerServer.registerCommand("SHUTDOWN", "cmdShutdown");
-			BannerServer.registerCommand("VERSION", "cmdVersion");
-			BannerServer.registerCommand("RECONNECT", "cmdReconnect");
-			BannerServer.registerCommand("LOGSTAT", "cmdLogStat");
-			BannerServer.registerCommand("GETFAIL", "cmdGetFail");
-			BannerServer.registerCommand("MINUTELY", "cmdMinutely");
-			BannerServer.registerCommand("HOURLY", "cmdHourly");
-			BannerServer.registerCommand("DAILY", "cmdDaily");
-			BannerServer.registerCommand("CLICK", "cmdClick");
-			BannerServer.commands.put(RELOAD_COEFFICIENTS, BannerServer.class.getMethod("cmdReloadCoeffecients", parameters));
-			BannerServer.commands.put(COLLECT_GARBAGE, BannerServer.class.getMethod("cmdCollectGarbage", parameters));
-			BannerServer.commands.put(MEMORY_STATS, BannerServer.class.getMethod("cmdMemoryStats", parameters));
-			BannerServer.commands.put(BANNER_INFO, BannerServer.class.getMethod("cmdBannerInfo", parameters));
-			BannerServer.commands.put(RECONNECT_DB, BannerServer.class.getMethod("cmdReconnectDB", parameters));
-			BannerServer.commands.put(SIMULATE_GET, BannerServer.class.getMethod("cmdSimulateGet", parameters));
-			BannerServer.commands.put(RELOAD_FROM_DB, BannerServer.class.getMethod("cmdReloadFromDB", parameters));
-*/
-	private String cmdDefault(String[] params) {
-		return "Command not found.";
+	private String cmdLogStat(String[] params) {
+		return (logsock.isConnected() ? "connected" : "not") + ": " + logserver + "," + logserver_port + "\n";
+	}
+	
+	private String cmdMinutely(String[] params) {
+		minutely(this.debug.get("timeupdates").booleanValue());
+		return "Running minutely.";
+	}
+	
+	private String cmdHourly(String[] params) {
+		hourly(this.debug.get("timeupdates").booleanValue());
+		return "Running hourly.";
+	}
+	private String cmdDaily(String[] params) {
+		daily(this.debug.get("timeupdates").booleanValue());
+		return "Running daily.";
+	}
+	
+	private String cmdClick(String[] params) {
+		if (debug.get("click").booleanValue()) {
+			bannerDebug("click " + Arrays.toString(params));
+		}
+		
+		int bannerid=Integer.parseInt(params[0]);
+		Banner b = db.getBannerByID(bannerid);
+		
+		this.bannerstats.getOrCreate(b, BannerStat.class).click();
+		this.campaignstats.getOrCreate(b.getCampaign(), BannerStat.class).click();
+		
+		stats.click++;
+		slidingstats[statstime()].click++;
+		try {
+			hitlogsock.send("c");
+		} catch (Exception e) {
+			bannerDebug("Error connecting to hit log server for click.");
+		}
+		return "Clicked " + bannerid;
+	}
+	
+	private String cmdReloadCoefficients(String[] params) {
+		//this.policy = new AdBlasterPolicy(db.getBanners());
+		//return "Coefficients reloaded.";
+		return "Reloading of coefficients is disabled under classic bannerserver serving policy.";
+	}
+	
+	private String cmdCollectGarbage(String[] params) {
+		bannerDebug("Performing garbage collection...");
+		System.gc();
+		bannerDebug("Garbarge collection complete.");
+		return "Garbage collected.";
+	}
+	
+	private String cmdMemoryStats(String[] params) {
+		String stats = "banners: " + ObjectProfiler.sizeof(banners) + " bytes\n";
+		stats += "bannerstats: " + ObjectProfiler.sizeof(bannerstats) + " bytes\n";
+		stats += "campaignstats: " + ObjectProfiler.sizeof(campaignstats) + " bytes\n";
+		stats += "viewstats: " + ObjectProfiler.sizeof(viewstats) + " bytes\n";
+		stats += "clickstats: " + ObjectProfiler.sizeof(clickstats) + " bytes\n";
+		stats += "hourlystats: " + ObjectProfiler.sizeof(hourlystats) + " bytes\n";
+		stats += "viewMap: " + ObjectProfiler.sizeof(viewMap) + " bytes\n";
+		stats += "pageIDDominance: " + ObjectProfiler.sizeof(pageIDDominance) + " bytes\n";
+		stats += "sqlQueue: " + ObjectProfiler.sizeof(JDBCConfig.getSQLQueue()) + " bytes\n";
+		stats += "Database connection: " + JDBCConfig.sizeofCon() + " bytes\n";
+		stats += "recentviews: " + ObjectProfiler.sizeof(recentviews) + " bytes\n";
+		stats += "slidingstats: " + ObjectProfiler.sizeof(slidingstats) + " bytes\n";
+		return stats;
+	}
+	
+	private String cmdBannerInfo(String[] params) {
+		int bannerid=Integer.parseInt(params[0]);
+		Banner b = db.getBannerByID(bannerid);
+		if (b != null) {
+			String bannerInfo = "Banner ID: " + b.getID() + "\n";
+			bannerInfo += "Campaign ID: " + b.getCampaign().getID() + "\n";
+			bannerInfo += "Size: " + b.getSize() + "\n";
+			bannerInfo += "Interests: " + b.getInterests() + "\n";
+			bannerInfo += "Locations: " + b.getLocations() + "\n";
+			bannerInfo += "Ages: " + b.getAges() + "\n";
+			bannerInfo += "Sexes: " + b.getSexes() + "\n";
+			bannerInfo += "Min Views Per Day: " + b.getMinViewsPerDay() + "\n";
+			bannerInfo += "Max Views Per Day: " + b.getIntegerMaxViewsPerDay() + "\n";
+			bannerInfo += "Max Views: " + b.getIntegerMaxViews() + "\n";
+			bannerInfo += "Views Per User: " + b.getIntegerMaxViewsPerUser() + "/" + b.getLimitByPeriod() + " seconds\n";
+			bannerInfo += "Pay Rate: " + b.getRealPayrate() + "\n";
+			bannerInfo += "Pay Type: " + b.getPayType() + "\n";
+			return bannerInfo;
+		} else {
+			return "Banner " + bannerid + " doesn't exist.";
+		}
+	}
+	
+	private String cmdReconnectDB(String[] params) {
+		if (JDBCConfig.initDBConnection(configFile)) {
+			return "Successfully reconnected to database.";
+		} else {
+			return "Failed to reconnect to database.";
+		}
+	}
+	
+	private String cmdSimulateGet(String[] params) {
+		int usertime=Integer.parseInt(params[0]);
+		int size=Integer.parseInt(params[1]);
+		int userid=Integer.parseInt(params[2]);
+		byte age=Byte.parseByte(params[3]);
+		byte sex=Byte.parseByte(params[4]);
+		short loc=Short.parseShort(params[5]);
+		String interestsStr=params[6];
+		String page=params[7];
+		int passback=Integer.parseInt(params[8]);
+		boolean debugGet=Boolean.parseBoolean(params[9]);
+		int pageid=Integer.parseInt(params[10]);
+		
+		Interests interests = new Interests(interestsStr, false);
+		
+		if(passback != 0)
+			passbackBanner(passback, userid);
+		
+		OutputStream str = new ByteArrayOutputStream();
+		Utilities.setDebugLog(str);
+		getBestBanner(usertime, size, userid, age, sex, loc, interests, page, pageid, true);
+		return str.toString();
+	}
+	
+	private String cmdReloadFromDB(String params[]) {
+		//TODO:
+		return "Implement this.";
 	}
 	
 	private String format(String[] params) {
