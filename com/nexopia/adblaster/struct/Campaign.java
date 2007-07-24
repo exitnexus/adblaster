@@ -123,16 +123,16 @@ public class Campaign extends ServablePropertyHolder{
 				interests, page, pageDominance, debug);		
 		
 		if (b1) {
-			if (BannerServer.debug.get("development").booleanValue())
-				System.out.println("Campaign " + this.toString() + " is: " + (b1?"empty":"non-empty") + ":" + (b2?"invalid":"valid"));
+			//if (BannerServer.debug.get("development").booleanValue())
+			//	System.out.println("Campaign " + this.toString() + " is: " + (b1?"empty":"non-empty") + ":" + (b2?"invalid":"valid"));
 			if (debug)
 				Utilities.bannerDebug("Bannerset is empty.");
 			return hs;
 		}
 		
 		if (b2){
-			if (BannerServer.debug.get("development").booleanValue())
-				System.out.println("Campaign " + this.toString() + " is: " + (b1?"empty":"non-empty") + ":" + (b2?"invalid":"valid"));
+			//if (BannerServer.debug.get("development").booleanValue())
+			//	System.out.println("Campaign " + this.toString() + " is: " + (b1?"empty":"non-empty") + ":" + (b2?"invalid":"valid"));
 			if (debug)
 				Utilities.bannerDebug("Campaign doesn't match parameters.");
 			return hs;

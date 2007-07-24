@@ -152,7 +152,6 @@ public class NIOServer {
 		if (lastHour <= DAILY_HOURS_OFFSET) {
 			lastDay--;
 		} 
-		
 		while (true) {
 			if (System.currentTimeMillis()-time > 1000) {
 				if (banners.debug.get("tick").booleanValue()) {
@@ -231,12 +230,12 @@ public class NIOServer {
 			// For each keys...
 			while(i.hasNext()) {
 				SelectionKey key = (SelectionKey) i.next();
-
+				
 				// Remove the current key
 				i.remove();
 				if (key.isConnectable()) {
 					handleConnectable(key);
-				} else if (key.isReadable() && key.isWritable()) {
+				} else if (key.isReadable()) {
 					handleReadableWritable(key);
 				}
 			}
@@ -257,7 +256,6 @@ public class NIOServer {
 	}
 	
 	private void handleReadableWritable(SelectionKey key) throws IOException {
-//		System.out.println("In the block.");
 		BufferedSocketChannel client = socketMap.get( key.channel() );
 		client.sc = (SocketChannel)key.channel();
 		
@@ -268,7 +266,7 @@ public class NIOServer {
 				String result = null;
 				try {
 					if (banners.debug.get("development").booleanValue()) {
-						BannerServer.bannerDebug(strbuf.toString());
+						BannerServer.bannerDebug("Received: " + strbuf.toString());
 					}
 					if (strbuf.toString().toUpperCase().startsWith("QUIT")) {
 						client.sc.close();

@@ -84,6 +84,7 @@ public class BannerServer {
 	private static HashMap<String, Method> commands = new HashMap<String,Method>();
 	private static void registerCommand(String command, String methodName) {
 		Class[] parameters = {String[].class};
+		command = command.toUpperCase();
 		try {
 			BannerServer.commands.put(command, BannerServer.class.getDeclaredMethod(methodName, parameters));
 		} catch (NoSuchMethodException e) {
@@ -236,11 +237,6 @@ public class BannerServer {
 		}
 		 
 		 this.creationTime = System.currentTimeMillis();
-	}
-	
-	//reinitialize everything that is database backed
-	public void reset() {
-		
 	}
 	
 	public boolean addCampaign(int id){
@@ -520,6 +516,7 @@ public class BannerServer {
 	
 	public String receive(String command) throws IOException{
 		String[] split = command.split(" ");
+		command = split[0];
 		Method commandMethod = commands.get("DEFAULT");
 		String[] params;
 		if (split.length > 1){
@@ -528,7 +525,6 @@ public class BannerServer {
 			boolean first = true;
 			for (String s : split) {
 				if (first) {
-					commandMethod = commands.get(s.trim().toUpperCase());
 					first = false;
 				} else {
 					params[i] = s.trim();
@@ -537,13 +533,13 @@ public class BannerServer {
 			}
 		} else {
 			params = new String[0];
-			commandMethod = commands.get(command.trim().toUpperCase());
 		}
-		
-		//System.out.println(cmd);
-		
+		commandMethod = commands.get(command.trim().toUpperCase());
+
+		System.err.println("Execute " + command);
 		try {
-			return (String)commandMethod.invoke(this, (Object[])params);
+			Object[] methodArgs = {params};
+			return (String)commandMethod.invoke(this, methodArgs);
 		} catch (Exception e) {
 			bannerDebug("Error attempting to handle command: " + command);
 			e.printStackTrace();
@@ -1045,7 +1041,78 @@ public class BannerServer {
 	}
 	
 	private String cmdReloadFromDB(String params[]) {
+		/*
+		 *debug.put("tick", config.getBoolean("tick"));
+		debug.put("connect", config.getBoolean("connect"));
+		debug.put("get", config.getBoolean("get"));
+		debug.put("getlog", config.getBoolean("getlog"));
+		debug.put("getfail", config.getBoolean("getfail"));
+		debug.put("click", config.getBoolean("click"));
+		debug.put("timeupdates", config.getBoolean("timeupdates"));
+		debug.put("dailyrestart", config.getBoolean("dailyrestart"));
+		debug.put("passback", config.getBoolean("passback"));
+		debug.put("development", config.getBoolean("development"));
+		
+		configFile = config;
+		
+		this.currentConnected = 0;
+		this.viewMap = new LowMemMultiMap();
+		this.banners = new Vector<Banner>();
+		this.viewstats = new FastMap<Integer,TypeStat>();
+		this.clickstats = new FastMap<Integer,TypeStat>();
+		this.campaignstats = new FastMap<Campaign,BannerStat>();
+		this.hourlystats = new FastMap<Banner,HourlyStat>();
+		this.pageIDDominance = new IntObjectHashMap<IntObjectHashMap<int[]>>();
+		
+		while (recentviews.size() < VIEW_WINDOWS) {
+			recentviews.add(new HashMap<Integer, Vector<Integer>>());
+		}
+		this.currentwindow = 0;
+		this.policy = new OldPolicy(cdb);
+		//this.policy = new AdBlasterPolicy(db.getBanners());
+		
+		Object args1[] = {};
+
+		PageValidatorFactory factory = new PageValidatorFactory(StringArrayPageValidator.class,args1);
+		
+		this.cdb = new CampaignDB(factory);
+		this.db = new BannerDatabase(cdb, factory);
+		
+		
+		JDBCConfig.initThreadedSQLQueue();
+		this.numservers = numservers;
+		this.bannerstats = new FastMap<Banner, BannerStat>();
+		for(int i = 0; i < sizes_array.length; i++) {
+			Integer size = BannerServer.sizes_array[i];
+			this.viewstats.put(size, new TypeStat());
+			this.clickstats.put(size, new TypeStat());
+		}
+		stats = new ServerStat();
+		slidingstats = new ServerStat[STATS_WINDOW];
+		for (int i = 0; i < slidingstats.length; i++){
+			slidingstats[i] = new ServerStat();
+		}
+		
+		try {
+			
+			logsock = new EasyDatagramSocket();
+			hitlogsock = new EasyDatagramSocket();
+			
+			logserver = config.getString("log_host");
+			hitlogserver = config.getString("hit_log_host");
+			logserver_port = config.getInt("log_port");
+			hitlogserver_port = config.getInt("hit_log_port");
+			logsock.connect(new InetSocketAddress(logserver, logserver_port));
+			hitlogsock.connect(new InetSocketAddress(hitlogserver, hitlogserver_port));
+			logsock.setSoTimeout(20);
+			hitlogsock.setSoTimeout(20);
+		} catch (SocketException e) {
+			e.printStackTrace();
+		}
+		 
+		 this.creationTime = System.currentTimeMillis();*/
 		//TODO:
+		System.err.println("W00T!");
 		return "Implement this.";
 	}
 	
