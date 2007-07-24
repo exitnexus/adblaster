@@ -1,5 +1,8 @@
 package com.nexopia.adblaster;
 
+import com.nexopia.adblaster.util.XMLInterestsConverter;
+import com.nexopia.adblaster.util.XMLTimeTableConverter;
+import com.thoughtworks.xstream.XStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -126,6 +129,7 @@ public class BannerServer {
 		BannerServer.registerCommand(RECONNECT_DB, "cmdReconnectDB");
 		BannerServer.registerCommand(SIMULATE_GET, "cmdSimulateGet");
 		BannerServer.registerCommand(RELOAD_FROM_DB, "cmdReloadFromDB");
+		BannerServer.registerCommand("XML", "cmdXML");
 	}
 	
 	
@@ -1063,6 +1067,10 @@ public class BannerServer {
 		return "Banner and campaign data reloaded from the database.";
 	}
 	
+	private String cmdXML(String params[]) {
+		return this.toXML();
+	}
+	
 	private String format(String[] params) {
 		StringBuffer str = new StringBuffer("");
 		for (int i = 0; i < params.length; i++){
@@ -1095,6 +1103,17 @@ public class BannerServer {
 	
 	public BannerStat getBannerStat(Banner b) {
 		return this.bannerstats.get(b);
+	}
+	
+	public String toXML() {
+		XStream xstream = new XStream();
+		xstream.registerConverter(new XMLInterestsConverter());
+		xstream.registerConverter(new XMLTimeTableConverter());
+		xstream.alias("integer", Integer.class);
+		xstream.alias("banner", Integer.class);
+		String xml = "";
+		xml += xstream.toXML(this.db.getBanners());
+		return xml;
 	}
 
 }

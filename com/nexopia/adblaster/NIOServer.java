@@ -48,8 +48,11 @@ public class NIOServer {
 			this.sc.close();
 		}
 		public int write(ByteBuffer output) throws IOException {
-			return this.sc.write(output);
-			
+			int length = output.array().length;
+			while (output.hasRemaining()) {
+				this.sc.write(output);
+			}
+			return length;
 		}
 		
 		/**

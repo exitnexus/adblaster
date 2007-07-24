@@ -21,7 +21,6 @@ import com.nexopia.adblaster.util.PageValidator;
 import com.nexopia.adblaster.util.Utilities;
 
 
-
 public class Banner extends ServablePropertyHolder {
 	public static final int PAYRATE_INHERIT = -1;
 	public static final int PAYTYPE_CPM = 0;

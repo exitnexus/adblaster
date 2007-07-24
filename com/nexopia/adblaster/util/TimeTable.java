@@ -227,6 +227,11 @@ public class TimeTable {
 		//Utilities.bannerDebug("Checking time for day " + d + " and hour " + h + ". - " + this.allowed[d][h] );
 		return this.allowed[d][h];
 	}
+	
+	public Vector<String> validRanges() {
+		return this.validRanges;
+	}
+	
 	/**
 	 * @param args
 	 */
