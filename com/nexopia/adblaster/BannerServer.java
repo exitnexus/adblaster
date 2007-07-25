@@ -4,6 +4,7 @@ import com.nexopia.adblaster.util.XMLIntIntHashMapConverter;
 import com.nexopia.adblaster.util.XMLIntObjectHashMapConverter;
 import com.nexopia.adblaster.util.XMLInterestsConverter;
 import com.nexopia.adblaster.util.XMLTimeTableConverter;
+import com.nexopia.adblaster.util.XMLTypeStatConverter;
 import com.thoughtworks.xstream.XStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -539,7 +540,6 @@ public class BannerServer {
 		}
 		commandMethod = commands.get(command.trim().toUpperCase());
 
-		System.err.println("Execute " + command);
 		try {
 			Object[] methodArgs = {params};
 			return (String)commandMethod.invoke(this, methodArgs);
@@ -1112,8 +1112,11 @@ public class BannerServer {
 		xstream.registerConverter(new XMLTimeTableConverter());
 		xstream.registerConverter(new XMLIntIntHashMapConverter());
 		xstream.registerConverter(new XMLIntObjectHashMapConverter());
+		xstream.registerConverter(new XMLTypeStatConverter());
 		xstream.alias("integer", Integer.class);
-		xstream.alias("banner", Integer.class);
+		xstream.alias("banner", Banner.class);
+		xstream.alias("typestat", TypeStat.class);
+		
 		String xml = "";
 		xml += xstream.toXML(this);
 		return xml;
