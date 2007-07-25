@@ -1,5 +1,7 @@
 package com.nexopia.adblaster;
 
+import com.nexopia.adblaster.util.XMLIntIntHashMapConverter;
+import com.nexopia.adblaster.util.XMLIntObjectHashMapConverter;
 import com.nexopia.adblaster.util.XMLInterestsConverter;
 import com.nexopia.adblaster.util.XMLTimeTableConverter;
 import com.thoughtworks.xstream.XStream;
@@ -237,8 +239,7 @@ public class BannerServer {
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}
-		 
-		 this.creationTime = System.currentTimeMillis();
+		this.creationTime = System.currentTimeMillis();
 	}
 	
 	public boolean addCampaign(int id){
@@ -1109,10 +1110,12 @@ public class BannerServer {
 		XStream xstream = new XStream();
 		xstream.registerConverter(new XMLInterestsConverter());
 		xstream.registerConverter(new XMLTimeTableConverter());
+		xstream.registerConverter(new XMLIntIntHashMapConverter());
+		xstream.registerConverter(new XMLIntObjectHashMapConverter());
 		xstream.alias("integer", Integer.class);
 		xstream.alias("banner", Integer.class);
 		String xml = "";
-		xml += xstream.toXML(this.db.getBanners());
+		xml += xstream.toXML(this);
 		return xml;
 	}
 

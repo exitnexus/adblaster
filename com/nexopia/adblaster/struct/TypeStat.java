@@ -10,6 +10,7 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.zip.GZIPOutputStream;
+import java.util.Vector;
 
 import com.nexopia.adblaster.util.IntIntHashMap;
 import com.nexopia.adblaster.util.IntObjectHashMap;
