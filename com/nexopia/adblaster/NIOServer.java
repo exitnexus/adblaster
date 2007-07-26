@@ -63,7 +63,12 @@ public class NIOServer {
 		 */
 		public int read(StringBuffer strbuf) throws IOException {
 			buffer.clear();
-			int i = this.sc.read(buffer);
+			int i = 0;
+			try {
+				this.sc.read(buffer);
+			} catch (IOException ioe) {
+				return -1;
+			}
 			
 			if (i == -1){
 				strbuf.append(previous_str);
@@ -288,6 +293,9 @@ public class NIOServer {
 														ObjectProfiler.sizeof(server)) 
 														+ " bytes\n";
 						result += banners.receive(strbuf.toString());
+					} else if (strbuf.toString().toUpperCase().startsWith("RESET")) {
+						this.banners = new BannerServer(NUM_SERVERS, config);
+						result = "Reinitialized the banner server.";
 					} else {
 						//The banner server deals with any commands except a server reset.
 						result = banners.receive(strbuf.toString());

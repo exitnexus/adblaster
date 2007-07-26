@@ -90,17 +90,16 @@ public class BannerDatabase {
 			int i = 0;
 			while (rs.next()) {
 				int id = rs.getInt("ID");
-				if (!precheck || (Banner.precheck(rs) &&
+				try {
+					if (!precheck || (Banner.precheck(rs) &&
 						cdb.get(rs.getInt("CAMPAIGNID")).precheck())) {
-					try {
 						Banner b = new Banner(rs, cdb, pvfactory.make());
 						banners.put(id, b);
 						bannerList.add(b);
-					} catch (SQLException e){
-						System.out.println("This probably indicates a bad campaign. Continue if you know what you're doing.");
-						e.printStackTrace();
+						i++;
 					}
-					i++;
+				} catch (Exception e){
+					System.err.println("Error prechecking a campaign, likely a missing campaign for banner " + id);
 				}
 			}
 			System.out.println("Total: " + i + " banners.");
