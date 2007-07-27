@@ -624,10 +624,6 @@ public class BannerServer {
 	
 	@SuppressWarnings("unchecked")
 	public void daily(boolean debug) {
-		Collection<Banner> banners = (Collection<Banner>)this.db.getBanners();
-		for (Banner b: banners) {
-			daily(b, debug);
-		}
 		long time = System.currentTimeMillis()/1000;
 		for (Integer size: sizes_array) {
 			TypeStat views = viewstats.get(size);
@@ -638,15 +634,7 @@ public class BannerServer {
 			//System.err.println("****" + "INSERT INTO " + JDBCConfig.BANNERTYPESTAT_TABLE + " SET size = "+size+", time = "+time+", views = "+views.total+", clicks = "+clicks.total+", viewsdump = '"+views.toXML()+"', clicksdump = '"+clicks.toXML()+"'" + "****");
 		}
 		JDBCConfig.finishQueries(); //Waits until the queue is empty.
-	}
-	
-	public void daily(Banner b, boolean debug) {
-		BannerStat stats = bannerstats.get(b);
-		if (stats == null) {
-			stats = new BannerStat();
-			bannerstats.put(b, stats);
-		}
-		stats.clearDaily();
+		this.reload();
 	}
 	
 	//records statistics, indicates a new connection was made.
@@ -1047,7 +1035,10 @@ public class BannerServer {
 		minutely(true);
 		hourly(true);
 		daily(true);
-		
+		return "Banner and campaign data reloaded from the database.";
+	}
+	
+	private void reload() {
 		this.viewstats = new FastMap<Integer,TypeStat>();
 		this.clickstats = new FastMap<Integer,TypeStat>();
 		this.campaignstats = new FastMap<Campaign,BannerStat>();
@@ -1064,8 +1055,6 @@ public class BannerServer {
 			this.viewstats.put(size, new TypeStat());
 			this.clickstats.put(size, new TypeStat());
 		}
-		
-		return "Banner and campaign data reloaded from the database.";
 	}
 	
 	private String cmdXML(String params[]) {
