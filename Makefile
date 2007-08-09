@@ -4,7 +4,7 @@ JAVAC=javac
 JFLAGS=
 JAVA_CLASSPATH=.:$(JARS)
 JAVA_DEPENDENCIES=${wildcard com/nexopia/adblaster/*.java}
-REVISION=${subst :,,${subst $$,,$$Rev$$}}
+REVISION=${strip ${subst Rev,,${subst :,,${subst $$,,$$Rev$$}}}}
 
 .java.class:
 	${JAVAC} ${JFLAGS} -classpath ${JAVA_CLASSPATH} $<
