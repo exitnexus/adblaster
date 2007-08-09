@@ -28,4 +28,11 @@ jar: rebuild
 	cd jar.build ;	jar cvf ../adblaster-r${REVISION}.jar `find . -name '*.class'`
 	rm -rf jar.build
 
+pristine: realclean
+
+proper: realclean
+
+realclean: clean
+	rm -f adblaster-r*.jar
+
 rebuild: clean all
