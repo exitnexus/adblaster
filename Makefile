@@ -4,6 +4,7 @@ JAVAC=javac
 JFLAGS=
 JAVA_CLASSPATH=.:$(JARS)
 JAVA_DEPENDENCIES=${wildcard com/nexopia/adblaster/*.java}
+REVISION=${subst :,,${subst $$,,$$Rev$$}}
 
 .java.class:
 	${JAVAC} ${JFLAGS} -classpath ${JAVA_CLASSPATH} $<
@@ -24,7 +25,7 @@ jar: rebuild
 	for JAR_FILE in ${subst :, ,${JARS}}; do \
 		cd jar.build ; jar xvf ../$${JAR_FILE} ; \
 	done
-	cd jar.build ;	jar cvf ../adblaster-`date +%Y-%m-%d`.jar `find . -name '*.class'`
+	cd jar.build ;	jar cvf ../adblaster-r${REVISION}.jar `find . -name '*.class'`
 	rm -rf jar.build
 
 rebuild: clean all
