@@ -36,7 +36,6 @@ jar: rebuild
 package: jar
 	mkdir adblaster-r${REVISION}
 	cp adblaster-r${REVISION}.jar ${subst :, ,${JARS}} adblaster-r${REVISION}
-	ln -s ../adblaster.config adblaster-r${REVISION}/banner.config
 	tar cfv adblaster-r${REVISION}.tar adblaster-r${REVISION}
 	rm -rf adblaster-r${REVISION}
 
