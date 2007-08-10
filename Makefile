@@ -32,6 +32,9 @@ jar: rebuild
 	cd jar.build ;	jar cvfm ../adblaster-r${REVISION}.jar manifest `find . -name '*.class'`
 	rm -rf jar.build
 
+package: jar
+	tar cfv adblaster-r${REVISION}.tar *.jar
+
 potentialcheck: all
 	java ${JAVA_FLAGS} -classpath ${JAVA_CLASSPATH} com/nexopia/adblaster/PotentialChecker 2
 
@@ -41,5 +44,8 @@ proper: realclean
 
 realclean: clean
 	rm -f adblaster-r*.jar
+	rm -f adblaster-r*.tar
 
 rebuild: clean all
+
+tar: package
