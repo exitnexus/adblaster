@@ -1,5 +1,5 @@
 .SUFFIXES: .java .class
-JARS=jdbc-mysql.jar:xpp3_min-1.1.3.4.0.jar:xstream-1.2.jar
+JARS=jdbc-mysql.jar:xpp3_min-1.1.3.4.O.jar:xstream-1.2.jar
 JAVA_FLAGS=-Xmx256M
 JAVAC=javac
 JAVAC_FLAGS=
@@ -33,7 +33,7 @@ jar: rebuild
 	rm -rf jar.build
 
 package: jar
-	tar cfv adblaster-r${REVISION}.tar *.jar
+	tar cfv adblaster-r${REVISION}.tar adblaster-r${REVISION}.jar ${subst :, ,${JARS}}
 
 potentialcheck: all
 	java ${JAVA_FLAGS} -classpath ${JAVA_CLASSPATH} com/nexopia/adblaster/PotentialChecker 2
@@ -46,6 +46,6 @@ realclean: clean
 	rm -f adblaster-r*.jar
 	rm -f adblaster-r*.tar
 
-rebuild: clean all
+rebuild: realclean all
 
 tar: package
