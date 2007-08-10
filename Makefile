@@ -22,14 +22,12 @@ clean:
 jar: rebuild
 	mkdir jar.build
 	echo 'Manifest-Version: 1.0' > jar.build/manifest
+	echo 'Class-Path: ' ${subst :, ,${JARS}} >> jar.build/manifest
 	echo "Created-By: `whoami`@`hostname --fqdn`" >> jar.build/manifest
+	echo 'Main-Class: com.nexopia.adblaster.NIOServer' >> jar.build/manifest
 	echo 'Package-Title: AdBlaster' >> jar.build/manifest
 	echo 'Package-Version: r${REVISION}' >> jar.build/manifest
-	echo 'Main-Class: com.nexopia.adblaster.NIOServer' >> jar.build/manifest
 	find . -name '*.class' -print0 | xargs --null --replace cp --parents '{}' jar.build
-	for JAR_FILE in ${subst :, ,${JARS}}; do \
-		cd jar.build ; jar xvf ../$${JAR_FILE} ; \
-	done
 	cd jar.build ;	jar cvfm ../adblaster-r${REVISION}.jar manifest `find . -name '*.class'`
 	rm -rf jar.build
 
