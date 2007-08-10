@@ -17,6 +17,7 @@ all: ${JAVA_DEPENDENCIES:.java=.class}
 
 clean:
 	find . -name '*.class' -print0 | xargs --null rm -f
+	find . -type d -wholename './adblaster-r*' -print0 | xargs --null rm -rf
 	rm -rf jar.build
 	rm -f run.sh
 
@@ -33,7 +34,10 @@ jar: rebuild
 	rm -rf jar.build
 
 package: jar
-	tar cfv adblaster-r${REVISION}.tar adblaster-r${REVISION}.jar ${subst :, ,${JARS}}
+	mkdir adblaster-r${REVISION}
+	cp adblaster-r${REVISION}.jar ${subst :, ,${JARS}} adblaster-r${REVISION}
+	tar cfv adblaster-r${REVISION}.tar adblaster-r${REVISION}
+	rm -rf adblaster-r${REVISION}
 
 potentialcheck: all
 	java ${JAVA_FLAGS} -classpath ${JAVA_CLASSPATH} com/nexopia/adblaster/PotentialChecker 2
