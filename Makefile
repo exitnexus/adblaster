@@ -11,15 +11,15 @@ REVISION=${strip ${subst Rev,,${subst :,,${subst $$,,$$Rev$$}}}}
 	${JAVAC} ${JAVAC_FLAGS} -classpath ${JAVA_CLASSPATH} $<
 
 all: ${JAVA_DEPENDENCIES:.java=.class}
-	echo '#!/bin/sh' >run.sh
-	echo 'java ${JAVA_FLAGS} -classpath ${JAVA_CLASSPATH} com/nexopia/adblaster/NIOServer' >>run.sh
-	chmod +x run.sh
+	echo '#!/bin/sh' >nioserver.sh
+	echo 'java ${JAVA_FLAGS} -classpath ${JAVA_CLASSPATH} com/nexopia/adblaster/NIOServer' >>nioserver.sh
+	chmod +x nioserver.sh
 
 clean:
 	find . -name '*.class' -print0 | xargs --null rm -f
-	find . -type d -wholename './adblaster-r*' -print0 | xargs --null rm -rf
+	find . -type d -wholename './adblaster-nioserver-r*' -print0 | xargs --null rm -rf
 	rm -rf jar.build
-	rm -f run.sh
+	rm -f nioserver.sh
 
 jar: rebuild
 	mkdir jar.build
@@ -30,14 +30,14 @@ jar: rebuild
 	echo 'Package-Title: AdBlaster' >> jar.build/manifest
 	echo 'Package-Version: r${REVISION}' >> jar.build/manifest
 	find . -name '*.class' -print0 | xargs --null --replace cp --parents '{}' jar.build
-	cd jar.build ;	jar cvfm ../adblaster-r${REVISION}.jar manifest `find . -name '*.class'`
+	cd jar.build ;	jar cvfm ../adblaster-nioserver-r${REVISION}.jar manifest `find . -name '*.class'`
 	rm -rf jar.build
 
 package: jar
-	mkdir adblaster-r${REVISION}
-	cp adblaster-r${REVISION}.jar ${subst :, ,${JARS}} adblaster-r${REVISION}
-	tar cfv adblaster-r${REVISION}.tar adblaster-r${REVISION}
-	rm -rf adblaster-r${REVISION}
+	mkdir adblaster-nioserver-r${REVISION}
+	cp adblaster-nioserver-r${REVISION}.jar ${subst :, ,${JARS}} adblaster-nioserver-r${REVISION}
+	tar cfv adblaster-nioserver-r${REVISION}.tar adblaster-nioserver-r${REVISION}
+	rm -rf adblaster-nioserver-r${REVISION}
 
 potentialcheck: all
 	java ${JAVA_FLAGS} -classpath ${JAVA_CLASSPATH} com/nexopia/adblaster/PotentialChecker 2
@@ -47,8 +47,8 @@ pristine: realclean
 proper: realclean
 
 realclean: clean
-	rm -f adblaster-r*.jar
-	rm -f adblaster-r*.tar
+	rm -f adblaster-nioserver-r*.jar
+	rm -f adblaster-nioserver-r*.tar
 
 rebuild: realclean all
 
