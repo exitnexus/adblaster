@@ -21,6 +21,8 @@ clean:
 	rm -rf jar.build
 	rm -f nioserver.sh
 
+distclean: realclean
+
 jar: rebuild
 	mkdir jar.build
 	echo 'Manifest-Version: 1.0' > jar.build/manifest
