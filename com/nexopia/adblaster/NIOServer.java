@@ -11,13 +11,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
-import com.nexopia.adblaster.db.BannerDatabase;
-import com.nexopia.adblaster.db.CampaignDB;
 import com.nexopia.adblaster.db.JDBCConfig;
 import com.nexopia.adblaster.struct.ConfigFile;
-import com.nexopia.adblaster.util.StringArrayPageValidator;
-import com.nexopia.adblaster.util.FlatFilePageValidator;
-import com.nexopia.adblaster.util.PageValidatorFactory;
 import com.nexopia.adblaster.util.Integer;
 import com.vladium.utils.ObjectProfiler;
 
