@@ -65,7 +65,7 @@ public class NIOServer {
 			buffer.clear();
 			int i = 0;
 			try {
-				this.sc.read(buffer);
+				i = this.sc.read(buffer);
 			} catch (IOException ioe) {
 				return -1;
 			}
