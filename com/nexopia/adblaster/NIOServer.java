@@ -24,7 +24,7 @@ public class NIOServer {
 	Charset charset=Charset.forName("ISO-8859-1");
 	HashMap <SocketChannel, BufferedSocketChannel> socketMap;
 	private static ConfigFile config;
-	public static final long SELECTOR_TIMEOUT = 5; //ms
+	public static final long SELECTOR_TIMEOUT = 500; //ms
 	
 	class BufferedSocketChannel{
 		String previous_str = "";

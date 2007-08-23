@@ -1058,9 +1058,14 @@ public class BannerServer {
 	}
 	
 	private String cmdXML(String params[]) {
-		return this.toXML();
+		return this.addHeader(this.toXML());
 	}
 	
+	private String addHeader(String output) {
+		output = "BANNER_HEADER:"+(output.length()+1) +"\n"+ output;
+		return output;
+	}
+
 	private String format(String[] params) {
 		StringBuffer str = new StringBuffer("");
 		for (int i = 0; i < params.length; i++){
