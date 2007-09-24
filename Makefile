@@ -5,7 +5,7 @@ JAVAC=javac
 JAVAC_FLAGS=
 JAVA_CLASSPATH=.:$(JARS)
 JAVA_DEPENDENCIES=${wildcard com/nexopia/adblaster/*.java}
-REVISION=${strip ${subst Rev,,${subst :,,${subst $$,,$$Rev$$}}}}
+REVISION=${shell svn info | grep 'Revision' | sed -e 's/[^0-9]//g'}
 
 .java.class:
 	${JAVAC} ${JAVAC_FLAGS} -classpath ${JAVA_CLASSPATH} $<
