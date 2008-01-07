@@ -43,7 +43,7 @@ jar-adblaster: all
 	echo 'Package-Version: r${REVISION}' >> $@.jar.build/manifest
 	find . -name '*.class' -print0 | xargs --null --replace cp --parents '{}' $@.jar.build
 	cd $@.jar.build ;	jar cvfm ../adblaster-r${REVISION}.jar manifest `find . -name '*.class'`
-#	rm -rf $@.jar.build
+	rm -rf $@.jar.build
 
 jar-logserver: all
 	mkdir $@.jar.build
@@ -55,7 +55,7 @@ jar-logserver: all
 	echo 'Package-Version: r${REVISION}' >> $@.jar.build/manifest
 	find . -name '*.class' -print0 | xargs --null --replace cp --parents '{}' $@.jar.build
 	cd $@.jar.build ;	jar cvfm ../adblaster-logserver-r${REVISION}.jar manifest `find . -name '*.class'`
-#	rm -rf $@.jar.build
+	rm -rf $@.jar.build
 
 jar-nioserver: all
 	mkdir $@.jar.build
@@ -67,7 +67,7 @@ jar-nioserver: all
 	echo 'Package-Version: r${REVISION}' >> $@.jar.build/manifest
 	find . -name '*.class' -print0 | xargs --null --replace cp --parents '{}' $@.jar.build
 	cd $@.jar.build ;	jar cvfm ../adblaster-nioserver-r${REVISION}.jar manifest `find . -name '*.class'`
-#	rm -rf $@.jar.build
+	rm -rf $@.jar.build
 
 package: package-adblaster package-logserver package-nioserver
 
