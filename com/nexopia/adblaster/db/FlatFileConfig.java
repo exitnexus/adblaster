@@ -16,8 +16,8 @@ public class FlatFileConfig {
 		dayBefore(); 
 		File directory = null;
 		int counter = 0;
-		while ((directory == null || !directory.canRead()) && counter < 1000)) {
-			String folder = "DB_" + calendar.get(Calendar.YEAR) + "-" + calendar.get(Calendar.MONTH) + '-' + calendar.get(Calendar.DAY_OF_MONTH);
+		while ((directory == null || !directory.canRead()) && counter < 1000) {
+			String folder = "DB_" + calendar.get(Calendar.YEAR) + "-" + calendar.get(Calendar.MONTH) + "-" + calendar.get(Calendar.DAY_OF_MONTH);
 			directory = new File(folder);
 			dayBefore();
 			counter++;
@@ -39,7 +39,7 @@ public class FlatFileConfig {
 		return defaultDay;
 	}
 	
-	private static int dayBefore() {
-		calendar.setTimeInMillis(callender.getTimeInMillis()-86400000);
+	private static void dayBefore() {
+		calendar.add(Calendar.DAY_OF_YEAR, -1);
 	}
 }
