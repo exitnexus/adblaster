@@ -17,7 +17,7 @@ public class FlatFileConfig {
 		File directory = null;
 		int counter = 0;
 		while ((directory == null || !directory.canRead()) && counter < 1000) {
-			String folder = "DB_" + calendar.get(Calendar.YEAR) + "-" + calendar.get(Calendar.MONTH) + "-" + calendar.get(Calendar.DAY_OF_MONTH);
+			String folder = String.format("DB_%1$tF", calendar);
 			directory = new File(folder);
 			dayBefore();
 			counter++;
