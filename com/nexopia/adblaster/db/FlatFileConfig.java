@@ -7,18 +7,20 @@ public class FlatFileConfig {
 	public static final int FILE_COUNT = 100;
 	public static File defaultDirectory = null;
 	public static int defaultDay = 0;
-	
+	private static Calendar calendar = Calendar.getInstance();
+
 	public static File getDefaultDirectory() {
 		if (defaultDirectory != null) {
 			return defaultDirectory;
 		}
-		Calendar c = Calendar.getInstance();
-		int day = dayBefore(c.get(Calendar.DAY_OF_YEAR)); 
+		dayBefore(); 
 		File directory = null;
-		
-		while ((directory == null || !directory.canRead()) && day != c.get(Calendar.DAY_OF_YEAR)) {
-			directory = new File("DB_" + day);
-			day = dayBefore(day);
+		int counter = 0;
+		while ((directory == null || !directory.canRead()) && counter < 1000)) {
+			String folder = "DB_" + calendar.get(Calendar.YEAR) + "-" + calendar.get(Calendar.MONTH) + '-' + calendar.get(Calendar.DAY_OF_MONTH);
+			directory = new File(folder);
+			dayBefore();
+			counter++;
 		}
 		
 		if (!directory.canRead()) {
@@ -37,11 +39,7 @@ public class FlatFileConfig {
 		return defaultDay;
 	}
 	
-	private static int dayBefore(int day) {
-		if (day <= 0) {
-			return 366;
-		} else {
-			return day-1;
-		}
+	private static int dayBefore() {
+		calendar.setTimeInMillis(callender.getTimeInMillis()-86400000);
 	}
 }

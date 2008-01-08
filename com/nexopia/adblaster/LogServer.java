@@ -33,9 +33,11 @@ public class LogServer {
 		
 		private void init() throws IOException {
 			day = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
-			userWriter = new UserFlatFileWriter("DB_" + day, true);
-			bannerViewWriter = new BannerViewFlatFileWriter("DB_" + day, true);
-			pageWriter = new PageFlatFileDatabase("DB_" + day, true);
+			Calendar c = Calendar.getInstance();
+			String folder = "DB_" + c.get(Calendar.YEAR) + "-" + c.get(Calendar.MONTH) + '-' + c.get(Calendar.DAY_OF_MONTH);
+			userWriter = new UserFlatFileWriter(folder, true);
+			bannerViewWriter = new BannerViewFlatFileWriter(folder, true);
+			pageWriter = new PageFlatFileDatabase(folder, true);
 		}
 		
 		synchronized public void renew() {
